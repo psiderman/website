@@ -1,0 +1,66 @@
+@font-face {
+  font-family: "General Sans";
+  src:
+    local("General Sans Extralight"),
+    local("GeneralSans-Extralight"),
+    url("GeneralSans-Extralight.woff") format("woff"),
+    url("GeneralSans-Extralight.woff2") format("woff2");
+  font-weight: 200;
+  font-style: "normal";
+  font-display: "swap";
+}
+@font-face {
+  font-family: "General Sans";
+  src:
+    local("General Sans Light"),
+    local("GeneralSans-Light"),
+    url("GeneralSans-Light.woff2") format("woff"),
+    url("GeneralSans-Light.woff") format("woff2");
+  font-weight: 300;
+  font-style: "normal";
+  font-display: "swap";
+}
+@font-face {
+  font-family: "General Sans";
+  src:
+    local("General Sans Regular"),
+    local("GeneralSans-Regular"),
+    url("GeneralSans-Regular.woff") format("woff"),
+    url("GeneralSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: "normal";
+  font-display: "swap";
+}
+@font-face {
+  font-family: "General Sans";
+  src:
+    local("General Sans Medium"),
+    local("GeneralSans-Medium"),
+    url("GeneralSans-Medium.woff") format("woff"),
+    url("GeneralSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: "normal";
+  font-display: "swap";
+}
+@font-face {
+  font-family: "General Sans";
+  src:
+    local("General Sans Semibold"),
+    local("GeneralSans-Semibold"),
+    url("GeneralSans-Semibold.woff") format("woff"),
+    url("GeneralSans-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: "normal";
+  font-display: "swap";
+}
+@font-face {
+  font-family: "General Sans";
+  src:
+    local("General Sans Bold"),
+    local("GeneralSans-Bold"),
+    url("GeneralSans-Bold.woff") format("woff") url("GeneralSans-Bold.woff2")
+      format("woff2");
+  font-weight: 700;
+  font-style: "normal";
+  font-display: "swap";
+}
