@@ -1,6 +1,7 @@
 <script setup>
 import Leftbar from "@/components/home/Leftbar.vue";
 import WorkCard from "@/components/home/WorkCard.vue";
+import NowCard from "@/components/home/NowCard.vue";
 </script>
 
 <template>
@@ -13,7 +14,7 @@ import WorkCard from "@/components/home/WorkCard.vue";
     <!-- Right bar -->
     <div class="grid min-h-fit w-full grid-cols-2 gap-10">
       <WorkCard />
-      <div class="card"></div>
+      <NowCard />
       <div class="card"></div>
       <div class="grid grid-cols-2 gap-10">
         <div class="card card-small"></div>

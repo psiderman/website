@@ -1,3 +1,7 @@
+<script setup>
+import Description from "./CardDescription.vue";
+</script>
+
 <template>
   <div class="card group/quizizz">
     <div class="relative inset-0 -mt-4 h-full w-full">
@@ -33,16 +37,13 @@
         >
       </div>
     </div>
-    <div class="absolute bottom-0 flex flex-col p-6">
-      <div class="flex flex-row items-center gap-2 text-white/90">
-        <img src="@/assets/duotone/work.svg" alt="laptop icon" class="h-6" />
-        Design Work
-      </div>
-      <span class="text-xs text-white/60"
-        >I’ve been a product designer for ≈5y, specializing in desktop design &
-        design systems.</span
-      >
-    </div>
+    <Description
+      title="Design Work"
+      description="I’ve been a product designer for ≈5y, specializing in desktop design &
+        design systems."
+    >
+      <img src="@/assets/duotone/work.svg" alt="laptop icon" class="h-6" />
+    </Description>
   </div>
 </template>
 
