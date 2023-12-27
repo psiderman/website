@@ -7,7 +7,7 @@ body {
   @apply text-white;
   background: radial-gradient(
     50% 50% at 50% 50%,
-    hsla(240, 4%, 11%) 0%,
+    hsla(240, 4%, 13%) 0%,
     hsla(240, 6%, 10%) 100%
   );
 }
