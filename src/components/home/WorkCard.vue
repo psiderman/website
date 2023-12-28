@@ -36,6 +36,11 @@ import Description from "./CardDescription.vue";
           >❖ Product Design at</span
         >
       </div>
+      <img
+        class="absolute inset-0 m-auto translate-x-20 translate-y-16 opacity-0 transition-all duration-500 group-hover/quizizz:translate-x-16 group-hover/quizizz:translate-y-6 group-hover/quizizz:opacity-100"
+        src="@/assets/svg/figma-arrow.svg"
+        alt="arrow"
+      />
     </div>
     <Description
       title="Design Work"
@@ -45,9 +50,3 @@ import Description from "./CardDescription.vue";
     />
   </div>
 </template>
-
-<style lang="postcss" scoped>
-.card:hover {
-  cursor: url("@/assets/svg/figma-arrow.svg"), auto;
-}
-</style>

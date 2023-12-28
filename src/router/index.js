@@ -8,6 +8,17 @@ const router = createRouter({
       name: "Home",
       component: () => import("../views/Home.vue"),
     },
+    {
+      path: "/design",
+      component: () => import("../pages/Blog.vue"),
+      children: [
+        {
+          path: "",
+          name: "Design - Quizizz",
+          component: () => import("../views/Design.vue"),
+        },
+      ],
+    },
   ],
 });
 

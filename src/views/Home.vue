@@ -3,6 +3,8 @@ import Leftbar from "@/components/home/Leftbar.vue";
 import WorkCard from "@/components/home/WorkCard.vue";
 import NowCard from "@/components/home/NowCard.vue";
 import LinkCard from "@/components/home/LinkCard.vue";
+
+import { RouterLink } from "vue-router";
 </script>
 
 <template>
@@ -14,7 +16,9 @@ import LinkCard from "@/components/home/LinkCard.vue";
 
     <!-- Right bar -->
     <div class="grid min-h-fit w-full grid-cols-2 gap-10">
-      <WorkCard />
+      <RouterLink to="/design">
+        <WorkCard />
+      </RouterLink>
       <NowCard />
       <div class="grid grid-cols-2 gap-10">
         <a href="https://owensans.vercel.app" target="_blank">
