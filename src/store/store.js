@@ -4,9 +4,9 @@ import { defineStore } from "pinia";
 export const useStore = defineStore("store", () => {
   const localStore = JSON.parse(localStorage.getItem("store")) || {};
 
-  const lastLogin = ref(localStore.lastLogin || new Date());
+  const animatedOnce = ref(localStore.animatedOnce || false);
 
   return {
-    lastLogin,
+    animatedOnce,
   };
 });

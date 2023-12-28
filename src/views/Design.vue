@@ -1,6 +1,6 @@
 <script setup></script>
 <template>
-  <div class="w640 mb-6">
+  <div class="w640 anime-entry mb-6">
     <img
       src="@/assets/svg/quizizz.svg"
       alt="Quizizz Logo"
@@ -31,25 +31,35 @@
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img src="@/assets/design/qtcs/01.png" />
-      <img src="@/assets/design/qtcs/02.png" />
-      <img src="@/assets/design/qtcs/03.png" />
-      <img src="@/assets/design/qtcs/04.png" />
+      <img class="anime-entry" src="@/assets/design/qtcs/01.png" />
+      <img class="anime-entry" src="@/assets/design/qtcs/02.png" />
+      <img class="anime-entry" src="@/assets/design/qtcs/03.png" />
+      <img class="anime-entry" src="@/assets/design/qtcs/04.png" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
-  <p class="caption">A sneak peek of the case study</p>
+  <p class="caption anime-entry">A sneak peek of the case study</p>
 
   <!-- Design System -->
 
-  <!-- <h2>Design System</h2>
-  <p>I am responsible forever, for the design system that I tamed</p>
-  <div
-    class="large aspect-video overflow-hidden rounded-3xl bg-black outline outline-white/10"
-  ></div> -->
+  <h2>Design System</h2>
+  <p>
+    I created and maintained three iterations of the design system in Figma+Code
+    to be used by 16 designers and 50+ engineers.
+  </p>
+  <div class="aspect-video">
+    <div class="gallery-scroll">
+      <div class="gallery-spacer"></div>
+      <img class="anime-entry" src="@/assets/design/ds/01.png" />
+      <div class="gallery-spacer"></div>
+    </div>
+  </div>
+  <p class="caption anime-entry">
+    I'm putting together a case study for this rn...
+  </p>
 
   <!-- Lessons -->
-  <h2>Lessons, 2020</h2>
+  <!-- <h2>Lessons, 2020</h2>
   <p>
     What happens when you take informational slides and marry them with the
     interactivity of a quiz game? You kill ‘death by slides’. The sole two
@@ -59,10 +69,10 @@
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img src="@/assets/design/lessons/01.png" />
-      <img src="@/assets/design/lessons/02.png" />
-      <img src="@/assets/design/lessons/03.png" />
-      <img src="@/assets/design/lessons/04.gif" />
+      <img class="anime-entry" src="@/assets/design/lessons/01.png" />
+      <img class="anime-entry" src="@/assets/design/lessons/02.png" />
+      <img class="anime-entry" src="@/assets/design/lessons/03.png" />
+      <img class="anime-entry" src="@/assets/design/lessons/04.gif" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
@@ -74,7 +84,7 @@
       class="underline"
       >here</a
     >
-  </p>
+  </p> -->
 
   <!-- Motion -->
   <h2>Motion and Interaction</h2>
@@ -85,7 +95,7 @@
     small things will likely outlive the other work I've done.
   </p>
   <div class="large grid grid-cols-4 grid-rows-2 gap-10">
-    <div class="motion-card col-span-2 row-span-2 p-4">
+    <div class="motion-card anime-entry col-span-2 row-span-2 p-4">
       <video
         src="@/assets/design/motion/graphing.mp4"
         class="h-full w-full object-contain"
@@ -94,7 +104,7 @@
         loop
       ></video>
     </div>
-    <div class="motion-card">
+    <div class="motion-card anime-entry">
       <video
         src="@/assets/design/motion/spin.mp4"
         class="h-full w-full object-contain"
@@ -103,7 +113,7 @@
         loop
       ></video>
     </div>
-    <div class="motion-card">
+    <div class="motion-card anime-entry">
       <video
         src="@/assets/design/motion/calc.mp4"
         class="h-full w-full object-contain"
@@ -112,7 +122,7 @@
         loop
       ></video>
     </div>
-    <div class="motion-card">
+    <div class="motion-card anime-entry">
       <video
         src="@/assets/design/motion/mbox.mp4"
         class="h-full w-full object-contain"
@@ -121,7 +131,7 @@
         loop
       ></video>
     </div>
-    <div class="motion-card">
+    <div class="motion-card anime-entry">
       <video
         src="@/assets/design/motion/live.mp4"
         class="h-full w-full object-contain"

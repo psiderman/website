@@ -5,6 +5,54 @@ import NowCard from "@/components/home/NowCard.vue";
 import LinkCard from "@/components/home/LinkCard.vue";
 
 import { RouterLink } from "vue-router";
+import { onMounted } from "vue";
+import anime from "animejs";
+
+import { useStore } from "../store/store";
+const store = useStore();
+
+onMounted(() => {
+  if (store.animatedOnce) return;
+  const entrance = anime.timeline({});
+  entrance
+    .add(
+      {
+        targets: ".leftbar-headshot",
+        translateY: ["1rem", "0"],
+        opacity: [0, 1],
+        scale: [0.95, 1],
+        transformOrigin: "center",
+        duration: 500,
+        easing: "easeOutBack",
+        delay: anime.stagger(100),
+      },
+      0,
+    )
+    .add(
+      {
+        targets: ".pill",
+        translateY: ["1rem", "0"],
+        opacity: [0, 1],
+        scale: [0.95, 1],
+        transformOrigin: "center",
+        duration: 500,
+        easing: "easeOutBack",
+        delay: anime.stagger(100),
+      },
+      0,
+    );
+  entrance.add({
+    targets: ".card",
+    translateY: ["3rem", "0"],
+    opacity: [0, 1],
+    scale: [0.95, 1],
+    transformOrigin: "center",
+    duration: 500,
+    easing: "easeOutBack",
+    delay: anime.stagger(100),
+  });
+  store.animatedOnce = true;
+});
 </script>
 
 <template>
@@ -51,7 +99,7 @@ import { RouterLink } from "vue-router";
 .card {
   @apply relative h-80 rounded-3xl border border-white/5 bg-white/[2%];
   @apply select-none;
-  @apply grayscale transition-all duration-200 hover:grayscale-0;
+  @apply grayscale transition-colors duration-200 hover:grayscale-0;
   @apply hover:border-white/10 hover:bg-white/[4%];
 }
 

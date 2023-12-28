@@ -2,12 +2,19 @@
 defineProps({
   text: String,
   brand: String,
+  icon: String,
 });
 </script>
 <template>
   <button class="pill">
     <slot name="icon"></slot>
     <fa v-if="brand" class="w-min text-[14px]" :icon="['fab', brand]" />
+    <img
+      v-if="icon"
+      class="h-5 w-min"
+      src="@/assets/duotone/read-cv.svg"
+      alt="logo"
+    />
     {{ text }}
   </button>
 </template>

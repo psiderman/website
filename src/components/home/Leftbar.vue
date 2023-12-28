@@ -63,17 +63,20 @@ function copyEmail(event) {
     <!-- Quick intro -->
     <div class="flex flex-col gap-y-8">
       <div
-        class="pointer-events-none relative h-16 w-16 select-none rounded-full bg-blue-600"
+        class="leftbar-headshot pointer-events-none relative h-16 w-16 select-none rounded-full bg-blue-600"
       >
         <div
           class="absolute bottom-0 h-20 w-16 overflow-hidden rounded-b-full align-bottom"
         >
-          <img class="h-20 w-20 object-cover" src="@/assets/images/dp.png" />
+          <img
+            class="leftbar-dp h-20 w-20 object-cover"
+            src="@/assets/images/dp.png"
+          />
         </div>
       </div>
       <div class="flex flex-col gap-y-4">
-        <h1 class="text-4xl font-bold">Hi, I’m Karan</h1>
-        <p class="text-base font-medium">
+        <h1 class="leftbar-headshot text-4xl font-bold">Hi, I’m Karan</h1>
+        <p class="leftbar-headshot text-base font-medium">
           I’m still searching for a one-liner to sum me up, but until then my
           life is a bento box of endless interests, neatly packed for display on
           my ever-evolving personal website.
@@ -82,7 +85,7 @@ function copyEmail(event) {
     </div>
 
     <!-- Socials/External Links -->
-    <div class="flex w-full flex-row flex-wrap gap-2">
+    <div class="pills flex w-full flex-row flex-wrap gap-2">
       <Pill text="hi@psiderman.com" @click="copyEmail">
         <template v-slot:icon>
           <img src="@/assets/duotone/envelope.svg" />
@@ -96,6 +99,9 @@ function copyEmail(event) {
       </a>
       <a href="https://www.youtube.com/watch?v=xvFZjo5PgG0" target="_blank">
         <Pill text="Reddit" brand="reddit-alien" />
+      </a>
+      <a href="https://psiderman.read.cv" target="_blank">
+        <Pill text="Read.cv" icon="read-cv" />
       </a>
     </div>
   </div>

@@ -4,7 +4,6 @@ const data = [
     id: 1,
     caption: "Third year in a row! One of these days, I'll see him live.",
     url: new URL("../assets/now/01.jpeg", import.meta.url).toString(),
-    contain: true,
   },
   {
     id: 2,
@@ -15,7 +14,7 @@ const data = [
   {
     id: 3,
     caption:
-      "The only time I travelled this month was to apply for a visa. This only looks like a fancy bus. I don't like sleeper buses anymore.",
+      "The only time I travelled this month was to apply for a visa. This looks like a fancy bus. Looks can be deceptive.",
     url: new URL("../assets/now/03.jpeg", import.meta.url).toString(),
   },
   {
@@ -29,7 +28,7 @@ const data = [
 <template>
   <div class="large grid select-none grid-cols-4 gap-4">
     <div
-      class="aspect-long overflow-hidden rounded-lg bg-black outline outline-white/10"
+      class="anime-entry aspect-long overflow-hidden rounded-lg bg-black outline outline-white/10"
       v-for="image in data"
       :key="image.id"
     >
@@ -45,14 +44,6 @@ const data = [
     </div>
   </div>
   <h1 class="mb-4">What am I doing now?</h1>
-  <div class="-mt-12 text-xs text-white/50">
-    This is a
-    <a href="https://nownownow.com/about" target="_blank" class="underline"
-      >/now page</a
-    >
-    inspired by Derek Sivers.
-  </div>
-
   <h3>December 31, 2023</h3>
   <ul>
     <li>
@@ -74,11 +65,18 @@ const data = [
       this point in life; not alone. So, I'm pressing pause on Kiwi as well.
     </li>
     <li>
-      I resumed therapy again. Who knew quitting your job and giving your
+      I resumed therapy again. Who knew quitting your job and giving up your
       apartment would mean having to work through some uncomfortable thoughts?
       Not me!
     </li>
   </ul>
+  <p>
+    This is a
+    <a href="https://nownownow.com/about" target="_blank" class="underline"
+      >/now page</a
+    >
+    inspired by Derek Sivers.
+  </p>
 </template>
 
 <style lang="postcss" scoped></style>

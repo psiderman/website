@@ -3,7 +3,7 @@ import Description from "./CardDescription.vue";
 </script>
 
 <template>
-  <div class="card group/quizizz">
+  <div class="card group/quizizz workcard">
     <div class="relative inset-0 -mt-4 h-full w-full">
       <!-- Logo -->
       <img

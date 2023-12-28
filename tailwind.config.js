@@ -30,7 +30,7 @@ export default {
       auto: "auto",
       square: "1 / 1",
       video: "16 / 9",
-      long: "1 / 2",
+      long: "9 / 16",
     },
     backdropBlur: ({ theme }) => theme("blur"),
     backdropBrightness: ({ theme }) => theme("brightness"),
