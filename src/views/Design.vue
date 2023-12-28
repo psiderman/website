@@ -25,15 +25,19 @@
     Quizizz. Between 2021 and 2023, we added 12 new question types, of which I
     designed 9, and led the designs for 3 more.
   </p>
-  <div
-    class="large aspect-video overflow-hidden rounded-3xl bg-black outline outline-white/10"
-  >
-    <iframe
-      class="h-full w-full"
-      src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FLkCRAdMMkn96M9tcssY0DL%2FQuestion-Types-Case-Study%3Fpage-id%3D0%253A1%26type%3Ddesign%26node-id%3D1-2%26viewport%3D45%252C407%252C0.02%26t%3DsccFd2Q6j2ULAXZD-1%26scaling%3Dscale-down-width%26mode%3Ddesign%26hide-ui%3D1%26hotspot-hints%3D0"
-      allowfullscreen
-    ></iframe>
+
+  <div class="large aspect-video">
+    <div class="gallery-scroll">
+      <div class="gallery-spacer"></div>
+      <img src="@/assets/design/qtcs/01.png" />
+      <img src="@/assets/design/qtcs/02.png" />
+      <img src="@/assets/design/qtcs/03.png" />
+      <img src="@/assets/design/qtcs/04.png" />
+      <div class="gallery-spacer"></div>
+    </div>
   </div>
+  <p class="caption">A sneak peek of the case study</p>
+
   <h2>Design System</h2>
   <p>I am responsible forever, for the design system that I tamed</p>
   <div

@@ -2,35 +2,42 @@
 const data = [
   {
     id: 1,
-    caption: "I need a balcony like this in Bangalore.",
+    caption: "Third year in a row! One of these days, I'll see him live.",
     url: new URL("../assets/now/01.jpeg", import.meta.url).toString(),
+    contain: true,
   },
   {
     id: 2,
-    caption: "Poker with Monopoly money.",
+    caption:
+      "I can't ever seem to get the recipe right for sabudana khichdi. Mum made foods hits differently.",
     url: new URL("../assets/now/02.jpeg", import.meta.url).toString(),
   },
   {
     id: 3,
-    caption: "I can't ever seem to get the recipe right for sabudana khichdi.",
+    caption:
+      "The only time I travelled this month was to apply for a visa. This only looks like a fancy bus. I don't like sleeper buses anymore.",
     url: new URL("../assets/now/03.jpeg", import.meta.url).toString(),
   },
   {
     id: 4,
-    caption: "My bicycle cards have seen a lot of action.",
+    caption:
+      "My bicycle cards have seen a lot of action, and they continue to make their way to /r/WellWorn",
     url: new URL("../assets/now/04.jpeg", import.meta.url).toString(),
   },
 ];
 </script>
 <template>
-  <div class="grid grid-cols-4 gap-4">
+  <div class="large grid grid-cols-4 gap-4">
     <div
       class="aspect-long overflow-hidden rounded-lg bg-black outline outline-white/10"
       v-for="image in data"
       :key="image.id"
     >
       <img
-        class="h-full w-full object-cover"
+        :class="[
+          'h-full w-full',
+          image.contain ? 'object-contain' : 'object-cover',
+        ]"
         :src="image.url"
         :alt="image.caption"
         :title="image.caption"
