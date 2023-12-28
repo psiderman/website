@@ -12,6 +12,22 @@ import { useStore } from "../store/store";
 const store = useStore();
 
 onMounted(() => {
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach((card) => {
+    card.addEventListener("mousemove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`;
+      card.style.setProperty("background", gradient);
+    });
+
+    card.addEventListener("mouseleave", () => {
+      card.style.setProperty("background", "hsla(0,0%,100%,2%)");
+    });
+  });
+
   if (store.animatedOnce) return;
   const entrance = anime.timeline({});
   entrance
@@ -97,13 +113,18 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .card {
-  @apply relative h-80 rounded-3xl border border-white/5 bg-white/[2%];
+  @apply relative h-80 overflow-hidden rounded-3xl border border-white/5 bg-white/[2%];
   @apply select-none;
   @apply grayscale transition-colors duration-200 hover:grayscale-0;
-  @apply hover:border-white/10 hover:bg-white/[4%];
+  @apply hover:border-white/10;
 }
 
-.figma-arrow:hover {
-  cursor: url("@/assets/svg/figma-arrow.svg"), auto;
+.card::before {
+  content: "";
+  @apply absolute inset-0;
+  opacity: 0.3;
+  background-image: url(../assets/images/noise.png);
+  background-repeat: repeat;
+  background-size: 100px;
 }
 </style>
