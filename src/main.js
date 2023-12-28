@@ -14,15 +14,19 @@ import {
   faRedditAlien,
 } from "@fortawesome/free-brands-svg-icons";
 
+import VueLazyload from "vue3-lazyload";
+
 const app = createApp(App);
 const pinia = createPinia();
 
-app.use(router);
 app.use(pinia);
+app.use(router);
 
 library.add();
 library.add(faTwitter, faDribbble, faRedditAlien);
 
 app.component("fa", FontAwesomeIcon);
+
+app.use(VueLazyload);
 
 app.mount("#app");

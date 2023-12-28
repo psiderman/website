@@ -3,13 +3,11 @@ import Leftbar from "@/components/home/Leftbar.vue";
 import WorkCard from "@/components/home/WorkCard.vue";
 import NowCard from "@/components/home/NowCard.vue";
 import LinkCard from "@/components/home/LinkCard.vue";
+import TravelCard from "@/components/home/TravelCard.vue";
 
 import { RouterLink } from "vue-router";
 import { onMounted } from "vue";
 import anime from "animejs";
-
-import { useStore } from "../store/store";
-const store = useStore();
 
 onMounted(() => {
   const cards = document.querySelectorAll(".card");
@@ -28,7 +26,6 @@ onMounted(() => {
     });
   });
 
-  if (store.animatedOnce) return;
   const entrance = anime.timeline({});
   entrance
     .add(
@@ -67,7 +64,6 @@ onMounted(() => {
     easing: "easeOutBack",
     delay: anime.stagger(100),
   });
-  store.animatedOnce = true;
 });
 </script>
 
@@ -85,6 +81,9 @@ onMounted(() => {
       </RouterLink>
       <RouterLink to="/now">
         <NowCard />
+      </RouterLink>
+      <RouterLink to="/backpacking">
+        <TravelCard />
       </RouterLink>
       <div class="grid grid-cols-2 gap-10">
         <a href="https://owensans.vercel.app" target="_blank">

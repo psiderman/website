@@ -30,6 +30,17 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/backpacking",
+      component: () => import("../pages/Blog.vue"),
+      children: [
+        {
+          path: "",
+          name: "Backpacking",
+          component: () => import("../views/Travel.vue"),
+        },
+      ],
+    },
   ],
 });
 

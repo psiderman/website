@@ -40,24 +40,6 @@
   </div>
   <p class="caption anime-entry">A sneak peek of the case study</p>
 
-  <!-- Design System -->
-
-  <h2>Design System</h2>
-  <p>
-    I created and maintained three iterations of the design system in Figma+Code
-    to be used by 16 designers and 50+ engineers.
-  </p>
-  <div class="aspect-video">
-    <div class="gallery-scroll">
-      <div class="gallery-spacer"></div>
-      <img class="anime-entry" src="@/assets/design/ds/01.png" />
-      <div class="gallery-spacer"></div>
-    </div>
-  </div>
-  <p class="caption anime-entry">
-    I'm putting together a case study for this rn...
-  </p>
-
   <!-- Lessons -->
   <!-- <h2>Lessons, 2020</h2>
   <p>
@@ -141,6 +123,24 @@
       ></video>
     </div>
   </div>
+
+  <!-- Design System -->
+
+  <h2>Design System</h2>
+  <p>
+    I created and maintained three iterations of the design system in Figma+Code
+    to be used by 16 designers and 50+ engineers.
+  </p>
+  <div class="aspect-video">
+    <div class="gallery-scroll">
+      <div class="gallery-spacer"></div>
+      <img class="anime-entry" src="@/assets/design/ds/01.png" />
+      <div class="gallery-spacer"></div>
+    </div>
+  </div>
+  <p class="caption anime-entry">
+    I'm putting together a case study for this rn...
+  </p>
 </template>
 
 <style lang="postcss" scoped>

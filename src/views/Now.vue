@@ -36,8 +36,9 @@ const data = [
         :class="[
           'h-full w-full',
           image.contain ? 'object-contain' : 'object-cover',
+          image.caption ? 'cursor-help' : '',
         ]"
-        :src="image.url"
+        v-lazy="image.url"
         :alt="image.caption"
         :title="image.caption"
       />
