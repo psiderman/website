@@ -87,22 +87,13 @@ onMounted(() => {
       </RouterLink>
       <div class="grid grid-cols-2 gap-10">
         <a href="https://owensans.vercel.app" target="_blank">
-          <LinkCard
-            title="Owen Sans, font quiz"
-            logo="../../assets/images/owensans.png"
-          />
+          <LinkCard title="Owen Sans, font quiz" logo="owensans" />
         </a>
         <a href="https://kiwi.psiderman.com" target="_blank">
-          <LinkCard
-            title="Kiwi, personal finance"
-            logo="../../assets/images/kiwi.png"
-          />
+          <LinkCard title="Kiwi, personal finance" logo="kiwi" />
         </a>
         <a href="https://links.psiderman.com/primer" target="_blank">
-          <LinkCard
-            title="Personal finance 101"
-            logo="../../assets/images/primer.png"
-          />
+          <LinkCard title="Personal finance 101" logo="primer" />
         </a>
       </div>
       <div class="col-span-2 h-10"></div>

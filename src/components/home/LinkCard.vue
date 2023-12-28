@@ -4,15 +4,17 @@ const props = defineProps({
   logo: String,
 });
 
-function getImageUrl() {
-  return new URL(props.logo, import.meta.url).toString();
-}
+const urls = {
+  owensans: new URL("@/assets/images/owensans.png", import.meta.url).toString(),
+  kiwi: new URL("@/assets/images/kiwi.png", import.meta.url).toString(),
+  primer: new URL("@/assets/images/primer.png", import.meta.url).toString(),
+};
 </script>
 
 <template>
   <div class="card card-small">
     <div class="h-8 w-8">
-      <img :src="getImageUrl()" alt="logo" />
+      <img :src="urls[logo]" alt="logo" />
     </div>
     <span>{{ title }}</span>
     <img

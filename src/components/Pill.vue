@@ -4,17 +4,19 @@ defineProps({
   brand: String,
   icon: String,
 });
+
+const urls = {
+  "read-cv": new URL(
+    "@/assets/duotone/read-cv.svg",
+    import.meta.url,
+  ).toString(),
+};
 </script>
 <template>
   <button class="pill">
     <slot name="icon"></slot>
     <fa v-if="brand" class="w-min text-[14px]" :icon="['fab', brand]" />
-    <img
-      v-if="icon"
-      class="h-5 w-min"
-      src="@/assets/duotone/read-cv.svg"
-      alt="logo"
-    />
+    <img v-if="icon" class="h-5 w-min" :src="urls[icon]" alt="logo" />
     {{ text }}
   </button>
 </template>

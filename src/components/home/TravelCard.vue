@@ -18,7 +18,7 @@ import Description from "./CardDescription.vue";
     <Description
       title="Backpacking"
       description="Started as post-COVID restlessness, became a full-fledged hobby."
-      icon="../../assets/duotone/backpack.svg"
+      icon="backpack"
       flex
     />
   </div>
