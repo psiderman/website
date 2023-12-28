@@ -1,4 +1,4 @@
-@font-face {
+/* @font-face {
   font-family: "General Sans";
   src:
     local("General Sans Extralight"),
@@ -8,8 +8,9 @@
   font-weight: 200;
   font-style: "normal";
   font-display: "swap";
-}
-@font-face {
+} */
+
+/* @font-face {
   font-family: "General Sans";
   src:
     local("General Sans Light"),
@@ -19,7 +20,8 @@
   font-weight: 300;
   font-style: "normal";
   font-display: "swap";
-}
+} */
+
 @font-face {
   font-family: "General Sans";
   src:
@@ -31,6 +33,7 @@
   font-style: "normal";
   font-display: "swap";
 }
+
 @font-face {
   font-family: "General Sans";
   src:
@@ -42,6 +45,7 @@
   font-style: "normal";
   font-display: "swap";
 }
+
 @font-face {
   font-family: "General Sans";
   src:
@@ -53,6 +57,7 @@
   font-style: "normal";
   font-display: "swap";
 }
+
 @font-face {
   font-family: "General Sans";
   src:
@@ -63,4 +68,59 @@
   font-weight: 700;
   font-style: "normal";
   font-display: "swap";
+}
+
+/* @font-face {
+  font-family: "Karma-Light";
+  src:
+    url("../fonts/Karma-Light.woff2") format("woff2"),
+    url("../fonts/Karma-Light.woff") format("woff"),
+    url("../fonts/Karma-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-display: swap;
+  font-style: normal;
+} */
+
+@font-face {
+  font-family: "Karma-Regular";
+  src:
+    url("../fonts/Karma-Regular.woff2") format("woff2"),
+    url("../fonts/Karma-Regular.woff") format("woff"),
+    url("../fonts/Karma-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* @font-face {
+  font-family: "Karma-Medium";
+  src:
+    url("../fonts/Karma-Medium.woff2") format("woff2"),
+    url("../fonts/Karma-Medium.woff") format("woff"),
+    url("../fonts/Karma-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+} */
+
+/* @font-face {
+  font-family: "Karma-SemiBold";
+  src:
+    url("../fonts/Karma-SemiBold.woff2") format("woff2"),
+    url("../fonts/Karma-SemiBold.woff") format("woff"),
+    url("../fonts/Karma-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+} */
+
+@font-face {
+  font-family: "Karma-Bold";
+  src:
+    url("../fonts/Karma-Bold.woff2") format("woff2"),
+    url("../fonts/Karma-Bold.woff") format("woff"),
+    url("../fonts/Karma-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
 }

@@ -27,7 +27,7 @@ const data = [
 ];
 </script>
 <template>
-  <div class="large grid grid-cols-4 gap-4">
+  <div class="large grid select-none grid-cols-4 gap-4">
     <div
       class="aspect-long overflow-hidden rounded-lg bg-black outline outline-white/10"
       v-for="image in data"
@@ -45,7 +45,7 @@ const data = [
     </div>
   </div>
   <h1 class="mb-4">What am I doing now?</h1>
-  <div class="text-xs text-white/50">
+  <div class="-mt-12 text-xs text-white/50">
     This is a
     <a href="https://nownownow.com/about" target="_blank" class="underline"
       >/now page</a

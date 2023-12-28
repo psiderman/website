@@ -1,52 +1,52 @@
-h1 {
+div.content h1 {
   @apply mb-16 mt-20 text-4xl font-semibold text-white;
 }
 
-h2 {
+div.content h2 {
   @apply mb-8 mt-16 text-2xl font-semibold text-white/80;
 }
 
-h3 {
-  @apply mb-4 mt-12 text-base font-semibold text-white/80;
+div.content h3 {
+  @apply text-lg mb-4 mt-12 font-semibold text-white/80;
 }
 
-p {
-  @apply mb-8 text-base leading-8 text-white/60;
+div.content p {
+  @apply text-lg mb-8 font-serif font-normal leading-8 text-white/80;
 }
 
-p.caption {
-  @apply -mt-8 mb-0 text-center text-xs leading-4 text-white/60;
+div.content p.caption {
+  @apply mb-0 mt-2 text-center font-sans text-xs font-normal leading-4 text-white/80;
 }
 
-li {
-  @apply my-8 text-base leading-8 text-white/60;
+div.content li {
+  @apply text-lg my-8 font-serif font-normal leading-8 text-white/80;
   @apply ml-4 list-disc;
 }
 
-.content > div,
-.w640,
-p,
-h1,
-h2,
-h3,
-ul {
+div.content > div,
+div.content .w640,
+div.content p,
+div.content h1,
+div.content h2,
+div.content h3,
+div.content ul {
   @apply mx-auto w-full max-w-screen-sm text-left;
 }
 
-.content > div.large {
+div.content > div.large {
   @apply mx-auto my-10 w-full max-w-screen-lg text-left;
 }
 
-.gallery-scroll {
+div.content .gallery-scroll {
   @apply absolute left-0 flex snap-mandatory flex-row gap-4 overflow-auto overscroll-x-none px-4;
   width: calc(100dvw - 16px);
 }
 
-.gallery-spacer {
+div.content .gallery-spacer {
   @apply h-full shrink-0;
-  width: calc((100dvw - 1024px) / 2 - 40px);
+  width: calc((100dvw - 640px) / 2 - 40px);
 }
 
-.gallery-scroll img {
-  @apply max-w-screen-lg snap-center rounded-sm bg-black;
+div.content .gallery-scroll img {
+  @apply w-full max-w-screen-sm shrink-0 snap-center rounded-sm border border-white/15 bg-black;
 }

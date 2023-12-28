@@ -19,6 +19,8 @@
     of the bigger projects I spearheaded, while leading the Design Systems, and
     Content Platform teams.
   </p>
+
+  <!-- Question types -->
   <h2>Question Types</h2>
   <p>
     At the time of writing this, there are sixteen ways to ask a question on
@@ -26,7 +28,7 @@
     designed 9, and led the designs for 3 more.
   </p>
 
-  <div class="large aspect-video">
+  <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
       <img src="@/assets/design/qtcs/01.png" />
@@ -38,48 +40,101 @@
   </div>
   <p class="caption">A sneak peek of the case study</p>
 
-  <h2>Design System</h2>
+  <!-- Design System -->
+
+  <!-- <h2>Design System</h2>
   <p>I am responsible forever, for the design system that I tamed</p>
   <div
     class="large aspect-video overflow-hidden rounded-3xl bg-black outline outline-white/10"
-  ></div>
-  <h2>Lessons</h2>
+  ></div> -->
+
+  <!-- Lessons -->
+  <h2>Lessons, 2020</h2>
   <p>
     What happens when you take informational slides and marry them with the
     interactivity of a quiz game? You kill ‘death by slides’. The sole two
     designers of Quizizz at the time delivered this 0→1 product in under four
     weeks.
   </p>
-  <div
-    class="large aspect-video overflow-hidden rounded-3xl bg-black outline outline-white/10"
-  ></div>
+  <div class="aspect-video">
+    <div class="gallery-scroll">
+      <div class="gallery-spacer"></div>
+      <img src="@/assets/design/lessons/01.png" />
+      <img src="@/assets/design/lessons/02.png" />
+      <img src="@/assets/design/lessons/03.png" />
+      <img src="@/assets/design/lessons/04.gif" />
+      <div class="gallery-spacer"></div>
+    </div>
+  </div>
+  <p class="caption">
+    You can read more about this project
+    <a
+      href="https://psiderman.read.cv/quizizz-lessons"
+      target="_blank"
+      class="underline"
+      >here</a
+    >
+  </p>
+
+  <!-- Motion -->
   <h2>Motion and Interaction</h2>
   <p>
     In addition to delivering screens and flows, I often took to Codepen,
-    Principle, and plain old Figma to create additional artifacts.
+    Principle, and plain old Figma to create additional artifacts. More often
+    than not, these artifacts made it into the product as MP4s or GIFs. These
+    small things will likely outlive the other work I've done.
   </p>
-  <div class="large grid grid-cols-4 grid-rows-3 gap-10">
-    <div
-      class="col-span-2 row-span-2 aspect-square rounded-3xl bg-black outline outline-white/10"
-    ></div>
-    <div
-      class="aspect-square rounded-3xl bg-black outline outline-white/10"
-    ></div>
-    <div
-      class="aspect-square rounded-3xl bg-black outline outline-white/10"
-    ></div>
-    <div class="col-span-2 rounded-3xl bg-black outline outline-white/10"></div>
-    <div
-      class="aspect-square rounded-3xl bg-black outline outline-white/10"
-    ></div>
-    <div
-      class="aspect-square rounded-3xl bg-black outline outline-white/10"
-    ></div>
-    <div
-      class="aspect-square rounded-3xl bg-black outline outline-white/10"
-    ></div>
-    <div
-      class="aspect-square rounded-3xl bg-black outline outline-white/10"
-    ></div>
+  <div class="large grid grid-cols-4 grid-rows-2 gap-10">
+    <div class="motion-card col-span-2 row-span-2 p-4">
+      <video
+        src="@/assets/design/motion/graphing.mp4"
+        class="h-full w-full object-contain"
+        autoplay
+        muted
+        loop
+      ></video>
+    </div>
+    <div class="motion-card">
+      <video
+        src="@/assets/design/motion/spin.mp4"
+        class="h-full w-full object-contain"
+        autoplay
+        muted
+        loop
+      ></video>
+    </div>
+    <div class="motion-card">
+      <video
+        src="@/assets/design/motion/calc.mp4"
+        class="h-full w-full object-contain"
+        autoplay
+        muted
+        loop
+      ></video>
+    </div>
+    <div class="motion-card">
+      <video
+        src="@/assets/design/motion/mbox.mp4"
+        class="h-full w-full object-contain"
+        autoplay
+        muted
+        loop
+      ></video>
+    </div>
+    <div class="motion-card">
+      <video
+        src="@/assets/design/motion/live.mp4"
+        class="h-full w-full object-contain"
+        autoplay
+        muted
+        loop
+      ></video>
+    </div>
   </div>
 </template>
+
+<style lang="postcss" scoped>
+.motion-card {
+  @apply pointer-events-none aspect-square overflow-hidden rounded-3xl border border-white/15 bg-black;
+}
+</style>
