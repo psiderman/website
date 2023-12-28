@@ -41,9 +41,8 @@ import Description from "./CardDescription.vue";
       title="Design Work"
       description="I’ve been a product designer for ≈5y, specializing in desktop design &
         design systems."
-    >
-      <img src="@/assets/duotone/work.svg" alt="laptop icon" class="h-6" />
-    </Description>
+      icon="../../assets/duotone/work.svg"
+    />
   </div>
 </template>
 

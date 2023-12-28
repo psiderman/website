@@ -70,8 +70,8 @@ function resetEye() {
       title="See what I'm up to ‘Now’"
       description="I’ll create an about page when I fill up Google Search results. For now
         there’s, well... now."
-      ><img src="@/assets/duotone/now.svg" alt="now icon" class="h-6" />
-    </Description>
+      icon="../../assets/duotone/now.svg"
+    />
   </div>
 </template>
 

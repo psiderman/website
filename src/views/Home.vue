@@ -18,34 +18,23 @@ import LinkCard from "@/components/home/LinkCard.vue";
       <NowCard />
       <div class="grid grid-cols-2 gap-10">
         <a href="https://owensans.vercel.app" target="_blank">
-          <LinkCard title="Owen Sans, font quiz">
-            <img src="@/assets/images/owensans.png" alt="owen sans logo" />
-            <img
-              src="@/assets/duotone/external-link.svg"
-              alt="link icon"
-              class="absolute right-4 top-4 h-6"
-            />
-          </LinkCard>
+          <LinkCard
+            title="Owen Sans, font quiz"
+            logo="../../assets/images/owensans.png"
+          />
         </a>
         <a href="https://kiwi.psiderman.com" target="_blank">
-          <LinkCard title="Kiwi, personal finance">
-            <img src="@/assets/images/kiwi.png" alt="owen sans logo" />
-            <img
-              src="@/assets/duotone/external-link.svg"
-              alt="link icon"
-              class="absolute right-4 top-4 h-6"
-            />
-          </LinkCard>
+          <LinkCard
+            title="Kiwi, personal finance"
+            logo="../../assets/images/kiwi.png"
+          />
         </a>
         <a href="https://links.psiderman.com/primer" target="_blank">
-          <LinkCard title="Personal finance 101">
-            <img src="@/assets/images/primer.png" alt="owen sans logo" />
-            <img
-              src="@/assets/duotone/external-link.svg"
-              alt="link icon"
-              class="absolute right-4 top-4 h-6"
-            /> </LinkCard
-        ></a>
+          <LinkCard
+            title="Personal finance 101"
+            logo="../../assets/images/primer.png"
+          />
+        </a>
       </div>
       <div class="col-span-2 h-10"></div>
     </div>
