@@ -9,7 +9,7 @@ import { RouterLink, RouterView } from "vue-router";
     </RouterLink>
     <RouterView />
     <RouterLink to="/">
-      <img src="@/assets/svg/psider.svg" alt="logo" class="mx-auto mt-20" />
+      <img src="@/assets/svg/psider.svg" alt="logo" class="mx-auto my-20" />
     </RouterLink>
   </div>
 </template>

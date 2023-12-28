@@ -19,7 +19,9 @@ import { RouterLink } from "vue-router";
       <RouterLink to="/design">
         <WorkCard />
       </RouterLink>
-      <NowCard />
+      <RouterLink to="/now">
+        <NowCard />
+      </RouterLink>
       <div class="grid grid-cols-2 gap-10">
         <a href="https://owensans.vercel.app" target="_blank">
           <LinkCard

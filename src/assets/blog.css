@@ -1,16 +1,31 @@
+h1 {
+  @apply mb-16 mt-20 text-4xl font-semibold;
+}
+
 h2 {
-  @apply mb-6 mt-20 text-2xl font-semibold;
+  @apply mb-8 mt-16 text-2xl font-semibold;
+}
+
+h3 {
+  @apply mb-4 mt-12 text-base font-semibold;
 }
 
 p {
-  @apply my-6 text-base leading-8;
+  @apply mb-8 text-base leading-8;
+}
+
+li {
+  @apply my-8 text-base leading-8;
+  @apply ml-4 list-disc;
 }
 
 .content > div,
+.w640,
 p,
 h1,
 h2,
-h3 {
+h3,
+ul {
   @apply mx-auto w-full max-w-screen-sm text-left;
 }
 

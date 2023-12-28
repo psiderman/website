@@ -19,6 +19,17 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/now",
+      component: () => import("../pages/Blog.vue"),
+      children: [
+        {
+          path: "",
+          name: "Now",
+          component: () => import("../views/Now.vue"),
+        },
+      ],
+    },
   ],
 });
 
