@@ -70,12 +70,12 @@ onMounted(() => {
 <template>
   <!-- Content -->
   <div
-    class="mx-auto flex h-screen max-h-dvh w-screen max-w-screen-lg flex-row gap-10 overflow-scroll py-20"
+    class="m-auto flex h-screen max-h-[900px] w-screen max-w-screen-lg flex-col gap-10 overflow-scroll p-10 py-20 lg:flex-row lg:p-0 lg:py-20"
   >
     <Leftbar />
 
     <!-- Right bar -->
-    <div class="grid min-h-fit w-full grid-cols-2 gap-10">
+    <div class="flex min-h-fit w-full grid-cols-2 flex-col gap-10 sm:grid">
       <RouterLink to="/design">
         <WorkCard />
       </RouterLink>

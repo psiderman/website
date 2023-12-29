@@ -6,11 +6,11 @@ import Description from "./CardDescription.vue";
   <div class="card nograyscale group/travel flex flex-col">
     <div class="relative h-full w-full">
       <img
-        class="absolute inset-0 h-full w-full object-contain opacity-100 grayscale transition-opacity duration-200 group-hover/travel:opacity-0"
+        class="absolute inset-0 h-full w-full object-cover opacity-100 grayscale transition-opacity duration-200 group-hover/travel:opacity-0"
         src="@/assets/images/maps-mono.png"
         alt=""
       /><img
-        class="absolute inset-0 h-full w-full object-contain opacity-0 transition-opacity duration-200 group-hover/travel:opacity-100"
+        class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-200 group-hover/travel:opacity-100"
         src="@/assets/images/maps-color.png"
         alt=""
       />

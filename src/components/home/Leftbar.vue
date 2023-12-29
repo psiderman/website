@@ -59,7 +59,9 @@ function copyEmail(event) {
 </script>
 
 <template>
-  <div class="sticky top-0 flex h-full w-80 shrink-0 flex-col justify-between">
+  <div
+    class="top-0 flex shrink-0 flex-col gap-y-8 lg:sticky lg:h-full lg:w-80 lg:justify-between"
+  >
     <!-- Quick intro -->
     <div class="flex flex-col gap-y-8">
       <div

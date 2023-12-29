@@ -76,7 +76,9 @@
     than not, these artifacts made it into the product as MP4s or GIFs. These
     small things will likely outlive the other work I've done.
   </p>
-  <div class="large grid grid-cols-4 grid-rows-2 gap-10">
+  <div
+    class="large grid grid-cols-2 grid-rows-2 gap-4 lg:grid-cols-4 lg:gap-10"
+  >
     <div class="motion-card anime-entry col-span-2 row-span-2 p-4">
       <video
         src="@/assets/design/motion/graphing.mp4"
