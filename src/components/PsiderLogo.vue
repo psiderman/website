@@ -416,7 +416,7 @@ function spiderAnimation() {
 
 <template>
   <div
-    class="psider-logo z-50 h-16 w-16 cursor-pointer bg-contain"
+    class="psider-logo z-50 h-20 w-20 cursor-pointer bg-contain"
     @click="spiderAnimation"
   >
     <div

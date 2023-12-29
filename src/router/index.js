@@ -41,6 +41,10 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/:catchAll(.*)",
+      component: () => import("../404.vue"),
+    },
   ],
 });
 
