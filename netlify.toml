@@ -7,15 +7,3 @@ status = 200
 for = "/assets/*"
 [headers.values]
 Cache-Control = "public, max-age=31536000"
-
-[[redirects]]
-from = "/*"
-to = "https://psiderman.com/design"
-status = 200
-conditions = { Domain = "design.psiderman.com" }
-
-[[redirects]]
-from = "/*"
-to = "https://psiderman.com/now"
-status = 200
-conditions = { Domain = "now.psiderman.com" }
