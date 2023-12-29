@@ -12,7 +12,7 @@ const urls = {
 </script>
 
 <template>
-  <div class="card card-small">
+  <div class="card card-small justify-between">
     <div class="h-8 w-8">
       <img class="h-8 w-8" :src="urls[logo]" alt="logo" />
     </div>
@@ -24,10 +24,3 @@ const urls = {
     />
   </div>
 </template>
-
-<style lang="postcss" scoped>
-.card-small {
-  @apply flex flex-col justify-between p-4;
-  height: 140px !important;
-}
-</style>

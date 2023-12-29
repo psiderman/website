@@ -117,4 +117,9 @@ onMounted(() => {
   background-repeat: repeat;
   background-size: 100px;
 }
+
+.card-small {
+  @apply flex flex-col p-4;
+  height: 140px !important;
+}
 </style>
