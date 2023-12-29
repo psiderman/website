@@ -1,5 +1,12 @@
 <script setup>
 import { computed } from "vue";
+import client from "@/store/sanity.js";
+import imageUrlBuilder from "@sanity/image-url";
+
+function sanityURL(r) {
+  const builder = imageUrlBuilder(client);
+  return builder.image(r).url();
+}
 
 const props = defineProps({
   images: Array,
@@ -34,7 +41,7 @@ const gridClasses = {
           image.contain ? 'object-contain' : 'object-cover',
           image.caption ? 'cursor-help' : 'object-cover',
         ]"
-        v-lazy="image.url"
+        v-lazy="sanityURL(image.asset._ref)"
         :alt="image.caption"
         :title="image.caption"
       />

@@ -1,9 +1,33 @@
 <script setup>
-import { countriesData } from "@/store/travelData.js";
-import { reactive } from "vue";
+import { onMounted, ref, nextTick } from "vue";
+import anime from "animejs";
+import client from "@/store/sanity.js";
 import LongImages from "@/components/blog/LongImages.vue";
 
-const countries = reactive(countriesData);
+const data = ref(null);
+
+onMounted(async () => {
+  try {
+    const query = '*[_type == "travel"]';
+    const response = await client.fetch(query);
+    data.value = response;
+
+    nextTick(() => {
+      anime({
+        targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
+        translateY: ["1rem", "0"],
+        opacity: [0, 1],
+        scale: [0.95, 1],
+        transformOrigin: "center",
+        duration: 500,
+        easing: "easeOutBack",
+        delay: anime.stagger(100),
+      });
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+});
 </script>
 <template>
   <h1 class="mb-4">You don't need more than /r/onebag</h1>
@@ -44,18 +68,12 @@ const countries = reactive(countriesData);
     here
   </p>
   <h1 title="log, get it?" class="cursor-help">Travel 🪵</h1>
-  <template v-for="country in countries" :key="country.name">
-    <template v-for="location in country.locations" :key="location.name">
-      <h2>
-        {{ country.flag }}
-        <span v-if="location.name">{{ location.name }}, </span
-        >{{ country.name }}
-      </h2>
-      <p v-if="location.description">{{ location.description }}</p>
-      <LongImages :images="location.images" />
-    </template>
-    <p>
-      There's more on my instagram, I'll move them here one of these weekends.
-    </p>
+  <template v-for="travel in data" :key="travel._id">
+    <h2>{{ travel.location }}, {{ travel.country }}</h2>
+    <p>{{ travel.description }}</p>
+    <LongImages :images="travel.images" />
   </template>
+  <p>
+    There's more on my instagram, I'll move them here one of these weekends.
+  </p>
 </template>

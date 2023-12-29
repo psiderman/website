@@ -1,4 +1,19 @@
-<script setup></script>
+<script setup>
+import { onMounted } from "vue";
+import anime from "animejs";
+onMounted(() => {
+  anime({
+    targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
+    translateY: ["1rem", "0"],
+    opacity: [0, 1],
+    scale: [0.95, 1],
+    transformOrigin: "center",
+    duration: 500,
+    easing: "easeOutBack",
+    delay: anime.stagger(100),
+  });
+});
+</script>
 <template>
   <div class="w640 anime-entry mb-6">
     <img
