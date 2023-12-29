@@ -13,7 +13,7 @@ const data = reactive(nowData);
     page inspired by Derek Sivers.
   </p>
   <template v-for="(now, i) in data" :key="i">
-    <div class="large grid select-none grid-cols-4 gap-4">
+    <div class="large grid grid-cols-4 gap-4">
       <div
         class="anime-entry aspect-long overflow-hidden rounded-lg bg-black outline outline-white/10"
         v-for="image in now.images"
@@ -21,7 +21,7 @@ const data = reactive(nowData);
       >
         <img
           :class="[
-            'h-full w-full',
+            'h-full w-full select-none',
             image.contain ? 'object-contain' : 'object-cover',
             image.caption ? 'cursor-help' : '',
           ]"

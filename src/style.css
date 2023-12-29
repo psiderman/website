@@ -5,11 +5,21 @@
 
 body {
   @apply text-white;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: radial-gradient(
     50% 50% at 50% 50%,
     hsla(240, 4%, 13%) 0%,
     hsla(240, 6%, 10%) 100%
   );
+  z-index: -1;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */

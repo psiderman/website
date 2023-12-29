@@ -21,9 +21,11 @@ const countries = reactive(countriesData);
     I've finally trimmed down to all plain black tees (not pictured).
   </p>
 
-  <div>
+  <div
+    class="anime-entry aspect-square h-full w-full overflow-hidden rounded-lg bg-black outline outline-white/10"
+  >
     <img
-      class="anime-entry aspect-square h-full w-full overflow-hidden rounded-lg bg-black object-contain outline outline-white/10"
+      class="aspect-square h-full w-full select-none object-contain"
       src="@/assets/travel/bag-i.jpeg"
       title="one bag setup"
       alt="one bag setup"
@@ -48,7 +50,7 @@ const countries = reactive(countriesData);
         >{{ country.name }}
       </h2>
       <p v-if="location.description">{{ location.description }}</p>
-      <div class="large grid select-none grid-cols-4 gap-4">
+      <div class="large grid grid-cols-4 gap-4">
         <div
           class="anime-entry aspect-long overflow-hidden rounded-lg bg-black outline outline-white/10"
           v-for="image in location.images"

@@ -147,4 +147,18 @@
 .motion-card {
   @apply pointer-events-none aspect-square overflow-hidden rounded-3xl border border-white/15 bg-black;
 }
+
+div.content .gallery-scroll {
+  @apply absolute left-0 flex snap-mandatory flex-row gap-4 overflow-auto overscroll-x-none px-4;
+  width: calc(100dvw - 16px);
+}
+
+div.content .gallery-spacer {
+  @apply h-full shrink-0;
+  width: calc((100dvw - 640px) / 2 - 40px);
+}
+
+div.content .gallery-scroll img {
+  @apply w-full max-w-screen-sm shrink-0 select-none snap-center rounded-sm border border-white/15 bg-black;
+}
 </style>

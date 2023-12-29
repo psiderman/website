@@ -69,7 +69,7 @@ function copyEmail(event) {
           class="absolute bottom-0 h-20 w-16 overflow-hidden rounded-b-full align-bottom"
         >
           <img
-            class="leftbar-dp h-20 w-20 object-cover"
+            class="leftbar-dp h-20 w-20 select-none object-cover"
             src="@/assets/images/dp.png"
             alt="cartoon me"
           />
