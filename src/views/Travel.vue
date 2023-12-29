@@ -25,17 +25,19 @@ const countries = reactive(countriesData);
     <img
       class="anime-entry aspect-square h-full w-full overflow-hidden rounded-lg bg-black object-contain outline outline-white/10"
       src="@/assets/travel/bag-i.jpeg"
-      title=""
+      title="one bag setup"
+      alt="one bag setup"
     />
   </div>
   <p class="caption">
-    You can learn more about one bagging
+    You can learn more about
     <a
       href="https://www.reddit.com/r/onebag/wiki/index/#wiki_what_is_onebag.3F"
       target="_blank"
       class="underline"
-      >here</a
+      >one bagging</a
     >
+    here
   </p>
   <h1 title="log, get it?" class="cursor-help">Travel 🪵</h1>
   <template v-for="country in countries" :key="country.name">

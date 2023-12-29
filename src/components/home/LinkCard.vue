@@ -14,7 +14,7 @@ const urls = {
 <template>
   <div class="card card-small">
     <div class="h-8 w-8">
-      <img :src="urls[logo]" alt="logo" />
+      <img class="h-8 w-8" :src="urls[logo]" alt="logo" />
     </div>
     <span>{{ title }}</span>
     <img

@@ -71,6 +71,7 @@ function copyEmail(event) {
           <img
             class="leftbar-dp h-20 w-20 object-cover"
             src="@/assets/images/dp.png"
+            alt="cartoon me"
           />
         </div>
       </div>
@@ -88,7 +89,7 @@ function copyEmail(event) {
     <div class="pills flex w-full flex-row flex-wrap gap-2">
       <Pill text="hi@psiderman.com" @click="copyEmail">
         <template v-slot:icon>
-          <img src="@/assets/duotone/envelope.svg" />
+          <img src="@/assets/duotone/envelope.svg" alt="email" />
         </template>
       </Pill>
       <a href="https://twitter.com/_psiderman_" target="_blank">

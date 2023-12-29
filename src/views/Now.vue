@@ -31,7 +31,7 @@ const data = reactive(nowData);
         />
       </div>
     </div>
-    <h3>{{ now.date }}</h3>
+    <h2>{{ now.date }}</h2>
     <ul>
       <li v-for="(update, j) in now.updates" :key="j">{{ update }}</li>
     </ul>
