@@ -1,19 +1,21 @@
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+from = "/*"
+to = "/index.html"
+status = 200
 
 [[headers]]
-  for = "/assets/*"
-  [headers.values]
-  Cache-Control = "public, max-age=31536000"
+for = "/assets/*"
+[headers.values]
+Cache-Control = "public, max-age=31536000"
 
 [[redirects]]
-  from = "design.psiderman.com/*"
-  to = "/design/:splat"
-  status = 200
+from = "/*"
+to = "https://psiderman.com/design"
+status = 200
+conditions = { Domain = "design.psiderman.com" }
 
 [[redirects]]
-  from = "now.psiderman.com/*"
-  to = "/now/:splat"
-  status = 200
+from = "/*"
+to = "https://psiderman.com/now"
+status = 200
+conditions = { Domain = "now.psiderman.com" }
