@@ -7,14 +7,25 @@ import LongImages from "@/components/blog/LongImages.vue";
 const data = ref(null);
 
 onMounted(async () => {
+  anime({
+    targets: [".anime-entry, h1, h2, h3, p, span"],
+    translateY: ["1rem", "0"],
+    opacity: [0, 1],
+    scale: [0.95, 1],
+    transformOrigin: "center",
+    duration: 500,
+    easing: "easeOutBack",
+    delay: anime.stagger(100),
+  });
   try {
-    const query = '*[_type == "travel"]';
+    const query = '*[_type == "travel"] | order(date desc)';
     const response = await client.fetch(query);
     data.value = response;
-
     nextTick(() => {
       anime({
-        targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
+        targets: [
+          ".sanity .anime-entry, .sanity h1, .sanity h2, .sanity h3, .sanity p, .sanity ul, .sanity li, .sanity span",
+        ],
         translateY: ["1rem", "0"],
         opacity: [0, 1],
         scale: [0.95, 1],
@@ -52,7 +63,7 @@ onMounted(async () => {
   >
     <img
       class="aspect-square h-full w-full select-none object-contain"
-      src="@/assets/travel/bag-i.jpeg"
+      src="@/assets/images/bag.jpeg"
       title="one bag setup"
       alt="one bag setup"
     />
@@ -68,11 +79,13 @@ onMounted(async () => {
     here
   </p>
   <h1 title="log, get it?" class="cursor-help">Travel 🪵</h1>
-  <template v-for="travel in data" :key="travel._id">
-    <h2>{{ travel.location }}, {{ travel.country }}</h2>
-    <p>{{ travel.description }}</p>
-    <LongImages :images="travel.images" />
-  </template>
+  <div class="sanity large">
+    <template v-for="travel in data" :key="travel._id">
+      <h2>{{ travel.location }}, {{ travel.country }}</h2>
+      <p>{{ travel.description }}</p>
+      <LongImages :images="travel.images" />
+    </template>
+  </div>
   <p>
     There's more on my instagram, I'll move them here one of these weekends.
   </p>
