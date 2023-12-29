@@ -80,47 +80,22 @@
     <div class="motion-card anime-entry col-span-2 row-span-2 p-4">
       <video
         src="@/assets/design/motion/graphing.mp4"
-        class="h-full w-full object-contain"
         autoplay
         muted
         loop
       ></video>
     </div>
     <div class="motion-card anime-entry">
-      <video
-        src="@/assets/design/motion/spin.mp4"
-        class="h-full w-full object-contain"
-        autoplay
-        muted
-        loop
-      ></video>
+      <video src="@/assets/design/motion/spin.mp4" autoplay muted loop></video>
     </div>
     <div class="motion-card anime-entry">
-      <video
-        src="@/assets/design/motion/calc.mp4"
-        class="h-full w-full object-contain"
-        autoplay
-        muted
-        loop
-      ></video>
+      <video src="@/assets/design/motion/calc.mp4" autoplay muted loop></video>
     </div>
     <div class="motion-card anime-entry">
-      <video
-        src="@/assets/design/motion/mbox.mp4"
-        class="h-full w-full object-contain"
-        autoplay
-        muted
-        loop
-      ></video>
+      <video src="@/assets/design/motion/mbox.mp4" autoplay muted loop></video>
     </div>
     <div class="motion-card anime-entry">
-      <video
-        src="@/assets/design/motion/live.mp4"
-        class="h-full w-full object-contain"
-        autoplay
-        muted
-        loop
-      ></video>
+      <video src="@/assets/design/motion/live.mp4" autoplay muted loop></video>
     </div>
   </div>
 
@@ -148,17 +123,21 @@
   @apply pointer-events-none aspect-square overflow-hidden rounded-3xl border border-white/15 bg-black;
 }
 
-div.content .gallery-scroll {
+.motion-card video {
+  @apply h-full w-full object-contain;
+}
+
+.gallery-scroll {
   @apply absolute left-0 flex snap-mandatory flex-row gap-4 overflow-auto overscroll-x-none px-4;
   width: calc(100dvw - 16px);
 }
 
-div.content .gallery-spacer {
+.gallery-spacer {
   @apply h-full shrink-0;
   width: calc((100dvw - 640px) / 2 - 40px);
 }
 
-div.content .gallery-scroll img {
+.gallery-scroll img {
   @apply w-full max-w-screen-sm shrink-0 select-none snap-center rounded-sm border border-white/15 bg-black;
 }
 </style>

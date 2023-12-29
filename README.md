@@ -1,1 +1,0 @@
-# Karan Sanas | Personal Website

@@ -1,6 +1,8 @@
 <script setup>
 import { countriesData } from "@/store/travelData.js";
 import { reactive } from "vue";
+import LongImages from "@/components/blog/LongImages.vue";
+
 const countries = reactive(countriesData);
 </script>
 <template>
@@ -22,7 +24,7 @@ const countries = reactive(countriesData);
   </p>
 
   <div
-    class="anime-entry aspect-square h-full w-full overflow-hidden rounded-lg bg-black outline outline-white/10"
+    class="anime-entry aspect-square h-full w-full overflow-hidden rounded-lg bg-black"
   >
     <img
       class="aspect-square h-full w-full select-none object-contain"
@@ -50,24 +52,7 @@ const countries = reactive(countriesData);
         >{{ country.name }}
       </h2>
       <p v-if="location.description">{{ location.description }}</p>
-      <div class="large grid grid-cols-4 gap-4">
-        <div
-          class="anime-entry aspect-long overflow-hidden rounded-lg bg-black outline outline-white/10"
-          v-for="image in location.images"
-          :key="image.id"
-        >
-          <img
-            :class="[
-              'h-full w-full select-none',
-              image.contain ? 'object-contain' : 'object-cover',
-              image.caption ? 'cursor-help' : '',
-            ]"
-            v-lazy="image.url"
-            :alt="image.caption"
-            :title="image.caption"
-          />
-        </div>
-      </div>
+      <LongImages :images="location.images" />
     </template>
     <p>
       There's more on my instagram, I'll move them here one of these weekends.
