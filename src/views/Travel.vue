@@ -64,9 +64,9 @@ const countries = reactive(countriesData);
           />
         </div>
       </div>
-      <p>
-        There's more on my instagram, I'll move them here one of these weekends.
-      </p>
     </template>
+    <p>
+      There's more on my instagram, I'll move them here one of these weekends.
+    </p>
   </template>
 </template>

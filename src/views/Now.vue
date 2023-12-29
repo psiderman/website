@@ -1,83 +1,41 @@
 <script setup>
-const data = [
-  {
-    id: 1,
-    caption: "Third year in a row! One of these days, I'll see him live.",
-    url: new URL("../assets/now/01.jpeg", import.meta.url).toString(),
-  },
-  {
-    id: 2,
-    caption:
-      "I can't ever seem to get the recipe right for sabudana khichdi. Mum made foods hits differently.",
-    url: new URL("../assets/now/02.jpeg", import.meta.url).toString(),
-  },
-  {
-    id: 3,
-    caption:
-      "The only time I travelled this month was to apply for a visa. This looks like a fancy bus. Looks can be deceptive.",
-    url: new URL("../assets/now/03.jpeg", import.meta.url).toString(),
-  },
-  {
-    id: 4,
-    caption:
-      "My bicycle cards have seen a lot of action, and they continue to make their way to /r/WellWorn",
-    url: new URL("../assets/now/04.jpeg", import.meta.url).toString(),
-  },
-];
+import { reactive } from "vue";
+import { nowData } from "../store/nowData.js";
+const data = reactive(nowData);
 </script>
 <template>
-  <div class="large grid select-none grid-cols-4 gap-4">
-    <div
-      class="anime-entry aspect-long overflow-hidden rounded-lg bg-black outline outline-white/10"
-      v-for="image in data"
-      :key="image.id"
-    >
-      <img
-        :class="[
-          'h-full w-full',
-          image.contain ? 'object-contain' : 'object-cover',
-          image.caption ? 'cursor-help' : '',
-        ]"
-        v-lazy="image.url"
-        :alt="image.caption"
-        :title="image.caption"
-      />
-    </div>
-  </div>
   <h1 class="mb-4">What am I doing now?</h1>
-  <h3>December 31, 2023</h3>
-  <ul>
-    <li>
-      Moved back to Kolhapur and brought my PS5 with me. Thought I'd only spend
-      a couple of weeks here, but it's been close to five. I made the mistake of
-      teaching my parents poker using monopoly money and they're addicted to the
-      game. We bought chips. They aren't gamblers so hopefully, they'll never
-      play with real money.
-    </li>
-    <li>
-      The last few months have been a good break and a great change of scenery
-      after working for five years non-stop. But a big part of my life has been
-      my work, which is missing right now. I'm not quite ready to give that up
-      just yet. I now find myself redoing my portfolio and applying for jobs
-      again, with some excitement and loads of nervousness.
-    </li>
-    <li>
-      I also can't bring myself to focus on building a product from scratch at
-      this point in life; not alone. So, I'm pressing pause on Kiwi as well.
-    </li>
-    <li>
-      I resumed therapy again. Who knew quitting your job and giving up your
-      apartment would mean having to work through some uncomfortable thoughts?
-      Not me!
-    </li>
-  </ul>
-  <p>
+  <p class="-mt-12">
     This is a
     <a href="https://nownownow.com/about" target="_blank" class="underline"
-      >/now page</a
+      >/now</a
     >
-    inspired by Derek Sivers.
+    page inspired by Derek Sivers.
   </p>
+  <template v-for="(now, i) in data" :key="i">
+    <div class="large grid select-none grid-cols-4 gap-4">
+      <div
+        class="anime-entry aspect-long overflow-hidden rounded-lg bg-black outline outline-white/10"
+        v-for="image in now.images"
+        :key="image.id"
+      >
+        <img
+          :class="[
+            'h-full w-full',
+            image.contain ? 'object-contain' : 'object-cover',
+            image.caption ? 'cursor-help' : '',
+          ]"
+          v-lazy="image.url"
+          :alt="image.caption"
+          :title="image.caption"
+        />
+      </div>
+    </div>
+    <h3>{{ now.date }}</h3>
+    <ul>
+      <li v-for="(update, j) in now.updates" :key="j">{{ update }}</li>
+    </ul>
+  </template>
 </template>
 
 <style lang="postcss" scoped></style>
