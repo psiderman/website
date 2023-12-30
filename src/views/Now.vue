@@ -7,6 +7,7 @@ import client from "@/store/sanity.js";
 import LongImages from "@/components/blog/LongImages.vue";
 
 const data = ref(null);
+const loading = ref(true);
 
 onMounted(async () => {
   anime({
@@ -24,6 +25,7 @@ onMounted(async () => {
     const response = await client.fetch(query);
     data.value = response;
     nextTick(() => {
+      loading.value = false;
       anime({
         targets: [
           ".sanity .anime-entry, .sanity h1, .sanity h2, .sanity h3, .sanity p, .sanity ul, .sanity li, .sanity span",
@@ -51,6 +53,31 @@ onMounted(async () => {
     >
     page inspired by Derek Sivers.
   </p>
+  <div class="large" v-if="loading">
+    <LongImages
+      :skeleton="true"
+      :images="[
+        { id: 1, asset: { _ref: '' } },
+        { id: 2, asset: { _ref: '' } },
+        { id: 3, asset: { _ref: '' } },
+        { id: 4, asset: { _ref: '' } },
+      ]"
+    />
+    <div class="w640">
+      <div
+        class="anime-entry skeleton-shimmer mb-8 mt-16 h-8 w-64 overflow-hidden rounded-lg bg-white/5"
+      ></div>
+      <div
+        class="anime-entry skeleton-shimmer my-8 h-16 w-full overflow-hidden rounded-lg bg-white/5"
+      ></div>
+      <div
+        class="anime-entry skeleton-shimmer my-8 h-16 w-full overflow-hidden rounded-lg bg-white/5"
+      ></div>
+      <div
+        class="anime-entry skeleton-shimmer my-8 h-16 w-full overflow-hidden rounded-lg bg-white/5"
+      ></div>
+    </div>
+  </div>
   <div class="sanity large">
     <template v-for="now in data" :key="now._id">
       <LongImages :images="now.images" />

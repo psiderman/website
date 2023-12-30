@@ -5,6 +5,7 @@ import client from "@/store/sanity.js";
 import LongImages from "@/components/blog/LongImages.vue";
 
 const data = ref(null);
+const loading = ref(true);
 
 onMounted(async () => {
   anime({
@@ -22,6 +23,7 @@ onMounted(async () => {
     const response = await client.fetch(query);
     data.value = response;
     nextTick(() => {
+      loading.value = false;
       anime({
         targets: [
           ".sanity .anime-entry, .sanity h1, .sanity h2, .sanity h3, .sanity p, .sanity ul, .sanity li, .sanity span",
@@ -79,14 +81,33 @@ onMounted(async () => {
     here
   </p>
   <h1 title="log, get it?" class="cursor-help">Travel 🪵</h1>
+  <div class="large" v-if="loading">
+    <div class="w640">
+      <div
+        class="anime-entry skeleton-shimmer mb-8 mt-16 h-8 w-64 overflow-hidden rounded-lg bg-white/5"
+      ></div>
+      <div
+        class="anime-entry skeleton-shimmer my-8 h-16 w-full overflow-hidden rounded-lg bg-white/5"
+      ></div>
+    </div>
+    <LongImages
+      :skeleton="true"
+      :images="[
+        { id: 1, asset: { _ref: '' } },
+        { id: 2, asset: { _ref: '' } },
+        { id: 3, asset: { _ref: '' } },
+        { id: 4, asset: { _ref: '' } },
+      ]"
+    />
+  </div>
   <div class="sanity large">
     <template v-for="travel in data" :key="travel._id">
       <h2>{{ travel.location }}, {{ travel.country }}</h2>
       <p>{{ travel.description }}</p>
       <LongImages :images="travel.images" />
     </template>
+    <p class="my-8">
+      There's more on my instagram, I'll move them here one of these weekends.
+    </p>
   </div>
-  <p>
-    There's more on my instagram, I'll move them here one of these weekends.
-  </p>
 </template>

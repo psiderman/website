@@ -10,12 +10,17 @@ const urls = {
     "@/assets/duotone/read-cv.svg",
     import.meta.url,
   ).toString(),
+
+  envelope: new URL(
+    "@/assets/duotone/envelope.svg",
+    import.meta.url,
+  ).toString(),
 };
 </script>
 <template>
   <button class="pill">
-    <fa v-if="brand" class="w-min text-[14px]" :icon="['fab', brand]" />
-    <img v-if="icon" class="h-5 w-min" :src="urls[icon]" alt="logo" />
+    <fa v-if="brand" class="text-[14px]" :icon="['fab', brand]" />
+    <img v-if="icon" class="h-5" :src="urls[icon]" alt="logo" />
     {{ text }}
   </button>
 </template>

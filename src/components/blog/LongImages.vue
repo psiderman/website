@@ -4,12 +4,19 @@ import client from "@/store/sanity.js";
 import imageUrlBuilder from "@sanity/image-url";
 
 function sanityURL(r) {
-  const builder = imageUrlBuilder(client);
-  return builder.image(r).url();
+  if (props.skeleton) return "";
+  try {
+    const builder = imageUrlBuilder(client);
+    return builder.image(r).url();
+  } catch (error) {
+    console.error(error);
+    return "";
+  }
 }
 
 const props = defineProps({
   images: Array,
+  skeleton: { type: Boolean, default: false },
 });
 
 const gridClasses = {
@@ -31,7 +38,10 @@ const gridClasses = {
     :class="['large grid gap-4', gridClasses[images.length] || 'grid-cols-5']"
   >
     <div
-      class="anime-entry group/image relative aspect-long overflow-hidden rounded-lg bg-black"
+      :class="[
+        'anime-entry group/image relative aspect-long overflow-hidden rounded-lg',
+        skeleton ? 'bg-white/5' : 'bg-black',
+      ]"
       v-for="image in props.images"
       :key="image.id"
     >
@@ -48,10 +58,3 @@ const gridClasses = {
     </div>
   </div>
 </template>
-
-<style lang="postcss" scoped>
-.group\/image::before {
-  content: url(@/assets/duotone/image.svg);
-  @apply absolute left-1/2 top-1/2 -z-10  -translate-x-1/2 -translate-y-1/2 animate-pulse opacity-20;
-}
-</style>

@@ -89,11 +89,7 @@ function copyEmail(event) {
 
     <!-- Socials/External Links -->
     <div class="pills flex w-full flex-row flex-wrap gap-2">
-      <Pill text="hi@psiderman.com" @click="copyEmail">
-        <template v-slot:icon>
-          <img src="@/assets/duotone/envelope.svg" alt="email" />
-        </template>
-      </Pill>
+      <Pill text="hi@psiderman.com" @click="copyEmail" icon="envelope"> </Pill>
       <a href="https://twitter.com/_psiderman_" target="_blank">
         <Pill text="Twitter" brand="twitter" />
       </a>
