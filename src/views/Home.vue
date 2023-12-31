@@ -55,7 +55,7 @@ onMounted(() => {
       0,
     );
   entrance.add({
-    targets: ".card",
+    targets: ".card, .anime-entry",
     translateY: ["3rem", "0"],
     opacity: [0, 1],
     scale: [0.95, 1],
@@ -96,6 +96,10 @@ onMounted(() => {
           <LinkCard title="Personal finance 101" logo="primer" />
         </a>
       </div>
+      <p class="anime-entry w-full text-base text-white/50">
+        ©️ Karan Sanas {{ new Date().getFullYear() }} <br />
+        Hand crafted in Vue.js, with love.
+      </p>
       <div class="col-span-2 h-10"></div>
     </div>
   </div>

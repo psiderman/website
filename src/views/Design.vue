@@ -46,7 +46,6 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img class="anime-entry" src="@/assets/design/qtcs/01.png" />
       <img class="anime-entry" src="@/assets/design/qtcs/02.png" />
       <img class="anime-entry" src="@/assets/design/qtcs/03.png" />
       <img class="anime-entry" src="@/assets/design/qtcs/04.png" />
@@ -54,34 +53,6 @@ onMounted(() => {
     </div>
   </div>
   <p class="caption anime-entry">A sneak peek of the case study</p>
-
-  <!-- Lessons -->
-  <!-- <h2>Lessons, 2020</h2>
-  <p>
-    What happens when you take informational slides and marry them with the
-    interactivity of a quiz game? You kill ‘death by slides’. The sole two
-    designers of Quizizz at the time delivered this 0→1 product in under four
-    weeks.
-  </p>
-  <div class="aspect-video">
-    <div class="gallery-scroll">
-      <div class="gallery-spacer"></div>
-      <img class="anime-entry" src="@/assets/design/lessons/01.png" />
-      <img class="anime-entry" src="@/assets/design/lessons/02.png" />
-      <img class="anime-entry" src="@/assets/design/lessons/03.png" />
-      <img class="anime-entry" src="@/assets/design/lessons/04.gif" />
-      <div class="gallery-spacer"></div>
-    </div>
-  </div>
-  <p class="caption">
-    You can read more about this project
-    <a
-      href="https://psiderman.read.cv/quizizz-lessons"
-      target="_blank"
-      class="underline"
-      >here</a
-    >
-  </p> -->
 
   <!-- Motion -->
   <h2>Motion and Interaction</h2>
@@ -133,6 +104,82 @@ onMounted(() => {
   <p class="caption anime-entry">
     I'm putting together a case study for this rn...
   </p>
+
+  <!-- Other -->
+  <h2>Lessons, and other projects</h2>
+  <p>
+    These are all archived projects from the earlier iterations of my portfolio.
+    I’ve since moved them out to read.cv just because I wasn’t keen on hosting a
+    website archive. You can read all of them here.
+  </p>
+  <div class="aspect-video">
+    <div class="gallery-scroll">
+      <div class="gallery-spacer"></div>
+      <img class="anime-entry" src="@/assets/design/lessons/01.png" />
+      <img class="anime-entry" src="@/assets/design/lessons/02.png" />
+      <img class="anime-entry" src="@/assets/design/lessons/03.png" />
+      <img class="anime-entry" src="@/assets/design/lessons/04.gif" />
+      <div class="gallery-spacer"></div>
+    </div>
+  </div>
+  <p class="caption">
+    The sole two designers of Quizizz at the time delivered this 0→1 product in
+    under four weeks.
+  </p>
+
+  <div class="w640 mt-10 flex flex-col gap-y-2">
+    <div class="flex flex-row items-center gap-x-2">
+      <a
+        href="https://psiderman.read.cv/quizizz-lessons"
+        target="_blank"
+        class="anime-entry shrink-0 font-serif text-lg leading-8 text-white/80 underline underline-offset-4"
+      >
+        Lessons
+      </a>
+      <span class="shrink-0 font-serif text-lg leading-8 text-white/50"
+        >Designer</span
+      >
+      <div class="anime-entry h-px w-full grow bg-white/10"></div>
+      <span
+        class="shrink-0 text-right font-serif text-lg leading-8 text-white/50"
+        >2020</span
+      >
+    </div>
+    <div class="flex flex-row items-center gap-x-2">
+      <a
+        href="https://psiderman.read.cv/quizizz-parent-reports"
+        target="_blank"
+        class="anime-entry shrink-0 font-serif text-lg leading-8 text-white/80 underline underline-offset-4"
+      >
+        Parent Reports v2
+      </a>
+      <span class="shrink-0 font-serif text-lg leading-8 text-white/50"
+        >Lead Designer</span
+      >
+      <div class="anime-entry h-px w-full grow bg-white/10"></div>
+      <span
+        class="shrink-0 text-right font-serif text-lg leading-8 text-white/50"
+        >2020</span
+      >
+    </div>
+    <div class="flex flex-row items-center gap-x-2">
+      <a
+        href="https://psiderman.read.cv/quizizz-other"
+        target="_blank"
+        class="anime-entry shrink-0 font-serif text-lg leading-8 text-white/80 underline underline-offset-4"
+      >
+        Miscellaneous Projects
+      </a>
+      <span class="shrink-0 font-serif text-lg leading-8 text-white/50"
+        >Designer</span
+      >
+      <div class="anime-entry h-px w-full grow bg-white/10"></div>
+      <span
+        class="shrink-0 text-right font-serif text-lg leading-8 text-white/50"
+        >2019 – 2020</span
+      >
+    </div>
+  </div>
 </template>
 
 <style lang="postcss" scoped>
