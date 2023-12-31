@@ -106,8 +106,5 @@ onMounted(async () => {
       <p>{{ travel.description }}</p>
       <LongImages :images="travel.images" />
     </template>
-    <p class="my-8">
-      There's more on my instagram, I'll move them here one of these weekends.
-    </p>
   </div>
 </template>
