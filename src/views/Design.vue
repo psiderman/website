@@ -1,6 +1,14 @@
 <script setup>
 import { onMounted } from "vue";
 import anime from "animejs";
+
+function nextScroll(event) {
+  const t = event.target;
+  const g = t.parentNode.previousSibling.querySelector(".gallery-scroll");
+  console.log(g);
+  g.scrollLeft += 640 + 16;
+}
+
 onMounted(() => {
   anime({
     targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
@@ -46,13 +54,36 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img class="anime-entry" src="@/assets/design/qtcs/02.png" />
-      <img class="anime-entry" src="@/assets/design/qtcs/03.png" />
-      <img class="anime-entry" src="@/assets/design/qtcs/04.png" />
+      <img
+        class="anime-entry gallery-image"
+        src="@/assets/design/qtcs/02.png"
+      />
+      <img
+        class="anime-entry gallery-image"
+        src="@/assets/design/qtcs/03.png"
+      />
+      <img
+        class="anime-entry gallery-image"
+        src="@/assets/design/qtcs/04.png"
+      />
       <div class="gallery-spacer"></div>
     </div>
   </div>
-  <p class="caption anime-entry">A sneak peek of the case study</p>
+  <div class="flex w-full flex-row justify-between">
+    <button
+      class="caption anime-entry rounded-full px-2 hover:bg-white/5"
+      @click="prevScroll"
+    >
+      Prev
+    </button>
+    <p class="caption anime-entry">A sneak peek of the case study</p>
+    <button
+      class="caption anime-entry rounded-full px-2 hover:bg-white/5"
+      @click="nextScroll"
+    >
+      Next
+    </button>
+  </div>
 
   <!-- Motion -->
   <h2>Motion and Interaction</h2>
@@ -97,7 +128,7 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img class="anime-entry" src="@/assets/design/ds/01.png" />
+      <img class="anime-entry gallery-image" src="@/assets/design/ds/01.png" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
@@ -115,10 +146,22 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img class="anime-entry" src="@/assets/design/lessons/01.png" />
-      <img class="anime-entry" src="@/assets/design/lessons/02.png" />
-      <img class="anime-entry" src="@/assets/design/lessons/03.png" />
-      <img class="anime-entry" src="@/assets/design/lessons/04.gif" />
+      <img
+        class="anime-entry gallery-image"
+        src="@/assets/design/lessons/01.png"
+      />
+      <img
+        class="anime-entry gallery-image"
+        src="@/assets/design/lessons/02.png"
+      />
+      <img
+        class="anime-entry gallery-image"
+        src="@/assets/design/lessons/03.png"
+      />
+      <img
+        class="anime-entry gallery-image"
+        src="@/assets/design/lessons/04.gif"
+      />
       <div class="gallery-spacer"></div>
     </div>
   </div>
@@ -192,16 +235,16 @@ onMounted(() => {
 }
 
 .gallery-scroll {
-  @apply absolute left-0 flex snap-mandatory flex-row gap-4 overflow-auto overscroll-x-none px-4;
+  @apply absolute left-0 flex flex-row gap-4 overflow-auto overscroll-x-none px-4;
   width: calc(100dvw - 16px);
 }
 
 .gallery-spacer {
   @apply h-full shrink-0;
-  width: calc((100dvw - 640px) / 2 - 40px);
+  width: calc((100dvw - 640px) / 2 - 32px);
 }
 
-.gallery-scroll img {
-  @apply w-full max-w-screen-sm shrink-0 select-none snap-center rounded-sm border border-white/15 bg-black;
+.gallery-scroll img.gallery-image {
+  @apply w-full max-w-screen-sm shrink-0 select-none rounded-sm border border-white/15 bg-black;
 }
 </style>
