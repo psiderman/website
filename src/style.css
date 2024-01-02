@@ -22,6 +22,22 @@ body::before {
   z-index: -1;
 }
 
+.card {
+  @apply relative overflow-hidden rounded-3xl border border-white/5 bg-white/[2%];
+  @apply select-none;
+  @apply grayscale transition-colors duration-200 hover:grayscale-0;
+  @apply hover:border-white/10;
+}
+
+.card::before {
+  content: "";
+  @apply absolute inset-0;
+  opacity: 0.3;
+  background-image: url(../assets/images/noise.png);
+  background-repeat: repeat;
+  background-size: 100px;
+}
+
 .skeleton-shimmer {
   @apply relative;
 }

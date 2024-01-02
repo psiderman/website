@@ -16,6 +16,7 @@ const urls = {
     import.meta.url,
   ).toString(),
   now: new URL("@/assets/duotone/now.svg", import.meta.url).toString(),
+  gaming: new URL("@/assets/duotone/gaming.svg", import.meta.url).toString(),
 };
 </script>
 <template>

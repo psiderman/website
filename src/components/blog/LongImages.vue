@@ -17,6 +17,7 @@ function sanityURL(r) {
 const props = defineProps({
   images: Array,
   skeleton: { type: Boolean, default: false },
+  square: { type: Boolean, default: false },
 });
 
 const gridClasses = {
@@ -39,8 +40,9 @@ const gridClasses = {
   >
     <div
       :class="[
-        'anime-entry group/image relative aspect-long overflow-hidden rounded-lg',
+        'anime-entry group/image relative overflow-hidden rounded-lg',
         skeleton ? 'bg-white/5' : 'bg-black',
+        square ? 'aspect-square' : 'aspect-long',
       ]"
       v-for="image in props.images"
       :key="image.id"

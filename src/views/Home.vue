@@ -4,6 +4,7 @@ import WorkCard from "@/components/home/WorkCard.vue";
 import NowCard from "@/components/home/NowCard.vue";
 import LinkCard from "@/components/home/LinkCard.vue";
 import TravelCard from "@/components/home/TravelCard.vue";
+import GamingCard from "@/components/home/GamingCard.vue";
 
 import { RouterLink } from "vue-router";
 import { onMounted } from "vue";
@@ -96,6 +97,10 @@ onMounted(() => {
           <LinkCard title="Personal finance 101" logo="primer" />
         </a>
       </div>
+      <RouterLink to="/gaming">
+        <GamingCard />
+      </RouterLink>
+      <div></div>
       <p class="anime-entry w-full text-base text-white/50">
         ©️ Karan Sanas {{ new Date().getFullYear() }} <br />
         Hand crafted in Vue.js, with love.
@@ -107,21 +112,8 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .card {
-  @apply relative h-80 overflow-hidden rounded-3xl border border-white/5 bg-white/[2%];
-  @apply select-none;
-  @apply grayscale transition-colors duration-200 hover:grayscale-0;
-  @apply hover:border-white/10;
+  @apply h-80;
 }
-
-.card::before {
-  content: "";
-  @apply absolute inset-0;
-  opacity: 0.3;
-  background-image: url(../assets/images/noise.png);
-  background-repeat: repeat;
-  background-size: 100px;
-}
-
 .card-small {
   @apply flex flex-col p-4;
   height: 140px !important;
