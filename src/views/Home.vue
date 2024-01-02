@@ -96,11 +96,27 @@ onMounted(() => {
         <a href="https://links.psiderman.com/primer" target="_blank">
           <LinkCard title="Personal finance 101" logo="primer" />
         </a>
+        <a
+          href="https://open.spotify.com/user/psiderman/playlists"
+          target="_blank"
+        >
+          <LinkCard title="Public Playlists" logo="spotify" />
+        </a>
       </div>
       <RouterLink to="/gaming">
         <GamingCard />
       </RouterLink>
-      <div></div>
+      <div class="grid grid-cols-2 gap-10">
+        <RouterLink to="/404">
+          <div class="card card-small">
+            <img
+              class="h-full w-full object-contain p-2"
+              src="@/assets/svg/psider.svg"
+              alt="psider logo"
+            />
+          </div>
+        </RouterLink>
+      </div>
       <p class="anime-entry w-full text-base text-white/50">
         ©️ Karan Sanas {{ new Date().getFullYear() }} <br />
         Hand crafted in Vue.js, with love.
