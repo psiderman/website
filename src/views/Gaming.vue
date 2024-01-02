@@ -9,16 +9,10 @@ const loading = ref(true);
 
 onMounted(async () => {
   const W1 = document.createElement("script");
-  W1.src = "https://fast.wistia.com/embed/medias/k56vrkksf4.jsonp";
+  W1.src = "https://fast.wistia.net/assets/external/E-v1.js";
   W1.async = true;
   W1.defer = true;
   document.body.appendChild(W1);
-
-  const W2 = document.createElement("script");
-  W2.src = "https://fast.wistia.com/assets/external/E-v1.js";
-  W2.async = true;
-  W2.defer = true;
-  document.body.appendChild(W2);
 
   const cards = document.querySelectorAll(".card");
 
@@ -125,9 +119,7 @@ onMounted(async () => {
     recording these for a while and had some time today, so I fired up iMovie
     and picked a song from my recents in Spotify.
   </p>
-  <div
-    class="anime-entry large aspect-video overflow-hidden rounded-lg bg-black"
-  >
+  <div class="anime-entry aspect-video overflow-hidden rounded-lg bg-black">
     <div
       class="wistia_responsive_padding"
       style="padding: 56.25% 0 0 0; position: relative"
@@ -136,44 +128,26 @@ onMounted(async () => {
         class="wistia_responsive_wrapper"
         style="height: 100%; left: 0; position: absolute; top: 0; width: 100%"
       >
-        <div
-          class="wistia_embed wistia_async_k56vrkksf4 seo=false videoFoam=true"
-          style="height: 100%; position: relative; width: 100%"
-        >
-          <div
-            class="wistia_swatch"
-            style="
-              height: 100%;
-              left: 0;
-              opacity: 0;
-              overflow: hidden;
-              position: absolute;
-              top: 0;
-              transition: opacity 200ms;
-              width: 100%;
-            "
-          >
-            <img
-              src="https://fast.wistia.com/embed/medias/k56vrkksf4/swatch"
-              style="
-                filter: blur(5px);
-                height: 100%;
-                object-fit: contain;
-                width: 100%;
-              "
-              alt=""
-              aria-hidden="true"
-              onload="this.parentNode.style.opacity=1;"
-            />
-          </div>
-        </div>
+        <iframe
+          src="https://fast.wistia.net/embed/iframe/ybn9loazpr?seo=false&videoFoam=true"
+          title="Valorant Reel"
+          allow="autoplay; fullscreen"
+          allowtransparency="true"
+          frameborder="0"
+          scrolling="no"
+          class="wistia_embed"
+          name="wistia_embed"
+          msallowfullscreen
+          width="100%"
+          height="100%"
+        ></iframe>
       </div>
     </div>
   </div>
   <p class="anime-entry caption">
     Video editing, is difficult, but easier than ranking higher in Valorant :')
   </p>
-  <div class="large" v-if="loading">
+  <div v-if="loading">
     <div class="w640">
       <div
         class="anime-entry skeleton-shimmer mb-8 mt-16 h-8 w-64 overflow-hidden rounded-lg bg-white/5"
@@ -193,7 +167,7 @@ onMounted(async () => {
       ]"
     />
   </div>
-  <div class="sanity large">
+  <div class="sanity">
     <template v-for="(game, i) in data" :key="i">
       <h1>{{ game.category }}</h1>
       <LongImages :images="game.images" :square="true" />
