@@ -112,7 +112,12 @@ onMounted(async () => {
       />
     </div>
   </div>
-  <p class="caption">My best estimate of total hours played in life: 12,818h</p>
+  <p class="caption">
+    My best estimate of total hours played in life: 13,000h+
+  </p>
+  <!-- 5 to 10, avg 2.5hrs/week + 10 to 15 avg 0.5hrs/weekday and 3hrs/weekend + 16 and 17, avg 3-5hrs/day + 18 to 27 avg 0.5hrs/weekday and 3-5hrs/weekend-->
+  <!-- 650 + 2,210 + 2,184–3,640 + 4,420–6,500-->
+  <!-- 9,464 to 13,000 -->
   <h1>Valorant Gameplay Montage</h1>
   <p>
     I always wanted to create some sort of a gameplay montage, and had been
