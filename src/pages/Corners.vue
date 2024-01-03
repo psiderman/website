@@ -73,7 +73,7 @@ onMounted(async () => {
       <h1 class="px-8 text-center text-2xl font-semibold text-white/80">
         Prove you are human
       </h1>
-      <div class="anime-entry scissor relative px-8 py-4">
+      <div class="anime-entry relative cursor-pointer px-8 py-4">
         <div class="absolute bottom-2 left-4 z-50 h-32 w-32" @click="cut"></div>
         <div class="relative">
           <img
@@ -123,9 +123,5 @@ onMounted(async () => {
   bottom: 44.5px;
   transform-origin: center center;
   rotate: 50deg;
-}
-
-.scissor {
-  cursor: url(../assets/svg/scissor.svg), auto;
 }
 </style>
