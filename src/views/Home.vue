@@ -131,7 +131,7 @@ onMounted(() => {
   @apply h-80;
 }
 .card-small {
-  @apply flex flex-col p-4;
+  @apply flex aspect-square flex-col p-4;
   height: 140px !important;
 }
 </style>
