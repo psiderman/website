@@ -31,7 +31,7 @@ import Description from "./CardDescription.vue";
     </div>
     <Description
       title="Gaming"
-      description="It's my only hobby that has withstood the test of time. This design is also my first tattoo."
+      description="It's my only hobby that has withstood the test of time. The P1 design is also my first tattoo."
       icon="gaming"
     />
   </div>

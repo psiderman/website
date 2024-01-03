@@ -2,12 +2,6 @@
 import { onMounted } from "vue";
 import anime from "animejs";
 
-function nextScroll(event) {
-  const t = event.target;
-  const g = t.parentNode.previousSibling.querySelector(".gallery-scroll");
-  g.scrollLeft += 640 + 16;
-}
-
 onMounted(() => {
   anime({
     targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
@@ -69,19 +63,7 @@ onMounted(() => {
     </div>
   </div>
   <div class="flex w-full flex-row justify-between">
-    <button
-      class="caption anime-entry rounded-full px-2 hover:bg-white/5"
-      @click="prevScroll"
-    >
-      Prev
-    </button>
     <p class="caption anime-entry">A sneak peek of the case study</p>
-    <button
-      class="caption anime-entry rounded-full px-2 hover:bg-white/5"
-      @click="nextScroll"
-    >
-      Next
-    </button>
   </div>
 
   <!-- Motion -->

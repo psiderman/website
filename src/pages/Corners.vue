@@ -32,7 +32,7 @@ function cut() {
     easing: "easeInOutQuad",
   });
   const status = document.querySelector("p.status");
-  status.innerHTML = `You cut corners too! If the website looks like shit on mobile sometimes, now you know why...`;
+  status.innerHTML = `Now we're both cutting corners, and you know why the website works best on desktop.`;
   const h1 = document.querySelector("h1");
   h1.innerHTML = `You're human.`;
   anime({
@@ -70,7 +70,7 @@ onMounted(async () => {
       class="anime-entry h-16 w-16 select-none"
     />
     <div class="flex w-screen max-w-xs flex-col">
-      <h1 class="px-8 text-center text-2xl font-semibold text-white/80">
+      <h1 class="px-8 text-center text-2xl font-semibold text-white">
         Prove you are human
       </h1>
       <div class="anime-entry relative cursor-pointer px-8 py-4">
@@ -100,7 +100,7 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <p class="status px-8 text-center text-base text-white/50">
+      <p class="status px-8 text-center text-base text-white">
         Tap your finger on the dotted line to make a cut. <br /><br />
       </p>
       <p></p>

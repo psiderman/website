@@ -71,6 +71,7 @@ onMounted(async () => {
     I built my PC back in 2014, and its due for an upgrade any minute now. It's
     kept me company from the likes of Batman: Arkham Asylum, Splinter Cell:
     Blacklist, and although sluggishly, even up to Hitman 3 and Watch Dogs 2.
+    For games after 2022, I have my PS5.
   </p>
   <div class="grid grid-cols-6 grid-rows-1 gap-4">
     <img
@@ -123,8 +124,8 @@ onMounted(async () => {
   <h1>Valorant Gameplay Montage</h1>
   <p>
     I always wanted to create some sort of a gameplay montage, and had been
-    recording these for a while and had some time today, so I fired up iMovie
-    and picked a song from my recents in Spotify.
+    recording these for a while. Had some time today so I fired up iMovie and
+    picked a song from my recents in Spotify.
   </p>
   <div class="anime-entry aspect-video overflow-hidden rounded-lg bg-black">
     <div
