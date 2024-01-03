@@ -150,7 +150,8 @@ onMounted(async () => {
     </div>
   </div>
   <p class="anime-entry caption">
-    Video editing, is difficult, but easier than ranking higher in Valorant :')
+    Video editing is difficult but it's easier than ranking higher in Valorant
+    :')
   </p>
   <div v-if="loading">
     <div class="w640">
