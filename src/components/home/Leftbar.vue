@@ -102,6 +102,12 @@ function copyEmail(event) {
       <a href="https://psiderman.read.cv" target="_blank">
         <Pill text="Read.cv" icon="read-cv" />
       </a>
+      <!-- <a href="https://github.com/psiderman/website" target="_blank">
+        <Pill text="Github" brand="github" />
+      </a>
+      <a href="https://instagram.com/psiderman" target="_blank">
+        <Pill text="Instagram" brand="instagram" />
+      </a> -->
     </div>
   </div>
 </template>

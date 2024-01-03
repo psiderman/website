@@ -117,9 +117,9 @@ onMounted(() => {
           </div>
         </RouterLink>
       </div>
-      <p class="anime-entry w-full text-xs text-white/50">
+      <p class="anime-entry w-full text-base text-white/50">
         ©️ Karan Sanas {{ new Date().getFullYear() }} <br />
-        Hand crafted in Vue.js, with love.
+        Handcrafted, with love.
       </p>
       <div class="col-span-2 h-10"></div>
     </div>

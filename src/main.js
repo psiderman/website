@@ -12,6 +12,8 @@ import {
   faTwitter,
   faDribbble,
   faRedditAlien,
+  faGithub,
+  faInstagram,
 } from "@fortawesome/free-brands-svg-icons";
 
 import VueLazyload from "vue3-lazyload";
@@ -23,7 +25,7 @@ app.use(pinia);
 app.use(router);
 
 library.add();
-library.add(faTwitter, faDribbble, faRedditAlien);
+library.add(faTwitter, faDribbble, faRedditAlien, faGithub, faInstagram);
 
 watch(
   pinia.state,

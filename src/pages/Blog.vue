@@ -20,10 +20,10 @@ import { RouterLink, RouterView } from "vue-router";
       />
     </RouterLink>
     <div
-      class="anime-entry pointer-events-none flex w-full select-none flex-col items-center justify-center gap-y-1 text-center text-xs text-white/50"
+      class="anime-entry pointer-events-none flex w-full select-none flex-col items-center justify-center gap-y-1 text-center text-base text-white/50"
     >
       <span> ©️ Karan Sanas {{ new Date().getFullYear() }} </span>
-      <span> Hand crafted in Vue.js, with love. </span>
+      <span> Handcrafted, with love. </span>
     </div>
   </div>
 </template>
