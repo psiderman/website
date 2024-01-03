@@ -25,6 +25,14 @@ app.use(router);
 library.add();
 library.add(faTwitter, faDribbble, faRedditAlien);
 
+watch(
+  pinia.state,
+  (state) => {
+    localStorage.setItem("store", JSON.stringify(state.store));
+  },
+  { deep: true },
+);
+
 app.component("fa", FontAwesomeIcon);
 
 app.use(VueLazyload);

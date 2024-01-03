@@ -5,7 +5,6 @@ import anime from "animejs";
 function nextScroll(event) {
   const t = event.target;
   const g = t.parentNode.previousSibling.querySelector(".gallery-scroll");
-  console.log(g);
   g.scrollLeft += 640 + 16;
 }
 

@@ -77,9 +77,11 @@ onMounted(async () => {
       src="@/assets/images/pc.jpeg"
       alt="pc setup"
       title="This picture was taken before I got my playstation, but it's here in spirit."
-      class="anime-entry col-span-5 row-span-2 cursor-help rounded-2xl border border-white/15 bg-black"
+      class="anime-entry col-span-6 row-span-2 cursor-help rounded-2xl border border-white/15 bg-black lg:col-span-5"
     />
-    <div class="col-span-1 grid grid-cols-1 grid-rows-5 content-start gap-4">
+    <div
+      class="col-span-1 hidden grid-cols-1 grid-rows-5 content-start gap-4 lg:grid"
+    >
       <img
         src="@/assets/images/pc/intel.png"
         alt="Intel Core i5-4670 @3.4GHz Quad-Core"

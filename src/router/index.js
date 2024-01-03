@@ -9,6 +9,11 @@ const router = createRouter({
       component: () => import("../views/Home.vue"),
     },
     {
+      path: "/verify",
+      name: "Verify",
+      component: () => import("../pages/Corners.vue"),
+    },
+    {
       path: "/design",
       component: () => import("../pages/Blog.vue"),
       children: [
@@ -57,6 +62,27 @@ const router = createRouter({
       component: () => import("../404.vue"),
     },
   ],
+});
+
+router.beforeEach(async (to, from, next) => {
+  let cut = false;
+
+  try {
+    const store = JSON.parse(localStorage.getItem("store"));
+    if (typeof store.cutCorners == "boolean") {
+      cut = store.cutCorners;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  const isMobile =
+    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 2) ||
+    window.innerWidth < 1024;
+
+  if (to.path != "/verify" && !cut && isMobile)
+    next({ path: "/verify", query: { p: to.path } });
+  else next();
 });
 
 export default router;
