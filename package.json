@@ -17,6 +17,8 @@
     "@portabletext/vue": "^1.0.6",
     "@sanity/client": "^6.10.0",
     "@sanity/image-url": "^1.0.2",
+    "@sentry/vite-plugin": "^2.10.2",
+    "@sentry/vue": "^7.91.0",
     "animejs": "^3.2.2",
     "axios": "^1.6.3",
     "date-fns": "^3.0.6",

@@ -17,9 +17,17 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 
 import VueLazyload from "vue3-lazyload";
+import * as Sentry from "@sentry/vue";
 
 const app = createApp(App);
 const pinia = createPinia();
+
+Sentry.init({
+  app,
+  dsn: "https://f9fb333b90d33074087c3e73695cfd07@o447178.ingest.sentry.io/4506513102012416",
+  trackComponents: true,
+  integrations: [],
+});
 
 app.use(pinia);
 app.use(router);
