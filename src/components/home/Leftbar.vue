@@ -20,9 +20,16 @@ function copyEmail(event) {
 
       document.body.appendChild(copiedMessage);
 
-      const messageX = event.clientX - copiedMessage.offsetWidth / 2;
-      const messageY = event.clientY - copiedMessage.offsetHeight / 2 - 20;
+      let messageX, messageY;
 
+      if (event.x == 0 && event.y == 0) {
+        const el = document.querySelector("#email").getBoundingClientRect();
+        messageX = el.x + el.width / 2 - copiedMessage.offsetWidth / 2;
+        messageY = el.y + el.height / 2 - copiedMessage.offsetHeight / 2 - 20;
+      } else {
+        messageX = event.clientX - copiedMessage.offsetWidth / 2;
+        messageY = event.clientY - copiedMessage.offsetHeight / 2 - 20;
+      }
       // Set the position for the centered message
       copiedMessage.style.position = "absolute";
       copiedMessage.style.top = `${messageY}px`;
@@ -59,11 +66,10 @@ function copyEmail(event) {
 </script>
 
 <template>
-  <div
-    class="top-0 flex shrink-0 flex-col gap-y-8 lg:sticky lg:h-full lg:w-80 lg:justify-between"
-  >
+  <div class="left-sticky-bar">
     <!-- Quick intro -->
-    <div class="flex flex-col gap-y-8">
+    <div>
+      <!-- DP -->
       <div
         class="leftbar-headshot pointer-events-none relative h-16 w-16 select-none rounded-full bg-blue-600"
       >
@@ -71,43 +77,61 @@ function copyEmail(event) {
           class="absolute bottom-0 h-20 w-16 overflow-hidden rounded-b-full align-bottom"
         >
           <img
-            class="leftbar-dp h-20 w-20 select-none object-cover"
+            class="h-20 w-20 select-none object-cover"
             src="@/assets/images/dp.png"
             alt="cartoon me"
           />
         </div>
       </div>
-      <div class="flex flex-col gap-y-4">
-        <h1 class="leftbar-headshot text-4xl font-bold">Hi, I’m Karan</h1>
-        <p class="leftbar-headshot text-base font-medium">
-          I’m still searching for a one-liner to sum me up, but until then my
-          life is a bento box of endless interests, neatly packed for display on
-          my ever-evolving personal website.
-        </p>
-      </div>
+      <h1 class="leftbar-headshot mb-4 mt-8 text-4xl font-bold">
+        Hi, I’m Karan
+      </h1>
+      <p class="leftbar-headshot text-base font-medium">
+        I’m still searching for a one-liner to sum me up, but until then my life
+        is a bento box of endless interests, neatly packed for display on my
+        ever-evolving personal website.
+      </p>
     </div>
 
-    <!-- Socials/External Links -->
-    <div class="pills flex w-full flex-row flex-wrap gap-2">
-      <Pill text="hi@psiderman.com" @click="copyEmail" icon="envelope"> </Pill>
-      <a href="https://twitter.com/_psiderman_" target="_blank">
-        <Pill text="Twitter" brand="twitter" />
-      </a>
-      <a href="https://dribbble.com/psiderman" target="_blank">
-        <Pill text="Dribbble" brand="dribbble" />
-      </a>
-      <a href="https://www.youtube.com/watch?v=xvFZjo5PgG0" target="_blank">
-        <Pill text="Reddit" brand="reddit-alien" />
-      </a>
-      <a href="https://psiderman.read.cv" target="_blank">
-        <Pill text="Read.cv" icon="read-cv" />
-      </a>
-      <!-- <a href="https://github.com/psiderman/website" target="_blank">
-        <Pill text="Github" brand="github" />
-      </a>
-      <a href="https://instagram.com/psiderman" target="_blank">
-        <Pill text="Instagram" brand="instagram" />
-      </a> -->
+    <div class="flex flex-col gap-2 overflow-visible">
+      <!-- Socials/External Links -->
+      <div class="flex w-full flex-row flex-wrap gap-2 overflow-visible">
+        <Pill
+          id="email"
+          text="hi@psiderman.com"
+          @click.prevent="copyEmail"
+          icon="envelope"
+        />
+        <Pill
+          text="Twitter"
+          brand="twitter"
+          link="https://twitter.com/_psiderman_"
+        />
+        <Pill
+          text="Dribbble"
+          brand="dribbble"
+          link="https://dribbble.com/psiderman"
+        />
+        <Pill
+          text="Reddit"
+          brand="reddit-alien"
+          link="https://www.youtube.com/watch?v=xvFZjo5PgG0"
+        />
+        <Pill text="Read.cv" icon="read-cv" link="https://psiderman.read.cv" />
+      </div>
     </div>
   </div>
 </template>
+
+<style lang="postcss" scoped>
+.left-sticky-bar {
+  @apply flex w-full shrink-0 flex-col justify-between gap-4 lg:sticky lg:top-20 lg:w-80;
+  height: calc(100dvh - 160px);
+}
+
+@media (max-width: 1023px) {
+  .left-sticky-bar {
+    height: auto;
+  }
+}
+</style>

@@ -1,8 +1,9 @@
 <script setup>
-defineProps({
+const props = defineProps({
   text: String,
   brand: String,
   icon: String,
+  link: String,
 });
 
 const urls = {
@@ -16,9 +17,13 @@ const urls = {
     import.meta.url,
   ).toString(),
 };
+
+function openLink(link) {
+  if (link) window.open(link);
+}
 </script>
 <template>
-  <button class="pill">
+  <button class="pill" @click="openLink(link)">
     <fa v-if="brand" class="text-[14px]" :icon="['fab', brand]" />
     <img v-if="icon" class="h-5" :src="urls[icon]" alt="logo" />
     {{ text }}

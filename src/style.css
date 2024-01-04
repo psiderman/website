@@ -16,14 +16,14 @@ body::before {
   height: 100vh;
   background: radial-gradient(
     50% 50% at 50% 50%,
-    hsla(240, 4%, 13%) 0%,
-    hsla(240, 6%, 10%) 100%
+    hsla(240, 4%, 15%) 0%,
+    hsla(240, 6%, 8%) 100%
   );
   z-index: -1;
 }
 
 .card {
-  @apply relative overflow-hidden rounded-3xl border border-white/5 bg-white/[2%];
+  @apply relative col-span-1 row-span-1 aspect-square shrink-0 overflow-hidden rounded-3xl border border-white/5 bg-white/[2%];
   @apply select-none;
   @apply grayscale transition-colors duration-200 hover:grayscale-0;
   @apply hover:border-white/10;
@@ -32,7 +32,7 @@ body::before {
 .card::before {
   content: "";
   @apply absolute inset-0;
-  opacity: 0.25;
+  opacity: 0.4;
   background-image: url(@/assets/images/noise.png);
   background-repeat: repeat;
   background-size: 100px;
@@ -64,6 +64,10 @@ body::before {
 * {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+*:focus {
+  @apply outline outline-offset-4 outline-white/50;
 }
 
 @tailwind utilities;

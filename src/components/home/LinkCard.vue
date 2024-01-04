@@ -2,6 +2,7 @@
 const props = defineProps({
   title: String,
   logo: String,
+  link: String,
 });
 
 const urls = {
@@ -13,7 +14,7 @@ const urls = {
 </script>
 
 <template>
-  <div class="card card-small justify-between">
+  <a class="card flex cursor-pointer flex-col justify-between p-4" :href="link">
     <div class="h-8 w-8">
       <img class="h-8 w-8" :src="urls[logo]" alt="logo" />
     </div>
@@ -23,5 +24,5 @@ const urls = {
       alt="link icon"
       class="absolute right-4 top-4 h-6"
     />
-  </div>
+  </a>
 </template>

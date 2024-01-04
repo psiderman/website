@@ -54,84 +54,81 @@ onMounted(() => {
         delay: anime.stagger(100),
       },
       0,
-    );
-  entrance.add({
-    targets: ".card, .anime-entry",
-    translateY: ["3rem", "0"],
-    opacity: [0, 1],
-    scale: [0.95, 1],
-    transformOrigin: "center",
-    duration: 500,
-    easing: "easeOutBack",
-    delay: anime.stagger(100),
-  });
+    )
+    .add({
+      targets: ".card, .anime-entry",
+      translateY: ["3rem", "0"],
+      opacity: [0, 1],
+      scale: [0.95, 1],
+      transformOrigin: "center",
+      duration: 500,
+      easing: "easeOutBack",
+      delay: anime.stagger(100),
+    });
 });
 </script>
 
 <template>
   <!-- Content -->
+
   <div
-    class="m-auto flex h-screen max-h-[900px] w-screen max-w-screen-lg flex-col gap-10 overflow-scroll p-10 py-20 lg:flex-row lg:p-0 lg:py-20"
+    class="mx-auto my-auto flex w-full max-w-screen-lg flex-col gap-4 px-10 py-20 md:gap-10 lg:flex-row"
   >
     <Leftbar />
 
     <!-- Right bar -->
-    <div class="flex min-h-fit w-full grid-cols-2 flex-col gap-10 sm:grid">
-      <RouterLink to="/design">
+    <div class="grid h-full w-full gap-4 md:grid-cols-2 md:gap-10">
+      <RouterLink class="rounded-3xl" to="/design">
         <WorkCard />
       </RouterLink>
-      <RouterLink to="/now">
+      <RouterLink class="rounded-3xl" to="/now">
         <NowCard />
       </RouterLink>
-      <RouterLink to="/backpacking">
+      <RouterLink class="rounded-3xl" to="/backpacking">
         <TravelCard />
       </RouterLink>
-      <div class="grid grid-cols-2 gap-10">
-        <a href="https://owensans.vercel.app" target="_blank">
-          <LinkCard title="Owen Sans, font quiz" logo="owensans" />
-        </a>
-        <a href="https://kiwi.psiderman.com" target="_blank">
-          <LinkCard title="Kiwi, personal finance" logo="kiwi" />
-        </a>
-        <a href="https://links.psiderman.com/primer" target="_blank">
-          <LinkCard title="Personal finance 101" logo="primer" />
-        </a>
-        <a
-          href="https://open.spotify.com/user/psiderman/playlists"
-          target="_blank"
-        >
-          <LinkCard title="Public Playlists" logo="spotify" />
-        </a>
+      <div class="grid grid-cols-2 grid-rows-2 gap-4 md:gap-10">
+        <LinkCard
+          title="Owen Sans, font quiz"
+          logo="owensans"
+          link="https://owensans.vercel.app"
+        />
+        <LinkCard
+          title="Kiwi, personal finance"
+          logo="kiwi"
+          link="https://kiwi.psiderman.com"
+        />
+        <LinkCard
+          title="Personal finance 101"
+          logo="primer"
+          link="://links.psiderman.com/primer"
+        />
+        <LinkCard
+          title="Public Playlists"
+          logo="spotify"
+          link="https://open.spotify.com/user/psiderman/playlists"
+        />
       </div>
-      <RouterLink to="/gaming">
+      <RouterLink to="/gaming" class="rounded-3xl">
         <GamingCard />
       </RouterLink>
-      <div class="grid grid-cols-2 gap-10">
-        <RouterLink to="/404">
+      <div class="grid grid-cols-2 gap-4 md:grid-rows-2 md:gap-10">
+        <RouterLink to="/404" class="rounded-3xl">
           <div class="card card-small">
             <img
-              class="h-full w-full object-contain p-2"
+              class="h-full w-full object-contain p-8"
               src="@/assets/svg/psider.svg"
               alt="psider logo"
             />
           </div>
         </RouterLink>
       </div>
-      <p class="anime-entry w-full text-base text-white/50">
+      <p
+        class="anime-entry col-span-1 w-full text-center text-base text-white/50 md:col-span-2 lg:col-span-1 lg:text-left"
+      >
         ©️ Karan Sanas {{ new Date().getFullYear() }} <br />
         Handcrafted, with love.
       </p>
-      <div class="col-span-2 h-10"></div>
     </div>
   </div>
 </template>
-
-<style lang="postcss" scoped>
-.card {
-  @apply h-80;
-}
-.card-small {
-  @apply flex aspect-square flex-col p-4;
-  height: 140px !important;
-}
-</style>
