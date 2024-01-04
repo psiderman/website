@@ -101,7 +101,7 @@ onMounted(() => {
         <LinkCard
           title="Personal finance 101"
           logo="primer"
-          link="://links.psiderman.com/primer"
+          link="https://links.psiderman.com/primer"
         />
         <LinkCard
           title="Public Playlists"
