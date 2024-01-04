@@ -3,7 +3,7 @@ import "@/assets/blog.css";
 import { RouterLink, RouterView } from "vue-router";
 </script>
 <template>
-  <div class="content mx-auto min-h-dvh w-screen max-w-screen-lg p-4 lg:py-20">
+  <div class="content mx-auto min-h-dvh w-screen max-w-screen-lg p-10 lg:py-20">
     <RouterLink to="/">
       <img
         src="@/assets/svg/psider.svg"

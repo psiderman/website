@@ -81,21 +81,46 @@ onMounted(() => {
       <video
         src="@/assets/design/motion/graphing.mp4"
         autoplay
+        playsinline
         muted
         loop
       ></video>
     </div>
     <div class="motion-card anime-entry">
-      <video src="@/assets/design/motion/spin.mp4" autoplay muted loop></video>
+      <video
+        src="@/assets/design/motion/spin.mp4"
+        autoplay
+        playsinline
+        muted
+        loop
+      ></video>
     </div>
     <div class="motion-card anime-entry">
-      <video src="@/assets/design/motion/calc.mp4" autoplay muted loop></video>
+      <video
+        src="@/assets/design/motion/calc.mp4"
+        autoplay
+        playsinline
+        muted
+        loop
+      ></video>
     </div>
     <div class="motion-card anime-entry">
-      <video src="@/assets/design/motion/mbox.mp4" autoplay muted loop></video>
+      <video
+        src="@/assets/design/motion/mbox.mp4"
+        autoplay
+        playsinline
+        muted
+        loop
+      ></video>
     </div>
     <div class="motion-card anime-entry">
-      <video src="@/assets/design/motion/live.mp4" autoplay muted loop></video>
+      <video
+        src="@/assets/design/motion/live.mp4"
+        autoplay
+        playsinline
+        muted
+        loop
+      ></video>
     </div>
   </div>
 
@@ -147,7 +172,7 @@ onMounted(() => {
     </div>
   </div>
   <p class="caption">
-    The sole two designers of Quizizz at the time delivered this 0→1 product in
+    The only two designers of Quizizz at the time delivered this 0→1 product in
     under four weeks.
   </p>
 
