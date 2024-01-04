@@ -14,7 +14,11 @@ const urls = {
 </script>
 
 <template>
-  <a class="card flex cursor-pointer flex-col justify-between p-4" :href="link">
+  <a
+    class="card flex cursor-pointer flex-col justify-between p-4"
+    :href="link"
+    target="_blank"
+  >
     <div class="h-8 w-8">
       <img class="h-8 w-8" :src="urls[logo]" alt="logo" />
     </div>

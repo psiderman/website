@@ -62,7 +62,7 @@ onMounted(async () => {
 </script>
 <template>
   <div
-    class="flex h-screen w-full select-none flex-col items-center justify-between p-10"
+    class="flex h-screen w-full select-none flex-col items-center justify-between p-10 lg:p-0"
   >
     <img
       src="@/assets/svg/psider.svg"

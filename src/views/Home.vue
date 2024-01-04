@@ -72,7 +72,7 @@ onMounted(() => {
   <!-- Content -->
 
   <div
-    class="mx-auto my-auto flex w-full max-w-screen-lg flex-col gap-4 px-10 py-20 md:gap-10 lg:flex-row"
+    class="mx-auto my-auto flex w-full max-w-screen-lg flex-col gap-4 px-10 py-20 md:gap-10 lg:flex-row lg:px-0"
   >
     <Leftbar />
 
@@ -123,12 +123,19 @@ onMounted(() => {
           </div>
         </RouterLink>
       </div>
-      <p
-        class="anime-entry col-span-1 w-full text-center text-base text-white/50 md:col-span-2 lg:col-span-1 lg:text-left"
+      <div
+        class="anime-entry col-span-1 flex w-full select-none flex-col text-center text-base text-white/50 md:col-span-2 lg:col-span-1 lg:text-left"
       >
-        ©️ Karan Sanas {{ new Date().getFullYear() }} <br />
-        Handcrafted, with love.
-      </p>
+        <span> ©️ Karan Sanas {{ new Date().getFullYear() }} </span>
+        <span>
+          <a
+            href="https://github.com/psiderman/website"
+            target="_blank"
+            class="underline underline-offset-4 hover:text-white/80"
+            >Handcrafted</a
+          >, with love.
+        </span>
+      </div>
     </div>
   </div>
 </template>

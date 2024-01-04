@@ -129,7 +129,14 @@ onMounted(() => {
   <h2>Design System</h2>
   <p>
     I created and maintained three iterations of the design system in Figma+Code
-    to be used by 16 designers and 50+ engineers.
+    to be used by 16 designers and 50+ engineers. While I prepare this case
+    study, you can go through an older iteration of the
+    <a
+      class="underline underline-offset-4"
+      href="https://psiderman.notion.site/Handbook-WIP-881cfca7ed1344f9935c77afb0531c14?pvs=4"
+      target="_blank"
+      >documentation that I maintained here.</a
+    >
   </p>
   <div class="aspect-video">
     <div class="gallery-scroll">

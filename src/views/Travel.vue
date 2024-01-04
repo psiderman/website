@@ -50,7 +50,7 @@ onMounted(async () => {
     laptop is 1.5kgs. Of course, I made a
     <a
       href="https://docs.google.com/spreadsheets/d/1qaqdf6zLSnEwbf700jZxeuDoB4JNATjNvUZObxbKWxE/edit?usp=sharing"
-      class="hover:underline"
+      class="underline underline-offset-4"
       target="_blank"
       >spreadsheet</a
     >. When I pack and dress smartly, I can bring the weight to under 7kgs.
@@ -75,7 +75,7 @@ onMounted(async () => {
     <a
       href="https://www.reddit.com/r/onebag/wiki/index/#wiki_what_is_onebag.3F"
       target="_blank"
-      class="underline"
+      class="underline underline-offset-2"
       >one bagging</a
     >
     here

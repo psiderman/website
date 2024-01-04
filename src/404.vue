@@ -32,8 +32,7 @@ onMounted(() => {
       404
     </h1>
     <p class="anime-entry max-w-screen-sm text-center text-base text-white/50">
-      You know... if you want to get back at the website, you can click on the
-      spider to make him drop his little heart.
+      To get back at the website, make the spider drop his little heart.
     </p>
     <RouterLink to="/">
       <Button

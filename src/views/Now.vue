@@ -48,7 +48,10 @@ onMounted(async () => {
   <h1 class="mb-4">What am I doing now?</h1>
   <p class="-mt-12">
     This is a
-    <a href="https://nownownow.com/about" target="_blank" class="underline"
+    <a
+      href="https://nownownow.com/about"
+      target="_blank"
+      class="underline underline-offset-4"
       >/now</a
     >
     page inspired by Derek Sivers.
