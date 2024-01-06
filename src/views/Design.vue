@@ -62,9 +62,7 @@ onMounted(() => {
       <div class="gallery-spacer"></div>
     </div>
   </div>
-  <div class="flex w-full flex-row justify-between">
-    <p class="caption anime-entry">A sneak peek of the case study</p>
-  </div>
+  <p class="caption anime-entry">A sneak peek of the case study</p>
 
   <!-- Motion -->
   <h2>Motion and Interaction</h2>
@@ -129,11 +127,10 @@ onMounted(() => {
   <h2>Design System</h2>
   <p>
     I created and maintained three iterations of the design system in Figma+Code
-    to be used by 16 designers and 50+ engineers. While I prepare this case
-    study, you can go through an older iteration of the
+    to be used by 16 designers and 50+ engineers.
     <a
       class="underline underline-offset-4"
-      href="https://psiderman.notion.site/Handbook-WIP-881cfca7ed1344f9935c77afb0531c14?pvs=4"
+      href="https://psiderman.notion.site/Handbook-Deprecated-881cfca7ed1344f9935c77afb0531c14?pvs=74"
       target="_blank"
       >documentation that I maintained here.</a
     >
@@ -142,12 +139,12 @@ onMounted(() => {
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
       <img class="anime-entry gallery-image" src="@/assets/design/ds/01.png" />
+      <img class="anime-entry gallery-image" src="@/assets/design/ds/02.png" />
+      <img class="anime-entry gallery-image" src="@/assets/design/ds/03.png" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
-  <p class="caption anime-entry">
-    I'm putting together a case study for this rn...
-  </p>
+  <p class="caption anime-entry">A sneak peek of the case study</p>
 
   <!-- Other -->
   <h2>Lessons, and other projects</h2>
@@ -236,6 +233,35 @@ onMounted(() => {
       >
     </div>
   </div>
+
+  <!-- Work/Play -->
+  <h2>Bonus BTS: Work and Play</h2>
+  <div class="aspect-video">
+    <div class="gallery-scroll">
+      <div class="gallery-spacer"></div>
+      <video
+        class="w640 anime-entry aspect-video rounded-sm border border-white/15 bg-black"
+        autoplay
+        src="@/assets/design/work.mp4"
+        playsinline
+        muted
+        loop
+      ></video>
+      <video
+        class="w640 anime-entry aspect-video rounded-sm border border-white/15 bg-black"
+        autoplay
+        src="@/assets/design/qudeez.mp4"
+        playsinline
+        muted
+        loop
+      ></video>
+      <div class="gallery-spacer"></div>
+    </div>
+  </div>
+  <p class="caption anime-entry">
+    Did you know? 'qudeez' is a portmanteau of Quizizz Design Cuties. Being a
+    qudee is the second highest honor after OP.
+  </p>
 </template>
 
 <style lang="postcss" scoped>
