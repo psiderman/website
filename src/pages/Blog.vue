@@ -15,17 +15,43 @@ import { RouterLink, RouterView } from "vue-router";
     </RouterLink>
     <RouterView />
     <div
-      class="anime-entry mt-20 flex w-full select-none flex-col items-center justify-center gap-y-1 text-center text-base text-white/50"
+      class="mt-20 flex w-full select-none flex-col items-center justify-center gap-y-1 text-center text-base text-white/50"
     >
-      <span> ©️ Karan Sanas {{ new Date().getFullYear() }} </span>
-      <span>
-        <a
-          href="https://github.com/psiderman/website"
-          target="_blank"
-          class="underline underline-offset-4 hover:text-white/80"
-          >Handcrafted</a
-        >, with love.
+      <span class="anime-entry">
+        ©️ Karan Sanas {{ new Date().getFullYear() }}
       </span>
+      <span class="anime-entry"> Handcrafted, with love. </span>
+    </div>
+    <div class="w640 mt-8 flex flex-row justify-center text-white/50">
+      <RouterLink
+        to="/"
+        class="anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
+        >Home</RouterLink
+      >
+      <a
+        href="https://twitter.com/_psiderman_"
+        target="_blank"
+        class="anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
+        >Twitter</a
+      >
+      <a
+        href="https://dribbble.com/psiderman"
+        target="_blank"
+        class="anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
+        >Dribbble</a
+      >
+      <a
+        href="https://github.com/psiderman/website"
+        target="_blank"
+        class="anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
+        >Github</a
+      >
+      <a
+        href="https://psiderman.read.cv"
+        target="_blank"
+        class="anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
+        >Read.cv</a
+      >
     </div>
   </div>
 </template>
