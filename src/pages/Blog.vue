@@ -22,7 +22,7 @@ import { RouterLink, RouterView } from "vue-router";
       </span>
       <span class="anime-entry"> Handcrafted, with love. </span>
     </div>
-    <div class="w640 mt-8 flex flex-row justify-center text-white/50">
+    <div class="w640 mt-8 flex flex-row flex-wrap justify-center text-white/50">
       <RouterLink
         to="/"
         class="anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
