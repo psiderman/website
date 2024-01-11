@@ -8,6 +8,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
+import { faHeart as faHeartS } from "@fortawesome/free-solid-svg-icons";
 import {
   faTwitter,
   faRedditAlien,
@@ -31,7 +32,7 @@ Sentry.init({
 app.use(pinia);
 app.use(router);
 
-library.add(faHeart);
+library.add(faHeart, faHeartS);
 library.add(faTwitter, faRedditAlien, faGithub, faInstagram);
 
 watch(

@@ -8,6 +8,12 @@ import _ from "lodash";
 
 const router = useRouter();
 
+const heartFill = ref(false);
+
+function fillHeart() {
+  heartFill.value = !heartFill.value;
+}
+
 const shotData = [
   {
     type: "image",
@@ -207,7 +213,6 @@ onMounted(() => {
 
     const spotlights = document.querySelectorAll(".spotlight");
 
-    console.log(spotlights);
     spotlights.forEach((card) => {
       card.addEventListener("mousemove", (e) => {
         const rect = card.getBoundingClientRect();
@@ -299,9 +304,11 @@ onMounted(() => {
       <span class="footer-anime-entry">
         ©️ Karan Sanas {{ new Date().getFullYear() }}
       </span>
-      <span class="footer anime-entry"
+      <span class="footer-anime-entry"
         >Handcrafted with Figma, Vue.js, and&nbsp;&nbsp;<fa
-          :icon="['far', 'heart']"
+          @click="fillHeart"
+          :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
+          :icon="[heartFill ? 'fas' : 'far', 'heart']"
         />
       </span>
     </div>

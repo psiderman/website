@@ -7,8 +7,14 @@ import GamingCard from "@/components/home/GamingCard.vue";
 import PortfolioCard from "@/components/home/PortfolioCard.vue";
 
 import { RouterLink } from "vue-router";
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import anime from "animejs";
+
+const heartFill = ref(false);
+
+function fillHeart() {
+  heartFill.value = !heartFill.value;
+}
 
 onMounted(() => {
   const cards = document.querySelectorAll(".card");
@@ -121,7 +127,9 @@ onMounted(() => {
         </span>
         <span class="anime-entry"
           >Handcrafted with Figma, Vue.js, and&nbsp;&nbsp;<fa
-            :icon="['far', 'heart']"
+            @click="fillHeart"
+            :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
+            :icon="[heartFill ? 'fas' : 'far', 'heart']"
           />
         </span>
       </div>

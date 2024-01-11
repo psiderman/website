@@ -1,6 +1,13 @@
 <script setup>
 import "@/assets/blog.css";
 import { RouterLink, RouterView } from "vue-router";
+
+import { ref } from "vue";
+const heartFill = ref(false);
+
+function fillHeart() {
+  heartFill.value = !heartFill.value;
+}
 </script>
 <template>
   <div
@@ -22,7 +29,9 @@ import { RouterLink, RouterView } from "vue-router";
       </span>
       <span class="anime-entry"
         >Handcrafted with Figma, Vue.js, and&nbsp;&nbsp;<fa
-          :icon="['far', 'heart']"
+          @click="fillHeart"
+          :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
+          :icon="[heartFill ? 'fas' : 'far', 'heart']"
         />
       </span>
     </div>
