@@ -22,7 +22,7 @@ const urls = {
 <template>
   <div :class="['flex flex-col p-6', flex ? '' : 'absolute bottom-0']">
     <div class="flex flex-row items-center gap-2 text-white/90">
-      <img :src="urls[icon]" alt="icon" class="h-6" />
+      <img v-if="icon" :src="urls[icon]" alt="icon" class="h-6" />
       {{ title }}
     </div>
     <span class="text-xs text-white/60">{{ description }}</span>

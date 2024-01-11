@@ -31,6 +31,7 @@ export default {
       square: "1 / 1",
       video: "16 / 9",
       long: "9 / 16",
+      shot: "4 / 3",
     },
     backdropBlur: ({ theme }) => theme("blur"),
     backdropBrightness: ({ theme }) => theme("brightness"),

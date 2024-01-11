@@ -1,6 +1,5 @@
 <script setup>
 import Leftbar from "@/components/home/Leftbar.vue";
-import WorkCard from "@/components/home/WorkCard.vue";
 import NowCard from "@/components/home/NowCard.vue";
 import LinkCard from "@/components/home/LinkCard.vue";
 import TravelCard from "@/components/home/TravelCard.vue";
@@ -79,7 +78,7 @@ onMounted(() => {
     <!-- Right bar -->
     <div class="grid h-full w-full gap-4 md:grid-cols-2 md:gap-10">
       <RouterLink class="rounded-3xl" to="/design">
-        <WorkCard />
+        <div class="card aspect-square"></div>
       </RouterLink>
       <RouterLink class="rounded-3xl" to="/now">
         <NowCard />
@@ -112,29 +111,12 @@ onMounted(() => {
       <RouterLink to="/gaming" class="rounded-3xl">
         <GamingCard />
       </RouterLink>
-      <div class="grid grid-cols-2 gap-4 md:grid-rows-2 md:gap-10">
-        <RouterLink to="/404" class="rounded-3xl">
-          <div class="card card-small">
-            <img
-              class="h-full w-full object-contain p-8"
-              src="@/assets/svg/psider.svg"
-              alt="psider logo"
-            />
-          </div>
-        </RouterLink>
-      </div>
+      <div></div>
       <div
         class="anime-entry col-span-1 flex w-full select-none flex-col text-center text-base text-white/50 md:col-span-2 lg:col-span-1 lg:text-left"
       >
         <span> ©️ Karan Sanas {{ new Date().getFullYear() }} </span>
-        <span>
-          <a
-            href="https://github.com/psiderman/website"
-            target="_blank"
-            class="underline underline-offset-4 hover:text-white/80"
-            >Handcrafted</a
-          >, with love.
-        </span>
+        <span> Handcrafted in Figma + Vue.js, with love. </span>
       </div>
     </div>
   </div>

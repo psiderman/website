@@ -10,7 +10,6 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {} from "@fortawesome/free-solid-svg-icons";
 import {
   faTwitter,
-  faDribbble,
   faRedditAlien,
   faGithub,
   faInstagram,
@@ -33,7 +32,7 @@ app.use(pinia);
 app.use(router);
 
 library.add();
-library.add(faTwitter, faDribbble, faRedditAlien, faGithub, faInstagram);
+library.add(faTwitter, faRedditAlien, faGithub, faInstagram);
 
 watch(
   pinia.state,

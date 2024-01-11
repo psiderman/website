@@ -15,12 +15,16 @@ const router = createRouter({
     },
     {
       path: "/design",
+      component: () => import("../pages/Design.vue"),
+    },
+    {
+      path: "/design/quizizz",
       component: () => import("../pages/Blog.vue"),
       children: [
         {
           path: "",
           name: "Design - Quizizz",
-          component: () => import("../views/Design.vue"),
+          component: () => import("../views/Quizizz.vue"),
         },
       ],
     },

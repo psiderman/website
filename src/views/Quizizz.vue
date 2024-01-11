@@ -30,10 +30,14 @@ onMounted(() => {
     million+ educators and students around the world.
   </p>
   <p>
-    I joined as Quizizz’s second designer, and worked with the team from 2019 to
-    2023. I delivered countless quality of life enhancements, and below are some
-    of the bigger projects I spearheaded, while leading the Design Systems, and
-    Content Platform teams.
+    I joined the team as the second ever designer at Quizizz, a high-growth
+    startup that helps teachers and students to teach and learn better, where we
+    scaled from 18M MAU to 80M MAU during my time there.
+  </p>
+  <p>
+    I've also contributed to growing the design team from 2 to 20 and shaping
+    its culture and rituals, including critical contributions such as using
+    Harry Potter references instead of Lorem Ipsum in Figma files.
   </p>
 
   <!-- Question types -->
@@ -63,64 +67,6 @@ onMounted(() => {
     </div>
   </div>
   <p class="caption anime-entry">A sneak peek of the case study</p>
-
-  <!-- Motion -->
-  <h2>Motion and Interaction</h2>
-  <p>
-    In addition to delivering screens and flows, I often took to Codepen,
-    Principle, and plain old Figma to create additional artifacts. More often
-    than not, these artifacts made it into the product as MP4s or GIFs. These
-    small things will likely outlive the other work I've done.
-  </p>
-  <div
-    class="large grid grid-cols-2 grid-rows-2 gap-4 lg:grid-cols-4 lg:gap-10"
-  >
-    <div class="motion-card anime-entry col-span-2 row-span-2 p-4">
-      <video
-        src="@/assets/design/motion/graphing.mp4"
-        autoplay
-        playsinline
-        muted
-        loop
-      ></video>
-    </div>
-    <div class="motion-card anime-entry">
-      <video
-        src="@/assets/design/motion/spin.mp4"
-        autoplay
-        playsinline
-        muted
-        loop
-      ></video>
-    </div>
-    <div class="motion-card anime-entry">
-      <video
-        src="@/assets/design/motion/calc.mp4"
-        autoplay
-        playsinline
-        muted
-        loop
-      ></video>
-    </div>
-    <div class="motion-card anime-entry">
-      <video
-        src="@/assets/design/motion/mbox.mp4"
-        autoplay
-        playsinline
-        muted
-        loop
-      ></video>
-    </div>
-    <div class="motion-card anime-entry">
-      <video
-        src="@/assets/design/motion/live.mp4"
-        autoplay
-        playsinline
-        muted
-        loop
-      ></video>
-    </div>
-  </div>
 
   <!-- Design System -->
 

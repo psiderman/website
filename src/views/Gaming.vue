@@ -87,31 +87,31 @@ onMounted(async () => {
         src="@/assets/images/pc/intel.png"
         alt="Intel Core i5-4670 @3.4GHz Quad-Core"
         title="Intel Core i5-4670 @3.4GHz Quad-Core"
-        class="card anime-entry col-span-1 row-span-1 aspect-square cursor-help rounded-3xl object-scale-down p-4"
+        class="card anime-entry col-span-1 row-span-1 aspect-square aspect-square cursor-help rounded-3xl object-scale-down p-4"
       />
       <img
         src="@/assets/images/pc/nvidia.png"
         alt="Zotac GeForce GTX 1060 3GB"
         title="Zotac GeForce GTX 1060 3GB"
-        class="card anime-entry col-span-1 row-span-1 aspect-square cursor-help rounded-3xl object-scale-down p-4"
+        class="card anime-entry col-span-1 row-span-1 aspect-square aspect-square cursor-help rounded-3xl object-scale-down p-4"
       />
       <img
         src="@/assets/images/pc/corsair.png"
         alt="Corsair Graphite Series 230T ATX Mid Tower"
         title="Corsair Graphite Series 230T ATX Mid Tower"
-        class="card anime-entry col-span-1 row-span-1 aspect-square cursor-help rounded-3xl object-scale-down p-4"
+        class="card anime-entry col-span-1 row-span-1 aspect-square aspect-square cursor-help rounded-3xl object-scale-down p-4"
       />
       <img
         src="@/assets/images/pc/gigabyte.png"
         alt="Gigabyte GA-B85M-D3H Micro-ATX LGA1150"
         title="Gigabyte GA-B85M-D3H Micro-ATX LGA1150"
-        class="card anime-entry col-span-1 row-span-1 aspect-square cursor-help rounded-3xl object-scale-down p-4"
+        class="card anime-entry col-span-1 row-span-1 aspect-square aspect-square cursor-help rounded-3xl object-scale-down p-4"
       />
       <img
         src="@/assets/images/pc/ps.png"
         alt="Sony PlayStation 5"
         title="Sony PlayStation 5"
-        class="card anime-entry col-span-1 row-span-1 aspect-square h-full w-full cursor-help rounded-3xl object-scale-down p-4"
+        class="card anime-entry col-span-1 row-span-1 aspect-square aspect-square h-full w-full cursor-help rounded-3xl object-scale-down p-4"
       />
     </div>
   </div>

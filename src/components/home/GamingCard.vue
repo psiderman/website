@@ -3,7 +3,7 @@ import Description from "./CardDescription.vue";
 </script>
 
 <template>
-  <div class="card group/gaming">
+  <div class="card group/gaming aspect-square">
     <div class="relative inset-0 -mt-4 h-full w-full">
       <svg
         class="absolute inset-0 m-auto overflow-visible"

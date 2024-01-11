@@ -15,7 +15,7 @@ const urls = {
 
 <template>
   <a
-    class="card flex cursor-pointer flex-col justify-between p-4"
+    class="card flex aspect-square cursor-pointer flex-col justify-between p-4"
     :href="link"
     target="_blank"
   >

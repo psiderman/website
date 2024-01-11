@@ -22,14 +22,25 @@ function copyEmail(event) {
 
       let messageX, messageY;
 
+      const emailElement = document.querySelector("#email");
+      const emailRect = emailElement.getBoundingClientRect();
+      const scrollYOffset = window.scrollY || window.pageYOffset;
+
       if (event.x == 0 && event.y == 0) {
-        const el = document.querySelector("#email").getBoundingClientRect();
-        messageX = el.x + el.width / 2 - copiedMessage.offsetWidth / 2;
-        messageY = el.y + el.height / 2 - copiedMessage.offsetHeight / 2 - 20;
+        messageX =
+          emailRect.x + emailRect.width / 2 - copiedMessage.offsetWidth / 2;
+        messageY =
+          emailRect.y +
+          emailRect.height / 2 -
+          copiedMessage.offsetHeight / 2 -
+          20 +
+          scrollYOffset;
       } else {
         messageX = event.clientX - copiedMessage.offsetWidth / 2;
-        messageY = event.clientY - copiedMessage.offsetHeight / 2 - 20;
+        messageY =
+          event.clientY - copiedMessage.offsetHeight / 2 - 20 + scrollYOffset;
       }
+
       // Set the position for the centered message
       copiedMessage.style.position = "absolute";
       copiedMessage.style.top = `${messageY}px`;
@@ -48,7 +59,7 @@ function copyEmail(event) {
         rotate: `${plusminus}${rotation}deg`,
         opacity: {
           value: 0,
-          duration: 2000,
+          duration: 1000,
           easing: "easeInOutSine",
         },
         duration: _.random(500, 1000),

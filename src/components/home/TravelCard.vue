@@ -3,7 +3,7 @@ import Description from "./CardDescription.vue";
 </script>
 
 <template>
-  <div class="card nograyscale group/travel flex flex-col">
+  <div class="card nograyscale group/travel flex aspect-square flex-col">
     <div class="relative h-full w-full">
       <img
         class="absolute inset-0 h-full w-full object-cover opacity-100 grayscale transition-opacity duration-200 group-hover/travel:opacity-0"

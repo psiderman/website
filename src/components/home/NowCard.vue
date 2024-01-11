@@ -46,7 +46,11 @@ function resetEye() {
 </script>
 
 <template>
-  <div class="card group/now" @mousemove="moveEye" @mouseleave="resetEye">
+  <div
+    class="card group/now aspect-square"
+    @mousemove="moveEye"
+    @mouseleave="resetEye"
+  >
     <div class="relative inset-0 -mt-4 h-full w-full">
       <div
         class="absolute inset-0 m-auto flex h-fit w-fit flex-row gap-2"
