@@ -11,7 +11,7 @@ defineProps({
   >
     <slot />
     <div
-      class="absolute inset-x-0 bottom-0 flex flex-row justify-between p-4 text-base"
+      class="pointer-events-none absolute inset-x-0 bottom-0 flex select-none flex-row justify-between p-4 text-base"
     >
       <span class="text-shadow text-white">{{ title }}</span>
       <span class="text-shadow text-white/80">{{ year }}</span>

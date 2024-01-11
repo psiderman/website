@@ -19,9 +19,9 @@ const shotData = [
   {
     type: "component",
     link: "/design/quizizz/",
-    aspect: "aspect-shot",
+    aspect: "aspect-shot spotlight",
     component: markRaw(QuizizzCard),
-    title: "Quizizz Inc.",
+    title: "Senior Product Designer",
     year: "2019–2023",
   },
   {
@@ -204,6 +204,23 @@ onMounted(() => {
         easing: "easeOutBack",
         delay: anime.stagger(100),
       });
+
+    const spotlights = document.querySelectorAll(".spotlight");
+
+    console.log(spotlights);
+    spotlights.forEach((card) => {
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 0%, 5%) 0%, hsla(0, 0%, 0%, 100%) 80%)`;
+        card.style.setProperty("background", gradient);
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.style.setProperty("background", "hsla(0,0%,0%,100%)");
+      });
+    });
   });
   window.addEventListener("resize", debouncedCalculateCols);
 });
@@ -286,7 +303,9 @@ onMounted(() => {
         >Handcrafted in Figma + Vue.js, with love.</span
       >
     </div>
-    <div class="w640 mt-8 flex flex-row flex-wrap justify-center text-white/50">
+    <div
+      class="w640 mt-8 flex select-none flex-row flex-wrap justify-center text-white/50"
+    >
       <RouterLink
         to="/"
         class="footer-anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
