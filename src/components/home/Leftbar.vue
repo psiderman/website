@@ -119,9 +119,9 @@ function copyEmail(event) {
           link="https://twitter.com/_psiderman_"
         />
         <Pill
-          text="Dribbble"
-          brand="dribbble"
-          link="https://dribbble.com/psiderman"
+          text="GitHub"
+          brand="github"
+          link="https://github.com/psiderman"
         />
         <Pill
           text="Reddit"

@@ -2,6 +2,8 @@
 const props = defineProps({
   title: String,
   logo: String,
+  brand: String,
+  color: String,
   link: String,
 });
 
@@ -19,8 +21,14 @@ const urls = {
     :href="link"
     target="_blank"
   >
-    <div class="h-8 w-8">
-      <img class="h-8 w-8" :src="urls[logo]" alt="logo" />
+    <div class="flex h-8 w-8 items-center justify-center">
+      <img v-if="logo" class="h-8 w-8" :src="urls[logo]" alt="logo" />
+      <fa
+        v-if="brand"
+        alt="link icon"
+        :icon="['fab', brand]"
+        :class="['h-6 w-6', color]"
+      />
     </div>
     <span>{{ title }}</span>
     <img

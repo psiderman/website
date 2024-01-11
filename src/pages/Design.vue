@@ -275,7 +275,7 @@ onMounted(() => {
             <img
               v-else-if="shot.type == 'image'"
               class="shot"
-              :src="shot.src"
+              v-lazy="shot.src"
               :alt="shot.title"
             />
             <component
@@ -299,9 +299,11 @@ onMounted(() => {
       <span class="footer-anime-entry">
         ©️ Karan Sanas {{ new Date().getFullYear() }}
       </span>
-      <span class="footer-anime-entry"
-        >Handcrafted in Figma + Vue.js, with love.</span
-      >
+      <span class="footer anime-entry"
+        >Handcrafted with Figma, Vue.js, and&nbsp;&nbsp;<fa
+          :icon="['far', 'heart']"
+        />
+      </span>
     </div>
     <div
       class="w640 mt-8 flex select-none flex-row flex-wrap justify-center text-white/50"

@@ -20,7 +20,11 @@ import { RouterLink, RouterView } from "vue-router";
       <span class="anime-entry">
         ©️ Karan Sanas {{ new Date().getFullYear() }}
       </span>
-      <span class="anime-entry">Handcrafted in Figma + Vue.js, with love.</span>
+      <span class="anime-entry"
+        >Handcrafted with Figma, Vue.js, and&nbsp;&nbsp;<fa
+          :icon="['far', 'heart']"
+        />
+      </span>
     </div>
     <div class="w640 mt-8 flex flex-row flex-wrap justify-center text-white/50">
       <RouterLink

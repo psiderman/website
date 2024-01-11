@@ -2,6 +2,26 @@
 import { onMounted } from "vue";
 import anime from "animejs";
 
+const imageData = {
+  qtcs: {
+    i: new URL("@/assets/design/qtcs/02.png", import.meta.url).toString(),
+    ii: new URL("@/assets/design/qtcs/03.png", import.meta.url).toString(),
+    iii: new URL("@/assets/design/qtcs/04.png", import.meta.url).toString(),
+    iv: new URL("@/assets/design/qtcs/05.png", import.meta.url).toString(),
+  },
+  ds: {
+    i: new URL("@/assets/design/ds/01.png", import.meta.url).toString(),
+    ii: new URL("@/assets/design/ds/02.png", import.meta.url).toString(),
+    iii: new URL("@/assets/design/ds/03.png", import.meta.url).toString(),
+  },
+  lessons: {
+    i: new URL("@/assets/design/lessons/01.png", import.meta.url).toString(),
+    ii: new URL("@/assets/design/lessons/02.png", import.meta.url).toString(),
+    iii: new URL("@/assets/design/lessons/03.png", import.meta.url).toString(),
+    iv: new URL("@/assets/design/lessons/04.gif", import.meta.url).toString(),
+  },
+};
+
 onMounted(() => {
   anime({
     targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
@@ -51,18 +71,10 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img
-        class="anime-entry gallery-image"
-        src="@/assets/design/qtcs/02.png"
-      />
-      <img
-        class="anime-entry gallery-image"
-        src="@/assets/design/qtcs/03.png"
-      />
-      <img
-        class="anime-entry gallery-image"
-        src="@/assets/design/qtcs/04.png"
-      />
+      <img class="anime-entry gallery-image" v-lazy="imageData.qtcs.i" />
+      <img class="anime-entry gallery-image" v-lazy="imageData.qtcs.ii" />
+      <img class="anime-entry gallery-image" v-lazy="imageData.qtcs.iii" />
+      <img class="anime-entry gallery-image" v-lazy="imageData.qtcs.iv" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
@@ -85,9 +97,9 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img class="anime-entry gallery-image" src="@/assets/design/ds/01.png" />
-      <img class="anime-entry gallery-image" src="@/assets/design/ds/02.png" />
-      <img class="anime-entry gallery-image" src="@/assets/design/ds/03.png" />
+      <img class="anime-entry gallery-image" v-lazy="imageData.ds.i" />
+      <img class="anime-entry gallery-image" v-lazy="imageData.ds.ii" />
+      <img class="anime-entry gallery-image" v-lazy="imageData.ds.iii" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
@@ -103,22 +115,10 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img
-        class="anime-entry gallery-image"
-        src="@/assets/design/lessons/01.png"
-      />
-      <img
-        class="anime-entry gallery-image"
-        src="@/assets/design/lessons/02.png"
-      />
-      <img
-        class="anime-entry gallery-image"
-        src="@/assets/design/lessons/03.png"
-      />
-      <img
-        class="anime-entry gallery-image"
-        src="@/assets/design/lessons/04.gif"
-      />
+      <img class="anime-entry gallery-image" v-lazy="imageData.lessons.i" />
+      <img class="anime-entry gallery-image" v-lazy="imageData.lessons.ii" />
+      <img class="anime-entry gallery-image" v-lazy="imageData.lessons.iii" />
+      <img class="anime-entry gallery-image" v-lazy="imageData.lessons.iv" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
@@ -231,6 +231,6 @@ onMounted(() => {
 }
 
 .gallery-scroll img.gallery-image {
-  @apply w-full max-w-screen-sm shrink-0 select-none rounded-sm border border-white/15 bg-black;
+  @apply aspect-video w-full max-w-screen-sm shrink-0 select-none rounded-sm border border-white/15 bg-black;
 }
 </style>

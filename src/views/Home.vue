@@ -4,6 +4,7 @@ import NowCard from "@/components/home/NowCard.vue";
 import LinkCard from "@/components/home/LinkCard.vue";
 import TravelCard from "@/components/home/TravelCard.vue";
 import GamingCard from "@/components/home/GamingCard.vue";
+import PortfolioCard from "@/components/home/PortfolioCard.vue";
 
 import { RouterLink } from "vue-router";
 import { onMounted } from "vue";
@@ -78,7 +79,7 @@ onMounted(() => {
     <!-- Right bar -->
     <div class="grid h-full w-full gap-4 md:grid-cols-2 md:gap-10">
       <RouterLink class="rounded-3xl" to="/design">
-        <div class="card aspect-square"></div>
+        <PortfolioCard />
       </RouterLink>
       <RouterLink class="rounded-3xl" to="/now">
         <NowCard />
@@ -113,11 +114,26 @@ onMounted(() => {
       </RouterLink>
       <div></div>
       <div
-        class="anime-entry col-span-1 flex w-full select-none flex-col text-center text-base text-white/50 md:col-span-2 lg:col-span-1 lg:text-left"
+        class="col-span-1 flex w-full select-none flex-col text-center text-base text-white/50 md:col-span-2 lg:col-span-1 lg:text-left"
       >
-        <span> ©️ Karan Sanas {{ new Date().getFullYear() }} </span>
-        <span> Handcrafted in Figma + Vue.js, with love. </span>
+        <span class="anime-entry">
+          ©️ Karan Sanas {{ new Date().getFullYear() }}
+        </span>
+        <span class="anime-entry"
+          >Handcrafted with Figma, Vue.js, and&nbsp;&nbsp;<fa
+            :icon="['far', 'heart']"
+          />
+        </span>
       </div>
     </div>
   </div>
 </template>
+
+<style lang="postcss" scoped>
+.social {
+  @apply relative col-span-1 row-span-1 aspect-square shrink-0 overflow-hidden rounded-lg border border-white/5 bg-white/[2%];
+  @apply select-none;
+  @apply grayscale transition-colors duration-200 hover:grayscale-0;
+  @apply hover:border-white/10;
+}
+</style>
