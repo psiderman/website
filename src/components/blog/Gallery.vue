@@ -49,9 +49,11 @@ function getLocation(image) {
       if (features.length > 0) {
         const context = features[0].properties.context || {};
         const { place, region, country } = context;
-        const str = [place?.name, region?.name, country?.name]
-          .filter(Boolean)
-          .join(", ");
+
+        const str = Array.from(
+          new Set([place?.name, region?.name, country?.name].filter(Boolean)),
+        ).join(", ");
+
         locationString.value = str || "";
       }
     });
