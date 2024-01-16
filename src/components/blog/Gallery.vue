@@ -9,8 +9,6 @@ import {
   defineEmits,
   watch,
 } from "vue";
-import client from "@/store/sanity.js";
-import imageUrlBuilder from "@sanity/image-url";
 
 const props = defineProps({
   galleryData: Array,
@@ -25,30 +23,50 @@ const emits = defineEmits([
   "albumIndexChange",
 ]);
 
-const sanityURL = (r) =>
-  props.skeleton ? "" : imageUrlBuilder(client).image(r).url();
-
-const relativeDate = computed(() => {
+function getRelativeDate(metadata, date) {
   try {
-    return formatDistance(
-      new Date(props.galleryData[props.albumIndex].date),
-      new Date(),
-      { addSuffix: true },
-    );
+    const d = new Date(metadata.exif.DateTimeOriginal.replace("Z", ""));
+    return formatDistance(d, new Date(), { addSuffix: true });
   } catch (error) {
-    return "";
+    return formatDistance(new Date(date), new Date(), { addSuffix: true });
   }
-});
+}
+
+const locationString = ref("");
+function getLocation(image) {
+  try {
+    const lat = image.metadata.location.lat;
+    const lon = image.metadata.location.lng;
+
+    const geoCodeURL = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lon}&latitude=${lat}&access_token=${
+      import.meta.env.VITE_MAPBOX
+    }`;
+
+    const query = fetch(geoCodeURL).then(async (response) => {
+      const data = await response.json();
+
+      const features = data.features;
+      if (features.length > 0) {
+        const context = features[0].properties.context || {};
+        const { place, region, country } = context;
+        const str = [place?.name, region?.name, country?.name]
+          .filter(Boolean)
+          .join(", ");
+        locationString.value = str || "";
+      }
+    });
+    return locationString.value;
+  } catch (error) {
+    return getTitle(props.galleryData[props.albumIndex]);
+  }
+}
 
 function getTitle(a) {
   let s;
-  try {
+  if (a.location !== undefined && a.country !== undefined)
     s = a.location + ", " + a.country;
-  } catch (error) {
-    s = format(new Date(a.date), "MMMM yyyy");
-  } finally {
-    return s;
-  }
+  else s = format(new Date(a.date), "MMMM yyyy");
+  return s;
 }
 
 const timer = ref(null);
@@ -77,6 +95,16 @@ function currentIndexChange(c) {
   }, slideShowTimerValue.value);
 }
 
+function currentAlbumChange(c) {
+  if (c < 0) {
+    emits("albumIndexChange", c);
+    emits("imageIndexChange", 0);
+  } else {
+    emits("albumIndexChange", c);
+    emits("imageIndexChange", 0);
+  }
+}
+
 function closeGallery() {
   clearInterval(timer.value);
   emits("closeGallery");
@@ -98,16 +126,6 @@ const handleTouchEnd = (event) => {
   touchEndY = event.changedTouches[0].clientY;
   handleSwipe();
 };
-
-function currentAlbumChange(c) {
-  if (c < 0) {
-    emits("albumIndexChange", c);
-    emits("imageIndexChange", 0);
-  } else {
-    emits("albumIndexChange", c);
-    emits("imageIndexChange", 0);
-  }
-}
 
 const handleSwipe = () => {
   const swipeDistanceX = touchEndX - touchStartX;
@@ -167,8 +185,8 @@ watch(
 
 <template>
   <div
-    v-show="showGallery"
-    class="ignore-blog fixed inset-0 z-50 flex h-screen w-screen max-w-none select-none items-center justify-center bg-gray-950 px-4 pb-4 pt-8 sm:pb-2 sm:pt-6"
+    v-if="showGallery"
+    class="ignore-blog fixed inset-0 z-50 flex h-screen w-screen max-w-none select-none items-center justify-center bg-gray-950 px-4 py-4 sm:pb-2"
     @touchstart.passive="handleTouchStart"
     @touchend.passive="handleTouchEnd"
   >
@@ -183,14 +201,6 @@ watch(
     <div
       class="relative inset-0 my-auto h-full rounded-lg bg-white/5 sm:aspect-long"
     >
-      <!-- Meta -->
-      <div class="absolute -top-5 flex w-full flex-row justify-between text-xs">
-        <span class="w-full grow truncate font-medium">{{
-          getTitle(galleryData[albumIndex])
-        }}</span>
-        <span class="shrink-0 text-white/80"> {{ relativeDate }} </span>
-      </div>
-
       <!-- Image -->
       <img
         :class="['h-full w-full select-none rounded-lg object-cover']"
@@ -200,6 +210,68 @@ watch(
         }"
         :alt="galleryData[albumIndex].images[imageIndex].caption"
       />
+
+      <!-- Indicator bar -->
+      <div class="absolute inset-x-2 top-2 z-10 flex flex-row gap-x-1">
+        <div
+          v-for="(img, j) in galleryData[albumIndex].images"
+          :key="j"
+          :class="['h-0.5 w-full overflow-hidden rounded-lg bg-white/50 ']"
+        >
+          <div
+            :class="[
+              'h-full w-full rounded-lg',
+              j < imageIndex ? 'bg-white' : 'bg-transparent',
+            ]"
+          >
+            <div
+              :class="[
+                'h-full w-0 rounded bg-white',
+                j == imageIndex ? 'progress-bar-increase' : '',
+              ]"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meta -->
+      <div
+        class="absolute inset-x-0 top-0 z-0 flex flex-row gap-x-1 bg-gradient-to-b from-black/50 to-transparent p-2 py-4 pb-8 text-xs"
+        style="text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5)"
+      >
+        <span class="font-medium text-white">{{
+          getLocation(galleryData[albumIndex].images[imageIndex])
+        }}</span>
+        <span class="text-white/80">{{
+          getRelativeDate(
+            galleryData[albumIndex].images[imageIndex].metadata,
+            galleryData[albumIndex].date,
+          )
+        }}</span>
+      </div>
+
+      <!-- Caption -->
+      <div
+        v-if="galleryData[albumIndex].images[imageIndex].caption"
+        class="absolute inset-x-0 bottom-0 p-2 text-xs sm:text-base"
+      >
+        <span class="bg-black p-1 py-px leading-5">
+          {{ galleryData[albumIndex].images[imageIndex].caption }}
+        </span>
+      </div>
+
+      <!-- Navigation -->
+      <div class="absolute inset-0 flex flex-row">
+        <div
+          class="h-full w-full cursor-pointer rounded-l-lg"
+          @click="currentIndexChange(-1)"
+        ></div>
+        <div class="h-full w-full"></div>
+        <div
+          class="h-full w-full cursor-pointer rounded-r-lg"
+          @click="currentIndexChange(1)"
+        ></div>
+      </div>
 
       <!-- Ghost -->
       <div
@@ -280,52 +352,6 @@ watch(
         <span class="p-4 text-center text-base text-white"
           >{{ getTitle(galleryData[albumIndex - 2]) }}
         </span>
-      </div>
-
-      <!-- Indicator bar -->
-      <div class="absolute inset-x-2 top-2 flex flex-row gap-x-1">
-        <div
-          v-for="(img, j) in galleryData[albumIndex].images"
-          :key="j"
-          :class="['h-0.5 w-full overflow-hidden rounded-lg bg-white/50 ']"
-        >
-          <div
-            :class="[
-              'h-full w-full rounded-lg',
-              j < imageIndex ? 'bg-white' : 'bg-transparent',
-            ]"
-          >
-            <div
-              :class="[
-                'h-full w-0 rounded bg-white',
-                j == imageIndex ? 'progress-bar-increase' : '',
-              ]"
-            ></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Caption -->
-      <div
-        v-if="galleryData[albumIndex].images[imageIndex].caption"
-        class="absolute inset-x-0 bottom-0 p-2 text-xs sm:text-base"
-      >
-        <span class="bg-black p-1 py-px leading-5">
-          {{ galleryData[albumIndex].images[imageIndex].caption }}
-        </span>
-      </div>
-
-      <!-- Navigation -->
-      <div class="absolute inset-0 flex flex-row">
-        <div
-          class="h-full w-full cursor-pointer rounded-l-lg"
-          @click="currentIndexChange(-1)"
-        ></div>
-        <div class="h-full w-full"></div>
-        <div
-          class="h-full w-full cursor-pointer rounded-r-lg"
-          @click="currentIndexChange(1)"
-        ></div>
       </div>
     </div>
   </div>

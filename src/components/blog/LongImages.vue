@@ -1,18 +1,4 @@
 <script setup>
-import client from "@/store/sanity.js";
-import imageUrlBuilder from "@sanity/image-url";
-
-function sanityURL(r) {
-  if (props.skeleton) return "";
-  try {
-    const builder = imageUrlBuilder(client);
-    return builder.image(r).url();
-  } catch (error) {
-    console.error(error);
-    return "";
-  }
-}
-
 const props = defineProps({
   images: Array,
   skeleton: { type: Boolean, default: false },
@@ -49,6 +35,7 @@ const gridClasses = {
       :key="i"
     >
       <img
+        v-if="!skeleton"
         :class="['h-full w-full cursor-pointer select-none object-cover']"
         v-lazy="{
           src: image.imageUrl,
