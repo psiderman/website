@@ -184,9 +184,10 @@ watch(
       <!-- Image -->
       <img
         :class="['h-full w-full select-none rounded-lg object-cover']"
-        v-lazy="
-          sanityURL(galleryData[albumIndex].images[imageIndex].asset._ref)
-        "
+        v-lazy="{
+          src: galleryData[albumIndex].images[imageIndex].imageUrl,
+          loading: galleryData[albumIndex].images[imageIndex].metadata.lqip,
+        }"
         :alt="galleryData[albumIndex].images[imageIndex].caption"
       />
 

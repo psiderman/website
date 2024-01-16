@@ -50,7 +50,10 @@ const gridClasses = {
     >
       <img
         :class="['h-full w-full cursor-pointer select-none object-cover']"
-        v-lazy="sanityURL(image.asset._ref)"
+        v-lazy="{
+          src: image.imageUrl,
+          loading: image.metadata.lqip,
+        }"
         :alt="image.caption"
         @click="emits('openGallery', i)"
       />

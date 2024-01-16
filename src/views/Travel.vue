@@ -20,7 +20,8 @@ onMounted(async () => {
     delay: anime.stagger(100),
   });
   try {
-    const query = '*[_type == "travel"] | order(date desc)';
+    const query =
+      '*[_type == "travel"] | order(date desc) { ..., images[] { ..., "imageUrl": asset->url, "metadata": asset->metadata } }';
     const response = await client.fetch(query);
     data.value = response;
     nextTick(() => {
