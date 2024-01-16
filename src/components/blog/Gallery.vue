@@ -49,12 +49,24 @@ const relativeDate = computed(() => {
   }
 });
 
-const currentIndexChange = (c) =>
-  emits(
-    "imageIndexChange",
-    (props.imageIndex + c + props.galleryData[props.albumIndex].images.length) %
-      props.galleryData[props.albumIndex].images.length,
-  );
+function currentIndexChange(c) {
+  const l = props.galleryData[props.albumIndex].images.length;
+  if (c < 0) {
+    if (props.imageIndex == 0) {
+      emits("albumIndexChange", -1);
+      emits("imageIndexChange", -1);
+    } else {
+      emits("imageIndexChange", props.imageIndex + c);
+    }
+  } else {
+    if (props.imageIndex == l - 1) {
+      emits("albumIndexChange", 1);
+      emits("imageIndexChange", 0);
+    } else {
+      emits("imageIndexChange", props.imageIndex + c);
+    }
+  }
+}
 
 // Touch Event Handling
 let touchStartX = 0;

@@ -56,11 +56,18 @@ function galleryToggle(f, j = 0, i = 0) {
 }
 
 function updateImageIndex(i) {
-  imageIndex.value = i;
+  if (i < 0) imageIndex.value = data.value[albumIndex.value].images.length - 1;
+  else imageIndex.value = i;
 }
 
 function updateAlbumIndex(i) {
-  albumIndex.value = i;
+  if (i < 0)
+    if (albumIndex.value == 0) galleryToggle(false);
+    else albumIndex.value += i;
+  else {
+    if (albumIndex.value == data.value.length - 1) galleryToggle(false);
+    else albumIndex.value += i;
+  }
 }
 </script>
 <template>
@@ -120,5 +127,6 @@ function updateAlbumIndex(i) {
     titleKey="date"
     @closeGallery="galleryToggle(false)"
     @imageIndexChange="updateImageIndex($event)"
+    @albumIndexChange="updateAlbumIndex($event)"
   />
 </template>
