@@ -34,7 +34,7 @@ const title = computed(() =>
         new Date(props.galleryData[props.albumIndex][props.titleKey]),
         "MMMM yyyy",
       )
-    : "",
+    : props.galleryData[props.albumIndex][props.titleKey],
 );
 
 const relativeDate = computed(() => {

@@ -3,6 +3,7 @@ import { onMounted, ref, nextTick } from "vue";
 import anime from "animejs";
 import client from "@/store/sanity.js";
 import LongImages from "@/components/blog/LongImages.vue";
+import Gallery from "@/components/blog/Gallery.vue";
 
 const data = ref(null);
 const loading = ref(true);
@@ -41,6 +42,24 @@ onMounted(async () => {
     console.error("Error fetching data:", error);
   }
 });
+
+const showGallery = ref(false);
+const albumIndex = ref(0);
+const imageIndex = ref(0);
+
+function galleryToggle(f, j = 0, i = 0) {
+  albumIndex.value = i;
+  imageIndex.value = j;
+  showGallery.value = f;
+}
+
+function updateImageIndex(i) {
+  imageIndex.value = i;
+}
+
+function updateAlbumIndex(i) {
+  albumIndex.value = i;
+}
 </script>
 <template>
   <h1 class="mb-4">You don't need more than /r/onebag</h1>
@@ -101,14 +120,26 @@ onMounted(async () => {
     />
   </div>
   <div class="sanity large">
-    <template v-for="travel in data" :key="travel._id">
+    <template v-for="(travel, i) in data" :key="travel._id">
       <h2>{{ travel.location }}, {{ travel.country }}</h2>
       <p>{{ travel.description }}</p>
       <LongImages
         :images="travel.images"
         :title="travel.location"
         :fullDate="travel.date"
+        @openGallery="galleryToggle(true, $event, i)"
       />
     </template>
   </div>
+
+  <Gallery
+    v-if="!loading"
+    :showGallery="showGallery"
+    :galleryData="data"
+    :albumIndex="albumIndex"
+    :imageIndex="imageIndex"
+    titleKey="location"
+    @closeGallery="galleryToggle(false)"
+    @imageIndexChange="updateImageIndex($event)"
+  />
 </template>

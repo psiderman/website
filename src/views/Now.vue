@@ -101,7 +101,7 @@ function updateAlbumIndex(i) {
     </div>
   </div>
   <div class="sanity large">
-    <template v-for="(now, i) in data" :key="i">
+    <template v-for="(now, i) in data" :key="now._id">
       <LongImages
         :images="now.images"
         @openGallery="galleryToggle(true, $event, i)"
