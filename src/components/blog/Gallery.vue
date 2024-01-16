@@ -7,6 +7,7 @@ import {
   ref,
   defineProps,
   defineEmits,
+  watch,
 } from "vue";
 import client from "@/store/sanity.js";
 import imageUrlBuilder from "@sanity/image-url";
@@ -49,7 +50,11 @@ const relativeDate = computed(() => {
   }
 });
 
+const timer = ref(null);
+const slideShowTimerValue = ref(5000);
+
 function currentIndexChange(c) {
+  clearInterval(timer.value);
   const l = props.galleryData[props.albumIndex].images.length;
   if (c < 0) {
     if (props.imageIndex == 0) {
@@ -66,6 +71,14 @@ function currentIndexChange(c) {
       emits("imageIndexChange", props.imageIndex + c);
     }
   }
+  timer.value = setInterval(() => {
+    currentIndexChange(1);
+  }, slideShowTimerValue.value);
+}
+
+function closeGallery() {
+  clearInterval(timer.value);
+  emits("closeGallery");
 }
 
 // Touch Event Handling
@@ -91,15 +104,16 @@ const handleSwipe = () => {
 
   if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)) {
     if (swipeDistanceX > 50) {
-      // currentIndexChange(-1); // Swipe right
+      emits("albumIndexChange", -1);
+      emits("imageIndexChange", 0);
     } else if (swipeDistanceX < -50) {
-      // currentIndexChange(1); // Swipe left
+      emits("albumIndexChange", 1);
+      emits("imageIndexChange", 0);
     }
   } else {
     if (swipeDistanceY > 50) {
-      emits("closeGallery");
+      closeGallery();
     } else if (swipeDistanceY < -50) {
-      // Handle swipe up
     }
   }
 };
@@ -108,7 +122,7 @@ onMounted(() => {
   const handleKeyDown = (event) => {
     switch (event.key) {
       case "Escape":
-        emits("closeGallery");
+        closeGallery();
         break;
       case "ArrowRight":
         currentIndexChange(1);
@@ -127,6 +141,19 @@ onMounted(() => {
     document.removeEventListener("keydown", handleKeyDown);
   });
 });
+
+watch(
+  () => props.showGallery,
+  (o, n) => {
+    if (props.showGallery) {
+      timer.value = setInterval(() => {
+        currentIndexChange(1);
+      }, slideShowTimerValue.value);
+    } else {
+      clearInterval(timer.value);
+    }
+  },
+);
 </script>
 
 <template>
@@ -162,25 +189,32 @@ onMounted(() => {
       />
 
       <!-- Indicator bar -->
-      <div class="absolute inset-x-2 top-2 flex flex-row gap-x-2">
+      <div class="absolute inset-x-2 top-2 flex flex-row gap-x-1">
         <div
           v-for="(img, j) in galleryData[albumIndex].images"
           :key="j"
-          :class="['h-0.5 w-full overflow-hidden rounded-lg bg-white/50']"
+          :class="['h-0.5 w-full overflow-hidden rounded-lg bg-white/50 ']"
         >
           <div
             :class="[
               'h-full w-full rounded-lg',
-              j <= imageIndex ? 'bg-white' : 'bg-transparent',
+              j < imageIndex ? 'bg-white' : 'bg-transparent',
             ]"
-          ></div>
+          >
+            <div
+              :class="[
+                'h-full w-0 rounded bg-white',
+                j == imageIndex ? 'progress-bar-increase' : '',
+              ]"
+            ></div>
+          </div>
         </div>
       </div>
 
       <!-- Caption -->
       <div
         v-if="galleryData[albumIndex].images[imageIndex].caption"
-        class="absolute inset-x-0 bottom-0 p-2 text-xs"
+        class="absolute inset-x-0 bottom-0 p-2 text-xs sm:text-base"
       >
         <span class="bg-black p-1 py-px leading-5">
           {{ galleryData[albumIndex].images[imageIndex].caption }}
@@ -203,4 +237,16 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="postcss" scoped></style>
+<style lang="postcss" scoped>
+.progress-bar-increase {
+  animation: pb 5000ms linear forwards;
+}
+@keyframes pb {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+</style>
