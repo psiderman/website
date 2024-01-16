@@ -35,7 +35,9 @@ const title = computed(() =>
         new Date(props.galleryData[props.albumIndex][props.titleKey]),
         "MMMM yyyy",
       )
-    : props.galleryData[props.albumIndex][props.titleKey],
+    : props.galleryData[props.albumIndex].location +
+      ", " +
+      props.galleryData[props.albumIndex].country,
 );
 
 const relativeDate = computed(() => {
@@ -175,8 +177,8 @@ watch(
     >
       <!-- Meta -->
       <div class="absolute -top-5 flex w-full flex-row justify-between text-xs">
-        <span class="font-medium">{{ title }}</span>
-        <span class="text-white/80"> {{ relativeDate }} </span>
+        <span class="w-full grow truncate font-medium">{{ title }}</span>
+        <span class="shrink-0 text-white/80"> {{ relativeDate }} </span>
       </div>
 
       <!-- Image -->
