@@ -146,7 +146,6 @@ function updateAlbumIndex(i) {
     :galleryData="data"
     :albumIndex="albumIndex"
     :imageIndex="imageIndex"
-    titleKey="location"
     @closeGallery="galleryToggle(false)"
     @imageIndexChange="updateImageIndex($event)"
     @albumIndexChange="updateAlbumIndex($event)"

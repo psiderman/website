@@ -17,7 +17,6 @@ const props = defineProps({
   showGallery: { type: Boolean, default: false },
   albumIndex: Number,
   imageIndex: Number,
-  titleKey: String,
 });
 
 const emits = defineEmits([
@@ -28,17 +27,6 @@ const emits = defineEmits([
 
 const sanityURL = (r) =>
   props.skeleton ? "" : imageUrlBuilder(client).image(r).url();
-
-const title = computed(() =>
-  props.titleKey === "date"
-    ? format(
-        new Date(props.galleryData[props.albumIndex][props.titleKey]),
-        "MMMM yyyy",
-      )
-    : props.galleryData[props.albumIndex].location +
-      ", " +
-      props.galleryData[props.albumIndex].country,
-);
 
 const relativeDate = computed(() => {
   try {
@@ -51,6 +39,17 @@ const relativeDate = computed(() => {
     return "";
   }
 });
+
+function getTitle(a) {
+  let s;
+  try {
+    s = a.location + ", " + a.country;
+  } catch (error) {
+    s = format(new Date(a.date), "MMMM yyyy");
+  } finally {
+    return s;
+  }
+}
 
 const timer = ref(null);
 const slideShowTimerValue = ref(5000);
@@ -100,17 +99,25 @@ const handleTouchEnd = (event) => {
   handleSwipe();
 };
 
+function currentAlbumChange(c) {
+  if (c < 0) {
+    emits("albumIndexChange", c);
+    emits("imageIndexChange", 0);
+  } else {
+    emits("albumIndexChange", c);
+    emits("imageIndexChange", 0);
+  }
+}
+
 const handleSwipe = () => {
   const swipeDistanceX = touchEndX - touchStartX;
   const swipeDistanceY = touchEndY - touchStartY;
 
   if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)) {
     if (swipeDistanceX > 50) {
-      emits("albumIndexChange", -1);
-      emits("imageIndexChange", 0);
+      currentAlbumChange(-1);
     } else if (swipeDistanceX < -50) {
-      emits("albumIndexChange", 1);
-      emits("imageIndexChange", 0);
+      currentAlbumChange(1);
     }
   } else {
     if (swipeDistanceY > 50) {
@@ -165,6 +172,7 @@ watch(
     @touchstart.passive="handleTouchStart"
     @touchend.passive="handleTouchEnd"
   >
+    <div class="absolute inset-0 z-0" @click="closeGallery()"></div>
     <button
       class="absolute right-2 top-2 hidden rounded bg-white/10 p-1 px-2 text-xs text-white/80 hover:bg-white/20 focus:outline-offset-0 active:bg-white/5 active:outline-none sm:inline-block"
       @click="emits('closeGallery')"
@@ -177,7 +185,9 @@ watch(
     >
       <!-- Meta -->
       <div class="absolute -top-5 flex w-full flex-row justify-between text-xs">
-        <span class="w-full grow truncate font-medium">{{ title }}</span>
+        <span class="w-full grow truncate font-medium">{{
+          getTitle(galleryData[albumIndex])
+        }}</span>
         <span class="shrink-0 text-white/80"> {{ relativeDate }} </span>
       </div>
 
@@ -190,6 +200,87 @@ watch(
         }"
         :alt="galleryData[albumIndex].images[imageIndex].caption"
       />
+
+      <!-- Ghost -->
+      <div
+        v-if="galleryData[albumIndex + 1]"
+        :class="[
+          'absolute inset-0 hidden h-full w-full translate-x-full scale-75 cursor-pointer select-none items-center justify-center overflow-hidden rounded-lg sm:flex',
+        ]"
+        @click="currentAlbumChange(1)"
+      >
+        <img
+          class="absolute h-full w-full object-cover opacity-20"
+          v-lazy="{
+            src: galleryData[albumIndex + 1].images[0].imageUrl,
+            loading: galleryData[albumIndex + 1].images[0].metadata.lqip,
+          }"
+          :alt="galleryData[albumIndex + 1].images[0].caption"
+        />
+        <span class="p-4 text-center text-base text-white"
+          >{{ getTitle(galleryData[albumIndex + 1]) }}
+        </span>
+      </div>
+
+      <div
+        v-if="galleryData[albumIndex - 1]"
+        :class="[
+          'absolute inset-0 hidden h-full w-full -translate-x-full scale-75 cursor-pointer select-none items-center justify-center overflow-hidden rounded-lg sm:flex',
+        ]"
+        @click="currentAlbumChange(-1)"
+      >
+        <img
+          class="absolute h-full w-full object-cover opacity-20"
+          v-lazy="{
+            src: galleryData[albumIndex - 1].images[0].imageUrl,
+            loading: galleryData[albumIndex - 1].images[0].metadata.lqip,
+          }"
+          :alt="galleryData[albumIndex - 1].images[0].caption"
+        />
+        <span class="p-4 text-center text-base text-white"
+          >{{ getTitle(galleryData[albumIndex - 1]) }}
+        </span>
+      </div>
+
+      <div
+        v-if="galleryData[albumIndex + 2]"
+        @click="currentAlbumChange(2)"
+        :class="[
+          'absolute inset-0 hidden h-full w-full translate-x-[175%] scale-50 cursor-pointer select-none items-center justify-center overflow-hidden rounded-lg sm:flex',
+        ]"
+      >
+        <img
+          class="absolute h-full w-full object-cover opacity-20"
+          v-lazy="{
+            src: galleryData[albumIndex + 2].images[0].imageUrl,
+            loading: galleryData[albumIndex + 2].images[0].metadata.lqip,
+          }"
+          :alt="galleryData[albumIndex + 2].images[0].caption"
+        />
+        <span class="p-4 text-center text-base text-white"
+          >{{ getTitle(galleryData[albumIndex + 2]) }}
+        </span>
+      </div>
+
+      <div
+        v-if="galleryData[albumIndex - 2]"
+        @click="currentAlbumChange(-2)"
+        :class="[
+          'absolute inset-0 hidden h-full w-full -translate-x-[175%] scale-50 cursor-pointer select-none items-center justify-center overflow-hidden rounded-lg sm:flex',
+        ]"
+      >
+        <img
+          class="absolute h-full w-full object-cover opacity-20"
+          v-lazy="{
+            src: galleryData[albumIndex - 2].images[0].imageUrl,
+            loading: galleryData[albumIndex - 2].images[0].metadata.lqip,
+          }"
+          :alt="galleryData[albumIndex - 2].images[0].caption"
+        />
+        <span class="p-4 text-center text-base text-white"
+          >{{ getTitle(galleryData[albumIndex - 2]) }}
+        </span>
+      </div>
 
       <!-- Indicator bar -->
       <div class="absolute inset-x-2 top-2 flex flex-row gap-x-1">
