@@ -104,7 +104,11 @@ onMounted(async () => {
     <template v-for="travel in data" :key="travel._id">
       <h2>{{ travel.location }}, {{ travel.country }}</h2>
       <p>{{ travel.description }}</p>
-      <LongImages :images="travel.images" />
+      <LongImages
+        :images="travel.images"
+        :title="travel.location"
+        :fullDate="travel.date"
+      />
     </template>
   </div>
 </template>

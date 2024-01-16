@@ -83,7 +83,7 @@ onMounted(async () => {
   </div>
   <div class="sanity large">
     <template v-for="now in data" :key="now._id">
-      <LongImages :images="now.images" />
+      <LongImages :images="now.images" :fullDate="now.date" :title="now.date" />
       <h2>{{ format(new Date(now.date), "MMMM dd, yyyy") }}</h2>
       <PortableText :value="now.updates" />
     </template>
