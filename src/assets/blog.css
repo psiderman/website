@@ -33,6 +33,10 @@ div.content ul {
   @apply mx-auto w-full max-w-screen-sm text-left;
 }
 
+div.content > div.ignore-blog {
+  @apply mx-0 w-auto max-w-none;
+}
+
 div.content > div.large {
   @apply mx-auto my-10 w-full max-w-screen-lg text-left;
 }

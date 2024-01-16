@@ -5,6 +5,7 @@ import { PortableText } from "@portabletext/vue";
 import anime from "animejs";
 import client from "@/store/sanity.js";
 import LongImages from "@/components/blog/LongImages.vue";
+import Gallery from "@/components/blog/Gallery.vue";
 
 const data = ref(null);
 const loading = ref(true);
@@ -43,6 +44,24 @@ onMounted(async () => {
     console.error("Error fetching data:", error);
   }
 });
+
+const showGallery = ref(false);
+const albumIndex = ref(0);
+const imageIndex = ref(0);
+
+function galleryToggle(f, j = 0, i = 0) {
+  albumIndex.value = i;
+  imageIndex.value = j;
+  showGallery.value = f;
+}
+
+function updateImageIndex(i) {
+  imageIndex.value = i;
+}
+
+function updateAlbumIndex(i) {
+  albumIndex.value = i;
+}
 </script>
 <template>
   <h1 class="mb-4">What am I doing now?</h1>
@@ -82,10 +101,24 @@ onMounted(async () => {
     </div>
   </div>
   <div class="sanity large">
-    <template v-for="now in data" :key="now._id">
-      <LongImages :images="now.images" :fullDate="now.date" :title="now.date" />
-      <h2>{{ format(new Date(now.date), "MMMM dd, yyyy") }}</h2>
+    <template v-for="(now, i) in data" :key="i">
+      <LongImages
+        :images="now.images"
+        @openGallery="galleryToggle(true, $event, i)"
+      />
+      <h2>{{ format(new Date(now.date), "MMMM yyyy") }}</h2>
       <PortableText :value="now.updates" />
     </template>
   </div>
+
+  <Gallery
+    v-if="!loading"
+    :showGallery="showGallery"
+    :galleryData="data"
+    :albumIndex="albumIndex"
+    :imageIndex="imageIndex"
+    titleKey="date"
+    @closeGallery="galleryToggle(false)"
+    @imageIndexChange="updateImageIndex($event)"
+  />
 </template>
