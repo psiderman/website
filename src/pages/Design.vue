@@ -197,7 +197,7 @@ onMounted(() => {
         duration: 500,
         easing: "easeOutBack",
         delay: anime.stagger(100, {
-          grid: [gridItems.value[1].length, gridItems.value.length],
+          grid: [gridItems.value[0].length, gridItems.value.length],
         }),
       })
       .add({
@@ -242,7 +242,7 @@ onMounted(() => {
     <div
       class="mx-auto mb-20 mt-10 flex max-w-2xl flex-col items-center justify-center gap-4 px-10"
     >
-      <h1 class="anime-entry text-4xl font-semibold text-white">
+      <h1 class="anime-entry text-center text-4xl font-semibold text-white">
         Design Portfolio
       </h1>
       <p class="anime-entry text-center text-base text-white/80">
