@@ -82,15 +82,16 @@ function copyEmail(event) {
     <div>
       <!-- DP -->
       <div
-        class="leftbar-headshot pointer-events-none relative h-16 w-16 select-none rounded-full bg-blue-600"
+        class="leftbar-headshot relative h-16 w-16 select-none rounded-full bg-white/10 transition-colors duration-200 ease-in-out hover:bg-blue-600"
       >
         <div
-          class="absolute bottom-0 h-20 w-16 overflow-hidden rounded-b-full align-bottom"
+          class="pointer-events-none absolute bottom-0 h-20 w-16 overflow-hidden rounded-b-full align-bottom"
         >
           <img
-            class="h-20 w-20 select-none object-cover"
+            class="pointer-events-auto bottom-0 h-20 w-20 cursor-help select-none object-cover"
             src="@/assets/images/dp.png"
-            alt="cartoon me"
+            alt="itsume"
+            title="It's a me!"
           />
         </div>
       </div>
