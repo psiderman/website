@@ -7,11 +7,6 @@ const props = defineProps({
 });
 
 const urls = {
-  "read-cv": new URL(
-    "@/assets/duotone/read-cv.svg",
-    import.meta.url,
-  ).toString(),
-
   envelope: new URL(
     "@/assets/duotone/envelope.svg",
     import.meta.url,

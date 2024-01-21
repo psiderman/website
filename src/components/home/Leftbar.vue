@@ -82,7 +82,7 @@ function copyEmail(event) {
     <div>
       <!-- DP -->
       <div
-        class="leftbar-headshot relative h-16 w-16 select-none rounded-full bg-white/10 transition-colors duration-200 ease-in-out hover:bg-blue-600"
+        class="leftbar-headshot relative h-16 w-16 select-none rounded-full bg-blue-600"
       >
         <div
           class="pointer-events-none absolute bottom-0 h-20 w-16 overflow-hidden rounded-b-full align-bottom"
@@ -90,7 +90,7 @@ function copyEmail(event) {
           <img
             class="pointer-events-auto bottom-0 h-20 w-20 cursor-help select-none object-cover"
             src="@/assets/images/dp.png"
-            alt="itsume"
+            alt="itsame"
             title="It's a me!"
           />
         </div>
@@ -129,7 +129,11 @@ function copyEmail(event) {
           brand="reddit-alien"
           link="https://www.youtube.com/watch?v=xvFZjo5PgG0"
         />
-        <Pill text="Read.cv" icon="read-cv" link="https://psiderman.read.cv" />
+        <Pill
+          text="LinkedIn"
+          brand="linkedin-in"
+          link="https://www.linkedin.com/in/psiderman/"
+        />
       </div>
     </div>
   </div>

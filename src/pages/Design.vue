@@ -339,10 +339,10 @@ onMounted(() => {
         >Github</a
       >
       <a
-        href="https://psiderman.read.cv"
+        href="https://www.linkedin.com/in/psiderman/"
         target="_blank"
         class="footer-anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
-        >Read.cv</a
+        >LinkedIn</a
       >
     </div>
   </div>
