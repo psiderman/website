@@ -110,11 +110,11 @@ function updateAlbumIndex(i) {
   </div>
   <div class="sanity large">
     <template v-for="(now, i) in data" :key="now._id">
+      <h2>{{ format(new Date(now.date), "MMMM yyyy") }}</h2>
       <LongImages
         :images="now.images"
         @openGallery="galleryToggle(true, $event, i)"
       />
-      <h2>{{ format(new Date(now.date), "MMMM yyyy") }}</h2>
       <PortableText :value="now.updates" />
     </template>
   </div>
