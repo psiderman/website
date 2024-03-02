@@ -72,7 +72,7 @@ function getTitle(a) {
 }
 
 const timer = ref(null);
-const slideShowTimerValue = ref(5000);
+const slideShowTimerValue = ref(7500);
 
 function currentIndexChange(c) {
   clearInterval(timer.value);
@@ -361,7 +361,7 @@ watch(
 
 <style lang="postcss" scoped>
 .progress-bar-increase {
-  animation: pb 5000ms linear forwards;
+  animation: pb 7500ms linear forwards;
 }
 @keyframes pb {
   0% {
