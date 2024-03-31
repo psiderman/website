@@ -1,14 +1,6 @@
 <script setup>
 import { format, formatDistance } from "date-fns";
-import {
-  computed,
-  onMounted,
-  onUnmounted,
-  ref,
-  defineProps,
-  defineEmits,
-  watch,
-} from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 const props = defineProps({
   galleryData: Array,
