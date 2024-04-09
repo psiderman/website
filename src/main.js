@@ -12,7 +12,7 @@ import { faHeart as faHeartS } from "@fortawesome/free-solid-svg-icons";
 import {
   faTwitter,
   faRedditAlien,
-  faGithub,
+  faInstagram,
   faLinkedinIn,
 } from "@fortawesome/free-brands-svg-icons";
 
@@ -33,7 +33,7 @@ app.use(pinia);
 app.use(router);
 
 library.add(faHeart, faHeartS);
-library.add(faTwitter, faRedditAlien, faGithub, faLinkedinIn);
+library.add(faTwitter, faRedditAlien, faInstagram, faLinkedinIn);
 
 watch(
   pinia.state,

@@ -120,9 +120,9 @@ function copyEmail(event) {
           link="https://twitter.com/_psiderman_"
         />
         <Pill
-          text="GitHub"
-          brand="github"
-          link="https://github.com/psiderman"
+          text="Insta"
+          brand="instagram"
+          link="https://instagram.com/psiderman"
         />
         <Pill
           text="Reddit"
