@@ -9,7 +9,7 @@ const props = defineProps({
 
 const urls = {
   owensans: new URL("@/assets/images/owensans.png", import.meta.url).toString(),
-  kiwi: new URL("@/assets/images/kiwi.png", import.meta.url).toString(),
+  // kiwi: new URL("@/assets/images/kiwi.png", import.meta.url).toString(),
   primer: new URL("@/assets/images/primer.png", import.meta.url).toString(),
   spotify: new URL("@/assets/svg/spotify.svg", import.meta.url).toString(),
 };

@@ -99,11 +99,11 @@ onMounted(() => {
           logo="owensans"
           link="https://owensans.vercel.app"
         />
-        <LinkCard
+        <!-- <LinkCard
           title="Kiwi, personal finance"
           logo="kiwi"
           link="https://kiwi.psiderman.com"
-        />
+        /> -->
         <LinkCard
           title="Personal finance 101"
           logo="primer"

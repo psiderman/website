@@ -112,7 +112,7 @@ const shotData = [
   },
   {
     type: "video",
-    link: "https://kiwi.psiderman.com",
+    // link: "https://kiwi.psiderman.com",
     title: "Kiwi Personal Finance",
     year: "2023",
     src: new URL("@/assets/design/shots/kiwi.mp4", import.meta.url).toString(),
