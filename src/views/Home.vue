@@ -1,8 +1,8 @@
 <script setup>
 import Leftbar from "@/components/home/Leftbar.vue";
-import NowCard from "@/components/home/NowCard.vue";
+// import NowCard from "@/components/home/NowCard.vue";
 import LinkCard from "@/components/home/LinkCard.vue";
-import TravelCard from "@/components/home/TravelCard.vue";
+// import TravelCard from "@/components/home/TravelCard.vue";
 import GamingCard from "@/components/home/GamingCard.vue";
 import PortfolioCard from "@/components/home/PortfolioCard.vue";
 
@@ -87,12 +87,12 @@ onMounted(() => {
       <RouterLink class="rounded-3xl" to="/design">
         <PortfolioCard />
       </RouterLink>
-      <RouterLink class="rounded-3xl" to="/now">
+      <!-- <RouterLink class="rounded-3xl" to="/now">
         <NowCard />
-      </RouterLink>
-      <RouterLink class="rounded-3xl" to="/backpacking">
+      </RouterLink> -->
+      <!-- <RouterLink class="rounded-3xl" to="/backpacking">
         <TravelCard />
-      </RouterLink>
+      </RouterLink> -->
       <div class="grid grid-cols-2 grid-rows-2 gap-4 md:gap-10">
         <LinkCard
           title="Owen Sans, font quiz"

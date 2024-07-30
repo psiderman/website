@@ -119,11 +119,11 @@ function copyEmail(event) {
           brand="twitter"
           link="https://twitter.com/_psiderman_"
         />
-        <Pill
+        <!-- <Pill
           text="Insta"
           brand="instagram"
           link="https://instagram.com/psiderman"
-        />
+        /> -->
         <Pill
           text="Reddit"
           brand="reddit-alien"
