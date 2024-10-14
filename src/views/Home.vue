@@ -1,6 +1,6 @@
 <script setup>
 import Leftbar from "@/components/home/Leftbar.vue";
-// import NowCard from "@/components/home/NowCard.vue";
+import NowCard from "@/components/home/NowCard.vue";
 import LinkCard from "@/components/home/LinkCard.vue";
 import TravelCard from "@/components/home/TravelCard.vue";
 import GamingCard from "@/components/home/GamingCard.vue";
@@ -87,15 +87,13 @@ onMounted(() => {
       <RouterLink class="rounded-3xl" to="/design">
         <PortfolioCard />
       </RouterLink>
-      <!-- <RouterLink class="rounded-3xl" to="/now">
+      <RouterLink class="rounded-3xl" to="/now">
         <NowCard />
-      </RouterLink> -->
+      </RouterLink>
       <RouterLink class="rounded-3xl" to="/backpacking">
         <TravelCard />
       </RouterLink>
-      <RouterLink to="/gaming" class="rounded-3xl">
-        <GamingCard />
-      </RouterLink>
+
       <div class="grid grid-cols-2 grid-rows-2 gap-4 md:gap-10">
         <LinkCard
           title="Owen Sans, font quiz"
@@ -118,6 +116,10 @@ onMounted(() => {
           link="https://open.spotify.com/user/psiderman/playlists"
         />
       </div>
+      <RouterLink to="/gaming" class="rounded-3xl">
+        <GamingCard />
+      </RouterLink>
+      <div></div>
       <div
         class="col-span-1 flex w-full select-none flex-col text-center text-base text-white/50 md:col-span-2 lg:col-span-1 lg:text-left"
       >
