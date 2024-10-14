@@ -4,7 +4,7 @@ import anime from "animejs";
 
 onMounted(async () => {
   anime({
-    targets: [".anime-entry, h1, h2, h3, p, span"],
+    targets: [".anime-entry, h1, h2, h3, p, li, span"],
     translateY: ["1rem", "0"],
     opacity: [0, 1],
     scale: [0.95, 1],
