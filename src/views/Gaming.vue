@@ -87,6 +87,13 @@ onMounted(async () => {
 
 <template>
   <h1>Stack: PC + Console</h1>
+  <p class="-mt-8">
+    <span
+      class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 p-2"
+    >
+      i </span
+    >Update: My brother has my PC now. Lately, it's only the PS5 for me.
+  </p>
   <p>
     I built my PC back in 2014, and its due for an upgrade any minute now. It's
     kept me company from the likes of Batman: Arkham Asylum, Splinter Cell:
