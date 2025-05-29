@@ -114,16 +114,16 @@ function copyEmail(event) {
           @click.prevent="copyEmail"
           icon="envelope"
         />
-        <Pill
+        <!-- <Pill
           text="Twitter"
           brand="twitter"
           link="https://twitter.com/_psiderman_"
-        />
-        <!-- <Pill
-          text="Insta"
+        /> -->
+        <Pill
+          text="Instagram"
           brand="instagram"
           link="https://instagram.com/psiderman"
-        /> -->
+        />
         <Pill
           text="Reddit"
           brand="reddit-alien"

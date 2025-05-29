@@ -28,7 +28,7 @@ function fillHeart() {
         ©️ Karan Sanas {{ new Date().getFullYear() }}
       </span>
       <span class="anime-entry"
-        >Handcrafted with Figma, Vue.js, and&nbsp;&nbsp;<fa
+        >Handcrafted with Figma, Vue.js, no AI content, and&nbsp;&nbsp;<fa
           @click="fillHeart"
           :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
           :icon="[heartFill ? 'fas' : 'far', 'heart']"
@@ -42,10 +42,10 @@ function fillHeart() {
         >Home</RouterLink
       >
       <a
-        href="https://twitter.com/_psiderman_"
+        href="https://instagram.com/psiderman"
         target="_blank"
         class="anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
-        >Twitter</a
+        >Instagram</a
       >
       <a
         href="https://github.com/psiderman/website"

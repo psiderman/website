@@ -127,7 +127,7 @@ onMounted(() => {
           ©️ Karan Sanas {{ new Date().getFullYear() }}
         </span>
         <span class="anime-entry"
-          >Handcrafted with Figma, Vue.js, and&nbsp;&nbsp;<fa
+          >Handcrafted with Figma, Vue.js, no AI content, and&nbsp;&nbsp;<fa
             @click="fillHeart"
             :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
             :icon="[heartFill ? 'fas' : 'far', 'heart']"
