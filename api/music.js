@@ -1,8 +1,23 @@
 import fetch from 'node-fetch';
+import getColors from 'get-image-colors';
 
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const refresh_token = process.env.SPOTIFY_REFRESH_TOKEN;
+
+export async function getDominantColorHex(imageUrl) {
+    try {
+        const response = await fetch(imageUrl);
+        if (!response.ok) throw new Error('Image fetch failed');
+        const buffer = await response.buffer();
+
+        const colors = await getColors(buffer, 'image/jpeg');
+        return colors[0].hex(); // Most dominant/vivid
+    } catch (err) {
+        console.error("Color extraction failed:", err.message);
+        return "#000000"; // fallback color
+    }
+}
 
 export default async function handler(req, res) {
     if (!client_id || !client_secret || !refresh_token) {
@@ -73,6 +88,9 @@ export default async function handler(req, res) {
                 return res.status(200).json({ isPlaying: false });
             }
 
+            const albumImageUrl = track.track?.album?.images?.[0]?.url || "";
+            const vividColor = albumImageUrl ? await getDominantColorHex(albumImageUrl) : "#000000";
+
             return res.status(200).json({
                 isPlaying: false,
                 lastPlayed: true,
@@ -80,7 +98,8 @@ export default async function handler(req, res) {
                 title: track.track?.name,
                 artist: track.track?.artists?.map(a => a.name).join(", "),
                 album: track.track?.album?.name,
-                albumImageUrl: track.track?.album?.images?.[0]?.url,
+                albumImageUrl,
+                vividColor,
                 songUrl: track.track?.external_urls?.spotify,
             });
         }
@@ -91,13 +110,17 @@ export default async function handler(req, res) {
             return res.status(200).json({ isPlaying: false });
         }
 
+        const albumImageUrl = song.item?.album?.images?.[0]?.url || "";
+        const vividColor = albumImageUrl ? await getDominantColorHex(albumImageUrl) : "#000000";
+
         return res.status(200).json({
             isPlaying: song.is_playing,
             lastPlayed: false,
             title: song.item.name,
             artist: song.item.artists.map(a => a.name).join(", "),
             album: song.item.album.name,
-            albumImageUrl: song.item.album.images[0].url,
+            albumImageUrl,
+            vividColor,
             songUrl: song.item.external_urls.spotify,
         });
 
