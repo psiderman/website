@@ -71,11 +71,11 @@ onMounted(async () => {
 <template>
   <transition @enter="enterAnimation" @leave="leaveAnimation" appear>
     <div
-      class="fixed bottom-8 right-8"
+      class="fixed inset-x-0 bottom-0 md:bottom-8 md:left-auto md:right-8"
       v-if="songData.isPlaying || songData.lastPlayed"
     >
       <div
-        class="spotify-entry flex h-16 w-80 cursor-pointer select-none flex-row items-center gap-2 rounded-2xl bg-black p-4"
+        class="spotify-entry flex h-16 w-screen cursor-pointer select-none flex-row items-center gap-2 rounded-b-none rounded-t-2xl border border-b-0 border-white/15 bg-black p-4 md:w-80 md:rounded-2xl md:border-b"
         @click="openSong"
       >
         <div
@@ -112,9 +112,50 @@ onMounted(async () => {
             last played {{ getRelativeDate(songData.playedAt) }}
           </p>
         </div>
+        <div
+          class="flex h-6 w-6 flex-row items-center justify-center gap-x-1"
+          v-if="songData.isPlaying"
+        >
+          <div class="waveform-bar rounded bg-white/30"></div>
+          <div class="waveform-bar rounded bg-white/30"></div>
+          <div class="waveform-bar rounded bg-white/30"></div>
+        </div>
       </div>
     </div>
   </transition>
 </template>
 
-<style lang="postcss" scoped></style>
+<style lang="postcss" scoped>
+@keyframes bounceHeight {
+  0%,
+  100% {
+    height: 4px;
+  }
+  50% {
+    height: 16px;
+  }
+}
+
+/* Add a little delay and speed difference for each bar */
+.waveform-bar {
+  animation-name: bounceHeight;
+  animation-duration: 800ms;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  width: 4px;
+  height: 4px;
+}
+
+/* Stagger animations for each bar */
+.waveform-bar:nth-child(1) {
+  animation-delay: 0ms;
+}
+.waveform-bar:nth-child(2) {
+  animation-delay: 200ms;
+  animation-duration: 600ms;
+}
+.waveform-bar:nth-child(3) {
+  animation-delay: 400ms;
+  animation-duration: 1000ms;
+}
+</style>
