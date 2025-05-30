@@ -74,12 +74,13 @@ onMounted(async () => {
       v-if="songData.isPlaying || songData.lastPlayed"
     >
       <div
-        class="spotify-entry flex h-16 w-screen cursor-pointer select-none flex-row items-center gap-2 rounded-b-none rounded-t-2xl border border-b-0 border-white/15 bg-black p-4 md:w-80 md:rounded-2xl md:border-b"
+        class="spotify-entry"
+        :style="{ backgroundColor: songData.vividColor }"
         @click="openSong"
       >
         <div
           :class="[
-            'h-8 w-8 shrink-0 overflow-hidden rounded-sm bg-white/10',
+            'z-10 h-8 w-8 shrink-0 overflow-hidden rounded-sm bg-white/10',
             songData.isPlaying || songData.lastPlayed ? '' : 'skeleton-shimmer',
           ]"
         >
@@ -91,7 +92,7 @@ onMounted(async () => {
             role="img"
           />
         </div>
-        <div class="w-full flex-col gap-0 truncate font-sans text-xs">
+        <div class="z-10 w-full flex-col gap-0 truncate font-sans text-xs">
           <p class="truncate font-semibold text-white/90">
             {{ songData.title }}
             <span class="font-normal text-white/60"
@@ -102,7 +103,7 @@ onMounted(async () => {
             v-if="songData.isPlaying"
             class="font-regular truncate text-white/60"
           >
-            listening to this right now
+            i'm listening to this right now
           </p>
           <p
             v-else-if="songData.lastPlayed"
@@ -112,7 +113,7 @@ onMounted(async () => {
           </p>
         </div>
         <div
-          class="flex h-6 w-6 flex-row items-center justify-center gap-x-1"
+          class="z-10 flex h-6 w-6 flex-row items-center justify-center gap-x-1"
           v-if="songData.isPlaying"
         >
           <div class="waveform-bar rounded bg-white/30"></div>
@@ -125,6 +126,23 @@ onMounted(async () => {
 </template>
 
 <style lang="postcss" scoped>
+.spotify-entry {
+  @apply relative flex h-16 w-screen cursor-pointer select-none flex-row items-center gap-2 overflow-hidden p-4 md:w-80;
+  @apply rounded rounded-b-none rounded-t-lg md:rounded-xl;
+}
+
+.spotify-entry::before {
+  content: "";
+  @apply pointer-events-none absolute inset-0 z-0;
+  @apply rounded rounded-b-none rounded-t-lg md:rounded-xl;
+  @apply border border-x-0 border-b-0 border-white/5 md:border-x md:border-b;
+  background: rgba(24, 24, 27, 0.75);
+}
+
+.spotify-entry:hover::before {
+  background: rgba(24, 24, 27, 0.5);
+}
+
 @keyframes bounceHeight {
   0%,
   100% {
