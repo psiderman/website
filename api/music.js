@@ -39,6 +39,7 @@ export default async function handler(req, res) {
 
         if (recentlyPlayed.ok) {
             const data = await recentlyPlayed.json();
+
             const track = data.items[0];
 
             return res.status(200).json({
@@ -59,7 +60,7 @@ export default async function handler(req, res) {
     const song = await nowPlaying.json();
 
     res.status(200).json({
-        isPlaying: true,
+        isPlaying: song.is_playing,
         lastPlayed: false,
         title: song.item.name,
         artist: song.item.artists.map((a) => a.name).join(", "),
