@@ -59,11 +59,10 @@ onMounted(async () => {
     if (res.ok) {
       songData.value = await res.json();
     }
-    console.log(songData.value);
   };
 
   fetchSong();
-  const interval = setInterval(fetchSong, 1000);
+  const interval = setInterval(fetchSong, 10000);
 
   onUnmounted(() => clearInterval(interval));
 });
@@ -71,7 +70,7 @@ onMounted(async () => {
 <template>
   <transition @enter="enterAnimation" @leave="leaveAnimation" appear>
     <div
-      class="fixed inset-x-0 bottom-0 md:bottom-8 md:left-auto md:right-8"
+      class="fixed inset-x-0 bottom-0 md:bottom-4 md:left-auto md:right-4"
       v-if="songData.isPlaying || songData.lastPlayed"
     >
       <div
@@ -103,13 +102,13 @@ onMounted(async () => {
             v-if="songData.isPlaying"
             class="font-regular truncate text-white/60"
           >
-            now listening
+            listening to this right now
           </p>
           <p
             v-else-if="songData.lastPlayed"
             class="font-regular truncate text-white/60"
           >
-            last played {{ getRelativeDate(songData.playedAt) }}
+            was listening to this {{ getRelativeDate(songData.playedAt) }}
           </p>
         </div>
         <div
