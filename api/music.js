@@ -12,12 +12,21 @@ export async function getDominantColorHex(imageUrl) {
         const buffer = await response.buffer();
 
         const colors = await getColors(buffer, 'image/jpeg');
-        return colors[0].hex(); // Most dominant/vivid
+
+        const vividColors = colors.filter(color => {
+            const [h, s, l] = color.hsl();
+            return (s > 0.15 && l > 0.15);
+        });
+
+        const topColor = (vividColors[0] || colors[0]);
+
+        return topColor.hex();
     } catch (err) {
         console.error("Color extraction failed:", err.message);
-        return "#000000"; // fallback color
+        return "#000000";
     }
 }
+
 
 export default async function handler(req, res) {
     if (!client_id || !client_secret || !refresh_token) {
@@ -66,42 +75,7 @@ export default async function handler(req, res) {
         });
 
         if (nowPlaying.status === 204 || nowPlaying.status >= 400) {
-            // Fallback to recently played
-            const recentlyPlayed = await fetch("https://api.spotify.com/v1/me/player/recently-played?limit=1", {
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                },
-            });
-
-            if (!recentlyPlayed.ok) {
-                const errorText = await recentlyPlayed.text();
-                return res.status(recentlyPlayed.status).json({
-                    error: "Failed to fetch recently played",
-                    details: errorText,
-                });
-            }
-
-            const data = await recentlyPlayed.json();
-            const track = data?.items?.[0];
-
-            if (!track) {
-                return res.status(200).json({ isPlaying: false });
-            }
-
-            const albumImageUrl = track.track?.album?.images?.[0]?.url || "";
-            const vividColor = albumImageUrl ? await getDominantColorHex(albumImageUrl) : "#000000";
-
-            return res.status(200).json({
-                isPlaying: false,
-                lastPlayed: true,
-                playedAt: track.played_at,
-                title: track.track?.name,
-                artist: track.track?.artists?.map(a => a.name).join(", "),
-                album: track.track?.album?.name,
-                albumImageUrl,
-                vividColor,
-                songUrl: track.track?.external_urls?.spotify,
-            });
+            return res.status(200).json({ isPlaying: false });
         }
 
         const song = await nowPlaying.json();
@@ -115,9 +89,8 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
             isPlaying: song.is_playing,
-            lastPlayed: false,
             title: song.item.name,
-            artist: song.item.artists.map(a => a.name).join(", "),
+            artist: song.item.artists[0].name,
             album: song.item.album.name,
             albumImageUrl,
             vividColor,

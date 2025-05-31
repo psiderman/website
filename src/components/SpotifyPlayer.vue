@@ -1,6 +1,6 @@
 <script setup>
 import anime from "animejs";
-import { onMounted, ref, onUnmounted } from "vue";
+import { onMounted, ref, onUnmounted, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { formatDistance } from "date-fns";
 
@@ -9,8 +9,14 @@ const router = useRouter();
 
 const songData = ref({
   isPlaying: false,
-  lastPlayed: false,
 });
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 function enterAnimation(el, done) {
   anime({
@@ -38,12 +44,6 @@ function leaveAnimation(el, done) {
   });
 }
 
-function openSong() {
-  if (songData.value.songUrl) {
-    window.open(songData.value.songUrl, "_blank");
-  }
-}
-
 function getRelativeDate(date) {
   try {
     const d = new Date(date.DateTimeOriginal.replace("Z", ""));
@@ -58,6 +58,21 @@ onMounted(async () => {
     const res = await fetch("/api/music");
     if (res.ok) {
       songData.value = await res.json();
+      nextTick(() => {
+        const card = document.querySelector(".spotify-card");
+
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`;
+          card.style.setProperty("background", gradient);
+        });
+
+        card.addEventListener("mouseleave", () => {
+          card.style.setProperty("background", "hsla(0,0%,100%,2%)");
+        });
+      });
     }
   };
 
@@ -69,78 +84,66 @@ onMounted(async () => {
 </script>
 <template>
   <transition @enter="enterAnimation" @leave="leaveAnimation" appear>
-    <div
-      class="fixed inset-x-0 bottom-0 md:bottom-4 md:left-auto md:right-4"
-      v-if="songData.isPlaying || songData.lastPlayed"
+    <a
+      v-if="songData.isPlaying"
+      :href="songData.songUrl"
+      target="_blank"
+      class="rounded-3xl"
     >
-      <div
-        class="spotify-entry"
-        :style="{ backgroundColor: songData.vividColor }"
-        @click="openSong"
-      >
+      <div class="spotify-card">
         <div
-          :class="[
-            'z-10 h-8 w-8 shrink-0 overflow-hidden rounded-sm bg-white/10',
-            songData.isPlaying || songData.lastPlayed ? '' : 'skeleton-shimmer',
-          ]"
+          class="absolute inset-0 -z-10 h-full w-full rounded-3xl"
+          :style="{
+            backgroundColor: hexToRgba(songData.vividColor, 0.2),
+            boxShadow: `0 0 0 1px ${hexToRgba(songData.vividColor, 0.3)}`,
+          }"
+        ></div>
+        <img
+          v-if="songData.albumImageUrl"
+          class="h-8 w-8 shrink-0 rounded-sm border-white"
+          :src="songData.albumImageUrl"
+          :alt="
+            songData.album ? `Album art for ${songData.album}` : 'Album art'
+          "
+          role="img"
+        />
+        <div
+          class="text z-10 w-full flex-col gap-0 font-sans text-xs font-medium tracking-tight text-white"
         >
-          <img
-            :src="songData.albumImageUrl"
-            :alt="
-              songData.album ? `Album art for ${songData.album}` : 'Album art'
-            "
-            role="img"
-          />
-        </div>
-        <div class="z-10 w-full flex-col gap-0 truncate font-sans text-xs">
-          <p class="truncate font-semibold text-white/90">
+          <p class="mb-1 text-white/50">i'm now listening to</p>
+          <p class="truncate text-white">
             {{ songData.title }}
-            <span class="font-normal text-white/60"
-              >by {{ songData.artist }}</span
-            >
           </p>
-          <p
-            v-if="songData.isPlaying"
-            class="font-regular truncate text-white/60"
-          >
-            i'm listening to this right now
-          </p>
-          <p
-            v-else-if="songData.lastPlayed"
-            class="font-regular truncate text-white/60"
-          >
-            was listening to this {{ getRelativeDate(songData.playedAt) }}
+          <p class="truncate text-white/60">
+            {{ songData.artist }}
           </p>
         </div>
         <div
-          class="z-10 flex h-6 w-6 flex-row items-center justify-center gap-x-1"
+          class="absolute right-4 top-4 z-10 flex h-8 w-6 flex-row items-center justify-center gap-x-1"
           v-if="songData.isPlaying"
         >
-          <div class="waveform-bar rounded bg-white/30"></div>
-          <div class="waveform-bar rounded bg-white/30"></div>
-          <div class="waveform-bar rounded bg-white/30"></div>
+          <div
+            class="waveform-bar"
+            :style="{ backgroundColor: hexToRgba(songData.vividColor, 1) }"
+          ></div>
+          <div
+            class="waveform-bar"
+            :style="{ backgroundColor: hexToRgba(songData.vividColor, 1) }"
+          ></div>
+          <div
+            class="waveform-bar"
+            :style="{ backgroundColor: hexToRgba(songData.vividColor, 1) }"
+          ></div>
         </div>
       </div>
-    </div>
+    </a>
   </transition>
 </template>
 
 <style lang="postcss" scoped>
-.spotify-entry {
-  @apply relative flex h-16 w-screen cursor-pointer select-none flex-row items-center gap-2 overflow-hidden p-4 md:w-80;
-  @apply rounded rounded-b-none rounded-t-lg md:rounded-xl;
-}
-
-.spotify-entry::before {
-  content: "";
-  @apply pointer-events-none absolute inset-0 z-0;
-  @apply rounded rounded-b-none rounded-t-lg md:rounded-xl;
-  @apply border border-x-0 border-b-0 border-white/5 md:border-x md:border-b;
-  background: rgba(24, 24, 27, 0.75);
-}
-
-.spotify-entry:hover::before {
-  background: rgba(24, 24, 27, 0.5);
+.spotify-card {
+  @apply relative flex aspect-square cursor-pointer select-none flex-col items-start justify-between gap-2 rounded-3xl p-4;
+  @apply border border-white/5 bg-white/[2%];
 }
 
 @keyframes bounceHeight {
@@ -155,12 +158,18 @@ onMounted(async () => {
 
 /* Add a little delay and speed difference for each bar */
 .waveform-bar {
+  @apply relative overflow-hidden rounded;
   animation-name: bounceHeight;
   animation-duration: 800ms;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   width: 4px;
   height: 4px;
+}
+
+.waveform-bar::before {
+  content: "";
+  @apply absolute inset-0 bg-white/30;
 }
 
 /* Stagger animations for each bar */
