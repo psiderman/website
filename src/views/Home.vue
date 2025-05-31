@@ -97,6 +97,12 @@ onMounted(() => {
 
       <div class="grid grid-cols-2 grid-rows-2 gap-4 md:gap-10">
         <LinkCard
+          title="Public Playlists"
+          logo="spotify"
+          link="https://open.spotify.com/user/psiderman/playlists"
+        />
+        <SpotifyPlayer />
+        <LinkCard
           title="Owen Sans, font quiz"
           logo="owensans"
           link="https://owensans.vercel.app"
@@ -110,11 +116,6 @@ onMounted(() => {
           title="Personal finance 101"
           logo="primer"
           link="https://links.psiderman.com/primer"
-        />
-        <LinkCard
-          title="Public Playlists"
-          logo="spotify"
-          link="https://open.spotify.com/user/psiderman/playlists"
         />
       </div>
       <RouterLink to="/gaming" class="rounded-3xl">
@@ -136,7 +137,6 @@ onMounted(() => {
         </span>
       </div>
     </div>
-    <SpotifyPlayer />
   </div>
 </template>
 
