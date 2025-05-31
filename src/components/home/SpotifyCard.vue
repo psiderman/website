@@ -108,13 +108,14 @@ onMounted(async () => {
           role="img"
         />
         <div
-          class="text z-10 w-full flex-col gap-0 font-sans text-xs font-medium tracking-tight text-white"
+          class="text z-10 w-full flex-col gap-0 font-sans text-xs tracking-tight text-white"
         >
-          <p class="mb-1 text-white/50">i'm now listening to</p>
-          <p class="truncate text-white">
+          <p class="mb-1 text-white/60">i'm now listening to</p>
+          <p class="truncate font-medium text-white/90">
             {{ songData.title }}
           </p>
-          <p class="truncate text-white/60">
+          <p class="truncate font-medium text-white/90">
+            <span class="text-white/60">by&nbsp;</span>
             {{ songData.artist }}
           </p>
         </div>
