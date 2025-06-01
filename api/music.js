@@ -74,6 +74,9 @@ export default async function handler(req, res) {
             },
         });
 
+        // Always set cache header before sending a response
+        res.setHeader("Cache-Control", "s-maxage=15, stale-while-revalidate");
+
         if (nowPlaying.status === 204 || nowPlaying.status >= 400) {
             return res.status(200).json({ isPlaying: false });
         }

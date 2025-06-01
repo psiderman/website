@@ -11,6 +11,7 @@ export default defineConfig({
       org: "psiderman",
       project: "website",
       telemetry: false,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
     }),
   ],
 
