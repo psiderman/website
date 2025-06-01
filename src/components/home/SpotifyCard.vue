@@ -11,6 +11,9 @@ const songData = ref({
   isPlaying: false,
 });
 
+const POLL_INTERVAL = 10000;
+let pollInterval = null;
+
 function hexToRgba(hex, alpha) {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -53,33 +56,66 @@ function getRelativeDate(date) {
   }
 }
 
-onMounted(async () => {
-  const fetchSong = async () => {
-    const res = await fetch("/api/music");
-    if (res.ok) {
-      songData.value = await res.json();
-      nextTick(() => {
-        const card = document.querySelector(".spotify-card");
+async function fetchSong() {
+  if (document.visibilityState !== "visible") return;
 
-        card.addEventListener("mousemove", (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`;
-          card.style.setProperty("background", gradient);
-        });
+  const res = await fetch("/api/music");
+  console.log("polled");
 
-        card.addEventListener("mouseleave", () => {
-          card.style.setProperty("background", "hsla(0,0%,100%,2%)");
-        });
-      });
-    }
-  };
+  if (res.ok) {
+    songData.value = await res.json();
+    nextTick(() => {
+      const card = document.querySelector(".spotify-card");
+      if (!card) return;
 
+      const moveHandler = (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`;
+        card.style.setProperty("background", gradient);
+      };
+
+      const leaveHandler = () => {
+        card.style.setProperty("background", "hsla(0,0%,100%,2%)");
+      };
+
+      card.removeEventListener("mousemove", moveHandler); // prevent duplicates
+      card.removeEventListener("mouseleave", leaveHandler);
+
+      card.addEventListener("mousemove", moveHandler);
+      card.addEventListener("mouseleave", leaveHandler);
+    });
+  }
+}
+
+function startPolling() {
+  if (pollInterval) clearInterval(pollInterval);
   fetchSong();
-  const interval = setInterval(fetchSong, 10000);
+  pollInterval = setInterval(fetchSong, POLL_INTERVAL);
+}
 
-  onUnmounted(() => clearInterval(interval));
+function stopPolling() {
+  if (pollInterval) clearInterval(pollInterval);
+}
+
+onMounted(() => {
+  if (document.visibilityState === "visible") {
+    startPolling();
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      startPolling();
+    } else {
+      stopPolling();
+    }
+  });
+});
+
+onUnmounted(() => {
+  stopPolling();
+  document.removeEventListener("visibilitychange", startPolling);
 });
 </script>
 <template>
