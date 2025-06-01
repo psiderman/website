@@ -31,6 +31,7 @@ function enterAnimation(el, done) {
     duration: 500,
     easing: "easeOutBack",
     complete: done,
+    delay: 100,
   });
 }
 
@@ -126,7 +127,7 @@ onUnmounted(() => {
       target="_blank"
       class="rounded-3xl"
     >
-      <div class="spotify-card">
+      <div class="spotify-card anime-entry">
         <div
           class="absolute inset-0 -z-10 h-full w-full rounded-3xl"
           :style="{
