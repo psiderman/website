@@ -42,12 +42,6 @@ function fillHeart() {
         >Home</RouterLink
       >
       <a
-        href="https://instagram.com/psiderman"
-        target="_blank"
-        class="anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
-        >Instagram</a
-      >
-      <a
         href="https://github.com/psiderman/website"
         target="_blank"
         class="anime-entry rounded-full px-4 py-1 underline underline-offset-4 hover:text-white/80 focus:bg-white/10 focus:text-white/80 focus:no-underline"
