@@ -118,12 +118,12 @@ function copyEmail(event) {
           text="Twitter"
           brand="twitter"
           link="https://twitter.com/_psiderman_"
-        /> -->
+        />
         <Pill
           text="Instagram"
           brand="instagram"
           link="https://instagram.com/psiderman"
-        />
+        /> -->
         <Pill
           text="Reddit"
           brand="reddit-alien"
