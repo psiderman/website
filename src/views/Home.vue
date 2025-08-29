@@ -85,9 +85,6 @@ onMounted(() => {
 
     <!-- Right bar -->
     <div class="grid h-full w-full gap-4 md:grid-cols-2 md:gap-10">
-      <RouterLink class="rounded-3xl" to="/design">
-        <PortfolioCard />
-      </RouterLink>
       <RouterLink class="rounded-3xl" to="/now">
         <NowCard />
       </RouterLink>
@@ -118,6 +115,11 @@ onMounted(() => {
           link="https://links.psiderman.com/primer"
         />
       </div>
+
+      <RouterLink class="rounded-3xl" to="/design">
+        <PortfolioCard />
+      </RouterLink>
+
       <RouterLink to="/gaming" class="rounded-3xl">
         <GamingCard />
       </RouterLink>
