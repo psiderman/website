@@ -46,36 +46,11 @@
     <meta name="og:locale" content="en_IN" />
     <meta name="og:type" content="website" />
 
-    <!-- Cronitor RUM -->
-    <script async src="https://rum.cronitor.io/script.js"></script>
-    <script>
-      window.cronitor =
-        window.cronitor ||
-        function () {
-          (window.cronitor.q = window.cronitor.q || []).push(arguments);
-        };
-      cronitor("config", {
-        honorDNT: true,
-        clientKey: "a5c6d0061cda9cec846db67d23bf336d",
-      });
-    </script>
-
-    <!-- Hotjar Tracking Code for https://design.psiderman.com/ -->
-    <script>
-      (function (h, o, t, j, a, r) {
-        h.hj =
-          h.hj ||
-          function () {
-            (h.hj.q = h.hj.q || []).push(arguments);
-          };
-        h._hjSettings = { hjid: 3384488, hjsv: 6 };
-        a = o.getElementsByTagName("head")[0];
-        r = o.createElement("script");
-        r.async = 1;
-        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-        a.appendChild(r);
-      })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
-    </script>
+    <!-- 100% privacy-first analytics -->
+    <script
+      async
+      src="https://scripts.simpleanalyticscdn.com/latest.js"
+    ></script>
   </head>
   <body>
     <div id="app"></div>
