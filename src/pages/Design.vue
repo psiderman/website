@@ -246,10 +246,13 @@ onMounted(() => {
         Design Portfolio
       </h1>
       <p class="anime-entry text-center text-base text-white/80">
-        Most recently, I was a senior product designer at Quizizz Inc. where I
-        delivered countless quality of life enhancements across core product
-        experiences, revenue, and growth, while leading the Design Systems and
-        Content Platform teams.
+        Most recently, I was a senior product designer at Dezerv (Accel-backed,
+        $2Bn AUM) where I led the first ever desktop investor experience and
+        introduced Prosper, the design system that unifies design foundations
+        across 3 investor products and 1 internal tool.
+      </p>
+      <p class="anime-entry text-center text-base text-white/50 mt-1">
+        case studies coming soon
       </p>
     </div>
 

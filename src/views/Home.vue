@@ -88,8 +88,8 @@ onMounted(() => {
       <RouterLink class="rounded-3xl" to="/now">
         <NowCard />
       </RouterLink>
-      <RouterLink class="rounded-3xl" to="/backpacking">
-        <TravelCard />
+      <RouterLink class="rounded-3xl" to="/design">
+        <PortfolioCard />
       </RouterLink>
 
       <div class="grid grid-cols-2 grid-rows-2 gap-4 md:gap-10">
@@ -104,11 +104,11 @@ onMounted(() => {
           logo="owensans"
           link="https://owensans.vercel.app"
         />
-        <!-- <LinkCard
-          title="Kiwi, personal finance"
-          logo="kiwi"
-          link="https://kiwi.psiderman.com"
-        /> -->
+        <LinkCard
+          title="Foursight"
+          logo="foursight"
+          link="https://foursight.money"
+        />
         <LinkCard
           title="Personal finance 101"
           logo="primer"
@@ -116,8 +116,8 @@ onMounted(() => {
         />
       </div>
 
-      <RouterLink class="rounded-3xl" to="/design">
-        <PortfolioCard />
+      <RouterLink class="rounded-3xl" to="/backpacking">
+        <TravelCard />
       </RouterLink>
 
       <RouterLink to="/gaming" class="rounded-3xl">
