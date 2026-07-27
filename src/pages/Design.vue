@@ -1,5 +1,6 @@
 <script setup>
 import QuizizzCard from "@/components/design/QuizizzCard.vue";
+import DezervCard from "../components/design/DezervCard.vue";
 import DesignCard from "@/components/design/DesignCard.vue";
 import { RouterLink, useRouter } from "vue-router";
 import { ref, onMounted, nextTick, markRaw } from "vue";
@@ -15,6 +16,14 @@ function fillHeart() {
 }
 
 const shotData = [
+  {
+    type: "component",
+    link: "/design/dezerv/",
+    aspect: "aspect-shot spotlight",
+    component: markRaw(DezervCard),
+    title: "Senior Product Designer",
+    year: "Feb–Dec 2025",
+  },
   {
     type: "image",
     link: "https://links.psiderman.com/question-type-case-study",
@@ -250,9 +259,6 @@ onMounted(() => {
         $2Bn AUM) where I led the first ever desktop investor experience and
         introduced Prosper, the design system that unifies design foundations
         across 3 investor products and 1 internal tool.
-      </p>
-      <p class="anime-entry text-center text-base text-white/50 mt-1">
-        case studies coming soon
       </p>
     </div>
 

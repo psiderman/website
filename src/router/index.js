@@ -29,6 +29,17 @@ const router = createRouter({
       ],
     },
     {
+      path: "/design/dezerv",
+      component: () => import("../pages/Blog.vue"),
+      children: [
+        {
+          path: "",
+          name: "Design - Dezerv",
+          component: () => import("../views/Dezerv.vue"),
+        },
+      ],
+    },
+    {
       path: "/now",
       component: () => import("../pages/Blog.vue"),
       children: [

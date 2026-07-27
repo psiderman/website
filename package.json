@@ -8,7 +8,8 @@
     "dev:api": "vercel dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",

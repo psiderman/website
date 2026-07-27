@@ -88,7 +88,7 @@ onMounted(() => {
     to be used by 16 designers and 50+ engineers. Here's an old
     <a
       class="underline underline-offset-4"
-      href="https://psiderman.notion.site/Handbook-Deprecated-881cfca7ed1344f9935c77afb0531c14?pvs=74"
+      href="https://psiderman.notion.site/Handbook-Deprecated-881cfca7ed1344f9935c77afb0531c14"
       target="_blank"
       >documentation</a
     >
@@ -130,7 +130,7 @@ onMounted(() => {
   <div class="w640 mt-10 flex flex-col gap-y-2">
     <div class="flex flex-row items-center gap-x-2">
       <a
-        href="https://psiderman.read.cv/quizizz-lessons"
+        href="https://psiderman.notion.site/Lessons-7b2a0681aa7f4cb9b6e675923ada9608"
         target="_blank"
         class="anime-entry shrink-0 font-serif text-lg leading-8 text-white/80 underline underline-offset-4"
       >
@@ -147,7 +147,7 @@ onMounted(() => {
     </div>
     <div class="flex flex-row items-center gap-x-2">
       <a
-        href="https://psiderman.read.cv/quizizz-parent-reports"
+        href="https://psiderman.notion.site/Parent-Reports-v2-39b7c0b161b38020b419d2d170671f6a"
         target="_blank"
         class="anime-entry shrink-0 font-serif text-lg leading-8 text-white/80 underline underline-offset-4"
       >
@@ -164,7 +164,7 @@ onMounted(() => {
     </div>
     <div class="flex flex-row items-center gap-x-2">
       <a
-        href="https://psiderman.read.cv/quizizz-other"
+        href="https://psiderman.notion.site/Miscellaneous-39b7c0b161b380e194ebc11a60eacd2c"
         target="_blank"
         class="anime-entry shrink-0 font-serif text-lg leading-8 text-white/80 underline underline-offset-4"
       >

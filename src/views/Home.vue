@@ -5,7 +5,7 @@ import LinkCard from "@/components/home/LinkCard.vue";
 import TravelCard from "@/components/home/TravelCard.vue";
 import GamingCard from "@/components/home/GamingCard.vue";
 import PortfolioCard from "@/components/home/PortfolioCard.vue";
-import SpotifyCard from "@/components/home/SpotifyCard.vue";
+// import SpotifyCard from "@/components/home/SpotifyCard.vue";
 
 import { RouterLink } from "vue-router";
 import { ref, onMounted } from "vue";
@@ -98,7 +98,7 @@ onMounted(() => {
           logo="spotify"
           link="https://open.spotify.com/user/psiderman/playlists"
         />
-        <SpotifyCard />
+        <!-- <SpotifyCard /> -->
         <LinkCard
           title="Owen Sans, font quiz"
           logo="owensans"
