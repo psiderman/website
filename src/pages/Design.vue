@@ -249,7 +249,7 @@ onMounted(() => {
       />
     </RouterLink>
     <div
-      class="mx-auto mb-20 mt-10 flex max-w-2xl flex-col items-center justify-center gap-4 px-10"
+      class="mx-auto mt-10 mb-20 flex max-w-2xl flex-col items-center justify-center gap-4 px-10"
     >
       <h1 class="anime-entry text-center text-4xl font-semibold text-white">
         Design Portfolio
@@ -300,7 +300,7 @@ onMounted(() => {
               v-if="shot.link"
               src="@/assets/duotone/external-link.svg"
               alt="link"
-              class="absolute right-1 top-1 h-6 w-6 rounded-full bg-black/50 px-1.5"
+              class="absolute top-1 right-1 h-6 w-6 rounded-full bg-black/50 px-1.5"
             />
           </DesignCard>
         </template>
@@ -308,7 +308,7 @@ onMounted(() => {
     </div>
 
     <div
-      class="mt-20 flex w-full select-none flex-col items-center justify-center gap-y-1 text-center text-base text-white/50"
+      class="mt-20 flex w-full flex-col items-center justify-center gap-y-1 text-center text-base text-white/50 select-none"
     >
       <span class="footer-anime-entry">
         ©️ Karan Sanas {{ new Date().getFullYear() }}
@@ -322,7 +322,7 @@ onMounted(() => {
       </span>
     </div>
     <div
-      class="w640 mt-8 flex select-none flex-row flex-wrap justify-center text-white/50"
+      class="w640 mt-8 flex flex-row flex-wrap justify-center text-white/50 select-none"
     >
       <RouterLink
         to="/"
@@ -357,7 +357,8 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .grid img.shot,
 .grid video.shot {
   @apply h-full w-full object-contain;

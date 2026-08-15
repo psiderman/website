@@ -180,24 +180,24 @@ watch(
 <template>
   <div
     v-if="showGallery"
-    class="ignore-blog fixed inset-0 z-50 flex h-screen w-screen max-w-none select-none items-center justify-center bg-gray-950 px-4 py-4 sm:pb-2"
+    class="ignore-blog fixed inset-0 z-50 flex h-screen w-screen max-w-none items-center justify-center bg-gray-950 px-4 py-4 select-none sm:pb-2"
     @touchstart.passive="handleTouchStart"
     @touchend.passive="handleTouchEnd"
   >
     <div class="absolute inset-0 z-0" @click="closeGallery()"></div>
     <button
-      class="absolute right-2 top-2 hidden rounded bg-white/10 p-1 px-2 text-xs text-white/80 hover:bg-white/20 focus:outline-offset-0 active:bg-white/5 active:outline-none sm:inline-block"
+      class="absolute top-2 right-2 hidden rounded bg-white/10 p-1 px-2 text-xs text-white/80 hover:bg-white/20 focus:outline-offset-0 active:bg-white/5 active:outline-none sm:inline-block"
       @click="emits('closeGallery')"
     >
       Close (Esc)
     </button>
 
     <div
-      class="relative inset-0 my-auto h-full rounded-lg bg-white/5 sm:aspect-long"
+      class="sm:aspect-long relative inset-0 my-auto h-full rounded-lg bg-white/5"
     >
       <!-- Image -->
       <img
-        :class="['h-full w-full select-none rounded-lg object-cover']"
+        :class="['h-full w-full rounded-lg object-cover select-none']"
         v-lazy="{
           src: galleryData[albumIndex].images[imageIndex].imageUrl,
           loading: galleryData[albumIndex].images[imageIndex].metadata.lqip,
@@ -210,7 +210,7 @@ watch(
         <div
           v-for="(img, j) in galleryData[albumIndex].images"
           :key="j"
-          :class="['h-0.5 w-full overflow-hidden rounded-lg bg-white/50 ']"
+          :class="['h-0.5 w-full overflow-hidden rounded-lg bg-white/50']"
         >
           <div
             :class="[
@@ -271,7 +271,7 @@ watch(
       <div
         v-if="galleryData[albumIndex + 1]"
         :class="[
-          'absolute inset-0 hidden h-full w-full translate-x-full scale-75 cursor-pointer select-none items-center justify-center overflow-hidden rounded-lg sm:flex',
+          'absolute inset-0 hidden h-full w-full translate-x-full scale-75 cursor-pointer items-center justify-center overflow-hidden rounded-lg select-none sm:flex',
         ]"
         @click="currentAlbumChange(1)"
       >
@@ -291,7 +291,7 @@ watch(
       <div
         v-if="galleryData[albumIndex - 1]"
         :class="[
-          'absolute inset-0 hidden h-full w-full -translate-x-full scale-75 cursor-pointer select-none items-center justify-center overflow-hidden rounded-lg sm:flex',
+          'absolute inset-0 hidden h-full w-full -translate-x-full scale-75 cursor-pointer items-center justify-center overflow-hidden rounded-lg select-none sm:flex',
         ]"
         @click="currentAlbumChange(-1)"
       >
@@ -312,7 +312,7 @@ watch(
         v-if="galleryData[albumIndex + 2]"
         @click="currentAlbumChange(2)"
         :class="[
-          'absolute inset-0 hidden h-full w-full translate-x-[175%] scale-50 cursor-pointer select-none items-center justify-center overflow-hidden rounded-lg sm:flex',
+          'absolute inset-0 hidden h-full w-full translate-x-[175%] scale-50 cursor-pointer items-center justify-center overflow-hidden rounded-lg select-none sm:flex',
         ]"
       >
         <img
@@ -332,7 +332,7 @@ watch(
         v-if="galleryData[albumIndex - 2]"
         @click="currentAlbumChange(-2)"
         :class="[
-          'absolute inset-0 hidden h-full w-full -translate-x-[175%] scale-50 cursor-pointer select-none items-center justify-center overflow-hidden rounded-lg sm:flex',
+          'absolute inset-0 hidden h-full w-full -translate-x-[175%] scale-50 cursor-pointer items-center justify-center overflow-hidden rounded-lg select-none sm:flex',
         ]"
       >
         <img
@@ -351,7 +351,7 @@ watch(
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
 .progress-bar-increase {
   animation: pb 7500ms linear forwards;
 }

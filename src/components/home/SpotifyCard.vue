@@ -157,7 +157,7 @@ onUnmounted(() => {
           </p>
         </div>
         <div
-          class="absolute right-4 top-4 z-10 flex h-8 w-6 flex-row items-center justify-center gap-x-1"
+          class="absolute top-4 right-4 z-10 flex h-8 w-6 flex-row items-center justify-center gap-x-1"
           v-if="songData.isPlaying"
         >
           <div
@@ -178,9 +178,10 @@ onUnmounted(() => {
   </transition>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .spotify-card {
-  @apply relative flex aspect-square cursor-pointer select-none flex-col items-start justify-between gap-2 rounded-3xl p-4;
+  @apply relative flex aspect-square cursor-pointer flex-col items-start justify-between gap-2 rounded-3xl p-4 select-none;
   @apply border border-white/5 bg-white/[2%];
 }
 

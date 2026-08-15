@@ -28,10 +28,12 @@ const urls = {
   </button>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .button {
-  @apply flex select-none items-center gap-x-1 overflow-hidden rounded-full border-2 border-white/25 px-4 py-2 text-base font-medium text-white/80 shadow-sm;
-  background: linear-gradient(
+  @apply flex items-center gap-x-1 overflow-hidden rounded-full border-2 border-white/25 px-4 py-2 text-base font-medium text-white/80 shadow-sm select-none;
+  background:
+    linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.1) 0%,
       rgba(255, 255, 255, 0) 100%
@@ -45,7 +47,8 @@ const urls = {
 }
 .button:hover {
   @apply border-white/35 shadow-lg;
-  background: linear-gradient(
+  background:
+    linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.1) 0%,
       rgba(255, 255, 255, 0) 100%
@@ -59,7 +62,8 @@ const urls = {
 }
 .button:active {
   @apply border-white/10 shadow-none;
-  background: linear-gradient(
+  background:
+    linear-gradient(
       0deg,
       rgba(37, 99, 235, 0.2) 0%,
       rgba(37, 99, 235, 0.2) 100%

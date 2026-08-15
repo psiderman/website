@@ -211,7 +211,8 @@ onMounted(() => {
   </p>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .motion-card {
   @apply pointer-events-none aspect-square overflow-hidden rounded-3xl border border-white/15 bg-black;
 }
@@ -231,6 +232,6 @@ onMounted(() => {
 }
 
 .gallery-scroll img.gallery-image {
-  @apply aspect-video w-full max-w-screen-sm shrink-0 select-none rounded-sm border border-white/15 bg-black;
+  @apply aspect-video w-full max-w-screen-sm shrink-0 rounded-sm border border-white/15 bg-black select-none;
 }
 </style>

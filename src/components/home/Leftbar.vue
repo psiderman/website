@@ -82,20 +82,20 @@ function copyEmail(event) {
     <div>
       <!-- DP -->
       <div
-        class="leftbar-headshot relative h-16 w-16 select-none rounded-full bg-blue-600"
+        class="leftbar-headshot relative h-16 w-16 rounded-full bg-blue-600 select-none"
       >
         <div
           class="pointer-events-none absolute bottom-0 h-20 w-16 overflow-hidden rounded-b-full align-bottom"
         >
           <img
-            class="pointer-events-auto bottom-0 h-20 w-20 cursor-help select-none object-cover"
+            class="pointer-events-auto bottom-0 h-20 w-20 cursor-help object-cover select-none"
             src="@/assets/images/dp.png"
             alt="itsame"
             title="It's a me!"
           />
         </div>
       </div>
-      <h1 class="leftbar-headshot mb-4 mt-8 text-4xl font-bold">
+      <h1 class="leftbar-headshot mt-8 mb-4 text-4xl font-bold">
         Hi, I’m Karan
       </h1>
       <p class="leftbar-headshot text-base font-medium">
@@ -139,7 +139,8 @@ function copyEmail(event) {
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .left-sticky-bar {
   @apply flex w-full shrink-0 flex-col justify-between gap-4 lg:sticky lg:top-20 lg:w-80;
   height: calc(100dvh - 160px);

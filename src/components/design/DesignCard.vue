@@ -7,11 +7,11 @@ defineProps({
 
 <template>
   <div
-    class="design-card group relative col-span-1 row-span-1 shrink-0 select-none overflow-hidden rounded-2xl border border-white/20 bg-black hover:border-white/25"
+    class="design-card group relative col-span-1 row-span-1 shrink-0 overflow-hidden rounded-2xl border border-white/20 bg-black select-none hover:border-white/25"
   >
     <slot />
     <div
-      class="pointer-events-none absolute inset-x-0 bottom-0 flex select-none flex-row justify-between p-4 text-base"
+      class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-row justify-between p-4 text-base select-none"
     >
       <span class="text-shadow text-white">{{ title }}</span>
       <span class="text-shadow text-white/80">{{ year }}</span>
@@ -19,7 +19,8 @@ defineProps({
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .design-card::before {
   content: "";
   @apply absolute -bottom-16 h-48 w-full bg-gradient-to-b from-transparent to-black;

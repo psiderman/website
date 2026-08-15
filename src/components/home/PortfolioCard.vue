@@ -44,7 +44,8 @@ import Description from "./CardDescription.vue";
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .laptop {
 }
 .lid {
@@ -52,17 +53,17 @@ import Description from "./CardDescription.vue";
 }
 .engraving {
   @apply flex flex-col items-center justify-center text-[4px] text-white/30;
-  @apply absolute bottom-0 left-0 right-0 h-2 w-36 rounded-b bg-black;
+  @apply absolute right-0 bottom-0 left-0 h-2 w-36 rounded-b bg-black;
   @apply z-10 border-t border-white/10;
 }
 .screen {
-  @apply absolute left-0.5 right-0.5 top-0.5 z-0 overflow-hidden rounded-t-sm bg-cover bg-no-repeat;
+  @apply absolute top-0.5 right-0.5 left-0.5 z-0 overflow-hidden rounded-t-sm bg-cover bg-no-repeat;
   width: 140px;
   height: 89px;
 }
 .base {
   width: 168px;
-  @apply absolute -bottom-1.5 -left-3 z-10 h-2 rounded-b-3xl rounded-t-sm bg-gray-700;
+  @apply absolute -bottom-1.5 -left-3 z-10 h-2 rounded-t-sm rounded-b-3xl bg-gray-700;
   box-shadow: inset 0px -3px 4px rgba(0, 0, 0, 0.33);
 }
 .notch {
@@ -79,6 +80,6 @@ import Description from "./CardDescription.vue";
   @apply -bottom-px left-3;
 }
 .pad.right {
-  @apply -bottom-px right-3;
+  @apply right-3 -bottom-px;
 }
 </style>

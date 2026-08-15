@@ -36,7 +36,7 @@ const gridClasses = {
     >
       <img
         v-if="!skeleton"
-        :class="['h-full w-full cursor-pointer select-none object-cover']"
+        :class="['h-full w-full cursor-pointer object-cover select-none']"
         v-lazy="{
           src: image.imageUrl,
           loading: image.metadata.lqip,

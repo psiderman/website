@@ -24,7 +24,7 @@ import Description from "./CardDescription.vue";
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
 .nograyscale {
   filter: grayscale(0) !important;
 }

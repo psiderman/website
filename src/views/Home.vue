@@ -125,7 +125,7 @@ onMounted(() => {
       </RouterLink>
       <div></div>
       <div
-        class="col-span-1 flex w-full select-none flex-col text-center text-base text-white/50 md:col-span-2 lg:col-span-1 lg:text-left"
+        class="col-span-1 flex w-full flex-col text-center text-base text-white/50 select-none md:col-span-2 lg:col-span-1 lg:text-left"
       >
         <span class="anime-entry">
           ©️ Karan Sanas {{ new Date().getFullYear() }}
@@ -142,7 +142,8 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .social {
   @apply relative col-span-1 row-span-1 aspect-square shrink-0 overflow-hidden rounded-lg border border-white/5 bg-white/[2%];
   @apply select-none;

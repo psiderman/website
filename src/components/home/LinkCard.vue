@@ -9,7 +9,10 @@ const props = defineProps({
 
 const urls = {
   owensans: new URL("@/assets/images/owensans.png", import.meta.url).toString(),
-  foursight: new URL("@/assets/images/foursight.png", import.meta.url).toString(),
+  foursight: new URL(
+    "@/assets/images/foursight.png",
+    import.meta.url,
+  ).toString(),
   primer: new URL("@/assets/images/primer.png", import.meta.url).toString(),
   spotify: new URL("@/assets/svg/spotify.svg", import.meta.url).toString(),
 };
@@ -34,7 +37,7 @@ const urls = {
     <img
       src="@/assets/duotone/external-link.svg"
       alt="link icon"
-      class="absolute right-4 top-4 h-6"
+      class="absolute top-4 right-4 h-6"
     />
   </a>
 </template>

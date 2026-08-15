@@ -79,7 +79,8 @@ function resetEye() {
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .sclera {
   @apply relative h-14 w-8 overflow-hidden bg-white;
   border-radius: 50% / 50%;
@@ -100,6 +101,6 @@ function resetEye() {
 }
 
 .shine {
-  @apply absolute left-px top-[3px] h-1.5 w-1 rotate-[30deg] rounded-full bg-white blur-[1px];
+  @apply absolute top-[3px] left-px h-1.5 w-1 rotate-[30deg] rounded-full bg-white blur-[1px];
 }
 </style>

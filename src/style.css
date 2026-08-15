@@ -1,7 +1,6 @@
 @import url("/fonts/stylesheet.css");
 
-@tailwind base;
-@tailwind components;
+@import "tailwindcss";
 
 body {
   @apply text-white;
@@ -73,5 +72,3 @@ body::before {
 *:focus {
   @apply outline outline-offset-4 outline-white/50;
 }
-
-@tailwind utilities;

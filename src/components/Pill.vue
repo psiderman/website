@@ -25,9 +25,10 @@ function openLink(link) {
   </button>
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .pill {
-  @apply flex h-min select-none flex-row items-center gap-x-2 rounded-full bg-white/10 px-3 py-0 text-base font-medium text-white/80 shadow-sm;
+  @apply flex h-min flex-row items-center gap-x-2 rounded-full bg-white/10 px-3 py-0 text-base font-medium text-white/80 shadow-sm select-none;
   @apply hover:bg-white/20 hover:text-white hover:shadow-md;
   @apply active:bg-white/5 active:shadow-none;
 }

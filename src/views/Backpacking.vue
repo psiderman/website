@@ -74,7 +74,7 @@ function updateAlbumIndex(i) {
   <div class="large" v-if="loading">
     <div class="w640">
       <div
-        class="anime-entry skeleton-shimmer mb-8 mt-16 h-8 w-64 overflow-hidden rounded-lg bg-white/5"
+        class="anime-entry skeleton-shimmer mt-16 mb-8 h-8 w-64 overflow-hidden rounded-lg bg-white/5"
       ></div>
       <div
         class="anime-entry skeleton-shimmer my-8 h-16 w-full overflow-hidden rounded-lg bg-white/5"

@@ -27,7 +27,7 @@ onMounted(() => {
       <PsiderLogo />
     </div>
     <h1
-      class="anime-entry text-[200px] font-semibold diagonal-fractions leading-none tracking-tighter text-white/20"
+      class="anime-entry text-[200px] leading-none font-semibold tracking-tighter text-white/20 diagonal-fractions"
     >
       404
     </h1>

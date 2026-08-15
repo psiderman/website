@@ -77,7 +77,8 @@ onMounted(() => {
   <img class="anime-entry gallery-image" v-lazy="imageData.dWeb" />
 </template>
 
-<style lang="postcss" scoped>
+<style  scoped>
+@reference "tailwindcss";
 .motion-card {
   @apply pointer-events-none aspect-square overflow-hidden rounded-3xl border border-white/15 bg-black;
 }
@@ -87,6 +88,6 @@ onMounted(() => {
 }
 
 img.gallery-image {
-  @apply mx-auto aspect-video w-full max-w-screen-sm shrink-0 select-none rounded-sm border border-white/15 bg-black;
+  @apply mx-auto aspect-video w-full max-w-screen-sm shrink-0 rounded-sm border border-white/15 bg-black select-none;
 }
 </style>

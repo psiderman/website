@@ -22,7 +22,7 @@ function fillHeart() {
     </RouterLink>
     <RouterView />
     <div
-      class="mt-20 flex w-full select-none flex-col items-center justify-center gap-y-1 text-center text-base text-white/50"
+      class="mt-20 flex w-full flex-col items-center justify-center gap-y-1 text-center text-base text-white/50 select-none"
     >
       <span class="anime-entry">
         ©️ Karan Sanas {{ new Date().getFullYear() }}
