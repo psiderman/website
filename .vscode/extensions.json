@@ -1,7 +1,28 @@
 {
   "recommendations": [
-    "Vue.volar",
-    "Vue.vscode-typescript-vue-plugin",
-    "esbenp.prettier-vscode"
+    "github.vscode-pull-request-github",
+    "henrikdev.ag-quota",
+    "formulahendry.auto-rename-tag",
+    "catppuccin.catppuccin-vsc",
+    "catppuccin.catppuccin-vsc-icons",
+    "usernamehw.errorlens",
+    "dbaeumer.vscode-eslint",
+    "tamasfe.even-better-toml",
+    "eamodio.gitlens",
+    "vincaslt.highlight-matching-tag",
+    "lokalise.i18n-ally",
+    "yzhang.markdown-all-in-one",
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+    "esbenp.prettier-vscode",
+    "mechatroner.rainbow-csv",
+    "bradlc.vscode-tailwindcss",
+    "gruntfuggly.todo-tree",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "tomoki1207.pdf",
+    "tonybaloney.vscode-pets",
+    "vue.volar",
+    "redhat.vscode-xml",
+    "redhat.vscode-yaml"
   ]
 }

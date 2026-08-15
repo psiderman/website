@@ -1,40 +1,3 @@
-<script setup>
-import { onMounted } from "vue";
-import anime from "animejs";
-
-const imageData = {
-  qtcs: {
-    i: new URL("@/assets/design/qtcs/02.png", import.meta.url).toString(),
-    ii: new URL("@/assets/design/qtcs/03.png", import.meta.url).toString(),
-    iii: new URL("@/assets/design/qtcs/04.png", import.meta.url).toString(),
-    iv: new URL("@/assets/design/qtcs/05.png", import.meta.url).toString(),
-  },
-  ds: {
-    i: new URL("@/assets/design/ds/01.png", import.meta.url).toString(),
-    ii: new URL("@/assets/design/ds/02.png", import.meta.url).toString(),
-    iii: new URL("@/assets/design/ds/03.png", import.meta.url).toString(),
-  },
-  lessons: {
-    i: new URL("@/assets/design/lessons/01.png", import.meta.url).toString(),
-    ii: new URL("@/assets/design/lessons/02.png", import.meta.url).toString(),
-    iii: new URL("@/assets/design/lessons/03.png", import.meta.url).toString(),
-    iv: new URL("@/assets/design/lessons/04.gif", import.meta.url).toString(),
-  },
-};
-
-onMounted(() => {
-  anime({
-    targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
-    translateY: ["1rem", "0"],
-    opacity: [0, 1],
-    scale: [0.95, 1],
-    transformOrigin: "center",
-    duration: 500,
-    easing: "easeOutBack",
-    delay: anime.stagger(100),
-  });
-});
-</script>
 <template>
   <div class="w640 anime-entry mb-6">
     <img
@@ -71,10 +34,10 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img class="anime-entry gallery-image" v-lazy="imageData.qtcs.i" />
-      <img class="anime-entry gallery-image" v-lazy="imageData.qtcs.ii" />
-      <img class="anime-entry gallery-image" v-lazy="imageData.qtcs.iii" />
-      <img class="anime-entry gallery-image" v-lazy="imageData.qtcs.iv" />
+      <img v-lazy="imageData.qtcs.i" class="anime-entry gallery-image" />
+      <img v-lazy="imageData.qtcs.ii" class="anime-entry gallery-image" />
+      <img v-lazy="imageData.qtcs.iii" class="anime-entry gallery-image" />
+      <img v-lazy="imageData.qtcs.iv" class="anime-entry gallery-image" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
@@ -97,9 +60,9 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img class="anime-entry gallery-image" v-lazy="imageData.ds.i" />
-      <img class="anime-entry gallery-image" v-lazy="imageData.ds.ii" />
-      <img class="anime-entry gallery-image" v-lazy="imageData.ds.iii" />
+      <img v-lazy="imageData.ds.i" class="anime-entry gallery-image" />
+      <img v-lazy="imageData.ds.ii" class="anime-entry gallery-image" />
+      <img v-lazy="imageData.ds.iii" class="anime-entry gallery-image" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
@@ -115,10 +78,10 @@ onMounted(() => {
   <div class="aspect-video">
     <div class="gallery-scroll">
       <div class="gallery-spacer"></div>
-      <img class="anime-entry gallery-image" v-lazy="imageData.lessons.i" />
-      <img class="anime-entry gallery-image" v-lazy="imageData.lessons.ii" />
-      <img class="anime-entry gallery-image" v-lazy="imageData.lessons.iii" />
-      <img class="anime-entry gallery-image" v-lazy="imageData.lessons.iv" />
+      <img v-lazy="imageData.lessons.i" class="anime-entry gallery-image" />
+      <img v-lazy="imageData.lessons.ii" class="anime-entry gallery-image" />
+      <img v-lazy="imageData.lessons.iii" class="anime-entry gallery-image" />
+      <img v-lazy="imageData.lessons.iv" class="anime-entry gallery-image" />
       <div class="gallery-spacer"></div>
     </div>
   </div>
@@ -210,6 +173,44 @@ onMounted(() => {
     qudee is the second highest honor after OP.
   </p>
 </template>
+
+<script setup>
+import anime from "animejs";
+import { onMounted } from "vue";
+
+const imageData = {
+  ds: {
+    i: new URL("@/assets/design/ds/01.png", import.meta.url).toString(),
+    ii: new URL("@/assets/design/ds/02.png", import.meta.url).toString(),
+    iii: new URL("@/assets/design/ds/03.png", import.meta.url).toString(),
+  },
+  lessons: {
+    i: new URL("@/assets/design/lessons/01.png", import.meta.url).toString(),
+    ii: new URL("@/assets/design/lessons/02.png", import.meta.url).toString(),
+    iii: new URL("@/assets/design/lessons/03.png", import.meta.url).toString(),
+    iv: new URL("@/assets/design/lessons/04.gif", import.meta.url).toString(),
+  },
+  qtcs: {
+    i: new URL("@/assets/design/qtcs/02.png", import.meta.url).toString(),
+    ii: new URL("@/assets/design/qtcs/03.png", import.meta.url).toString(),
+    iii: new URL("@/assets/design/qtcs/04.png", import.meta.url).toString(),
+    iv: new URL("@/assets/design/qtcs/05.png", import.meta.url).toString(),
+  },
+};
+
+onMounted(() => {
+  anime({
+    delay: anime.stagger(100),
+    duration: 500,
+    easing: "easeOutBack",
+    opacity: [0, 1],
+    scale: [0.95, 1],
+    targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
+    transformOrigin: "center",
+    translateY: ["1rem", "0"],
+  });
+});
+</script>
 
 <style  scoped>
 @reference "tailwindcss";

@@ -1,23 +1,22 @@
-import { createApp, watch } from "vue";
-import "./style.css";
-import App from "./App.vue";
-
-import router from "./router";
-import { createPinia } from "pinia";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-import { faHeart } from "@fortawesome/free-regular-svg-icons";
-import { faHeart as faHeartS } from "@fortawesome/free-solid-svg-icons";
+import "./style.css";
 import {
-  faTwitter,
-  faRedditAlien,
   faInstagram,
   faLinkedinIn,
+  faRedditAlien,
+  faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-
-import VueLazyload from "vue3-lazyload";
+import { faHeart } from "@fortawesome/free-regular-svg-icons";
+import { faHeart as faHeartS } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import * as Sentry from "@sentry/vue";
+import { createPinia } from "pinia";
+import { createApp, watch } from "vue";
+import VueLazyload from "vue3-lazyload";
+
+import App from "./App.vue";
+import router from "./router";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -25,8 +24,8 @@ const pinia = createPinia();
 Sentry.init({
   app,
   dsn: "https://f9fb333b90d33074087c3e73695cfd07@o447178.ingest.sentry.io/4506513102012416",
-  trackComponents: true,
   integrations: [],
+  trackComponents: true,
 });
 
 app.use(pinia);
@@ -43,7 +42,7 @@ watch(
   { deep: true },
 );
 
-app.component("fa", FontAwesomeIcon);
+app.component("Fa", FontAwesomeIcon);
 
 app.use(VueLazyload);
 

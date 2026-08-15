@@ -1,7 +1,3 @@
-<script setup>
-import Description from "./CardDescription.vue";
-</script>
-
 <template>
   <div class="card nograyscale group/travel flex aspect-square flex-col">
     <div class="relative h-full w-full">
@@ -23,6 +19,10 @@ import Description from "./CardDescription.vue";
     />
   </div>
 </template>
+
+<script setup>
+import Description from "./CardDescription.vue";
+</script>
 
 <style  scoped>
 .nograyscale {

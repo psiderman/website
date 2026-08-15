@@ -1,25 +1,3 @@
-<script setup>
-import { onMounted } from "vue";
-import anime from "animejs";
-
-const imageData = {
-  prosper: new URL("@/assets/design/dezerv01.png", import.meta.url).toString(),
-  dWeb: new URL("@/assets/design/dezerv02.png", import.meta.url).toString(),
-};
-
-onMounted(() => {
-  anime({
-    targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
-    translateY: ["1rem", "0"],
-    opacity: [0, 1],
-    scale: [0.95, 1],
-    transformOrigin: "center",
-    duration: 500,
-    easing: "easeOutBack",
-    delay: anime.stagger(100),
-  });
-});
-</script>
 <template>
   <div class="w640 anime-entry mb-6">
     <img
@@ -57,7 +35,7 @@ onMounted(() => {
     >
   </p>
 
-  <img class="anime-entry gallery-image" v-lazy="imageData.prosper" />
+  <img v-lazy="imageData.prosper" class="anime-entry gallery-image" />
 
   <!-- Dezerv Web -->
 
@@ -74,8 +52,31 @@ onMounted(() => {
       >Read more here.</a
     >
   </p>
-  <img class="anime-entry gallery-image" v-lazy="imageData.dWeb" />
+  <img v-lazy="imageData.dWeb" class="anime-entry gallery-image" />
 </template>
+
+<script setup>
+import anime from "animejs";
+import { onMounted } from "vue";
+
+const imageData = {
+  dWeb: new URL("@/assets/design/dezerv02.png", import.meta.url).toString(),
+  prosper: new URL("@/assets/design/dezerv01.png", import.meta.url).toString(),
+};
+
+onMounted(() => {
+  anime({
+    delay: anime.stagger(100),
+    duration: 500,
+    easing: "easeOutBack",
+    opacity: [0, 1],
+    scale: [0.95, 1],
+    targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
+    transformOrigin: "center",
+    translateY: ["1rem", "0"],
+  });
+});
+</script>
 
 <style  scoped>
 @reference "tailwindcss";

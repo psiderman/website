@@ -1,5 +1,40 @@
+<template>
+  <div
+    class="card group/now aspect-square"
+    @mousemove="moveEye"
+    @mouseleave="resetEye"
+  >
+    <div class="relative inset-0 -mt-4 h-full w-full">
+      <div
+        ref="eyes"
+        class="absolute inset-0 m-auto flex h-fit w-fit flex-row gap-2"
+      >
+        <div class="sclera">
+          <div class="eyeball">
+            <div class="pupil"></div>
+            <div class="shine"></div>
+          </div>
+        </div>
+        <div class="sclera">
+          <div class="eyeball">
+            <div class="pupil"></div>
+            <div class="shine"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <Description
+      title="See what I’m up to ‘Now’"
+      description="I’ll create an about page when I fill up Google Search results. For now
+        there’s, well... now."
+      icon="now"
+    />
+  </div>
+</template>
+
 <script setup>
 import { ref } from "vue";
+
 import Description from "./CardDescription.vue";
 
 const eyes = ref(null);
@@ -44,40 +79,6 @@ function resetEye() {
   });
 }
 </script>
-
-<template>
-  <div
-    class="card group/now aspect-square"
-    @mousemove="moveEye"
-    @mouseleave="resetEye"
-  >
-    <div class="relative inset-0 -mt-4 h-full w-full">
-      <div
-        class="absolute inset-0 m-auto flex h-fit w-fit flex-row gap-2"
-        ref="eyes"
-      >
-        <div class="sclera">
-          <div class="eyeball">
-            <div class="pupil"></div>
-            <div class="shine"></div>
-          </div>
-        </div>
-        <div class="sclera">
-          <div class="eyeball">
-            <div class="pupil"></div>
-            <div class="shine"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <Description
-      title="See what I’m up to ‘Now’"
-      description="I’ll create an about page when I fill up Google Search results. For now
-        there’s, well... now."
-      icon="now"
-    />
-  </div>
-</template>
 
 <style  scoped>
 @reference "tailwindcss";

@@ -4,77 +4,77 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/",
-      name: "Home",
       component: () => import("../views/Home.vue"),
+      name: "Home",
+      path: "/",
     },
     {
-      path: "/verify",
-      name: "Verify",
       component: () => import("../pages/Corners.vue"),
+      name: "Verify",
+      path: "/verify",
     },
     {
-      path: "/design",
       component: () => import("../pages/Design.vue"),
+      path: "/design",
     },
     {
-      path: "/design/quizizz",
-      component: () => import("../pages/Blog.vue"),
       children: [
         {
-          path: "",
-          name: "Design - Quizizz",
           component: () => import("../views/Quizizz.vue"),
+          name: "Design - Quizizz",
+          path: "",
         },
       ],
+      component: () => import("../pages/Blog.vue"),
+      path: "/design/quizizz",
     },
     {
-      path: "/design/dezerv",
-      component: () => import("../pages/Blog.vue"),
       children: [
         {
-          path: "",
-          name: "Design - Dezerv",
           component: () => import("../views/Dezerv.vue"),
+          name: "Design - Dezerv",
+          path: "",
         },
       ],
+      component: () => import("../pages/Blog.vue"),
+      path: "/design/dezerv",
     },
     {
-      path: "/now",
-      component: () => import("../pages/Blog.vue"),
       children: [
         {
-          path: "",
-          name: "Now",
           component: () => import("../views/Now.vue"),
+          name: "Now",
+          path: "",
         },
       ],
+      component: () => import("../pages/Blog.vue"),
+      path: "/now",
     },
     {
-      path: "/gaming",
-      component: () => import("../pages/Blog.vue"),
       children: [
         {
-          path: "",
-          name: "Gaming",
           component: () => import("../views/Gaming.vue"),
+          name: "Gaming",
+          path: "",
         },
       ],
+      component: () => import("../pages/Blog.vue"),
+      path: "/gaming",
     },
     {
-      path: "/backpacking",
-      component: () => import("../pages/Blog.vue"),
       children: [
         {
-          path: "",
-          name: "Backpacking",
           component: () => import("../views/Backpacking.vue"),
+          name: "Backpacking",
+          path: "",
         },
       ],
+      component: () => import("../pages/Blog.vue"),
+      path: "/backpacking",
     },
     {
-      path: "/:catchAll(.*)",
       component: () => import("../404.vue"),
+      path: "/:catchAll(.*)",
     },
   ],
   scrollBehavior(to, from, savedPosition) {

@@ -1,14 +1,3 @@
-<script setup>
-import "@/assets/blog.css";
-import { RouterLink, RouterView } from "vue-router";
-
-import { ref } from "vue";
-const heartFill = ref(false);
-
-function fillHeart() {
-  heartFill.value = !heartFill.value;
-}
-</script>
 <template>
   <div
     class="content mx-auto min-h-dvh w-screen max-w-screen-lg p-10 lg:px-0 lg:py-20"
@@ -29,9 +18,9 @@ function fillHeart() {
       </span>
       <span class="anime-entry"
         >Handcrafted with Figma, Vue.js, no AI content, and&nbsp;&nbsp;<fa
-          @click="fillHeart"
           :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
           :icon="[heartFill ? 'fas' : 'far', 'heart']"
+          @click="fillHeart"
         />
       </span>
     </div>
@@ -62,3 +51,14 @@ function fillHeart() {
     </div>
   </div>
 </template>
+
+<script setup>
+import "@/assets/blog.css";
+import { ref } from "vue";
+import { RouterLink, RouterView } from "vue-router";
+const heartFill = ref(false);
+
+function fillHeart() {
+  heartFill.value = !heartFill.value;
+}
+</script>

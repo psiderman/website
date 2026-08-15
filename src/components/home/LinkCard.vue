@@ -1,23 +1,3 @@
-<script setup>
-const props = defineProps({
-  title: String,
-  logo: String,
-  brand: String,
-  color: String,
-  link: String,
-});
-
-const urls = {
-  owensans: new URL("@/assets/images/owensans.png", import.meta.url).toString(),
-  foursight: new URL(
-    "@/assets/images/foursight.png",
-    import.meta.url,
-  ).toString(),
-  primer: new URL("@/assets/images/primer.png", import.meta.url).toString(),
-  spotify: new URL("@/assets/svg/spotify.svg", import.meta.url).toString(),
-};
-</script>
-
 <template>
   <a
     class="card flex aspect-square cursor-pointer flex-col justify-between p-4"
@@ -41,3 +21,23 @@ const urls = {
     />
   </a>
 </template>
+
+<script setup>
+const props = defineProps({
+  brand: String,
+  color: String,
+  link: String,
+  logo: String,
+  title: String,
+});
+
+const urls = {
+  foursight: new URL(
+    "@/assets/images/foursight.png",
+    import.meta.url,
+  ).toString(),
+  owensans: new URL("@/assets/images/owensans.png", import.meta.url).toString(),
+  primer: new URL("@/assets/images/primer.png", import.meta.url).toString(),
+  spotify: new URL("@/assets/svg/spotify.svg", import.meta.url).toString(),
+};
+</script>

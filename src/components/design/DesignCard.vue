@@ -1,10 +1,3 @@
-<script setup>
-defineProps({
-  title: String,
-  year: String,
-});
-</script>
-
 <template>
   <div
     class="design-card group relative col-span-1 row-span-1 shrink-0 overflow-hidden rounded-2xl border border-white/20 bg-black select-none hover:border-white/25"
@@ -18,6 +11,13 @@ defineProps({
     </div>
   </div>
 </template>
+
+<script setup>
+defineProps({
+  title: String,
+  year: String,
+});
+</script>
 
 <style  scoped>
 @reference "tailwindcss";

@@ -1,90 +1,3 @@
-<script setup>
-import { ref, onMounted, nextTick } from "vue";
-import anime from "animejs";
-import client from "@/store/sanity.js";
-import LongImages from "@/components/blog/LongImages.vue";
-
-const games = ref([
-  {
-    url: new URL("@/assets/images/gaming/lis.jpg", import.meta.url).toString(),
-    caption:
-      "I always recommend Life is Strange to someone who wants to start out with games.",
-  },
-  {
-    url: new URL(
-      "@/assets/images/gaming/hitman3.jpg",
-      import.meta.url,
-    ).toString(),
-    caption:
-      "I was never a fan of the earlier hitman games, but this trilogy has to be one of the best stealth series I've played.",
-  },
-  {
-    url: new URL(
-      "@/assets/images/gaming/spiderman.jpg",
-      import.meta.url,
-    ).toString(),
-    caption:
-      "100% plat on the PS4, PS5, and Spider-Man 2 as well. I really wish SM2 lived up to the hype. Would have replaced this tile here.",
-  },
-  {
-    url: new URL(
-      "@/assets/images/gaming/budokai.jpg",
-      import.meta.url,
-    ).toString(),
-    caption: "This defined summer vacations for my brother and I.",
-  },
-  {
-    url: new URL(
-      "@/assets/images/gaming/arkham.jpg",
-      import.meta.url,
-    ).toString(),
-    caption:
-      "I can't remember if this or Splinter Cell: Conviction was my introduction to stealth. Probably this one since I was such a Batman nerd.",
-  },
-  {
-    url: new URL("@/assets/images/gaming/valo.jpg", import.meta.url).toString(),
-    caption:
-      "It's the one game that I'm not great at, but I love playing. There's always the one.",
-  },
-]);
-const loading = ref(true);
-
-onMounted(async () => {
-  const W1 = document.createElement("script");
-  W1.src = "https://fast.wistia.net/assets/external/E-v1.js";
-  W1.async = true;
-  W1.defer = true;
-  document.body.appendChild(W1);
-
-  const cards = document.querySelectorAll(".card");
-
-  cards.forEach((card) => {
-    card.addEventListener("mousemove", (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`;
-      card.style.setProperty("background", gradient);
-    });
-
-    card.addEventListener("mouseleave", () => {
-      card.style.setProperty("background", "hsla(0,0%,100%,2%)");
-    });
-  });
-
-  anime({
-    targets: [".anime-entry, h1, h2, h3, p, span"],
-    translateY: ["1rem", "0"],
-    opacity: [0, 1],
-    scale: [0.95, 1],
-    transformOrigin: "center",
-    duration: 500,
-    easing: "easeOutBack",
-    delay: anime.stagger(100),
-  });
-});
-</script>
-
 <template>
   <h1>Stack: PC + Console</h1>
   <p class="-mt-8">
@@ -186,18 +99,104 @@ onMounted(async () => {
   <h1>All-time favorites</h1>
   <div class="grid grid-cols-3 gap-4 sm:grid-cols-3">
     <div
+      v-for="(game, i) in games"
+      :key="i"
       :class="[
         'anime-entry group/image relative aspect-square overflow-hidden rounded-lg',
       ]"
-      v-for="(game, i) in games"
-      :key="i"
     >
       <img
-        class="h-full w-full cursor-help select-none"
         v-lazy="game.url"
+        class="h-full w-full cursor-help select-none"
         :alt="game.caption"
         :title="game.caption"
       />
     </div>
   </div>
 </template>
+
+<script setup>
+import anime from "animejs";
+import { onMounted, ref } from "vue";
+
+
+const games = ref([
+  {
+    caption:
+      "I always recommend Life is Strange to someone who wants to start out with games.",
+    url: new URL("@/assets/images/gaming/lis.jpg", import.meta.url).toString(),
+  },
+  {
+    caption:
+      "I was never a fan of the earlier hitman games, but this trilogy has to be one of the best stealth series I've played.",
+    url: new URL(
+      "@/assets/images/gaming/hitman3.jpg",
+      import.meta.url,
+    ).toString(),
+  },
+  {
+    caption:
+      "100% plat on the PS4, PS5, and Spider-Man 2 as well. I really wish SM2 lived up to the hype. Would have replaced this tile here.",
+    url: new URL(
+      "@/assets/images/gaming/spiderman.jpg",
+      import.meta.url,
+    ).toString(),
+  },
+  {
+    caption: "This defined summer vacations for my brother and I.",
+    url: new URL(
+      "@/assets/images/gaming/budokai.jpg",
+      import.meta.url,
+    ).toString(),
+  },
+  {
+    caption:
+      "I can't remember if this or Splinter Cell: Conviction was my introduction to stealth. Probably this one since I was such a Batman nerd.",
+    url: new URL(
+      "@/assets/images/gaming/arkham.jpg",
+      import.meta.url,
+    ).toString(),
+  },
+  {
+    caption:
+      "It's the one game that I'm not great at, but I love playing. There's always the one.",
+    url: new URL("@/assets/images/gaming/valo.jpg", import.meta.url).toString(),
+  },
+]);
+const loading = ref(true);
+
+onMounted(async () => {
+  const W1 = document.createElement("script");
+  W1.src = "https://fast.wistia.net/assets/external/E-v1.js";
+  W1.async = true;
+  W1.defer = true;
+  document.body.appendChild(W1);
+
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach((card) => {
+    card.addEventListener("mousemove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`;
+      card.style.setProperty("background", gradient);
+    });
+
+    card.addEventListener("mouseleave", () => {
+      card.style.setProperty("background", "hsla(0,0%,100%,2%)");
+    });
+  });
+
+  anime({
+    delay: anime.stagger(100),
+    duration: 500,
+    easing: "easeOutBack",
+    opacity: [0, 1],
+    scale: [0.95, 1],
+    targets: [".anime-entry, h1, h2, h3, p, span"],
+    transformOrigin: "center",
+    translateY: ["1rem", "0"],
+  });
+});
+</script>

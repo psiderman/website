@@ -1,12 +1,20 @@
+<template>
+  <button :class="['button', reverse ? 'flex-row-reverse' : 'flex-row']">
+    {{ text }}
+    <fa v-if="brand" class="w-min text-[14px]" :icon="['fab', brand]" />
+    <img v-if="icon" class="h-6 w-min" :src="urls[icon]" alt="icon" />
+  </button>
+</template>
+
 <script setup>
 defineProps({
-  text: String,
   brand: String,
   icon: String,
   reverse: {
-    type: Boolean,
     default: false,
+    type: Boolean,
   },
+  text: String,
 });
 
 const urls = {
@@ -20,13 +28,6 @@ const urls = {
   ).toString(),
 };
 </script>
-<template>
-  <button :class="['button', reverse ? 'flex-row-reverse' : 'flex-row']">
-    {{ text }}
-    <fa v-if="brand" class="w-min text-[14px]" :icon="['fab', brand]" />
-    <img v-if="icon" class="h-6 w-min" :src="urls[icon]" alt="icon" />
-  </button>
-</template>
 
 <style  scoped>
 @reference "tailwindcss";

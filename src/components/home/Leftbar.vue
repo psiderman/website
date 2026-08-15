@@ -1,7 +1,71 @@
+<template>
+  <div class="left-sticky-bar">
+    <!-- Quick intro -->
+    <div>
+      <!-- DP -->
+      <div
+        class="leftbar-headshot relative h-16 w-16 rounded-full bg-blue-600 select-none"
+      >
+        <div
+          class="pointer-events-none absolute bottom-0 h-20 w-16 overflow-hidden rounded-b-full align-bottom"
+        >
+          <img
+            class="pointer-events-auto bottom-0 h-20 w-20 cursor-help object-cover select-none"
+            src="@/assets/images/dp.png"
+            alt="itsame"
+            title="It's a me!"
+          />
+        </div>
+      </div>
+      <h1 class="leftbar-headshot mt-8 mb-4 text-4xl font-bold">
+        Hi, I’m Karan
+      </h1>
+      <p class="leftbar-headshot text-base font-medium">
+        I’m still searching for a one-liner to sum me up, but until then my life
+        is a bento box of endless interests, neatly packed for display on my
+        ever-evolving personal website.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-2 overflow-visible">
+      <!-- Socials/External Links -->
+      <div class="flex w-full flex-row flex-wrap gap-2 overflow-visible">
+        <Pill
+          id="email"
+          text="hi@psiderman.com"
+          icon="envelope"
+          @click.prevent="copyEmail"
+        />
+        <!-- <Pill
+          text="Twitter"
+          brand="twitter"
+          link="https://twitter.com/_psiderman_"
+        /> -->
+        <Pill
+          text="Instagram"
+          brand="instagram"
+          link="https://instagram.com/psiderman"
+        />
+        <Pill
+          text="Reddit"
+          brand="reddit-alien"
+          link="https://www.youtube.com/watch?v=xvFZjo5PgG0"
+        />
+        <Pill
+          text="LinkedIn"
+          brand="linkedin-in"
+          link="https://www.linkedin.com/in/psiderman/"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import Pill from "@/components/Pill.vue";
 import anime from "animejs";
 import _ from "lodash";
+
+import Pill from "@/components/Pill.vue";
 
 function copyEmail(event) {
   navigator.clipboard
@@ -53,20 +117,20 @@ function copyEmail(event) {
       const rotation = _.random(10, 15) * (flingXLength / 50);
 
       anime({
-        targets: copiedMessage,
-        translateY: `-=${flingYLength}px`,
-        translateX: `${plusminus}=${flingXLength}px`,
-        rotate: `${plusminus}${rotation}deg`,
-        opacity: {
-          value: 0,
-          duration: 1000,
-          easing: "easeInOutSine",
-        },
-        duration: _.random(500, 1000),
-        easing: "easeOutQuad",
         complete: () => {
           document.body.removeChild(copiedMessage);
         },
+        duration: _.random(500, 1000),
+        easing: "easeOutQuad",
+        opacity: {
+          duration: 1000,
+          easing: "easeInOutSine",
+          value: 0,
+        },
+        rotate: `${plusminus}${rotation}deg`,
+        targets: copiedMessage,
+        translateX: `${plusminus}=${flingXLength}px`,
+        translateY: `-=${flingYLength}px`,
       });
     })
     .catch((error) => {
@@ -75,69 +139,6 @@ function copyEmail(event) {
     });
 }
 </script>
-
-<template>
-  <div class="left-sticky-bar">
-    <!-- Quick intro -->
-    <div>
-      <!-- DP -->
-      <div
-        class="leftbar-headshot relative h-16 w-16 rounded-full bg-blue-600 select-none"
-      >
-        <div
-          class="pointer-events-none absolute bottom-0 h-20 w-16 overflow-hidden rounded-b-full align-bottom"
-        >
-          <img
-            class="pointer-events-auto bottom-0 h-20 w-20 cursor-help object-cover select-none"
-            src="@/assets/images/dp.png"
-            alt="itsame"
-            title="It's a me!"
-          />
-        </div>
-      </div>
-      <h1 class="leftbar-headshot mt-8 mb-4 text-4xl font-bold">
-        Hi, I’m Karan
-      </h1>
-      <p class="leftbar-headshot text-base font-medium">
-        I’m still searching for a one-liner to sum me up, but until then my life
-        is a bento box of endless interests, neatly packed for display on my
-        ever-evolving personal website.
-      </p>
-    </div>
-
-    <div class="flex flex-col gap-2 overflow-visible">
-      <!-- Socials/External Links -->
-      <div class="flex w-full flex-row flex-wrap gap-2 overflow-visible">
-        <Pill
-          id="email"
-          text="hi@psiderman.com"
-          @click.prevent="copyEmail"
-          icon="envelope"
-        />
-        <!-- <Pill
-          text="Twitter"
-          brand="twitter"
-          link="https://twitter.com/_psiderman_"
-        /> -->
-        <Pill
-          text="Instagram"
-          brand="instagram"
-          link="https://instagram.com/psiderman"
-        />
-        <Pill
-          text="Reddit"
-          brand="reddit-alien"
-          link="https://www.youtube.com/watch?v=xvFZjo5PgG0"
-        />
-        <Pill
-          text="LinkedIn"
-          brand="linkedin-in"
-          link="https://www.linkedin.com/in/psiderman/"
-        />
-      </div>
-    </div>
-  </div>
-</template>
 
 <style  scoped>
 @reference "tailwindcss";

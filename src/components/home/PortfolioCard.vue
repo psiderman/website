@@ -1,8 +1,3 @@
-<script setup>
-import { ref } from "vue";
-import Description from "./CardDescription.vue";
-</script>
-
 <template>
   <div class="card group/work aspect-square">
     <div class="relative inset-0 -mt-4 h-full w-full">
@@ -43,6 +38,10 @@ import Description from "./CardDescription.vue";
     />
   </div>
 </template>
+
+<script setup>
+import Description from "./CardDescription.vue";
+</script>
 
 <style  scoped>
 @reference "tailwindcss";

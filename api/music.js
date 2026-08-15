@@ -1,5 +1,5 @@
-import fetch from "node-fetch";
 import getColors from "get-image-colors";
+import fetch from "node-fetch";
 
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
@@ -39,23 +39,23 @@ export default async function handler(req, res) {
     const tokenResponse = await fetch(
       "https://accounts.spotify.com/api/token",
       {
-        method: "POST",
-        headers: {
-          Authorization: `Basic ${basic}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
         body: new URLSearchParams({
           grant_type: "refresh_token",
           refresh_token,
         }),
+        headers: {
+          Authorization: `Basic ${basic}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        method: "POST",
       },
     );
 
     if (!tokenResponse.ok) {
       const errorDetails = await tokenResponse.text();
       return res.status(tokenResponse.status).json({
-        error: "Failed to fetch access token",
         details: errorDetails,
+        error: "Failed to fetch access token",
       });
     }
 
@@ -102,13 +102,13 @@ export default async function handler(req, res) {
       : "#000000";
 
     return res.status(200).json({
-      isPlaying: song.is_playing,
-      title: song.item.name,
-      artist: song.item.artists[0].name,
       album: song.item.album.name,
       albumImageUrl,
-      vividColor,
+      artist: song.item.artists[0].name,
+      isPlaying: song.is_playing,
       songUrl: song.item.external_urls.spotify,
+      title: song.item.name,
+      vividColor,
     });
   } catch (err) {
     return res

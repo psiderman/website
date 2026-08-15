@@ -1,8 +1,35 @@
+<template>
+  <div
+    :class="['large grid gap-4', gridClasses[images.length] || 'grid-cols-5']"
+  >
+    <div
+      v-for="(image, i) in props.images"
+      :key="i"
+      :class="[
+        'anime-entry group/image relative overflow-hidden rounded-lg',
+        skeleton ? 'bg-white/5' : 'bg-black',
+        square ? 'aspect-square' : 'aspect-long',
+      ]"
+    >
+      <img
+        v-if="!skeleton"
+        v-lazy="{
+          src: image.imageUrl,
+          loading: image.metadata.lqip,
+        }"
+        :class="['h-full w-full cursor-pointer object-cover select-none']"
+        :alt="image.caption"
+        @click="emits('openGallery', i)"
+      />
+    </div>
+  </div>
+</template>
+
 <script setup>
 const props = defineProps({
   images: Array,
-  skeleton: { type: Boolean, default: false },
-  square: { type: Boolean, default: false },
+  skeleton: { default: false, type: Boolean },
+  square: { default: false, type: Boolean },
 });
 
 const emits = defineEmits(["openGallery"]);
@@ -20,30 +47,3 @@ const gridClasses = {
   10: "grid-cols-4 sm:grid-cols-5",
 };
 </script>
-
-<template>
-  <div
-    :class="['large grid gap-4', gridClasses[images.length] || 'grid-cols-5']"
-  >
-    <div
-      :class="[
-        'anime-entry group/image relative overflow-hidden rounded-lg',
-        skeleton ? 'bg-white/5' : 'bg-black',
-        square ? 'aspect-square' : 'aspect-long',
-      ]"
-      v-for="(image, i) in props.images"
-      :key="i"
-    >
-      <img
-        v-if="!skeleton"
-        :class="['h-full w-full cursor-pointer object-cover select-none']"
-        v-lazy="{
-          src: image.imageUrl,
-          loading: image.metadata.lqip,
-        }"
-        :alt="image.caption"
-        @click="emits('openGallery', i)"
-      />
-    </div>
-  </div>
-</template>

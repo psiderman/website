@@ -1,80 +1,3 @@
-<script setup>
-import Leftbar from "@/components/home/Leftbar.vue";
-import NowCard from "@/components/home/NowCard.vue";
-import LinkCard from "@/components/home/LinkCard.vue";
-import TravelCard from "@/components/home/TravelCard.vue";
-import GamingCard from "@/components/home/GamingCard.vue";
-import PortfolioCard from "@/components/home/PortfolioCard.vue";
-// import SpotifyCard from "@/components/home/SpotifyCard.vue";
-
-import { RouterLink } from "vue-router";
-import { ref, onMounted } from "vue";
-import anime from "animejs";
-
-const heartFill = ref(false);
-
-function fillHeart() {
-  heartFill.value = !heartFill.value;
-}
-
-onMounted(() => {
-  const cards = document.querySelectorAll(".card");
-
-  cards.forEach((card) => {
-    card.addEventListener("mousemove", (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`;
-      card.style.setProperty("background", gradient);
-    });
-
-    card.addEventListener("mouseleave", () => {
-      card.style.setProperty("background", "hsla(0,0%,100%,2%)");
-    });
-  });
-
-  const entrance = anime.timeline({});
-  entrance
-    .add(
-      {
-        targets: ".leftbar-headshot",
-        translateY: ["1rem", "0"],
-        opacity: [0, 1],
-        scale: [0.95, 1],
-        transformOrigin: "center",
-        duration: 500,
-        easing: "easeOutBack",
-        delay: anime.stagger(100),
-      },
-      0,
-    )
-    .add(
-      {
-        targets: ".pill",
-        translateY: ["1rem", "0"],
-        opacity: [0, 1],
-        scale: [0.95, 1],
-        transformOrigin: "center",
-        duration: 500,
-        easing: "easeOutBack",
-        delay: anime.stagger(100),
-      },
-      0,
-    )
-    .add({
-      targets: ".card, .anime-entry",
-      translateY: ["3rem", "0"],
-      opacity: [0, 1],
-      scale: [0.95, 1],
-      transformOrigin: "center",
-      duration: 500,
-      easing: "easeOutBack",
-      delay: anime.stagger(100),
-    });
-});
-</script>
-
 <template>
   <!-- Content -->
 
@@ -132,15 +55,92 @@ onMounted(() => {
         </span>
         <span class="anime-entry"
           >Handcrafted with Figma, Vue.js, no AI content, and&nbsp;&nbsp;<fa
-            @click="fillHeart"
             :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
             :icon="[heartFill ? 'fas' : 'far', 'heart']"
+            @click="fillHeart"
           />
         </span>
       </div>
     </div>
   </div>
 </template>
+
+<script setup>
+import anime from "animejs";
+import { onMounted, ref } from "vue";
+import { RouterLink } from "vue-router";
+
+import GamingCard from "@/components/home/GamingCard.vue";
+import Leftbar from "@/components/home/Leftbar.vue";
+import LinkCard from "@/components/home/LinkCard.vue";
+// import SpotifyCard from "@/components/home/SpotifyCard.vue";
+import NowCard from "@/components/home/NowCard.vue";
+import PortfolioCard from "@/components/home/PortfolioCard.vue";
+import TravelCard from "@/components/home/TravelCard.vue";
+
+const heartFill = ref(false);
+
+function fillHeart() {
+  heartFill.value = !heartFill.value;
+}
+
+onMounted(() => {
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach((card) => {
+    card.addEventListener("mousemove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`;
+      card.style.setProperty("background", gradient);
+    });
+
+    card.addEventListener("mouseleave", () => {
+      card.style.setProperty("background", "hsla(0,0%,100%,2%)");
+    });
+  });
+
+  const entrance = anime.timeline({});
+  entrance
+    .add(
+      {
+        delay: anime.stagger(100),
+        duration: 500,
+        easing: "easeOutBack",
+        opacity: [0, 1],
+        scale: [0.95, 1],
+        targets: ".leftbar-headshot",
+        transformOrigin: "center",
+        translateY: ["1rem", "0"],
+      },
+      0,
+    )
+    .add(
+      {
+        delay: anime.stagger(100),
+        duration: 500,
+        easing: "easeOutBack",
+        opacity: [0, 1],
+        scale: [0.95, 1],
+        targets: ".pill",
+        transformOrigin: "center",
+        translateY: ["1rem", "0"],
+      },
+      0,
+    )
+    .add({
+      delay: anime.stagger(100),
+      duration: 500,
+      easing: "easeOutBack",
+      opacity: [0, 1],
+      scale: [0.95, 1],
+      targets: ".card, .anime-entry",
+      transformOrigin: "center",
+      translateY: ["3rem", "0"],
+    });
+});
+</script>
 
 <style  scoped>
 @reference "tailwindcss";

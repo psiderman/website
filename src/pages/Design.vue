@@ -1,244 +1,3 @@
-<script setup>
-import QuizizzCard from "@/components/design/QuizizzCard.vue";
-import DezervCard from "../components/design/DezervCard.vue";
-import DesignCard from "@/components/design/DesignCard.vue";
-import { RouterLink, useRouter } from "vue-router";
-import { ref, onMounted, nextTick, markRaw } from "vue";
-import anime from "animejs";
-import _ from "lodash";
-
-const router = useRouter();
-
-const heartFill = ref(false);
-
-function fillHeart() {
-  heartFill.value = !heartFill.value;
-}
-
-const shotData = [
-  {
-    type: "component",
-    link: "/design/dezerv/",
-    aspect: "aspect-shot spotlight",
-    component: markRaw(DezervCard),
-    title: "Senior Product Designer",
-    year: "Feb–Dec 2025",
-  },
-  {
-    type: "image",
-    link: "https://links.psiderman.com/question-type-case-study",
-    title: "Question Types Case Study",
-    year: "2022–2023",
-    src: new URL("@/assets/design/shots/qt.png", import.meta.url).toString(),
-  },
-  {
-    type: "component",
-    link: "/design/quizizz/",
-    aspect: "aspect-shot spotlight",
-    component: markRaw(QuizizzCard),
-    title: "Senior Product Designer",
-    year: "2019–2023",
-  },
-  {
-    type: "image",
-    link: "https://links.psiderman.com/design-system-case-study",
-    title: "Design System Case Study",
-    year: "2020–2023",
-    src: new URL("@/assets/design/shots/ds.png", import.meta.url).toString(),
-  },
-  {
-    type: "video",
-    link: false,
-    title: "Skeumorphic Button",
-    year: "January 2024",
-    src: new URL(
-      "@/assets/design/shots/button.mp4",
-      import.meta.url,
-    ).toString(),
-  },
-  {
-    type: "video",
-    link: false,
-    aspect: "aspect-shot",
-    title: "Graphing in-Product Education",
-    year: "2023",
-    src: new URL(
-      "@/assets/design/shots/graphing.mp4",
-      import.meta.url,
-    ).toString(),
-  },
-  {
-    type: "video",
-    link: "https://codepen.io/psiderman/pen/KKevazx",
-    title: "Math Input",
-    year: "2023",
-    src: new URL("@/assets/design/shots/calc.mp4", import.meta.url).toString(),
-  },
-  {
-    type: "video",
-    link: "https://codepen.io/psiderman/pen/xxbNeXj",
-    aspect: "aspect-shot",
-    title: "Mystery Box Animation",
-    year: "2021",
-    src: new URL("@/assets/design/shots/mbox.mp4", import.meta.url).toString(),
-  },
-  {
-    type: "video",
-    link: "https://owensans.vercel.app/",
-    title: "Owen Sans",
-    year: "Feb 2023",
-    src: new URL(
-      "@/assets/design/shots/owensans.mp4",
-      import.meta.url,
-    ).toString(),
-  },
-  {
-    type: "image",
-    link: false,
-    title: "Graphing Question Type",
-    year: "2023",
-    src: new URL(
-      "@/assets/design/shots/graphing.png",
-      import.meta.url,
-    ).toString(),
-  },
-  {
-    type: "video",
-    link: false,
-    title: "Live Whiteboard Education",
-    year: "2021",
-    src: new URL("@/assets/design/shots/live.mp4", import.meta.url).toString(),
-  },
-  {
-    type: "video",
-    link: "https://links.psiderman.com/primer",
-    title: "Primer to Personal Finance",
-    year: "2022",
-    src: new URL(
-      "@/assets/design/shots/primer-2.mp4",
-      import.meta.url,
-    ).toString(),
-  },
-  {
-    type: "video",
-    // link: "https://kiwi.psiderman.com",
-    title: "Kiwi Personal Finance",
-    year: "2023",
-    src: new URL("@/assets/design/shots/kiwi.mp4", import.meta.url).toString(),
-  },
-  {
-    type: "video",
-    link: false,
-    title: "Spin the Wheel Education",
-    year: "2021",
-    src: new URL("@/assets/design/shots/spin.mp4", import.meta.url).toString(),
-  },
-  {
-    type: "image",
-    link: false,
-    aspect: "aspect-square",
-    title: "Cmd + F*ck off Laptop Stickers",
-    year: "2023",
-    src: new URL("@/assets/design/shots/cmd.png", import.meta.url).toString(),
-  },
-  {
-    type: "video",
-    link: false,
-    title: "Old Portfolio",
-    year: "2022",
-    src: new URL(
-      "@/assets/design/shots/psiderman.com.mp4",
-      import.meta.url,
-    ).toString(),
-  },
-];
-
-function navigateLink(link) {
-  if (!link) return;
-  if (link.startsWith("/")) router.push(link);
-  else window.open(link, "_blank");
-}
-
-const gridCols = ref(0);
-const gridItems = ref([]);
-
-function transformData(cols) {
-  gridCols.value = cols;
-  gridItems.value = Array.from({ length: cols }, () => []);
-  for (let i = 0; i < shotData.length; i++)
-    gridItems.value[i % gridCols.value].push(shotData[i]);
-}
-
-function calculateCols() {
-  const oldValue = gridCols.value;
-  let newValue;
-
-  if (window.innerWidth > 1024) newValue = 3;
-  else if (window.innerWidth >= 639) newValue = 2;
-  else newValue = 1;
-
-  if (newValue !== oldValue) transformData(newValue);
-}
-
-const debouncedCalculateCols = _.debounce(calculateCols, 50);
-
-onMounted(() => {
-  calculateCols();
-  nextTick(() => {
-    const animation = anime.timeline();
-    animation
-      .add({
-        targets: [".anime-entry"],
-        translateY: ["1rem", "0"],
-        opacity: [0, 1],
-        scale: [0.95, 1],
-        transformOrigin: "center",
-        duration: 500,
-        easing: "easeOutBack",
-        delay: anime.stagger(100),
-      })
-      .add({
-        targets: [".design-card"],
-        translateY: ["1rem", "0"],
-        opacity: [0, 1],
-        scale: [0.95, 1],
-        transformOrigin: "center",
-        duration: 500,
-        easing: "easeOutBack",
-        delay: anime.stagger(100, {
-          grid: [gridItems.value[0].length, gridItems.value.length],
-        }),
-      })
-      .add({
-        targets: [".footer-anime-entry"],
-        translateY: ["1rem", "0"],
-        opacity: [0, 1],
-        scale: [0.95, 1],
-        transformOrigin: "center",
-        duration: 500,
-        easing: "easeOutBack",
-        delay: anime.stagger(100),
-      });
-
-    const spotlights = document.querySelectorAll(".spotlight");
-
-    spotlights.forEach((card) => {
-      card.addEventListener("mousemove", (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 0%, 5%) 0%, hsla(0, 0%, 0%, 100%) 80%)`;
-        card.style.setProperty("background", gradient);
-      });
-
-      card.addEventListener("mouseleave", () => {
-        card.style.setProperty("background", "hsla(0,0%,0%,100%)");
-      });
-    });
-  });
-  window.addEventListener("resize", debouncedCalculateCols);
-});
-</script>
 <template>
   <div class="mx-auto min-h-dvh w-screen max-w-screen-xl px-0 py-20">
     <RouterLink to="/">
@@ -266,7 +25,7 @@ onMounted(() => {
     <div
       class="mx-auto grid w-screen max-w-screen-xl grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:grid-cols-3"
     >
-      <div class="flex flex-col gap-4" v-for="(col, i) in gridItems" :key="i">
+      <div v-for="(col, i) in gridItems" :key="i" class="flex flex-col gap-4">
         <template v-for="(shot, j) in col" :key="j">
           <DesignCard
             :title="shot.title"
@@ -288,13 +47,13 @@ onMounted(() => {
             ></video>
             <img
               v-else-if="shot.type == 'image'"
-              class="shot"
               v-lazy="shot.src"
+              class="shot"
               :alt="shot.title"
             />
             <component
-              v-else-if="shot.type == 'component'"
               :is="shot.component"
+              v-else-if="shot.type == 'component'"
             ></component>
             <img
               v-if="shot.link"
@@ -315,9 +74,9 @@ onMounted(() => {
       </span>
       <span class="footer-anime-entry"
         >Handcrafted with Figma, Vue.js, no AI content, and&nbsp;&nbsp;<fa
-          @click="fillHeart"
           :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
           :icon="[heartFill ? 'fas' : 'far', 'heart']"
+          @click="fillHeart"
         />
       </span>
     </div>
@@ -356,6 +115,250 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<script setup>
+import anime from "animejs";
+import _ from "lodash";
+import { markRaw, nextTick, onMounted, ref } from "vue";
+import { RouterLink, useRouter } from "vue-router";
+
+import DesignCard from "@/components/design/DesignCard.vue";
+import QuizizzCard from "@/components/design/QuizizzCard.vue";
+
+import DezervCard from "../components/design/DezervCard.vue";
+
+const router = useRouter();
+
+const heartFill = ref(false);
+
+function fillHeart() {
+  heartFill.value = !heartFill.value;
+}
+
+const shotData = [
+  {
+    aspect: "aspect-shot spotlight",
+    component: markRaw(DezervCard),
+    link: "/design/dezerv/",
+    title: "Senior Product Designer",
+    type: "component",
+    year: "Feb–Dec 2025",
+  },
+  {
+    link: "https://links.psiderman.com/question-type-case-study",
+    src: new URL("@/assets/design/shots/qt.png", import.meta.url).toString(),
+    title: "Question Types Case Study",
+    type: "image",
+    year: "2022–2023",
+  },
+  {
+    aspect: "aspect-shot spotlight",
+    component: markRaw(QuizizzCard),
+    link: "/design/quizizz/",
+    title: "Senior Product Designer",
+    type: "component",
+    year: "2019–2023",
+  },
+  {
+    link: "https://links.psiderman.com/design-system-case-study",
+    src: new URL("@/assets/design/shots/ds.png", import.meta.url).toString(),
+    title: "Design System Case Study",
+    type: "image",
+    year: "2020–2023",
+  },
+  {
+    link: false,
+    src: new URL(
+      "@/assets/design/shots/button.mp4",
+      import.meta.url,
+    ).toString(),
+    title: "Skeumorphic Button",
+    type: "video",
+    year: "January 2024",
+  },
+  {
+    aspect: "aspect-shot",
+    link: false,
+    src: new URL(
+      "@/assets/design/shots/graphing.mp4",
+      import.meta.url,
+    ).toString(),
+    title: "Graphing in-Product Education",
+    type: "video",
+    year: "2023",
+  },
+  {
+    link: "https://codepen.io/psiderman/pen/KKevazx",
+    src: new URL("@/assets/design/shots/calc.mp4", import.meta.url).toString(),
+    title: "Math Input",
+    type: "video",
+    year: "2023",
+  },
+  {
+    aspect: "aspect-shot",
+    link: "https://codepen.io/psiderman/pen/xxbNeXj",
+    src: new URL("@/assets/design/shots/mbox.mp4", import.meta.url).toString(),
+    title: "Mystery Box Animation",
+    type: "video",
+    year: "2021",
+  },
+  {
+    link: "https://owensans.vercel.app/",
+    src: new URL(
+      "@/assets/design/shots/owensans.mp4",
+      import.meta.url,
+    ).toString(),
+    title: "Owen Sans",
+    type: "video",
+    year: "Feb 2023",
+  },
+  {
+    link: false,
+    src: new URL(
+      "@/assets/design/shots/graphing.png",
+      import.meta.url,
+    ).toString(),
+    title: "Graphing Question Type",
+    type: "image",
+    year: "2023",
+  },
+  {
+    link: false,
+    src: new URL("@/assets/design/shots/live.mp4", import.meta.url).toString(),
+    title: "Live Whiteboard Education",
+    type: "video",
+    year: "2021",
+  },
+  {
+    link: "https://links.psiderman.com/primer",
+    src: new URL(
+      "@/assets/design/shots/primer-2.mp4",
+      import.meta.url,
+    ).toString(),
+    title: "Primer to Personal Finance",
+    type: "video",
+    year: "2022",
+  },
+  {
+    src: new URL("@/assets/design/shots/kiwi.mp4", import.meta.url).toString(),
+    // link: "https://kiwi.psiderman.com",
+    title: "Kiwi Personal Finance",
+    type: "video",
+    year: "2023",
+  },
+  {
+    link: false,
+    src: new URL("@/assets/design/shots/spin.mp4", import.meta.url).toString(),
+    title: "Spin the Wheel Education",
+    type: "video",
+    year: "2021",
+  },
+  {
+    aspect: "aspect-square",
+    link: false,
+    src: new URL("@/assets/design/shots/cmd.png", import.meta.url).toString(),
+    title: "Cmd + F*ck off Laptop Stickers",
+    type: "image",
+    year: "2023",
+  },
+  {
+    link: false,
+    src: new URL(
+      "@/assets/design/shots/psiderman.com.mp4",
+      import.meta.url,
+    ).toString(),
+    title: "Old Portfolio",
+    type: "video",
+    year: "2022",
+  },
+];
+
+function navigateLink(link) {
+  if (!link) return;
+  if (link.startsWith("/")) router.push(link);
+  else window.open(link, "_blank");
+}
+
+const gridCols = ref(0);
+const gridItems = ref([]);
+
+function calculateCols() {
+  const oldValue = gridCols.value;
+  let newValue;
+
+  if (window.innerWidth > 1024) newValue = 3;
+  else if (window.innerWidth >= 639) newValue = 2;
+  else newValue = 1;
+
+  if (newValue !== oldValue) transformData(newValue);
+}
+
+function transformData(cols) {
+  gridCols.value = cols;
+  gridItems.value = Array.from({ length: cols }, () => []);
+  for (let i = 0; i < shotData.length; i++)
+    gridItems.value[i % gridCols.value].push(shotData[i]);
+}
+
+const debouncedCalculateCols = _.debounce(calculateCols, 50);
+
+onMounted(() => {
+  calculateCols();
+  nextTick(() => {
+    const animation = anime.timeline();
+    animation
+      .add({
+        delay: anime.stagger(100),
+        duration: 500,
+        easing: "easeOutBack",
+        opacity: [0, 1],
+        scale: [0.95, 1],
+        targets: [".anime-entry"],
+        transformOrigin: "center",
+        translateY: ["1rem", "0"],
+      })
+      .add({
+        delay: anime.stagger(100, {
+          grid: [gridItems.value[0].length, gridItems.value.length],
+        }),
+        duration: 500,
+        easing: "easeOutBack",
+        opacity: [0, 1],
+        scale: [0.95, 1],
+        targets: [".design-card"],
+        transformOrigin: "center",
+        translateY: ["1rem", "0"],
+      })
+      .add({
+        delay: anime.stagger(100),
+        duration: 500,
+        easing: "easeOutBack",
+        opacity: [0, 1],
+        scale: [0.95, 1],
+        targets: [".footer-anime-entry"],
+        transformOrigin: "center",
+        translateY: ["1rem", "0"],
+      });
+
+    const spotlights = document.querySelectorAll(".spotlight");
+
+    spotlights.forEach((card) => {
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 0%, 5%) 0%, hsla(0, 0%, 0%, 100%) 80%)`;
+        card.style.setProperty("background", gradient);
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.style.setProperty("background", "hsla(0,0%,0%,100%)");
+      });
+    });
+  });
+  window.addEventListener("resize", debouncedCalculateCols);
+});
+</script>
 
 <style  scoped>
 @reference "tailwindcss";

@@ -1,182 +1,3 @@
-<script setup>
-import { format, formatDistance } from "date-fns";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-
-const props = defineProps({
-  galleryData: Array,
-  showGallery: { type: Boolean, default: false },
-  albumIndex: Number,
-  imageIndex: Number,
-});
-
-const emits = defineEmits([
-  "closeGallery",
-  "imageIndexChange",
-  "albumIndexChange",
-]);
-
-function getRelativeDate(metadata, date) {
-  try {
-    const d = new Date(metadata.exif.DateTimeOriginal.replace("Z", ""));
-    return formatDistance(d, new Date(), { addSuffix: true });
-  } catch (error) {
-    return formatDistance(new Date(date), new Date(), { addSuffix: true });
-  }
-}
-
-const locationString = ref("");
-function getLocation(image) {
-  try {
-    const lat = image.metadata.location.lat;
-    const lon = image.metadata.location.lng;
-
-    const geoCodeURL = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lon}&latitude=${lat}&access_token=${
-      import.meta.env.VITE_MAPBOX
-    }`;
-
-    const query = fetch(geoCodeURL).then(async (response) => {
-      const data = await response.json();
-
-      const features = data.features;
-      if (features.length > 0) {
-        const context = features[0].properties.context || {};
-        const { place, region, country } = context;
-
-        const str = Array.from(
-          new Set([place?.name, region?.name, country?.name].filter(Boolean)),
-        ).join(", ");
-
-        locationString.value = str || "";
-      }
-    });
-    return locationString.value;
-  } catch (error) {
-    return getTitle(props.galleryData[props.albumIndex]);
-  }
-}
-
-function getTitle(a) {
-  let s;
-  if (a.location !== undefined && a.country !== undefined)
-    s = a.location + ", " + a.country;
-  else s = format(new Date(a.date), "MMMM yyyy");
-  return s;
-}
-
-const timer = ref(null);
-const slideShowTimerValue = ref(7500);
-
-function currentIndexChange(c) {
-  clearInterval(timer.value);
-  const l = props.galleryData[props.albumIndex].images.length;
-  if (c < 0) {
-    if (props.imageIndex == 0) {
-      emits("albumIndexChange", -1);
-      emits("imageIndexChange", -1);
-    } else {
-      emits("imageIndexChange", props.imageIndex + c);
-    }
-  } else {
-    if (props.imageIndex == l - 1) {
-      emits("albumIndexChange", 1);
-      emits("imageIndexChange", 0);
-    } else {
-      emits("imageIndexChange", props.imageIndex + c);
-    }
-  }
-  timer.value = setInterval(() => {
-    currentIndexChange(1);
-  }, slideShowTimerValue.value);
-}
-
-function currentAlbumChange(c) {
-  if (c < 0) {
-    emits("albumIndexChange", c);
-    emits("imageIndexChange", 0);
-  } else {
-    emits("albumIndexChange", c);
-    emits("imageIndexChange", 0);
-  }
-}
-
-function closeGallery() {
-  clearInterval(timer.value);
-  emits("closeGallery");
-}
-
-// Touch Event Handling
-let touchStartX = 0;
-let touchStartY = 0;
-let touchEndX = 0;
-let touchEndY = 0;
-
-const handleTouchStart = (event) => {
-  touchStartX = event.touches[0].clientX;
-  touchStartY = event.touches[0].clientY;
-};
-
-const handleTouchEnd = (event) => {
-  touchEndX = event.changedTouches[0].clientX;
-  touchEndY = event.changedTouches[0].clientY;
-  handleSwipe();
-};
-
-const handleSwipe = () => {
-  const swipeDistanceX = touchEndX - touchStartX;
-  const swipeDistanceY = touchEndY - touchStartY;
-
-  if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)) {
-    if (swipeDistanceX > 50) {
-      currentAlbumChange(-1);
-    } else if (swipeDistanceX < -50) {
-      currentAlbumChange(1);
-    }
-  } else {
-    if (swipeDistanceY > 50) {
-      closeGallery();
-    } else if (swipeDistanceY < -50) {
-    }
-  }
-};
-
-onMounted(() => {
-  const handleKeyDown = (event) => {
-    switch (event.key) {
-      case "Escape":
-        closeGallery();
-        break;
-      case "ArrowRight":
-        currentIndexChange(1);
-        break;
-      case "ArrowLeft":
-        currentIndexChange(-1);
-        break;
-      default:
-        break;
-    }
-  };
-
-  document.addEventListener("keydown", handleKeyDown);
-
-  onUnmounted(() => {
-    document.removeEventListener("keydown", handleKeyDown);
-  });
-});
-
-watch(
-  () => props.showGallery,
-  (o, n) => {
-    if (props.showGallery) {
-      timer.value = setInterval(() => {
-        currentIndexChange(1);
-      }, slideShowTimerValue.value);
-    } else {
-      clearInterval(timer.value);
-    }
-  },
-);
-</script>
-
 <template>
   <div
     v-if="showGallery"
@@ -197,11 +18,11 @@ watch(
     >
       <!-- Image -->
       <img
-        :class="['h-full w-full rounded-lg object-cover select-none']"
         v-lazy="{
           src: galleryData[albumIndex].images[imageIndex].imageUrl,
           loading: galleryData[albumIndex].images[imageIndex].metadata.lqip,
         }"
+        :class="['h-full w-full rounded-lg object-cover select-none']"
         :alt="galleryData[albumIndex].images[imageIndex].caption"
       />
 
@@ -276,11 +97,11 @@ watch(
         @click="currentAlbumChange(1)"
       >
         <img
-          class="absolute h-full w-full object-cover opacity-20"
           v-lazy="{
             src: galleryData[albumIndex + 1].images[0].imageUrl,
             loading: galleryData[albumIndex + 1].images[0].metadata.lqip,
           }"
+          class="absolute h-full w-full object-cover opacity-20"
           :alt="galleryData[albumIndex + 1].images[0].caption"
         />
         <span class="p-4 text-center text-base text-white"
@@ -296,11 +117,11 @@ watch(
         @click="currentAlbumChange(-1)"
       >
         <img
-          class="absolute h-full w-full object-cover opacity-20"
           v-lazy="{
             src: galleryData[albumIndex - 1].images[0].imageUrl,
             loading: galleryData[albumIndex - 1].images[0].metadata.lqip,
           }"
+          class="absolute h-full w-full object-cover opacity-20"
           :alt="galleryData[albumIndex - 1].images[0].caption"
         />
         <span class="p-4 text-center text-base text-white"
@@ -310,17 +131,17 @@ watch(
 
       <div
         v-if="galleryData[albumIndex + 2]"
-        @click="currentAlbumChange(2)"
         :class="[
           'absolute inset-0 hidden h-full w-full translate-x-[175%] scale-50 cursor-pointer items-center justify-center overflow-hidden rounded-lg select-none sm:flex',
         ]"
+        @click="currentAlbumChange(2)"
       >
         <img
-          class="absolute h-full w-full object-cover opacity-20"
           v-lazy="{
             src: galleryData[albumIndex + 2].images[0].imageUrl,
             loading: galleryData[albumIndex + 2].images[0].metadata.lqip,
           }"
+          class="absolute h-full w-full object-cover opacity-20"
           :alt="galleryData[albumIndex + 2].images[0].caption"
         />
         <span class="p-4 text-center text-base text-white"
@@ -330,17 +151,17 @@ watch(
 
       <div
         v-if="galleryData[albumIndex - 2]"
-        @click="currentAlbumChange(-2)"
         :class="[
           'absolute inset-0 hidden h-full w-full -translate-x-[175%] scale-50 cursor-pointer items-center justify-center overflow-hidden rounded-lg select-none sm:flex',
         ]"
+        @click="currentAlbumChange(-2)"
       >
         <img
-          class="absolute h-full w-full object-cover opacity-20"
           v-lazy="{
             src: galleryData[albumIndex - 2].images[0].imageUrl,
             loading: galleryData[albumIndex - 2].images[0].metadata.lqip,
           }"
+          class="absolute h-full w-full object-cover opacity-20"
           :alt="galleryData[albumIndex - 2].images[0].caption"
         />
         <span class="p-4 text-center text-base text-white"
@@ -350,6 +171,185 @@ watch(
     </div>
   </div>
 </template>
+
+<script setup>
+import { format, formatDistance } from "date-fns";
+import { onMounted, onUnmounted, ref, watch } from "vue";
+
+const props = defineProps({
+  albumIndex: Number,
+  galleryData: Array,
+  imageIndex: Number,
+  showGallery: { default: false, type: Boolean },
+});
+
+const emits = defineEmits([
+  "closeGallery",
+  "imageIndexChange",
+  "albumIndexChange",
+]);
+
+function getRelativeDate(metadata, date) {
+  try {
+    const d = new Date(metadata.exif.DateTimeOriginal.replace("Z", ""));
+    return formatDistance(d, new Date(), { addSuffix: true });
+  } catch (error) {
+    return formatDistance(new Date(date), new Date(), { addSuffix: true });
+  }
+}
+
+const locationString = ref("");
+function getLocation(image) {
+  try {
+    const lat = image.metadata.location.lat;
+    const lon = image.metadata.location.lng;
+
+    const geoCodeURL = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lon}&latitude=${lat}&access_token=${
+      import.meta.env.VITE_MAPBOX
+    }`;
+
+    const query = fetch(geoCodeURL).then(async (response) => {
+      const data = await response.json();
+
+      const features = data.features;
+      if (features.length > 0) {
+        const context = features[0].properties.context || {};
+        const { country, place, region } = context;
+
+        const str = Array.from(
+          new Set([place?.name, region?.name, country?.name].filter(Boolean)),
+        ).join(", ");
+
+        locationString.value = str || "";
+      }
+    });
+    return locationString.value;
+  } catch (error) {
+    return getTitle(props.galleryData[props.albumIndex]);
+  }
+}
+
+function getTitle(a) {
+  let s;
+  if (a.location !== undefined && a.country !== undefined)
+    s = a.location + ", " + a.country;
+  else s = format(new Date(a.date), "MMMM yyyy");
+  return s;
+}
+
+const timer = ref(null);
+const slideShowTimerValue = ref(7500);
+
+function closeGallery() {
+  clearInterval(timer.value);
+  emits("closeGallery");
+}
+
+function currentAlbumChange(c) {
+  if (c < 0) {
+    emits("albumIndexChange", c);
+    emits("imageIndexChange", 0);
+  } else {
+    emits("albumIndexChange", c);
+    emits("imageIndexChange", 0);
+  }
+}
+
+function currentIndexChange(c) {
+  clearInterval(timer.value);
+  const l = props.galleryData[props.albumIndex].images.length;
+  if (c < 0) {
+    if (props.imageIndex == 0) {
+      emits("albumIndexChange", -1);
+      emits("imageIndexChange", -1);
+    } else {
+      emits("imageIndexChange", props.imageIndex + c);
+    }
+  } else {
+    if (props.imageIndex == l - 1) {
+      emits("albumIndexChange", 1);
+      emits("imageIndexChange", 0);
+    } else {
+      emits("imageIndexChange", props.imageIndex + c);
+    }
+  }
+  timer.value = setInterval(() => {
+    currentIndexChange(1);
+  }, slideShowTimerValue.value);
+}
+
+// Touch Event Handling
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+const handleTouchStart = (event) => {
+  touchStartX = event.touches[0].clientX;
+  touchStartY = event.touches[0].clientY;
+};
+
+const handleTouchEnd = (event) => {
+  touchEndX = event.changedTouches[0].clientX;
+  touchEndY = event.changedTouches[0].clientY;
+  handleSwipe();
+};
+
+const handleSwipe = () => {
+  const swipeDistanceX = touchEndX - touchStartX;
+  const swipeDistanceY = touchEndY - touchStartY;
+
+  if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)) {
+    if (swipeDistanceX > 50) {
+      currentAlbumChange(-1);
+    } else if (swipeDistanceX < -50) {
+      currentAlbumChange(1);
+    }
+  } else {
+    if (swipeDistanceY > 50) {
+      closeGallery();
+    } else if (swipeDistanceY < -50) {
+    }
+  }
+};
+
+onMounted(() => {
+  const handleKeyDown = (event) => {
+    switch (event.key) {
+      case "ArrowLeft":
+        currentIndexChange(-1);
+        break;
+      case "ArrowRight":
+        currentIndexChange(1);
+        break;
+      case "Escape":
+        closeGallery();
+        break;
+      default:
+        break;
+    }
+  };
+
+  document.addEventListener("keydown", handleKeyDown);
+
+  onUnmounted(() => {
+    document.removeEventListener("keydown", handleKeyDown);
+  });
+});
+
+watch(
+  () => props.showGallery,
+  (o, n) => {
+    if (props.showGallery) {
+      timer.value = setInterval(() => {
+        currentIndexChange(1);
+      }, slideShowTimerValue.value);
+    } else {
+      clearInterval(timer.value);
+    }
+  },
+);
+</script>
 
 <style  scoped>
 .progress-bar-increase {

@@ -1,65 +1,3 @@
-<script setup>
-import "@/assets/blog.css";
-import { ref, onMounted } from "vue";
-import { useStore } from "@/store/store";
-import { useRoute, useRouter } from "vue-router";
-import Button from "@/components/Button.vue";
-import anime from "animejs";
-
-const store = useStore();
-const route = useRoute();
-const router = useRouter();
-const cutStatus = ref(false);
-
-function verify() {
-  store.cutCorners = true;
-  router.replace(route.query.p);
-}
-
-function cut() {
-  if (cutStatus.value) return;
-  anime({
-    targets: ".dottedLine",
-    opacity: [1, 0],
-    duration: 100,
-  });
-  anime({
-    targets: ".corner",
-    rotate: "-3deg",
-    translateX: "-10px",
-    translateY: "6px",
-    duration: 500,
-    easing: "easeInOutQuad",
-  });
-  const status = document.querySelector("p.status");
-  status.innerHTML = `Now we're both cutting corners, and you know why the website works best on desktop.`;
-  const h1 = document.querySelector("h1");
-  h1.innerHTML = `You're human.`;
-  anime({
-    targets: "p.status, h1, button",
-    translateY: ["1rem", "0"],
-    opacity: [0, 1],
-    scale: [0.95, 1],
-    transformOrigin: "center",
-    duration: 500,
-    easing: "easeOutBack",
-    delay: anime.stagger(100, { start: 500 }),
-  });
-  cutStatus.value = true;
-}
-onMounted(async () => {
-  anime({
-    targets: [".anime-entry, h1, h2, h3, p, span"],
-    translateY: ["1rem", "0"],
-    opacity: [0, 1],
-    scale: [0.95, 1],
-    transformOrigin: "center",
-    duration: 500,
-    easing: "easeOutBack",
-    delay: anime.stagger(100),
-  });
-});
-</script>
 <template>
   <div
     class="flex h-screen w-full flex-col items-center justify-between p-10 select-none lg:p-0"
@@ -107,8 +45,8 @@ onMounted(async () => {
     </div>
     <div v-show="!cutStatus" class="h-11"></div>
     <Button
-      class="w-full justify-center"
       v-show="cutStatus"
+      class="w-full justify-center"
       text="Enter"
       icon="arrow-right"
       @click="verify"
@@ -116,6 +54,70 @@ onMounted(async () => {
     <div></div>
   </div>
 </template>
+
+<script setup>
+import "@/assets/blog.css";
+import anime from "animejs";
+import { onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+import Button from "@/components/Button.vue";
+import { useStore } from "@/store/store";
+
+const store = useStore();
+const route = useRoute();
+const router = useRouter();
+const cutStatus = ref(false);
+
+function cut() {
+  if (cutStatus.value) return;
+  anime({
+    duration: 100,
+    opacity: [1, 0],
+    targets: ".dottedLine",
+  });
+  anime({
+    duration: 500,
+    easing: "easeInOutQuad",
+    rotate: "-3deg",
+    targets: ".corner",
+    translateX: "-10px",
+    translateY: "6px",
+  });
+  const status = document.querySelector("p.status");
+  status.innerHTML = `Now we're both cutting corners, and you know why the website works best on desktop.`;
+  const h1 = document.querySelector("h1");
+  h1.innerHTML = `You're human.`;
+  anime({
+    delay: anime.stagger(100, { start: 500 }),
+    duration: 500,
+    easing: "easeOutBack",
+    opacity: [0, 1],
+    scale: [0.95, 1],
+    targets: "p.status, h1, button",
+    transformOrigin: "center",
+    translateY: ["1rem", "0"],
+  });
+  cutStatus.value = true;
+}
+
+function verify() {
+  store.cutCorners = true;
+  router.replace(route.query.p);
+}
+onMounted(async () => {
+  anime({
+    delay: anime.stagger(100),
+    duration: 500,
+    easing: "easeOutBack",
+    opacity: [0, 1],
+    scale: [0.95, 1],
+    targets: [".anime-entry, h1, h2, h3, p, span"],
+    transformOrigin: "center",
+    translateY: ["1rem", "0"],
+  });
+});
+</script>
 
 <style  scoped>
 .dottedLine {
