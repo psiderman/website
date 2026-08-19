@@ -1,6 +1,6 @@
 <template>
   <GlobalHeader />
-  <main>
+  <main class="flex w-screen flex-col items-center justify-center">
     <RouterView />
   </main>
   <GlobalFooter />

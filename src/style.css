@@ -545,6 +545,7 @@
   @apply bg-background text-text-primary;
   @apply font-sans font-normal;
   @apply select-none;
+  @apply overscroll-none;
   touch-action: manipulation;
 
   /* primitive typography */

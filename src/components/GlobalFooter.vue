@@ -16,7 +16,7 @@
       </div>
       <p>© 2026 Karan Sanas</p>
     </div>
-    <div class="h-57.5 w-fit">
+    <div class="h-57.5 w-fit overflow-hidden">
       <img
         src="@/assets/svg/wordmark.svg"
         alt="psiderman wordmark"
