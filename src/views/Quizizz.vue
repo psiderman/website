@@ -1,34 +1,28 @@
 <template>
   <div class="w640 anime-entry mb-6">
-    <img
-      src="@/assets/svg/quizizz.svg"
-      alt="Quizizz Logo"
-      class="-ml-2 h-10 w-[120px]"
-    />
+    <img src="@/assets/svg/quizizz.svg" alt="Quizizz Logo" class="-ml-2 h-10 w-[120px]" />
     <h1 class="hidden">Quizizz</h1>
   </div>
   <p>
-    Quizizz is an online platform that helps teachers conduct assessments,
-    instruction, and practice that motivate every student. It’s used by 80
-    million+ educators and students around the world.
+    Quizizz is an online platform that helps teachers conduct assessments, instruction, and practice
+    that motivate every student. It’s used by 80 million+ educators and students around the world.
   </p>
   <p>
-    I joined the team as the second ever designer at Quizizz, a high-growth
-    startup that helps teachers and students to teach and learn better, where we
-    scaled from 18M MAU to 80M MAU during my time there.
+    I joined the team as the second ever designer at Quizizz, a high-growth startup that helps
+    teachers and students to teach and learn better, where we scaled from 18M MAU to 80M MAU during
+    my time there.
   </p>
   <p>
-    I've also contributed to growing the design team from 2 to 20 and shaping
-    its culture and rituals, including critical contributions such as using
-    Harry Potter references instead of Lorem Ipsum in Figma files.
+    I've also contributed to growing the design team from 2 to 20 and shaping its culture and
+    rituals, including critical contributions such as using Harry Potter references instead of Lorem
+    Ipsum in Figma files.
   </p>
 
   <!-- Question types -->
   <h2>Question Types</h2>
   <p>
-    At the time of writing this, there are sixteen ways to ask a question on
-    Quizizz. Between 2021 and 2023, we added 12 new question types, of which I
-    designed 9, and led the designs for 3 more.
+    At the time of writing this, there are sixteen ways to ask a question on Quizizz. Between 2021
+    and 2023, we added 12 new question types, of which I designed 9, and led the designs for 3 more.
   </p>
 
   <div class="aspect-video">
@@ -47,8 +41,8 @@
 
   <h2>Design System</h2>
   <p>
-    I created and maintained three iterations of the design system in Figma+Code
-    to be used by 16 designers and 50+ engineers. Here's an old
+    I created and maintained three iterations of the design system in Figma+Code to be used by 16
+    designers and 50+ engineers. Here's an old
     <a
       class="underline underline-offset-4"
       href="https://psiderman.notion.site/Handbook-Deprecated-881cfca7ed1344f9935c77afb0531c14"
@@ -71,9 +65,9 @@
   <!-- Other -->
   <h2>Lessons, and other projects</h2>
   <p>
-    These are all archived projects from the earlier iterations of my portfolio.
-    I’ve since moved them out to read.cv just because I wasn’t keen on hosting a
-    website archive. You can read all of them here.
+    These are all archived projects from the earlier iterations of my portfolio. I’ve since moved
+    them out to read.cv just because I wasn’t keen on hosting a website archive. You can read all of
+    them here.
   </p>
   <div class="aspect-video">
     <div class="gallery-scroll">
@@ -86,8 +80,7 @@
     </div>
   </div>
   <p class="caption">
-    The only two designers of Quizizz at the time delivered this 0→1 product in
-    under four weeks.
+    The only two designers of Quizizz at the time delivered this 0→1 product in under four weeks.
   </p>
 
   <div class="w640 mt-10 flex flex-col gap-y-2">
@@ -99,14 +92,9 @@
       >
         Lessons
       </a>
-      <span class="shrink-0 font-serif text-lg leading-8 text-white/50"
-        >Designer</span
-      >
+      <span class="shrink-0 font-serif text-lg leading-8 text-white/50">Designer</span>
       <div class="anime-entry h-px w-full grow bg-white/10"></div>
-      <span
-        class="shrink-0 text-right font-serif text-lg leading-8 text-white/50"
-        >2020</span
-      >
+      <span class="shrink-0 text-right font-serif text-lg leading-8 text-white/50">2020</span>
     </div>
     <div class="flex flex-row items-center gap-x-2">
       <a
@@ -116,14 +104,9 @@
       >
         Parent Reports v2
       </a>
-      <span class="shrink-0 font-serif text-lg leading-8 text-white/50"
-        >Lead Designer</span
-      >
+      <span class="shrink-0 font-serif text-lg leading-8 text-white/50">Lead Designer</span>
       <div class="anime-entry h-px w-full grow bg-white/10"></div>
-      <span
-        class="shrink-0 text-right font-serif text-lg leading-8 text-white/50"
-        >2020</span
-      >
+      <span class="shrink-0 text-right font-serif text-lg leading-8 text-white/50">2020</span>
     </div>
     <div class="flex flex-row items-center gap-x-2">
       <a
@@ -133,12 +116,9 @@
       >
         Miscellaneous Projects
       </a>
-      <span class="shrink-0 font-serif text-lg leading-8 text-white/50"
-        >Designer</span
-      >
+      <span class="shrink-0 font-serif text-lg leading-8 text-white/50">Designer</span>
       <div class="anime-entry h-px w-full grow bg-white/10"></div>
-      <span
-        class="shrink-0 text-right font-serif text-lg leading-8 text-white/50"
+      <span class="shrink-0 text-right font-serif text-lg leading-8 text-white/50"
         >2019 – 2020</span
       >
     </div>
@@ -169,50 +149,50 @@
     </div>
   </div>
   <p class="caption anime-entry">
-    Did you know? 'qudeez' is a portmanteau of Quizizz Design Cuties. Being a
-    qudee is the second highest honor after OP.
+    Did you know? 'qudeez' is a portmanteau of Quizizz Design Cuties. Being a qudee is the second
+    highest honor after OP.
   </p>
 </template>
 
-<script setup>
-import anime from "animejs";
-import { onMounted } from "vue";
+<script setup lang="ts">
+import anime from 'animejs'
+import { onMounted } from 'vue'
 
 const imageData = {
   ds: {
-    i: new URL("@/assets/design/ds/01.png", import.meta.url).toString(),
-    ii: new URL("@/assets/design/ds/02.png", import.meta.url).toString(),
-    iii: new URL("@/assets/design/ds/03.png", import.meta.url).toString(),
+    i: new URL('@/assets/design/ds/01.png', import.meta.url).toString(),
+    ii: new URL('@/assets/design/ds/02.png', import.meta.url).toString(),
+    iii: new URL('@/assets/design/ds/03.png', import.meta.url).toString(),
   },
   lessons: {
-    i: new URL("@/assets/design/lessons/01.png", import.meta.url).toString(),
-    ii: new URL("@/assets/design/lessons/02.png", import.meta.url).toString(),
-    iii: new URL("@/assets/design/lessons/03.png", import.meta.url).toString(),
-    iv: new URL("@/assets/design/lessons/04.gif", import.meta.url).toString(),
+    i: new URL('@/assets/design/lessons/01.png', import.meta.url).toString(),
+    ii: new URL('@/assets/design/lessons/02.png', import.meta.url).toString(),
+    iii: new URL('@/assets/design/lessons/03.png', import.meta.url).toString(),
+    iv: new URL('@/assets/design/lessons/04.gif', import.meta.url).toString(),
   },
   qtcs: {
-    i: new URL("@/assets/design/qtcs/02.png", import.meta.url).toString(),
-    ii: new URL("@/assets/design/qtcs/03.png", import.meta.url).toString(),
-    iii: new URL("@/assets/design/qtcs/04.png", import.meta.url).toString(),
-    iv: new URL("@/assets/design/qtcs/05.png", import.meta.url).toString(),
+    i: new URL('@/assets/design/qtcs/02.png', import.meta.url).toString(),
+    ii: new URL('@/assets/design/qtcs/03.png', import.meta.url).toString(),
+    iii: new URL('@/assets/design/qtcs/04.png', import.meta.url).toString(),
+    iv: new URL('@/assets/design/qtcs/05.png', import.meta.url).toString(),
   },
-};
+}
 
 onMounted(() => {
   anime({
     delay: anime.stagger(100),
     duration: 500,
-    easing: "easeOutBack",
+    easing: 'easeOutBack',
     opacity: [0, 1],
     scale: [0.95, 1],
-    targets: [".anime-entry, h1, h2, h3, p, ul, li, span"],
-    transformOrigin: "center",
-    translateY: ["1rem", "0"],
-  });
-});
+    targets: ['.anime-entry, h1, h2, h3, p, ul, li, span'],
+    transformOrigin: 'center',
+    translateY: ['1rem', '0'],
+  })
+})
 </script>
 
-<style  scoped>
+<style scoped>
 @reference "tailwindcss";
 .motion-card {
   @apply pointer-events-none aspect-square overflow-hidden rounded-3xl border border-white/15 bg-black;

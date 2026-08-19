@@ -14,10 +14,7 @@
           d="M0 77h13.1V64.2h25.5V58H45V38.4h-6.4V32H0v45Zm13.1-38.3v18.8H32V38.7H13Z"
           clip-rule="evenodd"
         />
-        <path
-          fill="#fff"
-          d="M89.6 77H51v-6.8h12.8v-25h-6.4v-6.8h6.4V32h13v38.3h12.8V77Z"
-        />
+        <path fill="#fff" d="M89.6 77H51v-6.8h12.8v-25h-6.4v-6.8h6.4V32h13v38.3h12.8V77Z" />
         <path
           class="group-hover/gaming:animate-bounce"
           fill="#2563EB"
@@ -33,6 +30,6 @@
   </div>
 </template>
 
-<script setup>
-import Description from "./CardDescription.vue";
+<script setup lang="ts">
+import Description from './CardDescription.vue'
 </script>

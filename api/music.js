@@ -1,105 +1,93 @@
-import getColors from "get-image-colors";
-import fetch from "node-fetch";
+import getColors from 'get-image-colors'
+import fetch from 'node-fetch'
 
-const client_id = process.env.SPOTIFY_CLIENT_ID;
-const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const refresh_token = process.env.SPOTIFY_REFRESH_TOKEN;
+const client_id = process.env.SPOTIFY_CLIENT_ID
+const client_secret = process.env.SPOTIFY_CLIENT_SECRET
+const refresh_token = process.env.SPOTIFY_REFRESH_TOKEN
 
 export async function getDominantColorHex(imageUrl) {
   try {
-    const response = await fetch(imageUrl);
-    if (!response.ok) throw new Error("Image fetch failed");
-    const buffer = await response.buffer();
+    const response = await fetch(imageUrl)
+    if (!response.ok) throw new Error('Image fetch failed')
+    const buffer = await response.buffer()
 
-    const colors = await getColors(buffer, "image/jpeg");
+    const colors = await getColors(buffer, 'image/jpeg')
 
     const vividColors = colors.filter((color) => {
-      const [h, s, l] = color.hsl();
-      return s > 0.15 && l > 0.15;
-    });
+      const [h, s, l] = color.hsl()
+      return s > 0.15 && l > 0.15
+    })
 
-    const topColor = vividColors[0] || colors[0];
+    const topColor = vividColors[0] || colors[0]
 
-    return topColor.hex();
+    return topColor.hex()
   } catch (err) {
-    console.error("Color extraction failed:", err.message);
-    return "#000000";
+    console.error('Color extraction failed:', err.message)
+    return '#000000'
   }
 }
 
 export default async function handler(req, res) {
   if (!client_id || !client_secret || !refresh_token) {
-    return res.status(500).json({ error: "Missing Spotify credentials" });
+    return res.status(500).json({ error: 'Missing Spotify credentials' })
   }
 
-  const basic = Buffer.from(`${client_id}:${client_secret}`).toString("base64");
+  const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64')
 
-  let access_token;
+  let access_token
   try {
-    const tokenResponse = await fetch(
-      "https://accounts.spotify.com/api/token",
-      {
-        body: new URLSearchParams({
-          grant_type: "refresh_token",
-          refresh_token,
-        }),
-        headers: {
-          Authorization: `Basic ${basic}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        method: "POST",
+    const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token,
+      }),
+      headers: {
+        Authorization: `Basic ${basic}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-    );
+      method: 'POST',
+    })
 
     if (!tokenResponse.ok) {
-      const errorDetails = await tokenResponse.text();
+      const errorDetails = await tokenResponse.text()
       return res.status(tokenResponse.status).json({
         details: errorDetails,
-        error: "Failed to fetch access token",
-      });
+        error: 'Failed to fetch access token',
+      })
     }
 
-    const tokenData = await tokenResponse.json();
-    access_token = tokenData.access_token;
+    const tokenData = await tokenResponse.json()
+    access_token = tokenData.access_token
 
     if (!access_token) {
-      return res
-        .status(401)
-        .json({ error: "Access token missing in response" });
+      return res.status(401).json({ error: 'Access token missing in response' })
     }
   } catch (err) {
-    return res
-      .status(500)
-      .json({ error: "Token fetch failed", message: err.message });
+    return res.status(500).json({ error: 'Token fetch failed', message: err.message })
   }
 
   try {
-    const nowPlaying = await fetch(
-      "https://api.spotify.com/v1/me/player/currently-playing",
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
+    const nowPlaying = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
       },
-    );
+    })
 
     // Always set cache header before sending a response
-    res.setHeader("Cache-Control", "s-maxage=15, stale-while-revalidate");
+    res.setHeader('Cache-Control', 's-maxage=15, stale-while-revalidate')
 
     if (nowPlaying.status === 204 || nowPlaying.status >= 400) {
-      return res.status(200).json({ isPlaying: false });
+      return res.status(200).json({ isPlaying: false })
     }
 
-    const song = await nowPlaying.json();
+    const song = await nowPlaying.json()
 
     if (!song?.item) {
-      return res.status(200).json({ isPlaying: false });
+      return res.status(200).json({ isPlaying: false })
     }
 
-    const albumImageUrl = song.item?.album?.images?.[0]?.url || "";
-    const vividColor = albumImageUrl
-      ? await getDominantColorHex(albumImageUrl)
-      : "#000000";
+    const albumImageUrl = song.item?.album?.images?.[0]?.url || ''
+    const vividColor = albumImageUrl ? await getDominantColorHex(albumImageUrl) : '#000000'
 
     return res.status(200).json({
       album: song.item.album.name,
@@ -109,10 +97,8 @@ export default async function handler(req, res) {
       songUrl: song.item.external_urls.spotify,
       title: song.item.name,
       vividColor,
-    });
+    })
   } catch (err) {
-    return res
-      .status(500)
-      .json({ error: "Playback fetch failed", message: err.message });
+    return res.status(500).json({ error: 'Playback fetch failed', message: err.message })
   }
 }

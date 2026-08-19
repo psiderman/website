@@ -1,14 +1,7 @@
 <template>
-  <div
-    class="card group/now aspect-square"
-    @mousemove="moveEye"
-    @mouseleave="resetEye"
-  >
+  <div class="card group/now aspect-square" @mousemove="moveEye" @mouseleave="resetEye">
     <div class="relative inset-0 -mt-4 h-full w-full">
-      <div
-        ref="eyes"
-        class="absolute inset-0 m-auto flex h-fit w-fit flex-row gap-2"
-      >
+      <div ref="eyes" class="absolute inset-0 m-auto flex h-fit w-fit flex-row gap-2">
         <div class="sclera">
           <div class="eyeball">
             <div class="pupil"></div>
@@ -32,55 +25,55 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref } from 'vue'
 
-import Description from "./CardDescription.vue";
+import Description from './CardDescription.vue'
 
-const eyes = ref(null);
+const eyes = ref(null)
 
 function moveEye(event) {
-  const eyesUI = eyes.value;
-  const eyeballs = eyesUI.querySelectorAll(".eyeball");
-  const eyesRect = eyesUI.getBoundingClientRect();
+  const eyesUI = eyes.value
+  const eyeballs = eyesUI.querySelectorAll('.eyeball')
+  const eyesRect = eyesUI.getBoundingClientRect()
 
-  const eyesCenterX = eyesRect.left + eyesRect.width / 2;
-  const eyesCenterY = eyesRect.top + eyesRect.height / 2;
+  const eyesCenterX = eyesRect.left + eyesRect.width / 2
+  const eyesCenterY = eyesRect.top + eyesRect.height / 2
 
-  const mouseX = event.clientX;
-  const mouseY = event.clientY;
+  const mouseX = event.clientX
+  const mouseY = event.clientY
 
-  const angle = Math.atan2(mouseY - eyesCenterY, mouseX - eyesCenterX);
+  const angle = Math.atan2(mouseY - eyesCenterY, mouseX - eyesCenterX)
 
-  const distanceX = Math.cos(angle) * 6;
-  const distanceY = Math.sin(angle) * 20;
+  const distanceX = Math.cos(angle) * 6
+  const distanceY = Math.sin(angle) * 20
 
   eyeballs.forEach((eyeball) => {
-    const pupil = eyeball.querySelector(".pupil");
-    const dX = Math.cos(angle) * 1;
-    const dY = Math.sin(angle) * 1;
-    eyeball.style.transform = `translate(${distanceX}px, ${distanceY}px)`;
-    pupil.style.transform = `translate(${dX}px, ${dY}px)`;
-  });
+    const pupil = eyeball.querySelector('.pupil')
+    const dX = Math.cos(angle) * 1
+    const dY = Math.sin(angle) * 1
+    eyeball.style.transform = `translate(${distanceX}px, ${distanceY}px)`
+    pupil.style.transform = `translate(${dX}px, ${dY}px)`
+  })
 }
 
 function resetEye() {
-  const eyesUI = eyes.value;
-  const eyeballs = eyesUI.querySelectorAll(".eyeball");
+  const eyesUI = eyes.value
+  const eyeballs = eyesUI.querySelectorAll('.eyeball')
 
   eyeballs.forEach((eyeball) => {
-    const pupil = eyeball.querySelector(".pupil");
-    eyeball.classList.add("transition-all", "duration-500");
-    eyeball.style.transform = "translate(-6px, 0)";
-    pupil.style.transform = `translate(0px, 0px)`;
+    const pupil = eyeball.querySelector('.pupil')
+    eyeball.classList.add('transition-all', 'duration-500')
+    eyeball.style.transform = 'translate(-6px, 0)'
+    pupil.style.transform = `translate(0px, 0px)`
     setTimeout(() => {
-      eyeball.classList.remove("transition-all", "duration-500");
-    }, 500);
-  });
+      eyeball.classList.remove('transition-all', 'duration-500')
+    }, 500)
+  })
 }
 </script>
 
-<style  scoped>
+<style scoped>
 @reference "tailwindcss";
 .sclera {
   @apply relative h-14 w-8 overflow-hidden bg-white;

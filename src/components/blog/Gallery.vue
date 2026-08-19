@@ -13,9 +13,7 @@
       Close (Esc)
     </button>
 
-    <div
-      class="sm:aspect-long relative inset-0 my-auto h-full rounded-lg bg-white/5"
-    >
+    <div class="sm:aspect-long relative inset-0 my-auto h-full rounded-lg bg-white/5">
       <!-- Image -->
       <img
         v-lazy="{
@@ -34,10 +32,7 @@
           :class="['h-0.5 w-full overflow-hidden rounded-lg bg-white/50']"
         >
           <div
-            :class="[
-              'h-full w-full rounded-lg',
-              j < imageIndex ? 'bg-white' : 'bg-transparent',
-            ]"
+            :class="['h-full w-full rounded-lg', j < imageIndex ? 'bg-white' : 'bg-transparent']"
           >
             <div
               :class="[
@@ -82,10 +77,7 @@
           @click="currentIndexChange(-1)"
         ></div>
         <div class="h-full w-full"></div>
-        <div
-          class="h-full w-full cursor-pointer rounded-r-lg"
-          @click="currentIndexChange(1)"
-        ></div>
+        <div class="h-full w-full cursor-pointer rounded-r-lg" @click="currentIndexChange(1)"></div>
       </div>
 
       <!-- Ghost -->
@@ -172,186 +164,181 @@
   </div>
 </template>
 
-<script setup>
-import { format, formatDistance } from "date-fns";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+<script setup lang="ts">
+import { format, formatDistance } from 'date-fns'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 const props = defineProps({
   albumIndex: Number,
   galleryData: Array,
   imageIndex: Number,
   showGallery: { default: false, type: Boolean },
-});
+})
 
-const emits = defineEmits([
-  "closeGallery",
-  "imageIndexChange",
-  "albumIndexChange",
-]);
+const emits = defineEmits(['closeGallery', 'imageIndexChange', 'albumIndexChange'])
 
 function getRelativeDate(metadata, date) {
   try {
-    const d = new Date(metadata.exif.DateTimeOriginal.replace("Z", ""));
-    return formatDistance(d, new Date(), { addSuffix: true });
+    const d = new Date(metadata.exif.DateTimeOriginal.replace('Z', ''))
+    return formatDistance(d, new Date(), { addSuffix: true })
   } catch (error) {
-    return formatDistance(new Date(date), new Date(), { addSuffix: true });
+    return formatDistance(new Date(date), new Date(), { addSuffix: true })
   }
 }
 
-const locationString = ref("");
+const locationString = ref('')
 function getLocation(image) {
   try {
-    const lat = image.metadata.location.lat;
-    const lon = image.metadata.location.lng;
+    const lat = image.metadata.location.lat
+    const lon = image.metadata.location.lng
 
     const geoCodeURL = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lon}&latitude=${lat}&access_token=${
       import.meta.env.VITE_MAPBOX
-    }`;
+    }`
 
     const query = fetch(geoCodeURL).then(async (response) => {
-      const data = await response.json();
+      const data = await response.json()
 
-      const features = data.features;
+      const features = data.features
       if (features.length > 0) {
-        const context = features[0].properties.context || {};
-        const { country, place, region } = context;
+        const context = features[0].properties.context || {}
+        const { country, place, region } = context
 
         const str = Array.from(
           new Set([place?.name, region?.name, country?.name].filter(Boolean)),
-        ).join(", ");
+        ).join(', ')
 
-        locationString.value = str || "";
+        locationString.value = str || ''
       }
-    });
-    return locationString.value;
+    })
+    return locationString.value
   } catch (error) {
-    return getTitle(props.galleryData[props.albumIndex]);
+    return getTitle(props.galleryData[props.albumIndex])
   }
 }
 
 function getTitle(a) {
-  let s;
-  if (a.location !== undefined && a.country !== undefined)
-    s = a.location + ", " + a.country;
-  else s = format(new Date(a.date), "MMMM yyyy");
-  return s;
+  let s
+  if (a.location !== undefined && a.country !== undefined) s = a.location + ', ' + a.country
+  else s = format(new Date(a.date), 'MMMM yyyy')
+  return s
 }
 
-const timer = ref(null);
-const slideShowTimerValue = ref(7500);
+const timer = ref(null)
+const slideShowTimerValue = ref(7500)
 
 function closeGallery() {
-  clearInterval(timer.value);
-  emits("closeGallery");
+  clearInterval(timer.value)
+  emits('closeGallery')
 }
 
 function currentAlbumChange(c) {
   if (c < 0) {
-    emits("albumIndexChange", c);
-    emits("imageIndexChange", 0);
+    emits('albumIndexChange', c)
+    emits('imageIndexChange', 0)
   } else {
-    emits("albumIndexChange", c);
-    emits("imageIndexChange", 0);
+    emits('albumIndexChange', c)
+    emits('imageIndexChange', 0)
   }
 }
 
 function currentIndexChange(c) {
-  clearInterval(timer.value);
-  const l = props.galleryData[props.albumIndex].images.length;
+  clearInterval(timer.value)
+  const l = props.galleryData[props.albumIndex].images.length
   if (c < 0) {
     if (props.imageIndex == 0) {
-      emits("albumIndexChange", -1);
-      emits("imageIndexChange", -1);
+      emits('albumIndexChange', -1)
+      emits('imageIndexChange', -1)
     } else {
-      emits("imageIndexChange", props.imageIndex + c);
+      emits('imageIndexChange', props.imageIndex + c)
     }
   } else {
     if (props.imageIndex == l - 1) {
-      emits("albumIndexChange", 1);
-      emits("imageIndexChange", 0);
+      emits('albumIndexChange', 1)
+      emits('imageIndexChange', 0)
     } else {
-      emits("imageIndexChange", props.imageIndex + c);
+      emits('imageIndexChange', props.imageIndex + c)
     }
   }
   timer.value = setInterval(() => {
-    currentIndexChange(1);
-  }, slideShowTimerValue.value);
+    currentIndexChange(1)
+  }, slideShowTimerValue.value)
 }
 
 // Touch Event Handling
-let touchStartX = 0;
-let touchStartY = 0;
-let touchEndX = 0;
-let touchEndY = 0;
+let touchStartX = 0
+let touchStartY = 0
+let touchEndX = 0
+let touchEndY = 0
 
 const handleTouchStart = (event) => {
-  touchStartX = event.touches[0].clientX;
-  touchStartY = event.touches[0].clientY;
-};
+  touchStartX = event.touches[0].clientX
+  touchStartY = event.touches[0].clientY
+}
 
 const handleTouchEnd = (event) => {
-  touchEndX = event.changedTouches[0].clientX;
-  touchEndY = event.changedTouches[0].clientY;
-  handleSwipe();
-};
+  touchEndX = event.changedTouches[0].clientX
+  touchEndY = event.changedTouches[0].clientY
+  handleSwipe()
+}
 
 const handleSwipe = () => {
-  const swipeDistanceX = touchEndX - touchStartX;
-  const swipeDistanceY = touchEndY - touchStartY;
+  const swipeDistanceX = touchEndX - touchStartX
+  const swipeDistanceY = touchEndY - touchStartY
 
   if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)) {
     if (swipeDistanceX > 50) {
-      currentAlbumChange(-1);
+      currentAlbumChange(-1)
     } else if (swipeDistanceX < -50) {
-      currentAlbumChange(1);
+      currentAlbumChange(1)
     }
   } else {
     if (swipeDistanceY > 50) {
-      closeGallery();
+      closeGallery()
     } else if (swipeDistanceY < -50) {
     }
   }
-};
+}
 
 onMounted(() => {
   const handleKeyDown = (event) => {
     switch (event.key) {
-      case "ArrowLeft":
-        currentIndexChange(-1);
-        break;
-      case "ArrowRight":
-        currentIndexChange(1);
-        break;
-      case "Escape":
-        closeGallery();
-        break;
+      case 'ArrowLeft':
+        currentIndexChange(-1)
+        break
+      case 'ArrowRight':
+        currentIndexChange(1)
+        break
+      case 'Escape':
+        closeGallery()
+        break
       default:
-        break;
+        break
     }
-  };
+  }
 
-  document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener('keydown', handleKeyDown)
 
   onUnmounted(() => {
-    document.removeEventListener("keydown", handleKeyDown);
-  });
-});
+    document.removeEventListener('keydown', handleKeyDown)
+  })
+})
 
 watch(
   () => props.showGallery,
   (o, n) => {
     if (props.showGallery) {
       timer.value = setInterval(() => {
-        currentIndexChange(1);
-      }, slideShowTimerValue.value);
+        currentIndexChange(1)
+      }, slideShowTimerValue.value)
     } else {
-      clearInterval(timer.value);
+      clearInterval(timer.value)
     }
   },
-);
+)
 </script>
 
-<style  scoped>
+<style scoped>
 .progress-bar-increase {
   animation: pb 7500ms linear forwards;
 }

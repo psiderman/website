@@ -19,11 +19,7 @@
   <div class="sanity large">
     <h1 class="mb-4">
       What am I doing
-      <a
-        href="https://nownownow.com/about"
-        target="_blank"
-        class="underline underline-offset-2"
-      >
+      <a href="https://nownownow.com/about" target="_blank" class="underline underline-offset-2">
         now</a
       >
       ?
@@ -39,9 +35,9 @@
       <p class="italic">
         Last updated:
         {{
-          new Intl.DateTimeFormat("en-US", {
-            month: "short",
-            year: "numeric",
+          new Intl.DateTimeFormat('en-US', {
+            month: 'short',
+            year: 'numeric',
           }).format(new Date(now.date))
         }}
       </p>
@@ -67,76 +63,76 @@
   />
 </template>
 
-<script setup>
-import anime from "animejs";
-import { nextTick, onMounted, ref } from "vue";
+<script setup lang="ts">
+import anime from 'animejs'
+import { nextTick, onMounted, ref } from 'vue'
 
-import Gallery from "@/components/blog/Gallery.vue";
-import LongImages from "@/components/blog/LongImages.vue";
-import client from "@/store/sanity.js";
+import Gallery from '@/components/blog/Gallery.vue'
+import LongImages from '@/components/blog/LongImages.vue'
+import client from '@/store/sanity.js'
 
-const data = ref(null);
-const loading = ref(true);
+const data = ref(null)
+const loading = ref(true)
 
 onMounted(async () => {
   anime({
     delay: anime.stagger(100),
     duration: 500,
-    easing: "easeOutBack",
+    easing: 'easeOutBack',
     opacity: [0, 1],
     scale: [0.95, 1],
-    targets: [".anime-entry, h1, h2, h3, p, li, span"],
-    transformOrigin: "center",
-    translateY: ["1rem", "0"],
-  });
+    targets: ['.anime-entry, h1, h2, h3, p, li, span'],
+    transformOrigin: 'center',
+    translateY: ['1rem', '0'],
+  })
   try {
     const query =
-      '*[_type == "now"] | order(date desc) { ..., images[] { ..., "imageUrl": asset->url, "metadata": asset->metadata } }';
-    const response = await client.fetch(query);
-    data.value = response;
+      '*[_type == "now"] | order(date desc) { ..., images[] { ..., "imageUrl": asset->url, "metadata": asset->metadata } }'
+    const response = await client.fetch(query)
+    data.value = response
 
     nextTick(() => {
-      loading.value = false;
+      loading.value = false
       anime({
         delay: anime.stagger(100),
         duration: 500,
-        easing: "easeOutBack",
+        easing: 'easeOutBack',
         opacity: [0, 1],
         scale: [0.95, 1],
         targets: [
-          ".sanity .anime-entry, .sanity h1, .sanity h2, .sanity h3, .sanity p, .sanity ul, .sanity li, .sanity span",
+          '.sanity .anime-entry, .sanity h1, .sanity h2, .sanity h3, .sanity p, .sanity ul, .sanity li, .sanity span',
         ],
-        transformOrigin: "center",
-        translateY: ["1rem", "0"],
-      });
-    });
+        transformOrigin: 'center',
+        translateY: ['1rem', '0'],
+      })
+    })
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error('Error fetching data:', error)
   }
-});
+})
 
-const showGallery = ref(false);
-const albumIndex = ref(0);
-const imageIndex = ref(0);
+const showGallery = ref(false)
+const albumIndex = ref(0)
+const imageIndex = ref(0)
 
 function galleryToggle(f, j = 0, i = 0) {
-  albumIndex.value = i;
-  imageIndex.value = j;
-  showGallery.value = f;
+  albumIndex.value = i
+  imageIndex.value = j
+  showGallery.value = f
 }
 
 function updateAlbumIndex(i) {
   if (i < 0)
-    if (albumIndex.value == 0) galleryToggle(false);
-    else albumIndex.value += i;
+    if (albumIndex.value == 0) galleryToggle(false)
+    else albumIndex.value += i
   else {
-    if (albumIndex.value == data.value.length - 1) galleryToggle(false);
-    else albumIndex.value += i;
+    if (albumIndex.value == data.value.length - 1) galleryToggle(false)
+    else albumIndex.value += i
   }
 }
 
 function updateImageIndex(i) {
-  if (i < 0) imageIndex.value = data.value[albumIndex.value].images.length - 1;
-  else imageIndex.value = i;
+  if (i < 0) imageIndex.value = data.value[albumIndex.value].images.length - 1
+  else imageIndex.value = i
 }
 </script>

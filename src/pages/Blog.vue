@@ -1,21 +1,13 @@
 <template>
-  <div
-    class="content mx-auto min-h-dvh w-screen max-w-screen-lg p-10 lg:px-0 lg:py-20"
-  >
+  <div class="content mx-auto min-h-dvh w-screen max-w-screen-lg p-10 lg:px-0 lg:py-20">
     <RouterLink to="/">
-      <img
-        src="@/assets/svg/psider.svg"
-        alt="logo"
-        class="anime-entry mx-auto mb-20 select-none"
-      />
+      <img src="@/assets/svg/psider.svg" alt="logo" class="anime-entry mx-auto mb-20 select-none" />
     </RouterLink>
     <RouterView />
     <div
       class="mt-20 flex w-full flex-col items-center justify-center gap-y-1 text-center text-base text-white/50 select-none"
     >
-      <span class="anime-entry">
-        ©️ Karan Sanas {{ new Date().getFullYear() }}
-      </span>
+      <span class="anime-entry"> ©️ Karan Sanas {{ new Date().getFullYear() }} </span>
       <span class="anime-entry"
         >Handcrafted with Figma, Vue.js, no AI content, and&nbsp;&nbsp;<fa
           :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
@@ -52,13 +44,13 @@
   </div>
 </template>
 
-<script setup>
-import "@/assets/blog.css";
-import { ref } from "vue";
-import { RouterLink, RouterView } from "vue-router";
-const heartFill = ref(false);
+<script setup lang="ts">
+import '@/assets/blog.css'
+import { ref } from 'vue'
+import { RouterLink, RouterView } from 'vue-router'
+const heartFill = ref(false)
 
 function fillHeart() {
-  heartFill.value = !heartFill.value;
+  heartFill.value = !heartFill.value
 }
 </script>

@@ -22,16 +22,8 @@
           link="https://open.spotify.com/user/psiderman/playlists"
         />
         <!-- <SpotifyCard /> -->
-        <LinkCard
-          title="Owen Sans, font quiz"
-          logo="owensans"
-          link="https://owensans.vercel.app"
-        />
-        <LinkCard
-          title="Foursight"
-          logo="foursight"
-          link="https://foursight.money"
-        />
+        <LinkCard title="Owen Sans, font quiz" logo="owensans" link="https://owensans.vercel.app" />
+        <LinkCard title="Foursight" logo="foursight" link="https://foursight.money" />
         <LinkCard
           title="Personal finance 101"
           logo="primer"
@@ -50,9 +42,7 @@
       <div
         class="col-span-1 flex w-full flex-col text-center text-base text-white/50 select-none md:col-span-2 lg:col-span-1 lg:text-left"
       >
-        <span class="anime-entry">
-          ©️ Karan Sanas {{ new Date().getFullYear() }}
-        </span>
+        <span class="anime-entry"> ©️ Karan Sanas {{ new Date().getFullYear() }} </span>
         <span class="anime-entry"
           >Handcrafted with Figma, Vue.js, no AI content, and&nbsp;&nbsp;<fa
             :class="[heartFill ? 'text-red-500' : '', 'cursor-pointer']"
@@ -65,54 +55,54 @@
   </div>
 </template>
 
-<script setup>
-import anime from "animejs";
-import { onMounted, ref } from "vue";
-import { RouterLink } from "vue-router";
+<script setup lang="ts">
+import anime from 'animejs'
+import { onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 
-import GamingCard from "@/components/home/GamingCard.vue";
-import Leftbar from "@/components/home/Leftbar.vue";
-import LinkCard from "@/components/home/LinkCard.vue";
+import GamingCard from '@/components/home/GamingCard.vue'
+import Leftbar from '@/components/home/Leftbar.vue'
+import LinkCard from '@/components/home/LinkCard.vue'
 // import SpotifyCard from "@/components/home/SpotifyCard.vue";
-import NowCard from "@/components/home/NowCard.vue";
-import PortfolioCard from "@/components/home/PortfolioCard.vue";
-import TravelCard from "@/components/home/TravelCard.vue";
+import NowCard from '@/components/home/NowCard.vue'
+import PortfolioCard from '@/components/home/PortfolioCard.vue'
+import TravelCard from '@/components/home/TravelCard.vue'
 
-const heartFill = ref(false);
+const heartFill = ref(false)
 
 function fillHeart() {
-  heartFill.value = !heartFill.value;
+  heartFill.value = !heartFill.value
 }
 
 onMounted(() => {
-  const cards = document.querySelectorAll(".card");
+  const cards = document.querySelectorAll('.card')
 
   cards.forEach((card) => {
-    card.addEventListener("mousemove", (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`;
-      card.style.setProperty("background", gradient);
-    });
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      const gradient = `radial-gradient(circle at ${x}px ${y}px, hsla(0, 0%, 100%, 5%) 0%, hsla(0, 0%, 100%, 2%) 80%)`
+      card.style.setProperty('background', gradient)
+    })
 
-    card.addEventListener("mouseleave", () => {
-      card.style.setProperty("background", "hsla(0,0%,100%,2%)");
-    });
-  });
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('background', 'hsla(0,0%,100%,2%)')
+    })
+  })
 
-  const entrance = anime.timeline({});
+  const entrance = anime.timeline({})
   entrance
     .add(
       {
         delay: anime.stagger(100),
         duration: 500,
-        easing: "easeOutBack",
+        easing: 'easeOutBack',
         opacity: [0, 1],
         scale: [0.95, 1],
-        targets: ".leftbar-headshot",
-        transformOrigin: "center",
-        translateY: ["1rem", "0"],
+        targets: '.leftbar-headshot',
+        transformOrigin: 'center',
+        translateY: ['1rem', '0'],
       },
       0,
     )
@@ -120,29 +110,29 @@ onMounted(() => {
       {
         delay: anime.stagger(100),
         duration: 500,
-        easing: "easeOutBack",
+        easing: 'easeOutBack',
         opacity: [0, 1],
         scale: [0.95, 1],
-        targets: ".pill",
-        transformOrigin: "center",
-        translateY: ["1rem", "0"],
+        targets: '.pill',
+        transformOrigin: 'center',
+        translateY: ['1rem', '0'],
       },
       0,
     )
     .add({
       delay: anime.stagger(100),
       duration: 500,
-      easing: "easeOutBack",
+      easing: 'easeOutBack',
       opacity: [0, 1],
       scale: [0.95, 1],
-      targets: ".card, .anime-entry",
-      transformOrigin: "center",
-      translateY: ["3rem", "0"],
-    });
-});
+      targets: '.card, .anime-entry',
+      transformOrigin: 'center',
+      translateY: ['3rem', '0'],
+    })
+})
 </script>
 
-<style  scoped>
+<style scoped>
 @reference "tailwindcss";
 .social {
   @apply relative col-span-1 row-span-1 aspect-square shrink-0 overflow-hidden rounded-lg border border-white/5 bg-white/[2%];

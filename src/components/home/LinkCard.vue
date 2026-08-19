@@ -6,12 +6,7 @@
   >
     <div class="flex h-8 w-8 items-center justify-center">
       <img v-if="logo" class="h-8 w-8" :src="urls[logo]" alt="logo" />
-      <fa
-        v-if="brand"
-        alt="link icon"
-        :icon="['fab', brand]"
-        :class="['h-6 w-6', color]"
-      />
+      <fa v-if="brand" alt="link icon" :icon="['fab', brand]" :class="['h-6 w-6', color]" />
     </div>
     <span>{{ title }}</span>
     <img
@@ -22,22 +17,19 @@
   </a>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const props = defineProps({
   brand: String,
   color: String,
   link: String,
   logo: String,
   title: String,
-});
+})
 
 const urls = {
-  foursight: new URL(
-    "@/assets/images/foursight.png",
-    import.meta.url,
-  ).toString(),
-  owensans: new URL("@/assets/images/owensans.png", import.meta.url).toString(),
-  primer: new URL("@/assets/images/primer.png", import.meta.url).toString(),
-  spotify: new URL("@/assets/svg/spotify.svg", import.meta.url).toString(),
-};
+  foursight: new URL('@/assets/images/foursight.png', import.meta.url).toString(),
+  owensans: new URL('@/assets/images/owensans.png', import.meta.url).toString(),
+  primer: new URL('@/assets/images/primer.png', import.meta.url).toString(),
+  spotify: new URL('@/assets/svg/spotify.svg', import.meta.url).toString(),
+}
 </script>

@@ -1,24 +1,12 @@
 <template>
-  <div
-    class="flex h-screen w-full flex-col items-center justify-between p-10 select-none lg:p-0"
-  >
-    <img
-      src="@/assets/svg/psider.svg"
-      alt="logo"
-      class="anime-entry h-16 w-16 select-none"
-    />
+  <div class="flex h-screen w-full flex-col items-center justify-between p-10 select-none lg:p-0">
+    <img src="@/assets/svg/psider.svg" alt="logo" class="anime-entry h-16 w-16 select-none" />
     <div class="flex w-screen max-w-xs flex-col">
-      <h1 class="px-8 text-center text-2xl font-semibold text-white">
-        Prove you are human
-      </h1>
+      <h1 class="px-8 text-center text-2xl font-semibold text-white">Prove you are human</h1>
       <div class="anime-entry relative cursor-pointer px-8 py-4">
         <div class="absolute bottom-2 left-4 z-50 h-32 w-32" @click="cut"></div>
         <div class="relative">
-          <img
-            class="pointer-events-none"
-            src="@/assets/images/paper.png"
-            alt="paper"
-          />
+          <img class="pointer-events-none" src="@/assets/images/paper.png" alt="paper" />
           <img
             class="corner pointer-events-none absolute inset-0"
             src="@/assets/images/corner.png"
@@ -55,71 +43,71 @@
   </div>
 </template>
 
-<script setup>
-import "@/assets/blog.css";
-import anime from "animejs";
-import { onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+<script setup lang="ts">
+import '@/assets/blog.css'
+import anime from 'animejs'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-import Button from "@/components/Button.vue";
-import { useStore } from "@/store/store";
+import Button from '@/components/Button.vue'
+import { useStore } from '@/store/store'
 
-const store = useStore();
-const route = useRoute();
-const router = useRouter();
-const cutStatus = ref(false);
+const store = useStore()
+const route = useRoute()
+const router = useRouter()
+const cutStatus = ref(false)
 
 function cut() {
-  if (cutStatus.value) return;
+  if (cutStatus.value) return
   anime({
     duration: 100,
     opacity: [1, 0],
-    targets: ".dottedLine",
-  });
+    targets: '.dottedLine',
+  })
   anime({
     duration: 500,
-    easing: "easeInOutQuad",
-    rotate: "-3deg",
-    targets: ".corner",
-    translateX: "-10px",
-    translateY: "6px",
-  });
-  const status = document.querySelector("p.status");
-  status.innerHTML = `Now we're both cutting corners, and you know why the website works best on desktop.`;
-  const h1 = document.querySelector("h1");
-  h1.innerHTML = `You're human.`;
+    easing: 'easeInOutQuad',
+    rotate: '-3deg',
+    targets: '.corner',
+    translateX: '-10px',
+    translateY: '6px',
+  })
+  const status = document.querySelector('p.status')
+  status.innerHTML = `Now we're both cutting corners, and you know why the website works best on desktop.`
+  const h1 = document.querySelector('h1')
+  h1.innerHTML = `You're human.`
   anime({
     delay: anime.stagger(100, { start: 500 }),
     duration: 500,
-    easing: "easeOutBack",
+    easing: 'easeOutBack',
     opacity: [0, 1],
     scale: [0.95, 1],
-    targets: "p.status, h1, button",
-    transformOrigin: "center",
-    translateY: ["1rem", "0"],
-  });
-  cutStatus.value = true;
+    targets: 'p.status, h1, button',
+    transformOrigin: 'center',
+    translateY: ['1rem', '0'],
+  })
+  cutStatus.value = true
 }
 
 function verify() {
-  store.cutCorners = true;
-  router.replace(route.query.p);
+  store.cutCorners = true
+  router.replace(route.query.p)
 }
 onMounted(async () => {
   anime({
     delay: anime.stagger(100),
     duration: 500,
-    easing: "easeOutBack",
+    easing: 'easeOutBack',
     opacity: [0, 1],
     scale: [0.95, 1],
-    targets: [".anime-entry, h1, h2, h3, p, span"],
-    transformOrigin: "center",
-    translateY: ["1rem", "0"],
-  });
-});
+    targets: ['.anime-entry, h1, h2, h3, p, span'],
+    transformOrigin: 'center',
+    translateY: ['1rem', '0'],
+  })
+})
 </script>
 
-<style  scoped>
+<style scoped>
 .dottedLine {
   left: -30px;
   bottom: 44.5px;

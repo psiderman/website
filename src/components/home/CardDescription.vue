@@ -8,7 +8,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const props = defineProps({
   description: String,
   flex: {
@@ -17,15 +17,12 @@ const props = defineProps({
   },
   icon: String,
   title: String,
-});
+})
 
 const urls = {
-  backpack: new URL(
-    "@/assets/duotone/backpack.svg",
-    import.meta.url,
-  ).toString(),
-  gaming: new URL("@/assets/duotone/gaming.svg", import.meta.url).toString(),
-  now: new URL("@/assets/duotone/now.svg", import.meta.url).toString(),
-  work: new URL("@/assets/duotone/work.svg", import.meta.url).toString(),
-};
+  backpack: new URL('@/assets/duotone/backpack.svg', import.meta.url).toString(),
+  gaming: new URL('@/assets/duotone/gaming.svg', import.meta.url).toString(),
+  now: new URL('@/assets/duotone/now.svg', import.meta.url).toString(),
+  work: new URL('@/assets/duotone/work.svg', import.meta.url).toString(),
+}
 </script>

@@ -20,11 +20,11 @@
   </div>
 </template>
 
-<script setup>
-import Description from "./CardDescription.vue";
+<script setup lang="ts">
+import Description from './CardDescription.vue'
 </script>
 
-<style  scoped>
+<style scoped>
 .nograyscale {
   filter: grayscale(0) !important;
 }

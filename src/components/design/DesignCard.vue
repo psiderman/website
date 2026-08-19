@@ -12,17 +12,17 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   title: String,
   year: String,
-});
+})
 </script>
 
-<style  scoped>
+<style scoped>
 @reference "tailwindcss";
 .design-card::before {
-  content: "";
+  content: '';
   @apply absolute -bottom-16 h-48 w-full bg-gradient-to-b from-transparent to-black;
 }
 

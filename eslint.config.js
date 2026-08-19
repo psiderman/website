@@ -1,5 +1,5 @@
 import js from '@eslint/js'
-import vueI18n from '@intlify/eslint-plugin-vue-i18n'
+// import vueI18n from '@intlify/eslint-plugin-vue-i18n'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import perfectionist from 'eslint-plugin-perfectionist'
@@ -59,7 +59,7 @@ export default defineConfigWithVueTs(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...vue.configs['flat/strongly-recommended'],
-  ...vueI18n.configs['flat/recommended'],
+  // ...vueI18n.configs['flat/recommended'],
   vueTsConfigs.recommended,
 
   /*
@@ -83,13 +83,13 @@ export default defineConfigWithVueTs(
        * Console / debugger
        */
 
-      '@intlify/vue-i18n/no-raw-text': [
+      /* '@intlify/vue-i18n/no-raw-text': [
         'warn',
         {
           ignorePattern: '^[-#:()&]+$',
           ignoreText: ['...'],
         },
-      ],
+      ], */
 
       '@typescript-eslint/consistent-type-imports': [
         'error',
@@ -223,10 +223,10 @@ export default defineConfigWithVueTs(
     },
 
     settings: {
-      'vue-i18n': {
+      /* 'vue-i18n': {
         localeDir: './src/locales/*.{json,json5,yaml,yml}',
         messageSyntaxVersion: '^9.0.0',
-      },
+      }, */
     },
   },
 

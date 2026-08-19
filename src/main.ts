@@ -1,0 +1,52 @@
+import * as Sentry from '@sentry/vue'
+import { createPinia } from 'pinia'
+import { createApp } from 'vue'
+
+import './style.css'
+import App from './App.vue'
+import router from './router'
+
+const app = createApp(App)
+const pinia = createPinia()
+
+// Initialize Sentry
+if (import.meta.env.PROD && ['psiderman.com'].includes(window.location.hostname)) {
+  Sentry.init({
+    app,
+    // Only send errors in production
+    beforeSend(event) {
+      if (import.meta.env.DEV) {
+        return null
+      }
+      return event
+    },
+    dsn: import.meta.env.VITE_SENTRY_DSN as string,
+    // Logs
+    enableLogs: true,
+    // Environment
+    environment: import.meta.env.MODE,
+    ignoreErrors: [
+      "Unexpected token '<'",
+      'loading chunk',
+      'Failed to fetch dynamically imported module',
+      'Unable to preload CSS',
+      'AbortError: Lock broken',
+    ],
+    integrations: [Sentry.browserTracingIntegration({ router }), Sentry.replayIntegration()],
+    replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+    // Session Replay
+    replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+    // Setting this option to true will send default PII data to Sentry.
+    // For example, automatic IP address collection on events
+    sendDefaultPii: true,
+    // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
+    tracePropagationTargets: ['localhost', /^https:\/\/psiderman\.com\/api/],
+    // Tracing
+    tracesSampleRate: 1.0, // Capture 100% of the transactions
+  })
+}
+
+app.use(pinia)
+app.use(router)
+
+app.mount('#app')
