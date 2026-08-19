@@ -75,6 +75,20 @@
 }
 @font-face {
   font-family: 'PP Neue Montreal';
+  src: url('./assets/pp/PPNeueMontreal-Regular.woff2') format('woff2');
+  font-weight: 550;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('./assets/pp/PPNeueMontreal-Italic.woff2') format('woff2');
+  font-weight: 550;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Montreal';
   src: url('./assets/pp/PPNeueMontreal-Semibold.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
@@ -170,7 +184,7 @@
   --color-surface-primary: var(--color-light);
   --color-surface-secondary: var(--color-gray-100);
   --color-surface-tertiary: var(--color-gray-200);
-  --color-surface-inverted: var(--color-cyan-950);
+  --color-surface-inverted: var(--color-gray-950);
   --color-surface-inverted-secondary: var(--color-gray-800);
 
   --color-text-primary: var(--color-gray-800);
@@ -214,10 +228,10 @@
     monospace;
 
   /* weights */
-  --font-weight-normal: 399;
-  --font-weight-medium: 549;
-  --font-weight-semibold: 599;
-  --font-weight-bold: 699;
+  --font-weight-normal: 400;
+  --font-weight-medium: 550;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   /* text sizes */
   --text-*: initial;
@@ -244,65 +258,10 @@
   --tracking-21: -0.015em;
   --tracking-33: -0.025em;
   --tracking-42: -0.03em;
-}
 
-@layer base {
-  input[type='number']::-webkit-inner-spin-button,
-  input[type='number']::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-}
-
-@layer components {
-  /* text styles */
-  .text-ui {
-    @apply font-sans;
-    @apply font-medium;
-    @apply tracking-17 leading-17;
-  }
-  .text-ui-small {
-    @apply font-sans;
-    @apply font-medium;
-    @apply tracking-13 leading-13;
-  }
-  .text-display {
-    @apply font-sans-alt;
-    @apply font-semibold;
-    @apply tracking-42 leading-42;
-  }
-  .text-h1 {
-    @apply font-sans-alt;
-    @apply font-semibold;
-    @apply tracking-33 leading-33;
-  }
-  .text-h2 {
-    @apply font-sans-alt;
-    @apply font-semibold;
-    @apply tracking-21 leading-21;
-  }
-  .text-p {
-    @apply font-serif;
-    @apply font-normal;
-    @apply tracking-17 leading-17;
-  }
-  .text-p-small {
-    @apply font-serif;
-    @apply font-normal;
-    @apply tracking-13 leading-13;
-  }
-  .text-mono {
-    @apply font-mono;
-    @apply font-normal;
-    @apply tracking-13 leading-13;
-  }
-}
-
-:root {
-  @apply bg-background text-text-primary;
-  @apply font-sans;
-  @apply select-none;
-  touch-action: manipulation;
+  /* sizing */
+  --spacing-0.75: 0.1875rem;
+  --spacing-container: 1440px;
 
   /* primitive colors */
   --color-dark: oklch(0.118 0.021 216);
@@ -528,6 +487,65 @@
   --color-rose-800: oklch(0.455 0.1713 13.7);
   --color-rose-900: oklch(0.41 0.1502 10.3);
   --color-rose-950: oklch(0.271 0.1009 12.1);
+}
+
+@layer base {
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@layer components {
+  /* text styles */
+  .text-ui {
+    @apply font-sans;
+    @apply font-medium;
+    @apply tracking-17 leading-17;
+  }
+  .text-ui-small {
+    @apply font-sans;
+    @apply font-medium;
+    @apply tracking-13 leading-13;
+  }
+  .text-display {
+    @apply font-sans-alt;
+    @apply font-semibold;
+    @apply tracking-42 leading-42;
+  }
+  .text-h1 {
+    @apply font-sans-alt;
+    @apply font-semibold;
+    @apply tracking-33 leading-33;
+  }
+  .text-h2 {
+    @apply font-sans-alt;
+    @apply font-semibold;
+    @apply tracking-21 leading-21;
+  }
+  .text-p {
+    @apply font-serif;
+    @apply font-normal;
+    @apply tracking-17 leading-17;
+  }
+  .text-p-small {
+    @apply font-serif;
+    @apply font-normal;
+    @apply tracking-13 leading-13;
+  }
+  .text-mono {
+    @apply font-mono;
+    @apply font-normal;
+    @apply tracking-13 leading-13;
+  }
+}
+
+:root {
+  @apply bg-background text-text-primary;
+  @apply font-sans font-normal;
+  @apply select-none;
+  touch-action: manipulation;
 
   /* primitive typography */
   --text-size-11: 0.6875rem;

@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
 import { execSync } from 'node:child_process'
-import { writeFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
 import { sentryVitePlugin } from '@sentry/vite-plugin'
@@ -41,6 +39,10 @@ export default defineConfig({
     sourcemap: true,
   },
 
+  define: {
+    __COMMIT_HASH__: JSON.stringify(shortCommitHash),
+  },
+
   plugins: [
     vue(),
     VitePluginVueDevTools(),
@@ -51,24 +53,6 @@ export default defineConfig({
       project: 'website',
       telemetry: false,
     }),
-    {
-      closeBundle() {
-        const versionData = JSON.stringify({ version: shortCommitHash })
-        writeFileSync('dist/version.json', versionData)
-        console.log(`[VersionPlugin] Generated version.json with version: ${shortCommitHash}`)
-      },
-      configureServer(server) {
-        server.middlewares.use((req, res, next) => {
-          if (req.url && req.url.startsWith('/version.json')) {
-            res.setHeader('Content-Type', 'application/json')
-            res.end(JSON.stringify({ version: shortCommitHash }))
-            return
-          }
-          next()
-        })
-      },
-      name: 'generate-version-json',
-    },
   ],
 
   resolve: {

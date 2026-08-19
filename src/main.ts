@@ -1,13 +1,22 @@
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import {} from '@lucide/vue'
 import * as Sentry from '@sentry/vue'
 import { createPinia } from 'pinia'
-import { createApp } from 'vue'
 
 import './style.css'
+import { createApp } from 'vue'
+
 import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
 const pinia = createPinia()
+
+// Setup FontAwesome
+library.add(fab)
+app.component('FA', FontAwesomeIcon)
 
 // Initialize Sentry
 if (import.meta.env.PROD && ['psiderman.com'].includes(window.location.hostname)) {

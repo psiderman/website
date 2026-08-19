@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-h1">Hello World</h1>
+  <div></div>
 </template>
 
-<script lang="ts"></script>
+<script setup lang="ts"></script>
