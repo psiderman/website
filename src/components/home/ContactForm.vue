@@ -1,16 +1,18 @@
 <template>
-  <div class="flex flex-col items-center justify-center gap-6 rounded-xl bg-gray-900 p-20">
-    <div class="flex flex-col gap-0 text-center">
-      <span class="text-ui text-text-tertiary">come say hi</span>
-      <p class="text-display text-text-inverted-primary h-14">
-        hi<span class="font-sans leading-14">@</span>psiderman.com
-      </p>
-    </div>
-    <div class="contact-buttons flex flex-row gap-4">
-      <button>copy email</button>
-      <button v-for="btn in buttons" :key="btn.id" class="icon-btn">
-        <FA :icon="btn.logo" />
-      </button>
+  <div class="w-full p-20">
+    <div class="flex flex-col items-center justify-center gap-6 rounded-xl bg-gray-900 p-20">
+      <div class="flex flex-col gap-0 text-center">
+        <span class="text-ui text-text-tertiary">come say hi</span>
+        <p class="text-display text-text-inverted-primary h-14">
+          hi<span class="font-sans leading-14">@</span>psiderman.com
+        </p>
+      </div>
+      <div class="contact-buttons flex flex-row gap-4">
+        <button>copy email</button>
+        <button v-for="btn in buttons" :key="btn.id" class="icon-btn">
+          <FA :icon="btn.logo" />
+        </button>
+      </div>
     </div>
   </div>
 </template>
