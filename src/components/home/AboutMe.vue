@@ -14,7 +14,7 @@
           of endless interests,<br />neatly packed for display on my ever-evolving personal website.
         </p>
       </div>
-      <div class="flex w-full flex-row justify-between">
+      <div class="flex w-full flex-row justify-start gap-4">
         <button
           v-for="emj in emojis"
           :key="emj.id"

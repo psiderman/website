@@ -1,5 +1,5 @@
 <template>
-   <div class="max-w-container flex w-full flex-col gap-0">
+  <div class="max-w-container flex w-full flex-col gap-0">
     <AboutMe v-model:filter="activeFilter" />
     <div class="grid w-full grid-flow-row-dense grid-cols-12 gap-8 px-20">
       <CardContainer
@@ -24,6 +24,7 @@
 import { type Component, computed, ref } from 'vue'
 
 import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
+import MoviesCardContent from '@/components/cards/MoviesCardContent.vue'
 import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 import AboutMe from '@/components/home/AboutMe.vue'
@@ -53,6 +54,7 @@ const cards: Card[] = [
     content: FoursightCardContent,
     group: ['personal_finance', 'work'],
     id: 'foursight',
+    link: 'https://foursight.money/about',
     size: 'lg',
     span: 'col-span-7',
     title: 'https://foursight.money',
@@ -80,8 +82,11 @@ const cards: Card[] = [
     title: 'what have i been listening to?',
   },
   {
+    arrow: 'external',
+    content: MoviesCardContent,
     group: ['life', 'building'],
     id: 'movies',
+    link: 'https://letterboxd.com/_psiderman_/',
     size: 'md',
     span: 'col-span-4',
     title: 'what have i been watching?',

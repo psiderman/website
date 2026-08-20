@@ -13,6 +13,7 @@
     "cypress.config.*",
     "nightwatch.config.*",
     "playwright.config.*",
-    "eslint.config.*"
+    "eslint.config.*",
+    "supabase/functions/**/*.ts"
   ]
 }

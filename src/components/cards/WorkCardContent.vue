@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-border-primary bg-surface-secondary relative flex h-full w-full overflow-scroll rounded-lg border"
+    class="border-border-primary bg-surface-secondary noscrollbar relative flex h-full w-full overflow-scroll rounded-lg border"
   >
     <!-- Loading State -->
     <GenericLoader v-if="isLoading" />
@@ -73,6 +73,18 @@
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today Indicator -->
+      <div class="absolute inset-0 z-20">
+        <div class="absolute top-10 right-6 left-9 h-0.75 bg-red-500">
+          <div class="absolute left-0 -mt-0.75 -ml-1 size-2.25 rounded-full bg-red-500"></div>
+          <div
+            class="text-ui-small text-surface-secondary absolute right-0 -mt-1.75 -mr-4 h-4.25 w-8 rounded-full bg-red-500 text-center"
+          >
+            now
           </div>
         </div>
       </div>

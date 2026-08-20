@@ -34,3 +34,4 @@ dist-ssr
 .env.sentry-build-plugin
 .vercel
 .env*.local
+supabase/seed.sql

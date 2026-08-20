@@ -72,6 +72,6 @@ const handleClick = () => {
 @reference "@/style.css";
 
 div.clickable {
-  @apply origin-center cursor-pointer transition-all duration-200 hover:scale-101 hover:shadow-sm;
+  @apply origin-center cursor-pointer transition-all duration-200 hover:shadow-sm;
 }
 </style>
