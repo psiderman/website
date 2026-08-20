@@ -9,15 +9,18 @@
         :title="card.title"
         :arrow="card.arrow"
         :size="card.size"
-      />
+      >
+        <component :is="card.content" />
+      </CardContainer>
     </div>
     <ContactForm />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { type Component, computed, ref } from 'vue'
 
+import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
 import AboutMe from '@/components/home/AboutMe.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
@@ -28,6 +31,7 @@ const activeFilter = ref<EmojiGroupId | null>(null)
 
 interface Card {
   arrow?: 'external' | 'none' | 'right'
+  content: Component
   group: EmojiGroupId[]
   id: string
   size: 'lg' | 'md' | 'sm'
@@ -38,6 +42,7 @@ interface Card {
 const cards: Card[] = [
   {
     arrow: 'external',
+    content: FoursightCardContent,
     group: ['personal_finance', 'work'],
     id: 'foursight',
     size: 'lg',

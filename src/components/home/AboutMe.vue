@@ -22,7 +22,7 @@
           :class="{
             default: !activeFilter,
             active: activeFilter === emj.id,
-            inactive: activeFilter && activeFilter !== emj.id
+            inactive: activeFilter && activeFilter !== emj.id,
           }"
           @click="activeFilter = activeFilter === emj.id ? null : emj.id"
         >

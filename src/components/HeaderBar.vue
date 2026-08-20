@@ -10,8 +10,8 @@
         </div>
 
         <p class="text-text-tertiary text-ui-small text-left">
-          i'm in bengaluru, india <br />
-          and it is 11:11 right now
+          i'm in {{ current_location.city }} <br />
+          and it is {{ currentTime }} right now
         </p>
       </div>
       <div class="flex flex-row gap-4">
@@ -42,6 +42,56 @@
 
 <script setup lang="ts">
 import { Monitor, Moon, Sun } from '@lucide/vue'
+import { onMounted, onUnmounted, ref } from 'vue'
+
+import { supabase } from '../supabase'
+
+interface Location {
+  city: string
+  timezone: string
+}
+
+const current_location = ref<Location>({
+  city: 'bengaluru, india',
+  timezone: 'Asia/Kolkata',
+})
+
+const currentTime = ref('11:11')
+let timer: ReturnType<typeof setInterval>
+
+const updateTime = () => {
+  if (!current_location.value.timezone) return
+
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    hour12: false,
+    minute: '2-digit',
+    timeZone: current_location.value.timezone,
+  })
+  currentTime.value = formatter.format(new Date())
+}
+
+async function getCurrentLocation() {
+  try {
+    const { data } = await supabase.from('variables').select().eq('id', 'current_location')
+    if (data && data[0]) {
+      current_location.value.city = data[0].value.city || ''
+      current_location.value.timezone = data[0].value.time || data[0].value.timezone || ''
+      updateTime()
+    }
+  } catch (err) {
+    console.error('Error fetching location:', err)
+  }
+}
+
+onMounted(() => {
+  getCurrentLocation()
+  timer = setInterval(updateTime, 1000)
+})
+
+onUnmounted(() => {
+  clearInterval(timer)
+})
 </script>
 
 <style scoped>
