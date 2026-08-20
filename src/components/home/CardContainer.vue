@@ -1,9 +1,14 @@
 <template>
   <div
     class="outline-border-primary bg-surface-primary flex flex-col gap-2 rounded-xl p-2 outline"
-    :class="heightClass"
+    :class="[heightClass, { clickable: link }]"
+    @click="handleClick"
   >
-    <div class="bg-background h-full w-full grow overflow-hidden rounded-lg">
+    <div
+      class="relative flex h-full w-full grow items-center justify-center overflow-hidden rounded-lg"
+      :class="bgClass || 'bg-background'"
+    >
+      <img v-if="img" :src="img" :alt="title" class="h-3/5" />
       <slot />
     </div>
     <div
@@ -19,8 +24,13 @@
 import { ArrowRight, ArrowUpRight } from '@lucide/vue'
 import { computed } from 'vue'
 
+import router from '@/router'
+
 interface Props {
   arrow?: 'external' | 'none' | 'right'
+  bgClass?: string
+  img?: string
+  link?: string
   size: 'lg' | 'md' | 'sm'
   title: string
 }
@@ -46,4 +56,22 @@ const heightClass = computed(() => {
   }
   return heights[props.size]
 })
+
+const handleClick = () => {
+  if (!props.link) return
+
+  if (props.link.startsWith('http')) {
+    window.open(props.link, '_blank')
+  } else {
+    router.push(props.link)
+  }
+}
 </script>
+
+<style scoped>
+@reference "@/style.css";
+
+div.clickable {
+  @apply origin-center cursor-pointer transition-all duration-200 hover:scale-101 hover:shadow-sm;
+}
+</style>

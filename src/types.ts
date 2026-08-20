@@ -3,7 +3,7 @@ export const EMOJI_GROUPS = [
   { emoji: '💼', id: 'work' },
   { emoji: '🛠️', id: 'building' },
   { emoji: '🎵', id: 'music' },
-  { emoji: '🎮', id: 'gaming' },
+  // { emoji: '🎮', id: 'gaming' },
   { emoji: '🗺️', id: 'travel' },
   { emoji: '🌻', id: 'life' },
 ] as const

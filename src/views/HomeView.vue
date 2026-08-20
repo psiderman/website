@@ -9,8 +9,11 @@
         :title="card.title"
         :arrow="card.arrow"
         :size="card.size"
+        :bg-class="card.bgClass"
+        :img="card.imageUrl"
+        :link="card.link"
       >
-        <component :is="card.content" />
+        <component :is="card.content" v-if="card.content" />
       </CardContainer>
     </div>
     <ContactForm />
@@ -21,6 +24,7 @@
 import { type Component, computed, ref } from 'vue'
 
 import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
+import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 import AboutMe from '@/components/home/AboutMe.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
@@ -32,9 +36,12 @@ const activeFilter = ref<EmojiGroupId | null>(null)
 
 interface Card {
   arrow?: 'external' | 'none' | 'right'
-  content: Component
+  bgClass?: string
+  content?: Component
   group: EmojiGroupId[]
   id: string
+  imageUrl?: string
+  link?: string
   size: 'lg' | 'md' | 'sm'
   span: string
   title: string
@@ -80,6 +87,8 @@ const cards: Card[] = [
     title: 'what have i been watching?',
   },
   {
+    arrow: 'none',
+    content: TravelCardContent,
     group: ['travel'],
     id: 'travel',
     size: 'lg',
@@ -87,29 +96,45 @@ const cards: Card[] = [
     title: 'travel & photography',
   },
   {
+    arrow: 'external',
+    bgClass: 'bg-amber-200',
     group: ['building'],
     id: 'owensans',
+    imageUrl: new URL('@/assets/images/owensans.png', import.meta.url).toString(),
+    link: 'https://owensans.vercel.app',
     size: 'sm',
     span: 'col-span-2',
     title: 'owen sans',
   },
   {
+    arrow: 'external',
+    bgClass: 'bg-[#1ED760]',
     group: ['music'],
     id: 'playlists',
+    imageUrl: new URL('@/assets/images/spotify.png', import.meta.url).toString(),
+    link: 'https://links.psiderman.com/playlists',
     size: 'sm',
     span: 'col-span-2',
     title: 'playlists',
   },
   {
+    arrow: 'external',
+    bgClass: 'bg-orange-200',
     group: ['building'],
     id: 'milestones',
+    imageUrl: new URL('@/assets/images/milestones.png', import.meta.url).toString(),
+    link: 'https://milestones.psiderman.com',
     size: 'sm',
     span: 'col-span-2',
     title: 'milestones',
   },
   {
+    arrow: 'external',
+    bgClass: 'bg-emerald-900',
     group: ['personal_finance'],
     id: 'pf',
+    imageUrl: new URL('@/assets/images/primer.png', import.meta.url).toString(),
+    link: 'https://links.psiderman.com/primer',
     size: 'sm',
     span: 'col-span-2',
     title: 'personal finance',
@@ -123,11 +148,15 @@ const cards: Card[] = [
     title: 'art by the visitor before you',
   },
   {
-    group: ['gaming', 'life'],
-    id: 'gaming',
+    arrow: 'external',
+    bgClass: 'bg-rose-200',
+    group: ['travel', 'life'],
+    id: 'blr',
+    imageUrl: new URL('@/assets/images/blr.png', import.meta.url).toString(),
+    link: 'https://links.psiderman.com/blr',
     size: 'sm',
     span: 'col-span-2',
-    title: 'gaming',
+    title: 'blr maps',
   },
 ]
 
