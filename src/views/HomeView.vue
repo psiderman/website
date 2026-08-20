@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
     <AboutMe v-model:filter="activeFilter" />
-    <div class="grid w-full grid-cols-12 gap-8 px-20">
+    <div class="grid w-full grid-flow-row-dense grid-cols-12 gap-8 px-20">
       <CardContainer
         v-for="card in filteredCards"
         :key="card.id"
@@ -38,7 +38,7 @@ interface Card {
 const cards: Card[] = [
   {
     arrow: 'external',
-    group: ['personal_finance', 'work', 'building'],
+    group: ['personal_finance', 'work'],
     id: 'foursight',
     size: 'lg',
     span: 'col-span-7',
@@ -59,7 +59,7 @@ const cards: Card[] = [
     title: 'what am i doing now?',
   },
   {
-    group: ['music', 'building'],
+    group: ['music', 'building', 'life'],
     id: 'music',
     size: 'md',
     span: 'col-span-4',
@@ -73,7 +73,7 @@ const cards: Card[] = [
     title: 'what have i been watching?',
   },
   {
-    group: ['travel', 'life'],
+    group: ['travel'],
     id: 'travel',
     size: 'lg',
     span: 'col-span-6',
@@ -126,7 +126,12 @@ const cards: Card[] = [
 
 const filteredCards = computed(() => {
   if (!activeFilter.value) return cards
-  return cards.filter((card) => card.group.includes(activeFilter.value!))
+
+  const visible = cards.filter((card) => card.group.includes(activeFilter.value!))
+
+  const sizeWeight = { lg: 3, md: 2, sm: 1 }
+
+  return visible.sort((a, b) => sizeWeight[b.size] - sizeWeight[a.size])
 })
 </script>
 
