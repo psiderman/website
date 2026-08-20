@@ -67,6 +67,7 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
 import { createTimeline } from 'animejs'
 import { ref } from 'vue'
@@ -81,35 +82,36 @@ function spiderAnimation() {
     spiderTimeline
       // rotate to straight down
       .add(
+        '.psider-logo',
         {
           duration: 200,
           easing: 'outQuad',
           rotateZ: ['173deg', '0deg'],
-          targets: '.psider-logo',
         },
         0,
       )
       // make heart red
       .add(
+        '#spider-heart path',
         {
           duration: 0,
           stroke: '#ef4444',
-          targets: '#spider-heart path',
         },
         0,
       )
       // drop heart straight
       .add(
+        '#spider-heart',
         {
           duration: 500,
           easing: 'linear',
-          targets: '#spider-heart',
           translateY: window.innerHeight - 150 + 'px',
         },
         450,
       )
       // move rear 2 on the way down
       .add(
+        'svg #spider-R2',
         {
           d: [
             {
@@ -148,12 +150,12 @@ function spiderAnimation() {
           ],
           duration: 3000,
           easing: 'linear',
-          targets: 'svg #spider-R2',
         },
         2000,
       )
       // move rear 1 on the way down
       .add(
+        'svg #spider-R1',
         {
           d: [
             {
@@ -201,22 +203,22 @@ function spiderAnimation() {
           ],
           duration: 3000,
           easing: 'linear',
-          targets: 'svg #spider-R1',
         },
         2000,
       )
       // move spider straight down
       .add(
+        '#spider',
         {
           duration: 3000,
           easing: 'linear',
-          targets: '#spider',
           translateY: window.innerHeight - 160 + 'px',
         },
         2000,
       )
       // move front 2
       .add(
+        'svg #spider-F2',
         {
           d: [
             {
@@ -228,12 +230,12 @@ function spiderAnimation() {
           ],
           duration: 250,
           easing: 'linear',
-          targets: 'svg #spider-F2',
         },
         5000,
       )
       // move front 1
       .add(
+        'svg #spider-F1',
         {
           d: [
             {
@@ -249,12 +251,12 @@ function spiderAnimation() {
           ],
           duration: 500,
           easing: 'linear',
-          targets: 'svg #spider-F1',
         },
         5000,
       )
       // reset front 2
       .add(
+        'svg #spider-F2',
         {
           d: [
             {
@@ -266,12 +268,12 @@ function spiderAnimation() {
           ],
           duration: 500,
           easing: 'linear',
-          targets: 'svg #spider-F2',
         },
         5500,
       )
       // reset front 1
       .add(
+        'svg #spider-F1',
         {
           d: [
             {
@@ -283,23 +285,23 @@ function spiderAnimation() {
           ],
           duration: 500,
           easing: 'linear',
-          targets: 'svg #spider-F1',
         },
         5500,
       )
 
       // move heart slightly up
       .add(
+        '#spider-heart',
         {
           duration: 250,
           easing: 'linear',
-          targets: '#spider-heart',
           translateY: window.innerHeight - 160 + 'px',
         },
         5250,
       )
       // move rear 2 on the way up
       .add(
+        'svg #spider-R2',
         {
           d: [
             {
@@ -335,12 +337,12 @@ function spiderAnimation() {
           ],
           duration: 3000,
           easing: 'linear',
-          targets: 'svg #spider-R2',
         },
         6000,
       )
       // move rear 1 on the way up
       .add(
+        'svg #spider-R1',
         {
           d: [
             {
@@ -384,76 +386,75 @@ function spiderAnimation() {
           ],
           duration: 3000,
           easing: 'linear',
-          targets: 'svg #spider-R1',
         },
         6000,
       )
       // move spider back up
       .add(
+        '#spider',
         {
           duration: 3000,
           easing: 'linear',
-          targets: '#spider',
           translateY: 0,
         },
         6000,
       )
       // move heart back up
       .add(
+        '#spider-heart',
         {
           duration: 3000,
           easing: 'linear',
-          targets: '#spider-heart',
           translateY: 0,
         },
         6000,
       )
       // put spider back in og position (rotate)
       .add(
+        '.psider-logo',
         {
           duration: 1,
           easing: 'outQuad',
           rotateZ: ['0deg', '173deg'],
-          targets: '.psider-logo',
         },
         9000,
       )
       // show the silk strand
       .add(
+        '.silkStrand',
         {
           duration: 200,
           easing: 'linear',
           opacity: 1,
-          targets: '.silkStrand',
         },
         2000,
       )
       // move the silk strand down
       .add(
+        '.silkStrand',
         {
           duration: 3000,
           easing: 'linear',
-          targets: '.silkStrand',
           translateY: window.innerHeight - 160 + 'px',
         },
         2000,
       )
       // hide the silk strand
       .add(
+        '.silkStrand',
         {
           duration: 1,
           easing: 'linear',
           opacity: 0,
-          targets: '.silkStrand',
         },
         9000,
       )
       // move the silk strand up
       .add(
+        '.silkStrand',
         {
           duration: 3000,
           easing: 'linear',
-          targets: '.silkStrand',
           translateY: 0,
         },
         6000,
@@ -465,6 +466,7 @@ function spiderAnimation() {
   }
 }
 </script>
+
 
 <style scoped>
 .psider-logo {
