@@ -25,6 +25,7 @@ import { type Component, computed, ref } from 'vue'
 
 import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
 import MoviesCardContent from '@/components/cards/MoviesCardContent.vue'
+import SpotifyCardContainer from '@/components/cards/SpotifyCardContainer.vue'
 import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 import AboutMe from '@/components/home/AboutMe.vue'
@@ -75,6 +76,8 @@ const cards: Card[] = [
     title: 'what am i doing now?',
   },
   {
+    arrow: 'none',
+    content: SpotifyCardContainer,
     group: ['music', 'building', 'life'],
     id: 'music',
     size: 'md',

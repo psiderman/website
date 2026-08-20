@@ -32,6 +32,7 @@ Deno.serve(async (_req) => {
     // 2. Only process the most recent 6 movies
     const topItems = itemsRaw.slice(0, 8)
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const moviesToInsert = topItems.map((item: any) => {
       const id = item.guid?.['#text'] || item.guid
       const rawTitle = item.title
@@ -77,11 +78,13 @@ Deno.serve(async (_req) => {
     if (upsertError) throw upsertError
 
     // 4. Cleanup old movies to prevent table inflation
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const latestIds = moviesToInsert.map((m: any) => m.id)
     const { data: existingMovies } = await supabase.from('movies').select('id')
 
     if (existingMovies) {
       const idsToDelete = existingMovies
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map((m: any) => m.id)
         .filter((id: string) => !latestIds.includes(id))
 

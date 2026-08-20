@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-surface-primary flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-scroll"
+    class="bg-surface-primary noscrollbar flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-scroll"
   >
     <div
       v-for="movie in movies"

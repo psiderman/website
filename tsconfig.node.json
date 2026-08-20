@@ -14,6 +14,7 @@
     "nightwatch.config.*",
     "playwright.config.*",
     "eslint.config.*",
-    "supabase/functions/**/*.ts"
+    "supabase/functions/**/*.ts",
+    "api/**/*.ts"
   ]
 }
