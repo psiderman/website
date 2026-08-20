@@ -21,6 +21,7 @@
 import { type Component, computed, ref } from 'vue'
 
 import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
+import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 import AboutMe from '@/components/home/AboutMe.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
@@ -50,6 +51,7 @@ const cards: Card[] = [
     title: 'https://foursight.money',
   },
   {
+    content: WorkCardContent,
     group: ['work'],
     id: 'work',
     size: 'lg',
