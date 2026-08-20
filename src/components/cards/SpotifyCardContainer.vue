@@ -56,7 +56,7 @@
               <p class="truncate opacity-50">{{ now_playing.artist }}</p>
             </div>
 
-            <div class="z-10 flex h-4 items-center gap-0.5 opacity-50">
+            <div class="z-10 flex h-4 items-center gap-0.5">
               <div
                 v-for="i in 4"
                 :key="i"
