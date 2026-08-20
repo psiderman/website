@@ -10,7 +10,7 @@
 
 <style scoped>
 .maps-bg {
-  background: url('@/assets/images/maps-color.png');
+  background: url('@/assets/images/globe.png');
   @apply bg-cover;
 }
 </style>

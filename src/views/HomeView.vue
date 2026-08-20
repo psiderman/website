@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-container flex w-full flex-col gap-0">
+   <div class="max-w-container flex w-full flex-col gap-0">
     <AboutMe v-model:filter="activeFilter" />
     <div class="grid w-full grid-flow-row-dense grid-cols-12 gap-8 px-20">
       <CardContainer

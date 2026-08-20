@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import anime from 'animejs/lib/anime.es.js'
+import { createTimeline } from 'animejs'
 import { ref } from 'vue'
 
 const spiderAnimationFlag = ref(true)
@@ -77,13 +77,13 @@ function spiderAnimation() {
   if (spiderAnimationFlag.value) {
     spiderAnimationFlag.value = false
 
-    const spiderTimeline = anime.timeline({})
+    const spiderTimeline = createTimeline({})
     spiderTimeline
       // rotate to straight down
       .add(
         {
           duration: 200,
-          easing: 'easeOutQuad',
+          easing: 'outQuad',
           rotateZ: ['173deg', '0deg'],
           targets: '.psider-logo',
         },
@@ -412,7 +412,7 @@ function spiderAnimation() {
       .add(
         {
           duration: 1,
-          easing: 'easeOutQuad',
+          easing: 'outQuad',
           rotateZ: ['0deg', '173deg'],
           targets: '.psider-logo',
         },
