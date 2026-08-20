@@ -28,13 +28,7 @@
 </template>
 
 <script setup lang="ts">
-const emojis = [
-  { emoji: '🤑', id: 'pf' },
-  { emoji: '💼', id: 'work' },
-  { emoji: '🛠️', id: 'building' },
-  { emoji: '🎵', id: 'music' },
-  { emoji: '🎮', id: 'gaming' },
-  { emoji: '🗺️', id: 'travel' },
-  { emoji: '🌻', id: 'life' },
-]
+import { EMOJI_GROUPS } from '@/types'
+
+const emojis = EMOJI_GROUPS
 </script>
