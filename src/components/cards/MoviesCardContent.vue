@@ -1,31 +1,34 @@
 <template>
   <div
-    class="bg-surface-primary noscrollbar flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-scroll"
+    class="bg-surface-primary noscrollbar relative flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-scroll"
   >
-    <div
-      v-for="movie in movies"
-      :key="movie.id"
-      class="group border-border-primary relative shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border"
-      @click="handleClick(movie.link)"
-    >
-      <img :src="movie.cover" :alt="`poster for ${movie.title}`" class="h-full w-auto" />
+    <GenericLoader v-if="loading" theme="light" />
+    <template v-else>
       <div
-        class="bg-overlay text-p absolute inset-0 flex flex-col justify-between rounded-lg p-3 opacity-0 backdrop-blur-xs transition-opacity duration-200 group-hover:opacity-100"
+        v-for="movie in movies"
+        :key="movie.id"
+        class="group border-border-primary relative shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border"
+        @click="handleClick(movie.link)"
       >
-        <p class="text-text-inverted-primary line-clamp-8 text-ellipsis whitespace-pre-wrap">
-          “{{ movie.review }}”
-        </p>
-        <div v-if="movie.rating !== null" class="flex h-6 w-full flex-row gap-1">
-          <img
-            v-for="(star, index) in getStars(movie.rating)"
-            :key="index"
-            :src="star"
-            alt="star"
-            class="h-6 w-6"
-          />
+        <img :src="movie.cover" :alt="`poster for ${movie.title}`" class="h-full w-auto" />
+        <div
+          class="bg-overlay text-p absolute inset-0 flex flex-col justify-between rounded-lg p-3 opacity-0 backdrop-blur-xs transition-opacity duration-200 group-hover:opacity-100"
+        >
+          <p class="text-text-inverted-primary line-clamp-8 text-ellipsis whitespace-pre-wrap">
+            “{{ movie.review }}”
+          </p>
+          <div v-if="movie.rating !== null" class="flex h-6 w-full flex-row gap-1">
+            <img
+              v-for="(star, index) in getStars(movie.rating)"
+              :key="index"
+              :src="star"
+              alt="star"
+              class="h-6 w-6"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -35,6 +38,8 @@ import { onMounted, ref } from 'vue'
 import starHalf from '@/assets/svg/star-0.5.svg'
 import starFull from '@/assets/svg/star-1.svg'
 import { supabase } from '@/supabase'
+
+import GenericLoader from '../GenericLoader.vue'
 
 interface Movie {
   cover: string

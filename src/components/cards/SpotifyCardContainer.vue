@@ -1,21 +1,26 @@
 <template>
   <div ref="containerRef" class="noscrollbar relative h-full w-full overflow-scroll bg-[#121212]">
-    <div class="text-ui text-text-inverted-primary sticky top-0 z-1 bg-[#121212] p-4 font-semibold">
-      recently played
-    </div>
-    <div class="flex flex-col gap-0 pr-4 pl-2">
+    <GenericLoader v-if="isRecentLoading" theme="dark" />
+    <template v-else>
       <div
-        v-for="(t, i) in display_tracks"
-        :key="t.track_id"
-        class="text-ui-small text-text-inverted-primary hover:bg-hover-inverted active:bg-press-inverted relative flex w-full cursor-pointer flex-row gap-3 rounded-lg px-2 py-1"
-        @click="handleClick(t.song_url)"
+        class="text-ui text-text-inverted-primary sticky top-0 z-1 bg-[#121212] p-4 font-semibold"
       >
-        <p class="h-4 w-4 shrink-0 text-right tabular-nums opacity-60">{{ i + 1 }}</p>
-        <p class="grow truncate">{{ t.title }}</p>
-        <p class="w-30 shrink-0 truncate opacity-60">{{ t.artist }}</p>
-        <p class="w-8 shrink-0 text-right tabular-nums opacity-60">{{ t.duration }}</p>
+        recently played
       </div>
-    </div>
+      <div class="flex flex-col gap-0 pr-4 pl-2">
+        <div
+          v-for="(t, i) in display_tracks"
+          :key="t.track_id"
+          class="text-ui-small text-text-inverted-primary hover:bg-hover-inverted active:bg-press-inverted relative flex w-full cursor-pointer flex-row gap-3 rounded-lg px-2 py-1"
+          @click="handleClick(t.song_url)"
+        >
+          <p class="h-4 w-4 shrink-0 text-right tabular-nums opacity-60">{{ i + 1 }}</p>
+          <p class="grow truncate">{{ t.title }}</p>
+          <p class="w-30 shrink-0 truncate opacity-60">{{ t.artist }}</p>
+          <p class="w-8 shrink-0 text-right tabular-nums opacity-60">{{ t.duration }}</p>
+        </div>
+      </div>
+    </template>
 
     <Transition name="slide-up">
       <div v-if="!now_playing.is_loading" class="group sticky bottom-0 mt-auto w-full p-3.5">
@@ -46,16 +51,16 @@
               class="z-10 size-8 rounded-sm"
             />
 
-            <div class="z-10 flex grow flex-col text-left">
-              <p>{{ now_playing.title }}</p>
-              <p class="opacity-50">{{ now_playing.artist }}</p>
+            <div class="z-10 flex min-w-0 grow flex-col text-left">
+              <p class="truncate">{{ now_playing.title }}</p>
+              <p class="truncate opacity-50">{{ now_playing.artist }}</p>
             </div>
 
             <div class="z-10 flex h-4 items-center gap-0.5 opacity-50">
               <div
                 v-for="i in 4"
                 :key="i"
-                class="w-[3px] rounded-full bg-current transition-all duration-300"
+                class="bg-text-inverted-primary w-1 rounded-xs transition-all duration-300"
                 :class="[
                   now_playing.is_playing ? 'animate-waveform' : '',
                   !now_playing.is_playing ? 'h-0.75' : '',
@@ -80,6 +85,8 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { supabase } from '@/supabase'
 
+import GenericLoader from '../GenericLoader.vue'
+
 interface track {
   artist: string
   duration: number
@@ -101,6 +108,7 @@ const now_playing = ref({
 })
 
 const recently_played = ref<track[]>([])
+const isRecentLoading = ref(true)
 const containerRef = ref<HTMLElement | null>(null)
 
 const fetchNowPlaying = async () => {
@@ -146,6 +154,8 @@ const fetchRecentlyPlayed = async () => {
     }
   } catch (err) {
     console.error('Error fetching recently played:', err)
+  } finally {
+    isRecentLoading.value = false
   }
 }
 
@@ -158,7 +168,7 @@ const startPolling = () => {
     if (!document.hidden) {
       fetchNowPlaying()
     }
-  }, 15000) // Polling every 15s instead of 1s (1s will hit rate limits)
+  }, 30000) // Polling every 15s instead of 1s (1s will hit rate limits)
 }
 
 const stopPolling = () => {
