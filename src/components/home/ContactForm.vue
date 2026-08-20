@@ -35,18 +35,18 @@ const buttons = [
 ]
 </script>
 
-<style>
+<style scoped>
 @reference "@/style.css";
 
 .contact-buttons > button {
-  @apply bg-press-inverted text-text-inverted-primary text-ui flex items-center justify-center rounded-full;
-}
+  @apply bg-press-inverted text-text-inverted-primary text-ui hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted flex cursor-pointer items-center justify-center rounded-full bg-linear-0;
 
-.contact-buttons > button.icon-btn {
-  @apply size-10;
-}
+  &.icon-btn {
+    @apply size-10;
+  }
 
-.contact-buttons > button:not(.icon-btn) {
-  @apply h-10 px-6 py-2;
+  &:not(.icon-btn) {
+    @apply h-10 px-6 py-2;
+  }
 }
 </style>

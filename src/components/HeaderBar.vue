@@ -44,7 +44,7 @@
 import { Monitor, Moon, Sun } from '@lucide/vue'
 </script>
 
-<style>
+<style scoped>
 @reference "@/style.css";
 
 button.theme-toggle > div {

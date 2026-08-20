@@ -15,20 +15,62 @@
         </p>
       </div>
       <div class="flex w-full flex-row justify-between">
-        <div
+        <button
           v-for="emj in emojis"
           :key="emj.id"
-          class="bg-surface-tertiary text-ui flex size-14 items-center justify-center rounded-full"
+          class="emoji-filter"
+          :class="{
+            default: !activeFilter,
+            active: activeFilter === emj.id,
+            inactive: activeFilter && activeFilter !== emj.id
+          }"
+          @click="activeFilter = activeFilter === emj.id ? null : emj.id"
         >
-          {{ emj.emoji }}
-        </div>
+          <span>
+            {{ emj.emoji }}
+          </span>
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { EMOJI_GROUPS } from '@/types'
+import { EMOJI_GROUPS, type EmojiGroupId } from '@/types'
+
+const activeFilter = defineModel<EmojiGroupId | null>('filter')
 
 const emojis = EMOJI_GROUPS
 </script>
+
+<style scoped>
+@reference "@/style.css";
+
+.emoji-filter {
+  @apply text-ui flex size-14 cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-all;
+
+  &.default {
+    @apply bg-surface-tertiary hover:from-hover hover:to-hover active:from-press active:to-press;
+  }
+
+  &.active {
+    @apply bg-surface-inverted hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted;
+  }
+
+  &.inactive {
+    @apply bg-surface-secondary hover:from-hover hover:to-hover active:from-press active:to-press;
+
+    span {
+      @apply opacity-50 mix-blend-luminosity;
+    }
+
+    &:hover span {
+      @apply opacity-75;
+    }
+
+    &:active span {
+      @apply opacity-100 mix-blend-normal;
+    }
+  }
+}
+</style>
