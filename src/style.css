@@ -560,7 +560,7 @@ input,
 button,
 a,
 [role='button'] {
-  @apply focus-visible:outline-surface-inverted focus-visible:outline-2 focus-visible:outline-offset-2;
+  @apply focus-visible:outline-surface-inverted text-left focus-visible:outline-2 focus-visible:outline-offset-2;
   @apply underline-offset-1;
   touch-action: manipulation;
 }

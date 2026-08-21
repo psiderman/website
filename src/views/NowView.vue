@@ -23,7 +23,8 @@
           <!-- Render images at the top -->
           <div
             v-if="images && images.length > 0"
-            class="mx-auto -mt-10 grid grow grid-cols-4 gap-4"
+            class="mx-auto -mt-10 grid grow gap-4"
+            :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
           >
             <div
               v-for="img in images"

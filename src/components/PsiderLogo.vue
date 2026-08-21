@@ -67,7 +67,6 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { createTimeline } from 'animejs'
 import { ref } from 'vue'
@@ -466,7 +465,6 @@ function spiderAnimation() {
   }
 }
 </script>
-
 
 <style scoped>
 .psider-logo {

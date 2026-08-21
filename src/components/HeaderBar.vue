@@ -31,7 +31,7 @@
         <button
           class="bg-surface-inverted text-text-inverted-primary text-ui rounded-full px-6 py-2"
         >
-          Log <in>  </in>
+          Log in
         </button>
       </div>
     </div>

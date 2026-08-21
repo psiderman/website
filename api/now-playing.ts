@@ -13,17 +13,17 @@ export async function getDominantColorHex(imageUrl: string) {
 
     // Get semantic color swatches
     const swatches = await getSwatches(buffer)
-    
+
     // Attempt to get the Vibrant color, fallback to other options if it doesn't exist
     const targetSwatch = swatches.Vibrant || swatches.LightVibrant || swatches.DarkVibrant
-    
+
     if (!targetSwatch) {
       // Fallback to the first available swatch if no vibrant swatches exist
       const firstAvailable = Object.values(swatches).find(Boolean)
       if (firstAvailable) return firstAvailable.color.hex()
       throw new Error('Failed to extract colors from image')
     }
-    
+
     return targetSwatch.color.hex()
   } catch (err: unknown) {
     if (err instanceof Error) console.error('Color extraction failed:', err.message)
@@ -33,6 +33,11 @@ export async function getDominantColorHex(imageUrl: string) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function handler(req: any, res: any) {
+  const origin = req.headers.origin || req.headers.referer || ''
+  if (origin && !origin.includes('psiderman.com') && !origin.includes('localhost')) {
+    return res.status(403).json({ error: 'Forbidden' })
+  }
+
   if (!client_id || !client_secret || !refresh_token) {
     return res.status(500).json({ error: 'Missing Spotify credentials' })
   }
@@ -100,6 +105,7 @@ export default async function handler(req: any, res: any) {
       albumImageUrl,
       artist: song.item.artists[0].name,
       duration: song.item.duration_ms,
+      explicit: song.item.explicit,
       isPlaying: song.is_playing,
       songUrl: song.item.external_urls.spotify,
       title: song.item.name,

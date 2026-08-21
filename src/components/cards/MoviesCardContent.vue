@@ -45,7 +45,6 @@ import { onMounted, onUnmounted, ref } from 'vue'
 
 import starHalf from '@/assets/svg/star-0.5.svg'
 import starFull from '@/assets/svg/star-1.svg'
-import { supabase } from '@/supabase'
 
 import GenericLoader from '../GenericLoader.vue'
 
@@ -71,14 +70,9 @@ function getStars(rating: null | number) {
 
 const { data: movies, isLoading: loading } = useQuery({
   queryFn: async () => {
-    const { data, error } = await supabase
-      .from('movies')
-      .select('*')
-      .order('watched_date', { ascending: false })
-      .limit(8)
-
-    if (error) throw error
-    return data as Movie[]
+    const res = await fetch('/api/movies')
+    if (!res.ok) throw new Error('Failed to fetch movies')
+    return (await res.json()) as Movie[]
   },
   queryKey: ['movies'],
 })

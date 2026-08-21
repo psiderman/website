@@ -1,7 +1,7 @@
 <template>
   <div
     ref="containerRef"
-    class="noscrollbar relative h-full w-full overflow-scroll bg-[#121212] text-left focus:outline-none"
+    class="noscrollbar relative h-full w-full overflow-scroll bg-[#121212] focus:outline-none"
     tabindex="-1"
   >
     <GenericLoader v-if="isRecentLoading" theme="dark" />
@@ -19,7 +19,14 @@
           @click="handleClick(t.song_url)"
         >
           <p class="h-4 w-4 shrink-0 text-right tabular-nums opacity-60">{{ i + 1 }}</p>
-          <p class="grow truncate">{{ t.title }}</p>
+          <div class="flex grow flex-row items-center gap-1 truncate">
+            <p class="truncate">{{ t.title }}</p>
+            <span
+              v-if="t.explicit"
+              class="bg-text-inverted-primary/80 size-3 shrink-0 rounded-sm text-center text-[8px] leading-3.5 font-bold text-[#212121]"
+              >E</span
+            >
+          </div>
           <p class="w-30 shrink-0 truncate opacity-60">{{ t.artist }}</p>
           <p class="w-8 shrink-0 text-right tabular-nums opacity-60">{{ t.duration }}</p>
         </div>
@@ -29,10 +36,10 @@
     <Transition name="slide-up">
       <div v-if="!now_playing.is_loading" class="group sticky bottom-0 mt-auto w-full p-3.5">
         <div
-          class="text-ui-small text-text-inverted-primary bg-coal/50 border-light/25 relative flex h-12 flex-row items-center justify-between gap-2 overflow-hidden rounded-l-2xl rounded-r-xl border p-3 backdrop-blur-sm transition-all duration-200"
+          class="text-ui-small text-text-inverted-primary bg-coal/50 border-light/20 relative flex h-12 flex-row items-center justify-between gap-2 overflow-hidden rounded-l-2xl rounded-r-xl border p-3 backdrop-blur-sm transition-all duration-200"
           :class="[
             now_playing.title
-              ? 'group-hover:border-light/30 group-hover:bg-coal/80 cursor-pointer'
+              ? 'group-hover:border-light/25 group-hover:bg-coal/80 cursor-pointer'
               : '',
           ]"
           @click="handleClick(now_playing.song_url)"
@@ -56,21 +63,32 @@
             />
 
             <div class="z-10 flex min-w-0 grow flex-col text-left">
-              <p class="truncate">{{ now_playing.title }}</p>
+              <div class="flex flex-row items-center gap-1">
+                <p class="truncate">{{ now_playing.title }}</p>
+                <span
+                  v-if="now_playing.explicit"
+                  class="bg-text-inverted-primary/80 size-3 rounded-sm text-center text-[8px] leading-3.5 font-bold text-[#212121]"
+                  >E</span
+                >
+              </div>
+
               <p class="truncate opacity-50">{{ now_playing.artist }}</p>
             </div>
 
-            <div class="z-10 flex h-4 items-center gap-0.5">
+            <div class="z-10 flex h-4 items-end gap-0.5">
               <div
-                v-for="i in 4"
+                v-for="i in 5"
                 :key="i"
-                class="bg-text-inverted-primary w-1 rounded-xs transition-all duration-300"
+                class="bg-text-inverted-primary w-1 rounded-xs transition-all"
                 :class="[
                   now_playing.is_playing ? 'animate-waveform' : '',
                   !now_playing.is_playing ? 'h-0.75' : '',
                 ]"
                 :style="{
-                  animationDelay: now_playing.is_playing ? `${i * -0.66}s` : '0s',
+                  animationDelay: now_playing.is_playing ? `${i * -Math.random() * 300}ms` : '0s',
+                  animationDuration: now_playing.is_playing
+                    ? `${Math.max(Math.random() * 1, 0.75)}s`
+                    : '0s',
                 }"
               ></div>
             </div>
@@ -88,13 +106,12 @@
 import { useQuery } from '@tanstack/vue-query'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-import { supabase } from '@/supabase'
-
 import GenericLoader from '../GenericLoader.vue'
 
 interface track {
   artist: string
   duration: number
+  explicit: boolean
   song_url: string
   title: string
   track_id: string
@@ -123,6 +140,7 @@ const now_playing = computed(() => {
       artist: now_playing_data.value.artist || '',
       cover: now_playing_data.value.albumImageUrl || '',
       duration: now_playing_data.value.duration || 0,
+      explicit: now_playing_data.value.explicit || false,
       is_loading: isNowPlayingLoading.value,
       is_playing: now_playing_data.value.isPlaying,
       song_url: now_playing_data.value.songUrl || '',
@@ -135,6 +153,7 @@ const now_playing = computed(() => {
     artist: '',
     cover: '',
     duration: 0,
+    explicit: false,
     is_loading: isNowPlayingLoading.value,
     is_playing: false,
     song_url: '',
@@ -147,14 +166,9 @@ const now_playing = computed(() => {
 const { data: recently_played_data, isLoading: isRecentLoading } = useQuery({
   enabled: isVisible,
   queryFn: async () => {
-    const { data, error } = await supabase
-      .from('spotify_recently_played')
-      .select('*')
-      .order('played_at', { ascending: false })
-      .limit(13)
-
-    if (error) throw error
-    return data as track[]
+    const res = await fetch('/api/recently-played')
+    if (!res.ok) throw new Error('Failed to fetch recently played tracks')
+    return (await res.json()) as track[]
   },
   queryKey: ['recently-played'],
 })
