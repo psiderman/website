@@ -2,12 +2,12 @@
   <header class="flex w-screen flex-row items-center justify-center">
     <div class="max-w-container flex w-full flex-row items-center justify-between px-10 py-5">
       <div class="flex flex-row items-center justify-center gap-2">
-        <div class="bg-coal relative size-8 overflow-hidden rounded-full">
+        <router-link to="/" class="bg-coal relative size-8 overflow-hidden rounded-full">
           <img
             src="@/assets/svg/psider.svg"
             class="absolute top-2 left-1 -my-px -ml-px scale-200"
           />
-        </div>
+        </router-link>
 
         <p class="text-text-tertiary text-ui-small text-left">
           i'm in {{ current_location.city }} <br />
@@ -29,9 +29,18 @@
           </div>
         </button>
         <button
-          class="bg-surface-inverted text-text-inverted-primary text-ui rounded-full px-6 py-2"
+          v-if="!currentUser"
+          class="bg-surface-inverted text-text-inverted-primary text-ui hover:bg-coal/90 rounded-full px-6 py-2 transition-colors"
+          @click="isAuthModalOpen = true"
         >
           Log in
+        </button>
+        <button
+          v-else
+          class="bg-surface-primary border-border-primary text-text-primary text-ui hover:bg-hover cursor-pointer rounded-full border px-6 py-2 transition-colors"
+          @click="supabase.auth.signOut()"
+        >
+          Log out
         </button>
       </div>
     </div>
@@ -42,6 +51,7 @@
 import { Monitor, Moon, Sun } from '@lucide/vue'
 import { onMounted, onUnmounted, ref } from 'vue'
 
+import { currentUser, isAuthModalOpen } from '../composables/useAuth'
 import { supabase } from '../supabase'
 
 interface Location {

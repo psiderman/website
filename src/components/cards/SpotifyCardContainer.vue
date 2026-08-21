@@ -5,7 +5,7 @@
     tabindex="-1"
   >
     <GenericLoader v-if="isRecentLoading" theme="dark" />
-    <template v-else>
+    <template v-else-if="display_tracks.length > 0">
       <div
         class="text-ui text-text-inverted-primary sticky top-0 z-1 bg-[#121212] p-4 font-semibold"
       >
@@ -32,17 +32,24 @@
         </div>
       </div>
     </template>
+    <div v-else class="flex h-full w-full flex-col items-center justify-center gap-2 bg-[#121212]">
+      <OctagonAlert :size="24" class="text-text-inverted-secondary" />
+      <div class="text-text-inverted-secondary text-ui">Error fetching data</div>
+    </div>
 
     <Transition name="slide-up">
-      <div v-if="!now_playing.is_loading" class="group sticky bottom-0 mt-auto w-full p-3.5">
+      <div
+        v-if="!now_playing.is_loading && !isRecentLoading"
+        class="group sticky bottom-0 mt-auto w-full p-3.5"
+      >
         <div
           class="text-ui-small text-text-inverted-primary bg-coal/50 border-light/20 relative flex h-12 flex-row items-center justify-between gap-2 overflow-hidden rounded-l-2xl rounded-r-xl border p-3 backdrop-blur-sm transition-all duration-200"
           :class="[
-            now_playing.title
+            now_playing.title || !currentUser
               ? 'group-hover:border-light/25 group-hover:bg-coal/80 cursor-pointer'
               : '',
           ]"
-          @click="handleClick(now_playing.song_url)"
+          @click="playerClick(now_playing.song_url)"
         >
           <!-- Color overlay -->
           <div
@@ -93,6 +100,11 @@
               ></div>
             </div>
           </template>
+          <template v-else-if="!currentUser">
+            <p class="text-text-inverted-primary grow text-left">
+              log in to see what i'm listening to right now
+            </p>
+          </template>
           <template v-else>
             <p class="grow text-left opacity-50">i'm not using spotify right now</p>
           </template>
@@ -103,12 +115,19 @@
 </template>
 
 <script setup lang="ts">
+import { OctagonAlert } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
+import { currentUser, isAuthModalOpen } from '@/composables/useAuth.ts'
+
 import GenericLoader from '../GenericLoader.vue'
 
-interface track {
+interface DisplayTrack extends Omit<Track, 'duration'> {
+  duration: string
+}
+
+interface Track {
   artist: string
   duration: number
   explicit: boolean
@@ -121,46 +140,47 @@ const containerRef = ref<HTMLElement | null>(null)
 const isVisible = ref(false)
 
 const { data: now_playing_data, isLoading: isNowPlayingLoading } = useQuery({
-  enabled: isVisible,
+  enabled: computed(() => isVisible.value && !!currentUser.value),
   queryFn: async () => {
     const res = await fetch('/api/now-playing')
-    if (res.ok) {
-      return await res.json()
-    }
-    throw new Error('Failed to fetch now playing')
+    if (!res.ok) throw new Error('Failed to fetch now playing')
+    return await res.json()
   },
   queryKey: ['now-playing'],
   refetchInterval: 30000,
   refetchOnWindowFocus: true,
 })
 
+const defaultNowPlaying = {
+  artist: '',
+  cover: '',
+  duration: 0,
+  explicit: false,
+  is_playing: false,
+  song_url: '',
+  title: '',
+  track_id: '',
+  vivid_color: '#333333',
+}
+
 const now_playing = computed(() => {
-  if (now_playing_data.value && now_playing_data.value.isPlaying !== undefined) {
-    return {
-      artist: now_playing_data.value.artist || '',
-      cover: now_playing_data.value.albumImageUrl || '',
-      duration: now_playing_data.value.duration || 0,
-      explicit: now_playing_data.value.explicit || false,
-      is_loading: isNowPlayingLoading.value,
-      is_playing: now_playing_data.value.isPlaying,
-      song_url: now_playing_data.value.songUrl || '',
-      title: now_playing_data.value.title || '',
-      track_id: '',
-      vivid_color: now_playing_data.value.vividColor || '#333333',
-    }
-  }
-  return {
-    artist: '',
-    cover: '',
-    duration: 0,
-    explicit: false,
-    is_loading: isNowPlayingLoading.value,
-    is_playing: false,
-    song_url: '',
-    title: '',
-    track_id: '',
-    vivid_color: '#333333',
-  }
+  const data = now_playing_data.value
+  const base =
+    data?.isPlaying !== undefined
+      ? {
+          artist: data.artist || '',
+          cover: data.albumImageUrl || '',
+          duration: data.duration || 0,
+          explicit: data.explicit || false,
+          is_playing: data.isPlaying,
+          song_url: data.songUrl || '',
+          title: data.title || '',
+          track_id: '',
+          vivid_color: data.vividColor || '#333333',
+        }
+      : defaultNowPlaying
+
+  return { ...base, is_loading: isNowPlayingLoading.value }
 })
 
 const { data: recently_played_data, isLoading: isRecentLoading } = useQuery({
@@ -168,7 +188,7 @@ const { data: recently_played_data, isLoading: isRecentLoading } = useQuery({
   queryFn: async () => {
     const res = await fetch('/api/recently-played')
     if (!res.ok) throw new Error('Failed to fetch recently played tracks')
-    return (await res.json()) as track[]
+    return (await res.json()) as Track[]
   },
   queryKey: ['recently-played'],
 })
@@ -177,21 +197,17 @@ let observer: IntersectionObserver | null = null
 
 onMounted(() => {
   observer = new IntersectionObserver(
-    (entries) => {
-      isVisible.value = entries[0].isIntersecting
+    ([entry]) => {
+      isVisible.value = entry.isIntersecting
     },
     { threshold: 0.1 },
   )
 
-  if (containerRef.value) {
-    observer.observe(containerRef.value)
-  }
+  if (containerRef.value) observer.observe(containerRef.value)
 })
 
 onUnmounted(() => {
-  if (observer) {
-    observer.disconnect()
-  }
+  observer?.disconnect()
 })
 
 const formatTrackDuration = (duration: number) => {
@@ -200,23 +216,32 @@ const formatTrackDuration = (duration: number) => {
   return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, '0')}`
 }
 
-const display_tracks = computed(() => {
+const display_tracks = computed<DisplayTrack[]>(() => {
   if (!recently_played_data.value) return []
-  const seen = new Set()
 
-  return recently_played_data.value
-    .filter((a) => {
-      if (seen.has(a.track_id)) return false
-      seen.add(a.track_id)
-      return true
-    })
-    .map((a) => ({
-      ...a,
-      duration: formatTrackDuration(a.duration),
-    }))
+  const seen = new Set<string>()
+  return recently_played_data.value.reduce<DisplayTrack[]>((acc, track) => {
+    if (!seen.has(track.track_id)) {
+      seen.add(track.track_id)
+      acc.push({
+        ...track,
+        duration: formatTrackDuration(track.duration),
+      })
+    }
+    return acc
+  }, [])
 })
 
 const handleClick = (link: null | string) => {
+  if (link) window.open(link, '_blank')
+}
+
+const playerClick = (link: null | string) => {
+  if (!currentUser.value) {
+    isAuthModalOpen.value = true
+    return
+  }
+
   if (link) {
     window.open(link, '_blank')
   }

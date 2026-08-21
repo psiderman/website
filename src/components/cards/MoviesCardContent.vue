@@ -9,8 +9,14 @@
     @wheel="handleInteraction"
     @scroll="handleInteraction"
   >
-    <GenericLoader v-if="loading" theme="light" />
-    <template v-else>
+    <div
+      v-if="loading"
+      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+    >
+      <GenericLoader />
+    </div>
+
+    <template v-else-if="movies">
       <div
         v-for="movie in movies"
         :key="movie.id"
@@ -36,10 +42,19 @@
         </div>
       </div>
     </template>
+
+    <div
+      v-else
+      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+    >
+      <OctagonAlert :size="24" class="text-text-tertiary" />
+      <div class="text-text-tertiary text-ui">Error fetching data</div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { OctagonAlert } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query'
 import { onMounted, onUnmounted, ref } from 'vue'
 
@@ -95,7 +110,7 @@ const handleInteraction = () => {
   if (interactionTimeout) clearTimeout(interactionTimeout)
   interactionTimeout = window.setTimeout(() => {
     isInteracting.value = false
-  }, 3000)
+  }, 4000)
 }
 
 const scrollToNext = () => {

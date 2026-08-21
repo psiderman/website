@@ -5,12 +5,15 @@
   </main>
   <GlobalFooter />
   <VueQueryDevtools />
+  <AuthModal v-model:is-open="isAuthModalOpen" />
 </template>
 
 <script setup lang="ts">
 import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
 import { RouterView } from 'vue-router'
 
+import AuthModal from './components/AuthModal.vue'
 import GlobalFooter from './components/GlobalFooter.vue'
 import GlobalHeader from './components/HeaderBar.vue'
+import { isAuthModalOpen } from './composables/useAuth'
 </script>

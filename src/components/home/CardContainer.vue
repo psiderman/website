@@ -1,6 +1,6 @@
 <template>
   <button
-    class="outline-border-primary bg-surface-primary flex flex-col gap-2 rounded-xl p-2 outline"
+    class="outline-border-primary bg-surface-primary pointer-events-auto flex flex-col gap-2 rounded-xl p-2 outline"
     :class="[heightClass, { clickable: link }]"
     @click="handleClick"
   >
@@ -71,7 +71,7 @@ const handleClick = () => {
 <style scoped>
 @reference "@/style.css";
 
-div.clickable {
-  @apply origin-center cursor-pointer transition-all duration-200 hover:shadow-sm;
+button.clickable {
+  @apply cursor-pointer transition-all duration-200 hover:shadow-sm;
 }
 </style>

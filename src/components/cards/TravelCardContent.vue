@@ -5,12 +5,17 @@
     <p class="text-h1">🚧</p>
     <p class="text-h1">making smth cool here</p>
   </div>
-  <div class="bg-overlay absolute inset-0"></div>
 </template>
 
 <style scoped>
+@reference "@/style.css";
 .maps-bg {
-  background: url('@/assets/images/globe.png');
+  background: url('@/assets/images/travel.jpeg');
   @apply bg-cover;
+}
+
+.maps-bg::before {
+  content: '';
+  @apply bg-coal/50 absolute inset-0 -z-10;
 }
 </style>

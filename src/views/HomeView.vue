@@ -27,6 +27,7 @@ import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
 import MoviesCardContent from '@/components/cards/MoviesCardContent.vue'
 import NowCardContent from '@/components/cards/NowCardContent.vue'
 import SpotifyCardContainer from '@/components/cards/SpotifyCardContainer.vue'
+import TldrawCardContent from '@/components/cards/tldrawCardContent.vue'
 import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 import AboutMe from '@/components/home/AboutMe.vue'
@@ -152,6 +153,7 @@ const cards: Card[] = [
   },
   {
     arrow: 'none',
+    content: TldrawCardContent,
     group: ['building'],
     id: 'guestbook',
     size: 'md',

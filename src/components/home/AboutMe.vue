@@ -26,11 +26,11 @@
           }"
           @click="activeFilter = activeFilter === emj.id ? null : emj.id"
         >
-          <span>
+          <span class="text-center">
             {{ emj.emoji }}
           </span>
           <div
-            class="text-mono text-text-primary bg-background outline-surface-inverted absolute -bottom-0.75 h-4 w-7 rounded-full outline-4 transition-transform duration-200 ease-in-out"
+            class="text-mono text-text-primary bg-background outline-surface-inverted absolute -bottom-0.75 h-4 w-7 rounded-full text-center outline-4 transition-transform duration-200 ease-in-out"
             :class="
               activeFilter === emj.id ? 'translate-y-0 opacity-100' : 'translate-y-0.5 opacity-0'
             "

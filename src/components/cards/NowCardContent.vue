@@ -1,11 +1,14 @@
 <template>
   <div
-    class="bg-surface-secondary relative h-full w-full overflow-hidden rounded-xl"
+    class="bg-surface-secondary relative h-full w-full overflow-hidden rounded-lg"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
     <!-- Loading State -->
-    <div v-if="isLoadingImages" class="flex h-full w-full items-center justify-center">
+    <div
+      v-if="isLoadingSlug || isLoadingImages"
+      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+    >
       <GenericLoader />
     </div>
 
@@ -31,8 +34,9 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else class="flex h-full w-full items-center justify-center">
-      <div class="text-text-tertiary text-sm">No images found.</div>
+    <div v-else class="flex h-full w-full flex-col items-center justify-center gap-2">
+      <OctagonAlert :size="24" class="text-text-tertiary" />
+      <div class="text-text-tertiary text-ui">Error fetching data</div>
     </div>
 
     <!-- Custom Side Indicator -->
@@ -58,13 +62,14 @@
 </template>
 
 <script setup lang="ts">
+import { OctagonAlert } from '@lucide/vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { useNow } from '@/composables/useNow'
 
 import GenericLoader from '../GenericLoader.vue'
 
-const { images, isLoadingImages } = useNow()
+const { images, isLoadingImages, isLoadingSlug } = useNow()
 
 const activeIndex = ref(0)
 const isHovered = ref(false)

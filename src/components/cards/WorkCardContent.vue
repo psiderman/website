@@ -6,7 +6,7 @@
     <!-- Loading State -->
     <GenericLoader v-if="isLoading" />
 
-    <template v-else>
+    <template v-else-if="careerData.length > 0">
       <!-- Gridlines -->
       <div class="absolute z-0 flex w-full flex-col gap-1.5 px-10 py-12">
         <!-- Top Gridlines -->
@@ -90,10 +90,16 @@
         </div>
       </div>
     </template>
+
+    <div v-else class="flex h-full w-full flex-col items-center justify-center gap-2">
+      <OctagonAlert :size="24" class="text-text-tertiary" />
+      <div class="text-text-tertiary text-ui">Error fetching data</div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { OctagonAlert } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query'
 import { differenceInCalendarMonths, getYear, min } from 'date-fns'
 import { computed } from 'vue'
