@@ -1,6 +1,13 @@
 <template>
   <div
-    class="bg-surface-primary noscrollbar relative flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-scroll"
+    ref="scrollContainer"
+    class="bg-surface-primary noscrollbar relative flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-x-auto scroll-smooth focus:outline-none"
+    tabindex="-1"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
+    @touchstart="handleInteraction"
+    @wheel="handleInteraction"
+    @scroll="handleInteraction"
   >
     <GenericLoader v-if="loading" theme="light" />
     <template v-else>
@@ -33,7 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import starHalf from '@/assets/svg/star-0.5.svg'
 import starFull from '@/assets/svg/star-1.svg'
@@ -61,26 +69,18 @@ function getStars(rating: null | number) {
   return stars
 }
 
-const movies = ref<Movie[]>([])
-const loading = ref(true)
-const error = ref<null | string>(null)
-
-onMounted(async () => {
-  try {
-    const { data, error: err } = await supabase
+const { data: movies, isLoading: loading } = useQuery({
+  queryFn: async () => {
+    const { data, error } = await supabase
       .from('movies')
       .select('*')
       .order('watched_date', { ascending: false })
       .limit(8)
 
-    if (err) throw err
-
-    movies.value = data
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : String(e)
-  } finally {
-    loading.value = false
-  }
+    if (error) throw error
+    return data as Movie[]
+  },
+  queryKey: ['movies'],
 })
 
 const handleClick = (link: null | string) => {
@@ -88,6 +88,58 @@ const handleClick = (link: null | string) => {
     window.open(link, '_blank')
   }
 }
+
+const scrollContainer = ref<HTMLElement | null>(null)
+const isHovered = ref(false)
+const isInteracting = ref(false)
+
+let autoPlayInterval: null | number = null
+let interactionTimeout: null | number = null
+
+const handleInteraction = () => {
+  isInteracting.value = true
+  if (interactionTimeout) clearTimeout(interactionTimeout)
+  interactionTimeout = window.setTimeout(() => {
+    isInteracting.value = false
+  }, 3000)
+}
+
+const scrollToNext = () => {
+  if (!scrollContainer.value || (movies.value?.length ?? 0) <= 1) return
+
+  const { clientWidth, scrollLeft, scrollWidth } = scrollContainer.value
+
+  if (scrollLeft + clientWidth >= scrollWidth - 10) {
+    scrollContainer.value.scrollTo({ behavior: 'smooth', left: 0 })
+  } else {
+    // Scroll by an amount large enough to trigger the next snap point.
+    scrollContainer.value.scrollBy({ behavior: 'smooth', left: 150 })
+  }
+}
+
+const startAutoPlay = () => {
+  if (autoPlayInterval) clearInterval(autoPlayInterval)
+  autoPlayInterval = window.setInterval(() => {
+    if (!isHovered.value && !isInteracting.value && (movies.value?.length ?? 0) > 1) {
+      scrollToNext()
+    }
+  }, 4000)
+}
+
+const stopAutoPlay = () => {
+  if (autoPlayInterval) clearInterval(autoPlayInterval)
+}
+
+onMounted(() => {
+  setTimeout(() => {
+    startAutoPlay()
+  }, 2000)
+})
+
+onUnmounted(() => {
+  stopAutoPlay()
+  if (interactionTimeout) clearTimeout(interactionTimeout)
+})
 </script>
 
 <style scoped></style>

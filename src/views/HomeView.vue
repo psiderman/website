@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
-    <AboutMe v-model:filter="activeFilter" />
+    <AboutMe v-model:filter="activeFilter" :group-counts="groupCounts" />
     <div class="grid w-full grid-flow-row-dense grid-cols-12 gap-8 px-20">
       <CardContainer
         v-for="card in filteredCards"
@@ -179,6 +179,16 @@ const filteredCards = computed(() => {
   const sizeWeight = { lg: 3, md: 2, sm: 1 }
 
   return visible.sort((a, b) => sizeWeight[b.size] - sizeWeight[a.size])
+})
+
+const groupCounts = computed(() => {
+  const counts: Record<string, number> = {}
+  for (const card of cards) {
+    for (const g of card.group) {
+      counts[g] = (counts[g] || 0) + 1
+    }
+  }
+  return counts
 })
 </script>
 

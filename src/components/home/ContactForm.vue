@@ -39,8 +39,8 @@ const buttons = [
 @reference "@/style.css";
 
 .contact-buttons > button {
-  @apply bg-press-inverted text-text-inverted-primary text-ui hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted flex cursor-pointer items-center justify-center rounded-full bg-linear-0;
-
+  @apply bg-press-inverted text-text-inverted-primary text-ui hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted flex cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-all duration-200 ease-in-out;
+  @apply outline-surface-primary/50;
   &.icon-btn {
     @apply size-10;
   }

@@ -1,5 +1,5 @@
 <template>
-  <div
+  <button
     class="outline-border-primary bg-surface-primary flex flex-col gap-2 rounded-xl p-2 outline"
     :class="[heightClass, { clickable: link }]"
     @click="handleClick"
@@ -8,7 +8,7 @@
       class="relative flex h-full w-full grow items-center justify-center overflow-hidden rounded-lg"
       :class="bgClass || 'bg-background'"
     >
-      <img v-if="img" :src="img" :alt="title" class="h-3/5" />
+      <img v-if="img" :src="img" :alt="title" class="pointer-events-none h-3/5" />
       <slot />
     </div>
     <div
@@ -17,7 +17,7 @@
       <span>{{ title }}</span>
       <component :is="icon" v-if="icon" :size="16" />
     </div>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">

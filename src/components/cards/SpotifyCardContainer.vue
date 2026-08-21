@@ -1,5 +1,9 @@
 <template>
-  <div ref="containerRef" class="noscrollbar relative h-full w-full overflow-scroll bg-[#121212]">
+  <div
+    ref="containerRef"
+    class="noscrollbar relative h-full w-full overflow-scroll bg-[#121212] text-left focus:outline-none"
+    tabindex="-1"
+  >
     <GenericLoader v-if="isRecentLoading" theme="dark" />
     <template v-else>
       <div
@@ -81,6 +85,7 @@
 </template>
 
 <script setup lang="ts">
+import { useQuery } from '@tanstack/vue-query'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { supabase } from '@/supabase'
@@ -95,53 +100,53 @@ interface track {
   track_id: string
 }
 
-const now_playing = ref({
-  artist: '',
-  cover: '',
-  duration: 0,
-  is_loading: true,
-  is_playing: false,
-  song_url: '',
-  title: '',
-  track_id: '',
-  vivid_color: '#333333',
-})
-
-const recently_played = ref<track[]>([])
-const isRecentLoading = ref(true)
 const containerRef = ref<HTMLElement | null>(null)
+const isVisible = ref(false)
 
-const fetchNowPlaying = async () => {
-  try {
+const { data: now_playing_data, isLoading: isNowPlayingLoading } = useQuery({
+  enabled: isVisible,
+  queryFn: async () => {
     const res = await fetch('/api/now-playing')
     if (res.ok) {
-      const data = await res.json()
-      if (data.isPlaying !== undefined) {
-        now_playing.value = {
-          artist: data.artist || '',
-          cover: data.albumImageUrl || '',
-          duration: data.duration || 0,
-          is_loading: false,
-          is_playing: data.isPlaying,
-          song_url: data.songUrl || '',
-          title: data.title || '',
-          track_id: '',
-          vivid_color: data.vividColor || '#333333',
-        }
-      } else {
-        now_playing.value.is_loading = false
-      }
-    } else {
-      now_playing.value.is_loading = false
+      return await res.json()
     }
-  } catch (err) {
-    now_playing.value.is_loading = false
-    console.error('Error fetching now playing:', err)
-  }
-}
+    throw new Error('Failed to fetch now playing')
+  },
+  queryKey: ['now-playing'],
+  refetchInterval: 30000,
+  refetchOnWindowFocus: true,
+})
 
-const fetchRecentlyPlayed = async () => {
-  try {
+const now_playing = computed(() => {
+  if (now_playing_data.value && now_playing_data.value.isPlaying !== undefined) {
+    return {
+      artist: now_playing_data.value.artist || '',
+      cover: now_playing_data.value.albumImageUrl || '',
+      duration: now_playing_data.value.duration || 0,
+      is_loading: isNowPlayingLoading.value,
+      is_playing: now_playing_data.value.isPlaying,
+      song_url: now_playing_data.value.songUrl || '',
+      title: now_playing_data.value.title || '',
+      track_id: '',
+      vivid_color: now_playing_data.value.vividColor || '#333333',
+    }
+  }
+  return {
+    artist: '',
+    cover: '',
+    duration: 0,
+    is_loading: isNowPlayingLoading.value,
+    is_playing: false,
+    song_url: '',
+    title: '',
+    track_id: '',
+    vivid_color: '#333333',
+  }
+})
+
+const { data: recently_played_data, isLoading: isRecentLoading } = useQuery({
+  enabled: isVisible,
+  queryFn: async () => {
     const { data, error } = await supabase
       .from('spotify_recently_played')
       .select('*')
@@ -149,54 +154,17 @@ const fetchRecentlyPlayed = async () => {
       .limit(13)
 
     if (error) throw error
-    if (data) {
-      recently_played.value = data
-    }
-  } catch (err) {
-    console.error('Error fetching recently played:', err)
-  } finally {
-    isRecentLoading.value = false
-  }
-}
+    return data as track[]
+  },
+  queryKey: ['recently-played'],
+})
 
-let pollInterval: null | ReturnType<typeof setInterval> = null
 let observer: IntersectionObserver | null = null
-
-const startPolling = () => {
-  if (pollInterval) return
-  pollInterval = setInterval(() => {
-    if (!document.hidden) {
-      fetchNowPlaying()
-    }
-  }, 30000)
-}
-
-const stopPolling = () => {
-  if (pollInterval) {
-    clearInterval(pollInterval)
-    pollInterval = null
-  }
-}
-
-const handleVisibilityChange = () => {
-  if (document.hidden) {
-    stopPolling()
-  }
-}
-
-let isVisible = false
 
 onMounted(() => {
   observer = new IntersectionObserver(
     (entries) => {
-      isVisible = entries[0].isIntersecting
-      if (isVisible) {
-        if (recently_played.value.length === 0) fetchRecentlyPlayed()
-        fetchNowPlaying()
-        startPolling()
-      } else {
-        stopPolling()
-      }
+      isVisible.value = entries[0].isIntersecting
     },
     { threshold: 0.1 },
   )
@@ -204,23 +172,12 @@ onMounted(() => {
   if (containerRef.value) {
     observer.observe(containerRef.value)
   }
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      stopPolling()
-    } else if (isVisible) {
-      startPolling()
-      fetchNowPlaying() // instantly refresh when coming back
-    }
-  })
 })
 
 onUnmounted(() => {
-  stopPolling()
   if (observer) {
     observer.disconnect()
   }
-  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
 const formatTrackDuration = (duration: number) => {
@@ -230,9 +187,10 @@ const formatTrackDuration = (duration: number) => {
 }
 
 const display_tracks = computed(() => {
+  if (!recently_played_data.value) return []
   const seen = new Set()
 
-  return recently_played.value
+  return recently_played_data.value
     .filter((a) => {
       if (seen.has(a.track_id)) return false
       seen.add(a.track_id)

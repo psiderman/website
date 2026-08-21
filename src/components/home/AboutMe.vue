@@ -29,6 +29,14 @@
           <span>
             {{ emj.emoji }}
           </span>
+          <div
+            class="text-mono text-text-primary bg-background outline-surface-inverted absolute -bottom-0.75 h-4 w-7 rounded-full outline-4 transition-transform duration-200 ease-in-out"
+            :class="
+              activeFilter === emj.id ? 'translate-y-0 opacity-100' : 'translate-y-0.5 opacity-0'
+            "
+          >
+            {{ groupCounts[emj.id] || 0 }}
+          </div>
         </button>
       </div>
     </div>
@@ -39,6 +47,9 @@
 import { EMOJI_GROUPS, type EmojiGroupId } from '@/types'
 
 const activeFilter = defineModel<EmojiGroupId | null>('filter')
+defineProps<{
+  groupCounts: Record<string, number>
+}>()
 
 const emojis = EMOJI_GROUPS
 </script>
@@ -47,7 +58,7 @@ const emojis = EMOJI_GROUPS
 @reference "@/style.css";
 
 .emoji-filter {
-  @apply text-ui flex size-14 cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-all;
+  @apply text-ui relative flex size-14 cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-all duration-200 ease-in-out;
 
   &.default {
     @apply bg-surface-tertiary hover:from-hover hover:to-hover active:from-press active:to-press;

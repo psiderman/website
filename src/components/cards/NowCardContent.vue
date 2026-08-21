@@ -12,7 +12,7 @@
     <!-- Images Carousel -->
     <div
       v-else-if="images && images.length > 0"
-      class="relative h-full w-full overflow-hidden"
+      class="pointer-events-none relative h-full w-full overflow-hidden"
       @touchstart="handleInteraction"
       @wheel="handleInteraction"
     >
@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { useNow } from '@/composables/useNow'
 
@@ -95,7 +95,7 @@ const scrollToNext = () => {
 const startAutoPlay = () => {
   if (autoPlayInterval) clearInterval(autoPlayInterval)
   autoPlayInterval = window.setInterval(() => {
-    if (!isHovered.value && !isInteracting.value) {
+    if (!isHovered.value && !isInteracting.value && originalLength.value > 1) {
       scrollToNext()
     }
   }, 4000)
@@ -105,19 +105,11 @@ const stopAutoPlay = () => {
   if (autoPlayInterval) clearInterval(autoPlayInterval)
 }
 
-// Setup initial state when images load
-watch(
-  images,
-  (newImages) => {
-    if (newImages && newImages.length > 1) {
-      activeIndex.value = 0
-      startAutoPlay()
-    } else {
-      stopAutoPlay()
-    }
-  },
-  { immediate: true },
-)
+onMounted(() => {
+  setTimeout(() => {
+    startAutoPlay()
+  }, 2000)
+})
 
 onUnmounted(() => {
   stopAutoPlay()

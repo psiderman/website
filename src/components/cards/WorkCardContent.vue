@@ -1,6 +1,7 @@
 <template>
   <div
-    class="border-border-primary bg-surface-secondary noscrollbar relative flex h-full w-full overflow-scroll rounded-lg border"
+    class="border-border-primary bg-surface-secondary noscrollbar relative flex h-full w-full overflow-scroll rounded-lg border focus:outline-none"
+    tabindex="-1"
   >
     <!-- Loading State -->
     <GenericLoader v-if="isLoading" />
@@ -93,12 +94,23 @@
 </template>
 
 <script setup lang="ts">
+import { useQuery } from '@tanstack/vue-query'
 import { differenceInCalendarMonths, getYear, min } from 'date-fns'
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 
 import { supabase } from '@/supabase'
 
 import GenericLoader from '../GenericLoader.vue'
+
+interface WorkRow {
+  emoji: null | string
+  end_date: null | string
+  is_left: boolean
+  org_id: null | string
+  org_name: string
+  role: null | string
+  start_date: string
+}
 
 const getLogoUrl = (orgId: string) => {
   return supabase.storage.from('logos').getPublicUrl(`${orgId}.png`).data.publicUrl
@@ -116,52 +128,26 @@ const getDuration = (start: Date, end: Date) => {
   return parts.length > 0 ? parts.join(' ') : '1 mo'
 }
 
-interface WorkBlock {
-  emoji?: string
-  endDate?: Date
-  org: string
-  org_id?: string
-  role?: string
-  startDate: Date
-  track: 'left' | 'right'
-}
+const careerData = computed(() => {
+  if (!data.value) return []
+  return data.value.map((item: WorkRow) => ({
+    emoji: item.emoji ?? undefined,
+    endDate: item.end_date ? new Date(item.end_date) : undefined,
+    org: item.org_name,
+    org_id: item.org_id ?? undefined,
+    role: item.role ?? undefined,
+    startDate: new Date(item.start_date),
+    track: item.is_left ? 'left' : 'right',
+  }))
+})
 
-const careerData = ref<WorkBlock[]>([])
-const isLoading = ref(true)
-const errorMsg = ref<null | string>(null)
-
-interface WorkRow {
-  emoji: null | string
-  end_date: null | string
-  is_left: boolean
-  org_id: null | string
-  org_name: string
-  role: null | string
-  start_date: string
-}
-
-onMounted(async () => {
-  isLoading.value = true
-  errorMsg.value = null
-
-  const { data, error } = await supabase.from('work').select('*')
-
-  if (!error && data) {
-    careerData.value = data.map((item: WorkRow) => ({
-      emoji: item.emoji ?? undefined,
-      endDate: item.end_date ? new Date(item.end_date) : undefined,
-      org: item.org_name,
-      org_id: item.org_id ?? undefined,
-      role: item.role ?? undefined,
-      startDate: new Date(item.start_date),
-      track: item.is_left ? 'left' : 'right',
-    }))
-  } else if (error) {
-    console.error('Error fetching work data:', error)
-    errorMsg.value = 'Failed to load timeline.'
-  }
-
-  isLoading.value = false
+const { data, isLoading } = useQuery({
+  queryFn: async () => {
+    const { data, error } = await supabase.from('work').select('*')
+    if (error) throw error
+    return data as WorkRow[]
+  },
+  queryKey: ['work'],
 })
 
 const MONTH_HEIGHT = 7
