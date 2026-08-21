@@ -168,7 +168,7 @@ const startPolling = () => {
     if (!document.hidden) {
       fetchNowPlaying()
     }
-  }, 300000)
+  }, 30000)
 }
 
 const stopPolling = () => {
