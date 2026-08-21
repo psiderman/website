@@ -1,5 +1,4 @@
-// @ts-expect-error - dev didn't write ts defs
-import getColors from 'get-image-colors'
+import { getSwatches } from 'colorthief'
 
 const client_id = process.env.SPOTIFY_CLIENT_ID
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET
@@ -12,17 +11,20 @@ export async function getDominantColorHex(imageUrl: string) {
     const arrayBuffer = await response.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    const colors = await getColors(buffer, 'image/jpeg')
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const vividColors = colors.filter((color: any) => {
-      const [_h, s, l] = color.hsl()
-      return s > 0.15 && l > 0.15
-    })
-
-    const topColor = vividColors[0] || colors[0]
-
-    return topColor.hex()
+    // Get semantic color swatches
+    const swatches = await getSwatches(buffer)
+    
+    // Attempt to get the Vibrant color, fallback to other options if it doesn't exist
+    const targetSwatch = swatches.Vibrant || swatches.LightVibrant || swatches.DarkVibrant
+    
+    if (!targetSwatch) {
+      // Fallback to the first available swatch if no vibrant swatches exist
+      const firstAvailable = Object.values(swatches).find(Boolean)
+      if (firstAvailable) return firstAvailable.color.hex()
+      throw new Error('Failed to extract colors from image')
+    }
+    
+    return targetSwatch.color.hex()
   } catch (err: unknown) {
     if (err instanceof Error) console.error('Color extraction failed:', err.message)
     return '#000000'

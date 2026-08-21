@@ -3,7 +3,6 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {} from '@lucide/vue'
 import * as Sentry from '@sentry/vue'
-import { createPinia } from 'pinia'
 
 import './style.css'
 import { createApp } from 'vue'
@@ -12,7 +11,6 @@ import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
-const pinia = createPinia()
 
 // Setup FontAwesome
 library.add(fab)
@@ -55,7 +53,6 @@ if (import.meta.env.PROD && ['psiderman.com'].includes(window.location.hostname)
   })
 }
 
-app.use(pinia)
 app.use(router)
 
 app.mount('#app')
