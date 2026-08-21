@@ -9,25 +9,32 @@
       :class="bgClass || 'bg-background'"
     >
       <img v-if="img" :src="img" :alt="title" class="pointer-events-none h-3/5" />
-      <slot />
+      <slot :is-icon-hovered="isIconHovered" />
     </div>
     <div
       class="text-text-primary text-ui flex shrink-0 flex-row items-center justify-between px-2 py-1"
     >
       <span>{{ title }}</span>
-      <component :is="icon" v-if="icon" :size="16" />
+      <div
+        v-if="icon"
+        class="flex h-full items-center"
+        @mouseenter="isIconHovered = true"
+        @mouseleave="isIconHovered = false"
+      >
+        <component :is="icon" :size="16" />
+      </div>
     </div>
   </button>
 </template>
 
 <script setup lang="ts">
-import { ArrowRight, ArrowUpRight } from '@lucide/vue'
-import { computed } from 'vue'
+import { ArrowRight, ArrowUpRight, CircleHelp } from '@lucide/vue'
+import { computed, ref } from 'vue'
 
 import router from '@/router'
 
 interface Props {
-  arrow?: 'external' | 'none' | 'right'
+  arrow?: 'external' | 'help' | 'none' | 'right'
   bgClass?: string
   img?: string
   link?: string
@@ -42,11 +49,14 @@ const props = withDefaults(defineProps<Props>(), {
 const icon = computed(() => {
   const icons = {
     external: ArrowUpRight,
+    help: CircleHelp,
     none: null,
     right: ArrowRight,
   }
   return icons[props.arrow]
 })
+
+const isIconHovered = ref(false)
 
 const heightClass = computed(() => {
   const heights = {

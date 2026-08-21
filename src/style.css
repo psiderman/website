@@ -433,7 +433,7 @@
 
       /* Reduce bottom margin if the very next element is another paragraph */
       &:has(+ p, + ul, + ol) {
-        @apply mb-4;
+        @apply mb-6;
       }
 
       & strong {

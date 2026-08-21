@@ -5,6 +5,7 @@
       <CardContainer
         v-for="card in filteredCards"
         :key="card.id"
+        v-slot="{ isIconHovered }"
         :class="card.span"
         :title="card.title"
         :arrow="card.arrow"
@@ -13,7 +14,7 @@
         :img="card.imageUrl"
         :link="card.link"
       >
-        <component :is="card.content" v-if="card.content" />
+        <component :is="card.content" v-if="card.content" :show-help="isIconHovered" />
       </CardContainer>
     </div>
     <ContactForm />
@@ -23,11 +24,11 @@
 <script setup lang="ts">
 import { type Component, computed, ref } from 'vue'
 
+import DrawCardContent from '@/components/cards/DrawCardContent.vue'
 import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
 import MoviesCardContent from '@/components/cards/MoviesCardContent.vue'
 import NowCardContent from '@/components/cards/NowCardContent.vue'
 import SpotifyCardContainer from '@/components/cards/SpotifyCardContainer.vue'
-import TldrawCardContent from '@/components/cards/tldrawCardContent.vue'
 import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 import AboutMe from '@/components/home/AboutMe.vue'
@@ -39,7 +40,7 @@ import type { EmojiGroupId } from '@/types'
 const activeFilter = ref<EmojiGroupId | null>(null)
 
 interface Card {
-  arrow?: 'external' | 'none' | 'right'
+  arrow?: 'external' | 'help' | 'none' | 'right'
   bgClass?: string
   content?: Component
   group: EmojiGroupId[]
@@ -152,8 +153,8 @@ const cards: Card[] = [
     title: 'personal finance',
   },
   {
-    arrow: 'none',
-    content: TldrawCardContent,
+    arrow: 'help',
+    content: DrawCardContent,
     group: ['building'],
     id: 'guestbook',
     size: 'md',
