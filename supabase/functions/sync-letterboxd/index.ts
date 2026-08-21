@@ -11,7 +11,16 @@ const supabase = createClient(
 )
 
 // @ts-expect-error - Deno is a global in the Edge Runtime
-Deno.serve(async (_req) => {
+Deno.serve(async (req) => {
+  const authHeader = req.headers.get('Authorization')
+  const cronHeader = req.headers.get('x-cron-secret')
+  // @ts-expect-error - Deno is a global in the Edge Runtime
+  const secret = Deno.env.get('CRON_SECRET')
+
+  if (authHeader !== `Bearer ${secret}` && cronHeader !== secret) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
   try {
     const rssResponse = await fetch('https://letterboxd.com/_psiderman_/rss/')
     const rssText = await rssResponse.text()
