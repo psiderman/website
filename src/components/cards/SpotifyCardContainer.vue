@@ -168,7 +168,7 @@ const startPolling = () => {
     if (!document.hidden) {
       fetchNowPlaying()
     }
-  }, 30000) // Polling every 15s instead of 1s (1s will hit rate limits)
+  }, 300000)
 }
 
 const stopPolling = () => {

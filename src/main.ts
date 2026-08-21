@@ -3,6 +3,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {} from '@lucide/vue'
 import * as Sentry from '@sentry/vue'
+import { VueQueryPlugin } from '@tanstack/vue-query'
 
 import './style.css'
 import { createApp } from 'vue'
@@ -54,5 +55,6 @@ if (import.meta.env.PROD && ['psiderman.com'].includes(window.location.hostname)
 }
 
 app.use(router)
+app.use(VueQueryPlugin)
 
 app.mount('#app')

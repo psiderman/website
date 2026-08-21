@@ -9,6 +9,22 @@ const router = createRouter({
       path: '/',
     },
     {
+      children: [
+        {
+          component: () => import('../views/NowIndexView.vue'),
+          name: 'NowIndex',
+          path: '',
+        },
+        {
+          component: () => import('../views/NowPostView.vue'),
+          name: 'NowPost',
+          path: ':slug',
+        },
+      ],
+      component: () => import('../layout/NowLayout.vue'),
+      path: '/now',
+    },
+    {
       component: () => import('../views/NotFoundView.vue'),
       name: 'NotFound',
       path: '/:pathMatch(.*)*',

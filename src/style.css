@@ -1,178 +1,5 @@
 @import 'tailwindcss';
-
-/* Bricolage Grotesque */
-/* bricolage-grotesque-latin-ext-wght-normal */
-@font-face {
-  font-family: 'Bricolage Grotesque Variable';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 200 800;
-  font-stretch: 75% 100%;
-  src: url(@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-ext-standard-normal.woff2)
-    format('woff2-variations');
-  unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
-    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
-    U+A720-A7FF;
-}
-
-/* bricolage-grotesque-latin-wght-normal */
-@font-face {
-  font-family: 'Bricolage Grotesque Variable';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 200 800;
-  font-stretch: 75% 100%;
-  src: url(@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-standard-normal.woff2)
-    format('woff2-variations');
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* PP Neue Montreal */
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-Hairline.woff2') format('woff2');
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-HairlineItalic.woff2') format('woff2');
-  font-weight: 100;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-LightItalic.woff2') format('woff2');
-  font-weight: 300;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-Italic.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-Regular.woff2') format('woff2');
-  font-weight: 550;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-Italic.woff2') format('woff2');
-  font-weight: 550;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-Semibold.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-SemiboldItalic.woff2') format('woff2');
-  font-weight: 600;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-Extrabold.woff2') format('woff2');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('./assets/pp/PPNeueMontreal-ExtraboldItalic.woff2') format('woff2');
-  font-weight: 800;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* Tiny Mono */
-@font-face {
-  font-family: 'Tiny';
-  src: url('./assets/tiny/Tiny-Thin.woff2') format('woff2');
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tiny';
-  src: url('./assets/tiny/Tiny-ExtraLight.woff2') format('woff2');
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tiny';
-  src: url('./assets/tiny/Tiny-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tiny';
-  src: url('./assets/tiny/Tiny-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tiny';
-  src: url('./assets/tiny/Tiny-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tiny';
-  src: url('./assets/tiny/Tiny-SemiBold.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tiny';
-  src: url('./assets/tiny/Tiny-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Tiny';
-  src: url('./assets/tiny/Tiny-ExtraBold.woff2') format('woff2');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
+@import './fonts.css';
 
 @theme {
   /* colors */
@@ -222,7 +49,7 @@
   --font-sans-alt:
     'Bricolage Grotesque', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-  --font-serif: Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-serif: 'Source Serif Pro', Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-mono:
     'Tiny', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
@@ -539,6 +366,170 @@
     @apply font-normal;
     @apply tracking-13 leading-13;
   }
+
+  /* Markdown headers */
+  .markdown-content {
+    & h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      @apply font-sans-alt;
+      @apply my-5;
+
+      & + hr {
+        @apply mt-2;
+      }
+    }
+
+    & h1,
+    h2,
+    h3,
+    h4 {
+      @apply font-semibold;
+    }
+
+    & h1 {
+      @apply text-h1;
+      @apply tracking-33 leading-33;
+    }
+
+    & h2 {
+      @apply text-h2;
+      @apply tracking-21 leading-21;
+    }
+
+    & h3,
+    h4 {
+      @apply text-ui;
+      @apply tracking-17 leading-17;
+    }
+
+    & h4 {
+      @apply italic;
+    }
+
+    & h5,
+    h6 {
+      @apply text-ui-small uppercase;
+      @apply font-bold;
+      @apply tracking-13 leading-13;
+    }
+
+    & h6 {
+      @apply italic;
+    }
+  }
+
+  /* Markdown text */
+  .markdown-content {
+    & p {
+      @apply text-p;
+      @apply font-serif;
+      @apply font-normal;
+      @apply tracking-17 leading-17;
+      @apply mb-10;
+
+      /* Reduce bottom margin if the very next element is another paragraph */
+      &:has(+ p, + ul, + ol) {
+        @apply mb-4;
+      }
+
+      & strong {
+        @apply font-semibold;
+      }
+    }
+
+    & code {
+      @apply text-mono font-mono;
+      @apply tracking-13 leading-13;
+      @apply bg-surface-tertiary px-1 py-0.5;
+    }
+
+    & blockquote {
+      @apply pl-4;
+      @apply border-border-high-contrast border-l;
+
+      & p:has(+ blockquote) {
+        @apply mb-4;
+      }
+    }
+
+    & ul {
+      @apply list-disc pl-6;
+
+      & li:has(input[type='checkbox']) {
+        @apply -ml-6 list-none;
+      }
+
+      & input[type='checkbox'] {
+        @apply mr-1.5 shrink-0 appearance-none align-middle;
+        @apply bg-surface-primary border-border-high-contrast size-4 rounded-lg border;
+      }
+
+      & input[type='checkbox']:checked {
+        @apply border-emerald-700 bg-emerald-700;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+      }
+
+      & p {
+        @apply mb-0;
+      }
+    }
+
+    & ol {
+      @apply list-decimal pl-6;
+
+      & p {
+        @apply mb-0;
+      }
+    }
+
+    & li {
+      @apply my-1;
+    }
+
+    & pre {
+      @apply bg-surface-tertiary;
+      @apply rounded-lg p-4 px-8;
+      @apply mb-10 overflow-scroll;
+
+      & > code {
+        @apply bg-transparent p-0;
+      }
+    }
+
+    & a {
+      @apply text-blue-700 underline visited:text-purple-700;
+    }
+
+    & table {
+      @apply bg-surface-primary my-10 w-full border-collapse overflow-hidden rounded-lg text-left;
+
+      & th,
+      & td {
+        @apply px-4 py-2;
+        @apply border-border-faded not-first:border-l;
+      }
+
+      & tr {
+        @apply border-border-faded not-last:border-b;
+      }
+
+      & th {
+        @apply font-sans-alt bg-surface-secondary font-semibold;
+      }
+    }
+
+    & hr {
+      @apply border-border-high-contrast my-10;
+    }
+
+    & img {
+      @apply my-10;
+    }
+  }
 }
 
 :root {
@@ -565,7 +556,7 @@ a,
   touch-action: manipulation;
 }
 
-.noscrollbar {
+@utility noscrollbar {
   &::-webkit-scrollbar {
     display: none;
   }
