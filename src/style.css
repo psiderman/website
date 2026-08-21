@@ -370,11 +370,11 @@
   /* Markdown headers */
   .markdown-content {
     & h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
+    & h2,
+    & h3,
+    & h4,
+    & h5,
+    & h6 {
       @apply font-sans-alt;
       @apply my-5;
 
@@ -384,9 +384,9 @@
     }
 
     & h1,
-    h2,
-    h3,
-    h4 {
+    & h2,
+    & h3,
+    & h4 {
       @apply font-semibold;
     }
 
@@ -401,7 +401,7 @@
     }
 
     & h3,
-    h4 {
+    & h4 {
       @apply text-ui;
       @apply tracking-17 leading-17;
     }
@@ -411,7 +411,7 @@
     }
 
     & h5,
-    h6 {
+    & h6 {
       @apply text-ui-small uppercase;
       @apply font-bold;
       @apply tracking-13 leading-13;
@@ -441,8 +441,9 @@
       }
     }
 
-    & code {
-      @apply text-mono font-mono;
+    & code,
+    & kbd {
+      @apply text-mono rounded-lg font-mono;
       @apply tracking-13 leading-13;
       @apply bg-surface-tertiary px-1 py-0.5;
     }
@@ -528,6 +529,14 @@
 
     & img {
       @apply my-10;
+    }
+
+    & em {
+      @apply italic;
+    }
+
+    & del {
+      @apply text-text-tertiary line-through;
     }
   }
 }
