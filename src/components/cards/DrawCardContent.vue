@@ -118,7 +118,6 @@ const currentStroke = ref<number[][]>([])
 
 // Restore draft from local storage
 const draft = localStorage.getItem('guestbook_draft_strokes')
-let hasRestoredDraft = false
 if (draft) {
   try {
     const parsed = JSON.parse(draft)
@@ -127,7 +126,6 @@ if (draft) {
       localStorage.removeItem('guestbook_draft_strokes')
     } else {
       strokes.value = parsed
-      hasRestoredDraft = true
     }
   } catch (e) {
     console.error('Failed to parse guestbook draft', e)
