@@ -16,10 +16,51 @@
           />
         </router-link>
 
-        <p class="text-text-tertiary text-ui-small text-left">
+        <p
+          class="text-text-tertiary text-ui-small relative text-left select-none"
+          :class="{ 'cursor-pointer': isWishTime }"
+        >
           i'm in {{ current_location.city }} <br />
           and it is {{ currentTime }} right now
         </p>
+
+        <button
+          v-if="isButtonVisible"
+          v-tooltip="{ content: isPopping ? null : timeTooltip }"
+          class="btn icon-only relative overflow-hidden border-transparent hover:from-transparent hover:to-transparent hover:shadow-none active:from-transparent active:to-transparent"
+          :class="{
+            'bg-amber-200 dark:bg-amber-500/20': isWishTime,
+            'bg-surface-secondary': !isWishTime,
+            'translate-y-0.5 border-amber-400! shadow-none transition-transform duration-200':
+              isPressing,
+            'translate-y-0.5 border-transparent bg-transparent! shadow-none transition-transform duration-200 hover:from-transparent hover:to-transparent':
+              isPopping,
+            'popping cursor-default': isPopping,
+            jitter: isReadyToPop,
+          }"
+          @mousedown="onPressStart"
+          @mouseup="onPressEnd"
+          @mouseleave="onPressEnd"
+          @touchstart="onPressStart"
+          @touchend="onPressEnd"
+        >
+          <div
+            v-if="!isWishTime"
+            class="text-text-tertiary outline-text-tertiary flex size-4.5 scale-75 items-center justify-center rounded-sm font-mono font-semibold outline"
+          >
+            ?
+          </div>
+          <span v-else class="z-10 inline-block text-[24px] transition-transform">🤞</span>
+
+          <div
+            class="pointer-events-none absolute bottom-0 w-full bg-amber-400"
+            :class="isPopping ? 'bg-transparent' : 'transition-all ease-linear'"
+            :style="{
+              height: isPressing || isPopping ? '40px' : '0px',
+              transitionDuration: isPressing ? '5s' : '0s',
+            }"
+          ></div>
+        </button>
       </div>
 
       <!-- Right side -->
@@ -111,6 +152,7 @@
 
 <script setup lang="ts">
 import { Monitor, Moon, MousePointer2, MousePointer2Off, Sun } from '@lucide/vue'
+import { addDays, differenceInMinutes } from 'date-fns'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import { currentUser, isAuthModalOpen } from '../composables/useAuth'
@@ -136,6 +178,51 @@ const current_location = ref<Location>({
 })
 
 const currentTime = ref('11:11')
+const timeTooltip = ref('')
+
+const isWishTime = ref(false)
+const isPressing = ref(false)
+const isPopping = ref(false)
+const isButtonVisible = ref(true)
+const nextWishTimeStr = ref('')
+
+let holdTimeout: any = null
+const isReadyToPop = ref(false)
+
+const onPressStart = () => {
+  if (!isWishTime.value) return
+  isPressing.value = true
+  isPopping.value = false
+  isReadyToPop.value = false
+
+  if (holdTimeout) clearTimeout(holdTimeout)
+  holdTimeout = setTimeout(() => {
+    // 5 seconds reached, it's ready to pop when released
+    isReadyToPop.value = true
+  }, 4800)
+}
+
+const onPressEnd = () => {
+  if (!isPressing.value) return
+  isPressing.value = false
+  if (holdTimeout) clearTimeout(holdTimeout)
+
+  // Only pop if they held it for the full 5 seconds before releasing
+  if (isReadyToPop.value) {
+    isPopping.value = true
+    isReadyToPop.value = false
+
+    // Save to local storage so button vanishes for this specific matching time
+    localStorage.setItem('lastWishTime', nextWishTimeStr.value)
+
+    // After pop finishes, hide button completely
+    setTimeout(() => {
+      isPopping.value = false
+      isButtonVisible.value = false
+    }, 1000)
+  }
+}
+
 let timer: ReturnType<typeof setInterval>
 
 const updateTime = () => {
@@ -147,7 +234,53 @@ const updateTime = () => {
     minute: '2-digit',
     timeZone: current_location.value.timezone,
   })
-  currentTime.value = formatter.format(new Date())
+
+  const formatted = formatter.format(new Date())
+  currentTime.value = formatted
+
+  // Parse current hour/minute in the target timezone
+  const parts = formatted.split(':')
+  let h = parseInt(parts[0], 10)
+  const m = parseInt(parts[1], 10)
+  if (h === 24) h = 0
+
+  // Calculate the next matching HH:MM
+  let targetH = h
+  let targetM = h
+
+  if (m >= targetM) {
+    targetH = (h + 1) % 24
+    targetM = targetH
+  }
+
+  // Use date-fns to compute the difference
+  const nowMock = new Date()
+  nowMock.setHours(h, m, 0, 0)
+
+  let targetMock = new Date()
+  targetMock.setHours(targetH, targetM, 0, 0)
+
+  if (targetMock < nowMock) {
+    targetMock = addDays(targetMock, 1)
+  }
+
+  const mins = differenceInMinutes(targetMock, nowMock)
+  nextWishTimeStr.value = `${String(targetH).padStart(2, '0')}:${String(targetM).padStart(2, '0')}`
+  const lastWish = localStorage.getItem('lastWishTime')
+
+  if (lastWish === nextWishTimeStr.value) {
+    isButtonVisible.value = false
+    isWishTime.value = false
+  } else {
+    isButtonVisible.value = true
+    if (mins === 0) {
+      timeTooltip.value = 'press and hold to make a wish'
+      isWishTime.value = true
+    } else {
+      timeTooltip.value = `come back to this in ${mins} minutes`
+      isWishTime.value = false
+    }
+  }
 }
 
 async function getCurrentLocation() {
@@ -197,6 +330,45 @@ button.theme-toggle > div {
   }
   & .avatar:nth-child(5) {
     z-index: 1;
+  }
+}
+</style>
+
+<style scoped>
+.jitter {
+  animation: jitterWish 0.1s infinite;
+}
+
+@keyframes jitterWish {
+  0% {
+    transform: translate(0.5px, 0.5px) rotate(0deg);
+  }
+  25% {
+    transform: translate(-0.5px, -0.5px) rotate(-1deg);
+  }
+  50% {
+    transform: translate(-0.5px, 0.5px) rotate(1deg);
+  }
+  75% {
+    transform: translate(0.5px, -0.5px) rotate(-1deg);
+  }
+  100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+}
+
+.popping {
+  animation: popWish 1s cubic-bezier(1, -0.5, 0, 1) forwards;
+}
+
+@keyframes popWish {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(5);
+    opacity: 0;
   }
 }
 </style>
