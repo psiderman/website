@@ -1,5 +1,6 @@
 <template>
   <button
+    :data-sync="'card-' + title.toLowerCase().replace(/\s+/g, '-')"
     class="border-border-primary bg-surface-primary pointer-events-auto flex flex-col gap-2 rounded-xl border p-2"
     :class="[heightClass, { clickable: link }]"
     @click="handleClick"

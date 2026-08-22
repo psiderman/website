@@ -90,6 +90,9 @@
   --spacing-0.75: 0.1875rem;
   --spacing-container: 1440px;
 
+  /* shadows */
+  --drop-shadow-cursor: 0 0 3px rgba(0, 0, 0, 0.2);
+
   /* primitive colors */
   --color-dark: oklch(0.118 0.021 216);
   --color-light: oklch(1 0 0);

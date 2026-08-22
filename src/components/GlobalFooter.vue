@@ -1,5 +1,6 @@
 <template>
   <footer
+    data-sync="footer"
     class="text-text-inverted-secondary relative flex w-screen flex-col items-center justify-center gap-20 bg-gray-900 p-20 pb-0"
   >
     <button

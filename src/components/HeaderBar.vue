@@ -1,5 +1,8 @@
 <template>
-  <header class="flex w-screen flex-row items-center justify-center">
+  <header
+    data-sync="header"
+    class="bg-background/95 sticky top-0 z-50 flex w-screen flex-row items-center justify-center backdrop-blur-xs"
+  >
     <div class="max-w-container flex w-full flex-row items-center justify-between px-10 py-5">
       <div class="flex flex-row items-center justify-center gap-2">
         <router-link to="/" class="bg-coal relative size-8 overflow-hidden rounded-full">
@@ -15,8 +18,13 @@
         </p>
       </div>
       <div class="flex flex-row gap-4">
-        <button class="btn stroke icon-only">
-          <MousePointer2 :size="16" />
+        <button
+          class="btn stroke icon-only"
+          :class="{ 'opacity-50': !hasOtherUsersOnRoute }"
+          @click="global.allowMultiplayer.value = !global.allowMultiplayer.value"
+        >
+          <MousePointer2 v-if="global.allowMultiplayer.value" :size="16" />
+          <MousePointer2Off v-else :size="16" />
         </button>
         <button class="theme-toggle btn stroke pointer-events-none p-0.75">
           <div>
@@ -39,10 +47,12 @@
 </template>
 
 <script setup lang="ts">
-import { Monitor, Moon, MousePointer2, Sun } from '@lucide/vue'
+import { Monitor, Moon, MousePointer2, MousePointer2Off, Sun } from '@lucide/vue'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import { currentUser, isAuthModalOpen } from '../composables/useAuth'
+import { global } from '../composables/useGlobal'
+import { hasOtherUsersOnRoute } from '../composables/useLive'
 import { supabase } from '../supabase'
 
 interface Location {

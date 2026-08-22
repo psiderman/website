@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-full flex-row items-center justify-center gap-8 p-20">
+  <div data-sync="about-me" class="flex w-full flex-row items-center justify-center gap-8 p-20">
     <img
       src="@/assets/images/public.jpg"
       alt="karan sanas"
