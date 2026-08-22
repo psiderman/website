@@ -1,9 +1,11 @@
 <template>
   <div data-sync="contact-form" class="w-full p-20">
-    <div class="flex flex-col items-center justify-center gap-6 rounded-xl bg-gray-900 p-20">
+    <div
+      class="flex flex-col items-center justify-center gap-6 rounded-xl bg-gray-950 p-20 dark:bg-zinc-950"
+    >
       <div class="flex flex-col gap-0 text-center">
         <span class="text-ui text-text-tertiary">come say hi</span>
-        <p class="text-display text-text-inverted-primary h-14">
+        <p class="text-display text-light h-14">
           hi<span class="font-sans leading-14">@</span>psiderman.com
         </p>
       </div>

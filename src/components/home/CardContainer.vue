@@ -83,6 +83,6 @@ const handleClick = () => {
 @reference "@/style.css";
 
 button.clickable {
-  @apply cursor-pointer transition-all duration-200 hover:shadow-sm;
+  @apply cursor-pointer transition-colors duration-200 hover:shadow-sm;
 }
 </style>

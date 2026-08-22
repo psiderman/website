@@ -22,7 +22,7 @@
           v-for="(points, i) in backgroundStrokes.slice(0, visibleBgStrokeIndex)"
           :key="'bg' + i"
           :d="getSvgPathFromStroke(points)"
-          class="fill-pink-800"
+          class="fill-pink-800 dark:fill-pink-950"
         />
         <path
           v-if="visibleBgStrokeIndex < backgroundStrokes.length"
@@ -31,22 +31,22 @@
               backgroundStrokes[visibleBgStrokeIndex].slice(0, visibleBgPointIndex),
             )
           "
-          class="fill-pink-800"
+          class="fill-pink-800 dark:fill-pink-950"
         />
       </g>
       <path
         v-for="(points, i) in strokes"
         :key="i"
         :d="getSvgPathFromStroke(points)"
-        class="fill-coal"
+        class="fill-surface-inverted"
       />
-      <path v-if="currentStrokePath" :d="currentStrokePath" class="fill-coal" />
+      <path v-if="currentStrokePath" :d="currentStrokePath" class="fill-surface-inverted" />
     </svg>
 
     <template v-if="strokes.length > 0">
       <button
         v-if="hasUnsavedChanges"
-        class="text-text-tertiary hover:text-text-primary absolute top-0 right-0 z-20 cursor-pointer p-3 transition-colors"
+        class="text-text-tertiary dark:text-text-secondary hover:text-text-primary absolute top-0 right-0 z-20 cursor-pointer p-3 transition-colors"
         :class="{ 'animate-pulse cursor-not-allowed opacity-50': isSaving }"
         :disabled="isSaving"
         title="Save Drawing"
@@ -54,7 +54,7 @@
       >
         <CloudUpload :size="16" />
       </button>
-      <div v-else class="absolute top-0 right-0 z-20 p-3 text-green-600">
+      <div v-else class="absolute top-0 right-0 z-20 p-3 text-green-600 dark:text-green-700">
         <CloudCheck :size="16" />
       </div>
     </template>
@@ -67,22 +67,22 @@
     </div>
 
     <div
-      class="bg-coal/90 text-ui text-text-inverted-primary pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-20 backdrop-blur-xs transition-opacity duration-300"
+      class="bg-dark/90 text-ui text-light pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-20 backdrop-blur-xs transition-opacity duration-300"
       :class="showHelp ? 'opacity-100' : 'opacity-0'"
     >
       <h2 class="text-h2">leave art for others</h2>
       <div class="flex h-8 w-full flex-row items-center justify-between">
-        <p class="text-text-inverted-secondary">Click and drag to draw</p>
+        <p class="text-light/50">Click and drag to draw</p>
         <div class="keyboard-key">
           <MousePointer2 :size="16" />
         </div>
       </div>
       <div class="flex h-8 w-full flex-row items-center justify-between">
-        <p class="text-text-inverted-secondary">Reset all</p>
+        <p class="text-light/50">Reset all</p>
         <div class="keyboard-key">R</div>
       </div>
       <div class="flex h-8 w-full flex-row items-center justify-between">
-        <p class="text-text-inverted-secondary">Undo last stroke</p>
+        <p class="text-light/50">Undo last stroke</p>
         <div class="flex flex-row gap-1.5">
           <div class="keyboard-key">⌘</div>
           <div class="keyboard-key">Z</div>
@@ -387,10 +387,15 @@ onBeforeRouteLeave(() => {
 @reference "@/style.css";
 
 .drawing-board {
-  @apply border-border-faded relative h-full w-full overflow-hidden rounded-lg border;
+  @apply border-border-primary relative h-full w-full overflow-hidden rounded-lg border;
   background: url('@/assets/images/dot_grid.png');
   background-size: 2.5%;
   @apply bg-repeat;
+}
+
+.dark .drawing-board {
+  background: url('@/assets/images/dot_grid_dark.png');
+  background-size: 2.5%;
 }
 
 .canvas {

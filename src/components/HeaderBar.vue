@@ -6,7 +6,10 @@
     <div class="max-w-container flex w-full flex-row items-center justify-between px-10 py-5">
       <!-- Logo and Location -->
       <div class="flex flex-row items-center justify-center gap-2">
-        <router-link to="/" class="bg-coal relative size-8 shrink-0 overflow-hidden rounded-full">
+        <router-link
+          to="/"
+          class="bg-dark dark:bg-surface-tertiary relative size-8 shrink-0 overflow-hidden rounded-full"
+        >
           <img
             src="@/assets/svg/psider.svg"
             class="absolute top-2 left-1 -my-px -ml-px scale-200"
@@ -57,22 +60,41 @@
         <!-- Multiplayer tools -->
         <button
           class="btn stroke icon-only"
-          :class="{ 'opacity-50': !hasOtherUsersOnRoute }"
+          :class="{ 'pointer-events-none opacity-50': !hasOtherUsersOnRoute }"
+          :disabled="!hasOtherUsersOnRoute"
           @click="toggleMultiplayer()"
         >
           <MousePointer2 v-if="global.allowMultiplayer.value" :size="16" />
           <MousePointer2Off v-else :size="16" />
         </button>
-
         <!-- Theme -->
-        <button class="theme-toggle btn stroke pointer-events-none p-0.75">
-          <div>
+
+        <button class="theme-toggle btn stroke p-0.75">
+          <div
+            :class="{
+              'bg-surface-inverted text-text-inverted-primary rounded-full': theme === 'dark',
+            }"
+            class="cursor-pointer"
+            @click="setTheme('dark')"
+          >
             <Moon :size="16" />
           </div>
-          <div>
+          <div
+            :class="{
+              'bg-surface-inverted text-text-inverted-primary rounded-full': theme === 'light',
+            }"
+            class="cursor-pointer"
+            @click="setTheme('light')"
+          >
             <Sun :size="16" />
           </div>
-          <div>
+          <div
+            :class="{
+              'bg-surface-inverted text-text-inverted-primary rounded-full': theme === 'system',
+            }"
+            class="cursor-pointer"
+            @click="setTheme('system')"
+          >
             <Monitor :size="16" />
           </div>
         </button>
@@ -100,6 +122,7 @@ import {
   sortedPresenceUsers,
   toggleMultiplayer,
 } from '../composables/useLive'
+import { setTheme, theme } from '../composables/useTheme'
 import { supabase } from '../supabase'
 
 interface Location {

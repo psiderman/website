@@ -42,7 +42,7 @@
     <!-- Custom Side Indicator -->
     <div
       v-if="!isLoadingImages && originalLength > 1"
-      class="bg-overlay absolute top-1/2 left-2 flex w-4 -translate-y-1/2 flex-col items-center gap-1 rounded-full p-1 backdrop-blur-xs transition-opacity duration-1000"
+      class="bg-dark/70 absolute top-1/2 left-2 flex w-4 -translate-y-1/2 flex-col items-center gap-1 rounded-full p-1 backdrop-blur-xs transition-opacity duration-1000"
     >
       <!-- The sliding active pill -->
       <div

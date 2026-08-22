@@ -110,7 +110,7 @@ const cards: Card[] = [
   },
   {
     arrow: 'external',
-    bgClass: 'bg-amber-200',
+    bgClass: 'bg-amber-200 dark:bg-dark',
     group: ['building'],
     id: 'owensans',
     imageUrl: new URL('@/assets/images/owensans.png', import.meta.url).toString(),
@@ -121,7 +121,7 @@ const cards: Card[] = [
   },
   {
     arrow: 'external',
-    bgClass: 'bg-[#1ED760]',
+    bgClass: 'bg-[#1ED760] dark:bg-linear-0 from-dark/50 to-dark/50',
     group: ['music'],
     id: 'playlists',
     imageUrl: new URL('@/assets/images/spotify.png', import.meta.url).toString(),
@@ -132,7 +132,7 @@ const cards: Card[] = [
   },
   {
     arrow: 'external',
-    bgClass: 'bg-orange-200',
+    bgClass: 'bg-orange-200 dark:bg-amber-950',
     group: ['building'],
     id: 'milestones',
     imageUrl: new URL('@/assets/images/milestones.png', import.meta.url).toString(),
@@ -143,7 +143,7 @@ const cards: Card[] = [
   },
   {
     arrow: 'external',
-    bgClass: 'bg-emerald-900',
+    bgClass: 'bg-emerald-900 dark:bg-emerald-950',
     group: ['personal_finance'],
     id: 'pf',
     imageUrl: new URL('@/assets/images/primer.png', import.meta.url).toString(),
@@ -163,7 +163,7 @@ const cards: Card[] = [
   },
   {
     arrow: 'external',
-    bgClass: 'bg-rose-200',
+    bgClass: 'bg-rose-200 dark:bg-rose-950',
     group: ['travel', 'life'],
     id: 'blr',
     imageUrl: new URL('@/assets/images/blr.png', import.meta.url).toString(),

@@ -20,14 +20,18 @@
       <div
         v-for="movie in movies"
         :key="movie.id"
-        class="group border-border-primary relative shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border"
+        class="group border-border-primary dark:border-surface-tertiary relative shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border"
         @click="handleClick(movie.link)"
       >
-        <img :src="movie.cover" :alt="`poster for ${movie.title}`" class="h-full w-auto" />
+        <img
+          :src="movie.cover"
+          :alt="`poster for ${movie.title}`"
+          class="h-full w-auto group-hover:blur-xs"
+        />
         <div
-          class="bg-overlay text-p absolute inset-0 flex flex-col justify-between rounded-lg p-3 opacity-0 backdrop-blur-xs transition-opacity duration-200 group-hover:opacity-100"
+          class="bg-dark/70 text-p absolute inset-0 flex flex-col justify-between p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         >
-          <p class="text-text-inverted-primary line-clamp-8 text-ellipsis whitespace-pre-wrap">
+          <p class="text-light line-clamp-8 text-ellipsis whitespace-pre-wrap">
             “{{ movie.review }}”
           </p>
           <div v-if="movie.rating !== null" class="flex h-6 w-full flex-row gap-1">

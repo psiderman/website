@@ -19,6 +19,8 @@ import GlobalHeader from './components/HeaderBar.vue'
 import LiveCursors from './components/LiveCursors.vue'
 import { isAuthModalOpen } from './composables/useAuth'
 import { useLive } from './composables/useLive'
+import { initTheme } from './composables/useTheme'
 
 useLive()
+initTheme()
 </script>

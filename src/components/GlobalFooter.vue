@@ -1,10 +1,10 @@
 <template>
   <footer
     data-sync="footer"
-    class="text-text-inverted-secondary relative flex w-screen flex-col items-center justify-center gap-20 bg-gray-900 p-20 pb-0"
+    class="text-light/75 relative flex w-screen flex-col items-center justify-center gap-20 bg-gray-950 p-20 pb-0 dark:bg-zinc-950"
   >
     <button
-      class="text-mono absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl bg-gray-800 px-4 py-1.5 text-gray-100 transition-colors hover:bg-gray-700 focus:bg-gray-700 focus:outline-none"
+      class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors focus:outline-none"
       @click="handleClick(`https://github.com/psiderman/website/commit/${commit}`)"
     >
       <div class="flex size-4 items-center justify-center">
@@ -16,9 +16,9 @@
     </button>
     <div class="text-ui flex flex-col items-center justify-center gap-4">
       <div class="flex flex-row gap-3">
-        <button class="outline-surface-primary/50! rounded-full px-2">terms</button>
-        <span class="text-text-tertiary">✦</span>
-        <button class="outline-surface-primary/50! rounded-full px-2">privacy</button>
+        <button class="rounded-full px-2 outline-gray-400! dark:outline-zinc-400!">terms</button>
+        <span class="text-light/50">✦</span>
+        <button class="rounded-full px-2 outline-gray-400! dark:outline-zinc-400!">privacy</button>
       </div>
       <p>© 2026 Karan Sanas</p>
     </div>

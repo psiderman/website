@@ -58,10 +58,10 @@ const emojis = EMOJI_GROUPS
 @reference "@/style.css";
 
 .emoji-filter {
-  @apply text-ui relative flex size-14 cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-all duration-200 ease-in-out;
+  @apply text-ui relative flex size-14 cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-colors duration-200 ease-in-out;
 
   &.default {
-    @apply bg-surface-tertiary hover:from-hover hover:to-hover active:from-press active:to-press;
+    @apply bg-surface-secondary hover:from-hover hover:to-hover active:from-press active:to-press;
   }
 
   &.active {

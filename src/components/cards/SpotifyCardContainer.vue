@@ -1,21 +1,19 @@
 <template>
   <div
     ref="containerRef"
-    class="noscrollbar relative h-full w-full overflow-scroll bg-[#121212] focus:outline-none"
+    class="noscrollbar dark:bg-dark dark:border-border-primary relative h-full w-full overflow-scroll rounded-lg border border-transparent bg-[#121212] focus:outline-none"
     tabindex="-1"
   >
     <GenericLoader v-if="isRecentLoading" theme="dark" />
     <template v-else-if="display_tracks.length > 0">
-      <div
-        class="text-ui text-text-inverted-primary sticky top-0 z-1 bg-[#121212] p-4 font-semibold"
-      >
+      <div class="text-ui text-light dark:bg-dark sticky top-0 z-1 bg-[#121212] p-4 font-semibold">
         recently played
       </div>
       <div class="flex flex-col gap-0 pr-4 pl-2">
         <div
           v-for="(t, i) in display_tracks"
           :key="t.track_id"
-          class="text-ui-small text-text-inverted-primary hover:bg-hover-inverted active:bg-press-inverted relative flex w-full cursor-pointer flex-row gap-3 rounded-lg px-2 py-1"
+          class="text-ui-small text-light hover:bg-hover-inverted active:bg-press-inverted relative flex w-full cursor-pointer flex-row gap-3 rounded-lg px-2 py-1"
           @click="handleClick(t.song_url)"
         >
           <p class="h-4 w-4 shrink-0 text-right tabular-nums opacity-60">{{ i + 1 }}</p>
@@ -23,7 +21,7 @@
             <p class="truncate">{{ t.title }}</p>
             <span
               v-if="t.explicit"
-              class="bg-text-inverted-primary/80 size-3 shrink-0 rounded-sm text-center text-[8px] leading-3.5 font-bold text-[#212121]"
+              class="bg-light/80 size-3 shrink-0 rounded-sm text-center text-[8px] leading-3.5 font-bold text-[#212121]"
               >E</span
             >
           </div>
@@ -32,9 +30,12 @@
         </div>
       </div>
     </template>
-    <div v-else class="flex h-full w-full flex-col items-center justify-center gap-2 bg-[#121212]">
-      <OctagonAlert :size="24" class="text-text-inverted-secondary" />
-      <div class="text-text-inverted-secondary text-ui">Error fetching data</div>
+    <div
+      v-else
+      class="dark:bg-dark flex h-full w-full flex-col items-center justify-center gap-2 bg-[#121212]"
+    >
+      <OctagonAlert :size="24" class="text-light/50" />
+      <div class="text-light/50 text-ui">Error fetching data</div>
     </div>
 
     <Transition name="slide-up">
@@ -43,10 +44,10 @@
         class="group sticky bottom-0 mt-auto w-full p-3.5"
       >
         <div
-          class="text-ui-small text-text-inverted-primary bg-coal/50 border-light/20 relative flex h-12 flex-row items-center justify-between gap-2 overflow-hidden rounded-l-2xl rounded-r-xl border p-3 backdrop-blur-sm transition-all duration-200"
+          class="text-ui-small text-light bg-dark/50 border-light/20 relative flex h-12 flex-row items-center justify-between gap-2 overflow-hidden rounded-l-2xl rounded-r-xl border p-3 backdrop-blur-sm transition-all duration-200"
           :class="[
             now_playing.title || !currentUser
-              ? 'group-hover:border-light/25 group-hover:bg-coal/80 cursor-pointer'
+              ? 'group-hover:border-light/25 group-hover:bg-dark/80 cursor-pointer'
               : '',
           ]"
           @click="playerClick(now_playing.song_url)"
@@ -74,7 +75,7 @@
                 <p class="truncate">{{ now_playing.title }}</p>
                 <span
                   v-if="now_playing.explicit"
-                  class="bg-text-inverted-primary/80 size-3 rounded-sm text-center text-[8px] leading-3.5 font-bold text-[#212121]"
+                  class="bg-light/80 size-3 rounded-sm text-center text-[8px] leading-3.5 font-bold text-[#212121]"
                   >E</span
                 >
               </div>
@@ -86,7 +87,7 @@
               <div
                 v-for="i in 5"
                 :key="i"
-                class="bg-text-inverted-primary w-1 rounded-xs transition-all"
+                class="bg-light w-1 rounded-xs transition-all"
                 :class="[
                   now_playing.is_playing ? 'animate-waveform' : '',
                   !now_playing.is_playing ? 'h-0.75' : '',
@@ -101,9 +102,7 @@
             </div>
           </template>
           <template v-else-if="!currentUser">
-            <p class="text-text-inverted-primary grow text-left">
-              log in to see what i'm listening to right now
-            </p>
+            <p class="text-light grow text-left">log in to see what i'm listening to right now</p>
           </template>
           <template v-else>
             <p class="grow text-left opacity-50">i'm not using spotify right now</p>

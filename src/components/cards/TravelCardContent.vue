@@ -1,6 +1,6 @@
 <template>
   <div
-    class="text-text-inverted-primary maps-bg z-10 flex h-full w-full flex-col items-center justify-center gap-0"
+    class="text-light maps-bg z-10 flex h-full w-full flex-col items-center justify-center gap-0"
   >
     <p class="text-h1">🚧</p>
     <p class="text-h1">making smth cool here</p>
@@ -16,6 +16,6 @@
 
 .maps-bg::before {
   content: '';
-  @apply bg-coal/50 absolute inset-0 -z-10;
+  @apply bg-dark/50 absolute inset-0 -z-10;
 }
 </style>

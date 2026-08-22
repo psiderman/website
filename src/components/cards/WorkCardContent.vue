@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-border-primary bg-surface-secondary noscrollbar relative flex h-full w-full overflow-scroll rounded-lg border focus:outline-none"
+    class="border-border-primary bg-surface-secondary dark:bg-dark noscrollbar relative flex h-full w-full overflow-scroll rounded-lg border focus:outline-none"
     tabindex="-1"
   >
     <!-- Loading State -->
@@ -15,7 +15,7 @@
             <div class="tick" :class="tick.widthClass"></div>
             <div
               v-if="tick.isJan"
-              class="text-mono text-text-tertiary bg-surface-secondary absolute bottom-0.75 h-4 w-8 text-left"
+              class="text-mono text-text-tertiary bg-surface-secondary dark:bg-dark absolute bottom-0.75 h-4 w-8 text-left"
             >
               {{ tick.year }}
             </div>
@@ -27,7 +27,7 @@
           <div class="tick" :class="tick.widthClass"></div>
           <div
             v-if="tick.isJan"
-            class="text-mono text-text-tertiary bg-surface-secondary absolute bottom-0.75 h-4 w-8 text-left"
+            class="text-mono text-text-tertiary bg-surface-secondary dark:bg-dark absolute bottom-0.75 h-4 w-8 text-left"
           >
             {{ tick.year }}
           </div>
@@ -80,10 +80,12 @@
 
       <!-- Today Indicator -->
       <div class="absolute inset-0 z-20">
-        <div class="absolute top-10 right-6 left-9 h-0.75 bg-red-500">
-          <div class="absolute left-0 -mt-0.75 -ml-1 size-2.25 rounded-full bg-red-500"></div>
+        <div class="absolute top-10 right-6 left-9 h-0.75 bg-red-500 dark:bg-red-600">
           <div
-            class="text-ui-small text-surface-secondary absolute right-0 -mt-1.75 -mr-4 h-4.25 w-8 rounded-full bg-red-500 text-center"
+            class="absolute left-0 -mt-0.75 -ml-1 size-2.25 rounded-full bg-red-500 dark:bg-red-600"
+          ></div>
+          <div
+            class="text-ui-small text-surface-secondary dark:text-dark absolute right-0 -mt-1.75 -mr-4 h-4.25 w-8 rounded-full bg-red-500 text-center dark:bg-red-600"
           >
             now
           </div>

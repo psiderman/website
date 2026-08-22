@@ -8,11 +8,10 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ theme?: 'dark' | 'default' | 'light' }>()
+defineProps<{ theme?: 'dark' | 'default' }>()
 
 const classes: Record<string, string> = {
-  dark: 'border-surface-inverted-primary border-t-surface-primary',
+  dark: 'border-light/20 border-t-light',
   default: 'border-border-high-contrast border-t-text-primary',
-  light: 'border-border-primary border-t-text-tertiary',
 }
 </script>

@@ -25,7 +25,7 @@
             leave-to="opacity-0 scale-95"
           >
             <DialogPanel
-              class="bg-surface-primary flex h-90 w-80 flex-col items-center justify-center gap-8 rounded-xl px-6 py-12 shadow-none!"
+              class="bg-surface-primary border-border-primary flex h-90 w-80 flex-col items-center justify-center gap-8 rounded-xl border px-6 py-12 shadow-none!"
             >
               <div class="flex flex-col gap-2 text-center">
                 <p class="text-display mb-2">🚪</p>
