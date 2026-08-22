@@ -1,20 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import HomeView from '../views/HomeView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
+import NowView from '../views/NowView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      component: () => import('../views/HomeView.vue'),
+      component: HomeView,
       name: 'Home',
       path: '/',
     },
     {
-      component: () => import('../views/NowView.vue'),
+      component: NowView,
       name: 'Now',
       path: '/now',
     },
     {
-      component: () => import('../views/NotFoundView.vue'),
+      component: NotFoundView,
       name: 'NotFound',
       path: '/:pathMatch(.*)*',
     },

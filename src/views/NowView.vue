@@ -8,7 +8,7 @@
           <router-link to="/now" class="breadcrumb level">now</router-link>
         </div>
 
-        <div v-if="isLoadingSlug || isLoadingMarkdown" class="aspect-4/1 w-full">
+        <div v-if="isLoadingSlug || isLoadingMarkdown || isLoadingImages" class="aspect-4/1 w-full">
           <GenericLoader />
         </div>
 
@@ -67,6 +67,7 @@ import { useNow } from '@/composables/useNow'
 
 const {
   images,
+  isLoadingImages,
   isLoadingMarkdown,
   isLoadingSlug,
   markdownContent,
