@@ -539,6 +539,36 @@
       @apply text-text-tertiary line-through;
     }
   }
+
+  /* Buttons */
+  .btn {
+    @apply text-text-primary text-ui border bg-linear-0;
+    @apply flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full px-6 py-2;
+    @apply transition-colors duration-200 ease-in-out;
+
+    &.icon-only {
+      @apply size-10 p-0;
+    }
+
+    &.stroke {
+      @apply bg-surface-primary hover:from-hover hover:to-hover active:from-press active:to-press;
+      @apply border-border-primary;
+      @apply hover:shadow-2xs;
+    }
+
+    &.primary {
+      @apply bg-surface-inverted hover:from-light/20 hover:to-light/20 active:from-light/10 active:to-light/10;
+      @apply text-text-inverted-primary;
+      @apply border-transparent;
+    }
+
+    &.inverted {
+      @apply bg-press-inverted hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted;
+      @apply text-text-inverted-primary;
+      @apply border-transparent;
+      @apply outline-surface-primary/50!;
+    }
+  }
 }
 
 :root {

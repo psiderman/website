@@ -6,7 +6,7 @@
     v-else
     :ref="setupObserver"
     class="drawing-board focus:outline-none"
-    tabindex="0"
+    tabindex="-1"
     @keydown="handleKeyDown"
   >
     <!-- Drawing Surface -->
@@ -45,7 +45,7 @@
 
     <template v-if="strokes.length > 0">
       <button
-        v-if="!isSaved"
+        v-if="hasUnsavedChanges"
         class="text-text-tertiary hover:text-text-primary absolute top-0 right-0 z-20 cursor-pointer p-3 transition-colors"
         :class="{ 'animate-pulse cursor-not-allowed opacity-50': isSaving }"
         :disabled="isSaving"
@@ -104,7 +104,8 @@ import { CloudCheck, CloudUpload, MousePointer2 } from '@lucide/vue'
 import { useMutation, useQuery } from '@tanstack/vue-query'
 import { format } from 'date-fns'
 import { getStroke } from 'perfect-freehand'
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
 import { supabase } from '@/supabase'
@@ -200,7 +201,7 @@ const backgroundArtist = computed(() => {
   const data = latestDrawing.value
   if (!data) return ''
   const date = format(new Date(data.created_at), 'EEE, MMM d')
-  return `${data.display_name.toLowerCase()}, ${date.toLowerCase()}`
+  return `${data.display_name.toLowerCase().split(' ')[0]}, ${date.toLowerCase()}`
 })
 
 onUnmounted(() => {
@@ -345,6 +346,41 @@ function stopAnimation() {
 }
 
 const currentStrokePath = computed(() => getSvgPathFromStroke(currentStroke.value))
+
+const hasUnsavedChanges = computed(() => {
+  if (strokes.value.length === 0) return false
+  if (isSaved.value) return false
+
+  if (latestDrawing.value?.strokes) {
+    const currentStr = JSON.stringify(strokes.value)
+    const latestStr = JSON.stringify(latestDrawing.value.strokes)
+    if (currentStr === latestStr) return false
+  }
+
+  return true
+})
+
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+  if (hasUnsavedChanges.value) {
+    e.preventDefault()
+    e.returnValue = '' // Required for legacy browsers
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('beforeunload', handleBeforeUnload)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+})
+
+onBeforeRouteLeave(() => {
+  if (hasUnsavedChanges.value) {
+    const answer = window.confirm('You’r art wasn’t saved. Are you sure you want to leave?')
+    if (!answer) return false
+  }
+})
 </script>
 
 <style scoped>

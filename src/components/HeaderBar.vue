@@ -15,9 +15,10 @@
         </p>
       </div>
       <div class="flex flex-row gap-4">
-        <button
-          class="theme-toggle bg-surface-primary border-border-primary flex h-10 flex-row rounded-full border p-0.75"
-        >
+        <button class="btn stroke icon-only">
+          <MousePointer2 :size="16" />
+        </button>
+        <button class="theme-toggle btn stroke pointer-events-none p-0.75">
           <div>
             <Moon :size="16" />
           </div>
@@ -28,27 +29,17 @@
             <Monitor :size="16" />
           </div>
         </button>
-        <button
-          v-if="!currentUser"
-          class="bg-surface-inverted text-text-inverted-primary text-ui hover:bg-coal/90 rounded-full px-6 py-2 transition-colors"
-          @click="isAuthModalOpen = true"
-        >
+        <button v-if="!currentUser" class="btn primary" @click="isAuthModalOpen = true">
           Log in
         </button>
-        <button
-          v-else
-          class="bg-surface-primary border-border-primary text-text-primary text-ui hover:bg-hover cursor-pointer rounded-full border px-6 py-2 transition-colors"
-          @click="supabase.auth.signOut()"
-        >
-          Log out
-        </button>
+        <button v-else class="btn stroke" @click="supabase.auth.signOut()">Log out</button>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { Monitor, Moon, Sun } from '@lucide/vue'
+import { Monitor, Moon, MousePointer2, Sun } from '@lucide/vue'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import { currentUser, isAuthModalOpen } from '../composables/useAuth'

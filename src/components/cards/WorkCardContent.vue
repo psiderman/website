@@ -57,7 +57,7 @@
               class="work-block text-ui-small"
               :class="{ 'col-start-2': block.track == 'right' }"
             >
-              <div class="flex size-4 items-center justify-center">
+              <div class="flex size-4 shrink-0 items-center justify-center">
                 <img
                   v-if="block.logoUrl"
                   :src="block.logoUrl"
@@ -66,11 +66,11 @@
                 />
                 <span v-else-if="block.emoji">{{ block.emoji }}</span>
               </div>
-              <div class="flex flex-col">
+              <div class="flex grow flex-col">
                 <p class="text-text-primary">{{ block.org }}</p>
                 <p v-if="block.role" class="text-text-secondary">{{ block.role }}</p>
                 <p class="text-text-tertiary mt-1">
-                  {{ block.durationText }} <span v-if="!block.endDate">...</span>
+                  {{ block.durationText }}<span v-if="!block.endDate">...</span>
                 </p>
               </div>
             </div>
@@ -129,7 +129,7 @@ const getDuration = (start: Date, end: Date) => {
 
   const parts = []
   if (years) parts.push(`${years} yr${years > 1 ? 's' : ''}`)
-  if (months) parts.push(`${months} mo${months > 1 ? 's' : ''}`)
+  if (months) parts.push(`${months} mo${months > 1 ? 's' : 'n'}`)
 
   return parts.length > 0 ? parts.join(' ') : '1 mo'
 }
@@ -188,10 +188,11 @@ const timelineData = computed(() => {
     return b.startDate.getTime() - a.startDate.getTime()
   })
 
-  const dates = sorted.flatMap((b) => [b.startDate, b.endDate || new Date()])
+  const now = new Date()
+
+  const dates = sorted.flatMap((b) => [b.startDate, b.endDate || now])
   const minYear = getYear(min(dates))
 
-  const now = new Date()
   const todayYear = now.getFullYear()
   const todayMonth = now.getMonth()
 
@@ -212,7 +213,7 @@ const timelineData = computed(() => {
 
   const blocks = sorted.map((block) => {
     const start = block.startDate
-    const end = block.endDate || new Date()
+    const end = block.endDate || now
 
     const heightMonths = differenceInCalendarMonths(end, start) + 1
     const heightPx = heightMonths * MONTH_HEIGHT

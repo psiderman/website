@@ -40,10 +40,7 @@
               </div>
 
               <div class="flex w-fit flex-col items-center gap-2">
-                <button
-                  class="bg-surface-inverted text-text-inverted-primary text-ui hover:bg-coal/90 active:bg-coal/80 flex w-fit cursor-pointer flex-row items-center justify-center gap-2 rounded-full px-6 py-2 transition-colors"
-                  @click="signInWithGoogle"
-                >
+                <button class="btn primary" @click="signInWithGoogle">
                   <FA :icon="['fab', 'google']" class="text-ui-small" />
                   Continue with Google
                 </button>

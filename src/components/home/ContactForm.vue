@@ -7,9 +7,9 @@
           hi<span class="font-sans leading-14">@</span>psiderman.com
         </p>
       </div>
-      <div class="contact-buttons flex flex-row gap-4">
-        <button>copy email</button>
-        <button v-for="btn in buttons" :key="btn.id" class="icon-btn">
+      <div class="flex flex-row gap-4">
+        <button class="btn inverted">copy email</button>
+        <button v-for="btn in buttons" :key="btn.id" class="btn icon-only inverted">
           <FA :icon="btn.logo" />
         </button>
       </div>
@@ -34,19 +34,3 @@ const buttons = [
   { id: 'reddit', logo: faRedditAlien },
 ]
 </script>
-
-<style scoped>
-@reference "@/style.css";
-
-.contact-buttons > button {
-  @apply bg-press-inverted text-text-inverted-primary text-ui hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted flex cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-all duration-200 ease-in-out;
-  @apply outline-surface-primary/50;
-  &.icon-btn {
-    @apply size-10;
-  }
-
-  &:not(.icon-btn) {
-    @apply h-10 px-6 py-2;
-  }
-}
-</style>
