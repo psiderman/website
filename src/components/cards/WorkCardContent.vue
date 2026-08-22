@@ -121,7 +121,7 @@ interface WorkRow {
 }
 
 const getLogoUrl = (orgId: string) => {
-  return supabase.storage.from('logos').getPublicUrl(`${orgId}.png`).data.publicUrl
+  return supabase.storage.from('logos').getPublicUrl(`${orgId}.webp`).data.publicUrl
 }
 
 const getDuration = (start: Date, end: Date) => {

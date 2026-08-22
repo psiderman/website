@@ -388,13 +388,13 @@ onBeforeRouteLeave(() => {
 
 .drawing-board {
   @apply border-border-primary relative h-full w-full overflow-hidden rounded-lg border;
-  background: url('@/assets/images/dot_grid.png');
+  background: url('@/assets/images/dot_grid.webp');
   background-size: 2.5%;
   @apply bg-repeat;
 }
 
 .dark .drawing-board {
-  background: url('@/assets/images/dot_grid_dark.png');
+  background: url('@/assets/images/dot_grid_dark.webp');
   background-size: 2.5%;
 }
 

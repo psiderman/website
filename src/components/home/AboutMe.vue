@@ -1,7 +1,7 @@
 <template>
   <div data-sync="about-me" class="flex w-full flex-row items-center justify-center gap-8 p-20">
     <img
-      src="@/assets/images/public.jpg"
+      src="@/assets/images/public.webp"
       alt="karan sanas"
       class="border-border-primary aspect-auto h-60 rounded-[5rem] border"
     />
