@@ -1,9 +1,13 @@
-import { ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
-const allowMultiplayer = ref(localStorage.getItem('allowMultiplayer') !== 'false')
+const _allowMultiplayer = ref(localStorage.getItem('allowMultiplayer') !== 'false')
 
-watch(allowMultiplayer, (newVal) => {
-  localStorage.setItem('allowMultiplayer', newVal.toString())
+const allowMultiplayer = computed({
+  get: () => _allowMultiplayer.value,
+  set: (newVal) => {
+    _allowMultiplayer.value = newVal
+    localStorage.setItem('allowMultiplayer', newVal.toString())
+  },
 })
 
 export const global = {

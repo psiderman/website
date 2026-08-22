@@ -547,7 +547,7 @@
   .btn {
     @apply text-text-primary text-ui border bg-linear-0;
     @apply flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full px-6 py-2;
-    @apply transition-colors duration-200 ease-in-out;
+    @apply shrink-0 transition-colors duration-200 ease-in-out;
 
     &.icon-only {
       @apply size-10 p-0;
@@ -596,6 +596,28 @@ a,
   @apply focus-visible:outline-surface-inverted text-left focus-visible:outline-2 focus-visible:outline-offset-2;
   @apply underline-offset-1;
   touch-action: manipulation;
+}
+
+/* All tooltips */
+.tippy-box[data-theme~='tippy-small'] {
+  @apply bg-surface-inverted-secondary rounded-full;
+
+  &[data-placement^='top'] > .tippy-arrow::before {
+    @apply border-t-surface-inverted-secondary;
+  }
+  &[data-placement^='bottom'] > .tippy-arrow::before {
+    @apply border-b-surface-inverted-secondary;
+  }
+  &[data-placement^='left'] > .tippy-arrow::before {
+    @apply border-l-surface-inverted-secondary;
+  }
+  &[data-placement^='right'] > .tippy-arrow::before {
+    @apply border-r-surface-inverted-secondary;
+  }
+
+  & .tippy-content {
+    @apply text-text-inverted-primary text-ui-small;
+  }
 }
 
 @utility noscrollbar {
