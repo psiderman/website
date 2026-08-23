@@ -584,7 +584,7 @@
 
   /* Buttons */
   .btn {
-    @apply text-text-primary text-ui border bg-linear-0;
+    @apply text-text-primary text-ui h-10 border bg-linear-0;
     @apply flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full px-6 py-2;
     @apply shrink-0 transition-colors duration-200 ease-in-out;
 
@@ -639,7 +639,7 @@ a,
 
 /* All tooltips */
 .tippy-box[data-theme~='tippy-small'] {
-  @apply bg-surface-inverted-secondary rounded-full;
+  @apply bg-surface-inverted-secondary rounded-lg;
 
   &[data-placement^='top'] > .tippy-arrow::before {
     @apply border-t-surface-inverted-secondary;
@@ -657,6 +657,10 @@ a,
   & .tippy-content {
     @apply text-text-inverted-primary text-ui-small;
   }
+}
+
+.tippy-box[data-theme~='tabular-nums'] .tippy-content {
+  @apply tabular-nums!;
 }
 
 @utility noscrollbar {

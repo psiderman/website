@@ -4,7 +4,7 @@
     <p class="text-text-secondary text-xl">Oops! This page doesn't exist.</p>
     <router-link
       to="/"
-      class="bg-surface-primary outline-border-primary hover:bg-surface-secondary text-text-primary mt-4 rounded-lg px-6 py-3 font-medium outline transition-colors"
+      class="bg-surface-primary outline-border-primary hover:bg-surface-secondary text-text-primary mt-4 rounded-lg px-6 py-3 font-medium outline transition-colors duration-200"
     >
       Return Home
     </router-link>

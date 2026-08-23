@@ -1,31 +1,30 @@
 <template>
-  <div class="flex flex-row items-center justify-center gap-2">
-    <router-link
-      to="/"
-      class="bg-dark dark:bg-surface-tertiary relative size-8 shrink-0 overflow-hidden rounded-full"
+  <div class="flex flex-row items-center justify-center gap-2" data-sync="wish">
+    <Transition
+      enter-active-class="transition duration-1000 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
     >
-      <img src="@/assets/svg/psider.svg" class="absolute top-2 left-1 -my-px -ml-px scale-200" />
-    </router-link>
+      <router-link
+        v-if="!isWishTime"
+        to="/"
+        class="size-10 shrink-0 overflow-hidden rounded-full hover:opacity-80 active:opacity-90"
+      >
+        <img src="/psider.webp" class="size-10" />
+      </router-link>
+    </Transition>
 
-    <p
-      class="text-text-tertiary text-ui-small relative text-left select-none"
-      :class="{ 'cursor-pointer': isWishTime }"
-    >
-      i'm in {{ current_location.city }} <br />
-      and it is {{ currentTime }} right now
-    </p>
-
-    <button
-      v-if="isButtonVisible"
-      v-tooltip="{ content: isPopping ? null : timeTooltip }"
-      class="btn icon-only relative overflow-hidden border-transparent hover:from-transparent hover:to-transparent hover:shadow-none active:from-transparent active:to-transparent"
+    <div
+      v-if="isWishTime"
+      v-tooltip="{
+        content: isPopping ? null : wishTooltip,
+        theme: 'tippy-small',
+        hideOnClick: false,
+      }"
+      class="relative size-10 shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-transparent bg-amber-200 dark:bg-amber-500/20"
       :class="{
-        'bg-amber-200 dark:bg-amber-500/20': isWishTime,
-        'bg-surface-secondary': !isWishTime,
-        'translate-y-0.5 border-amber-400! shadow-none transition-transform duration-200':
-          isPressing,
-        'translate-y-0.5 border-transparent bg-transparent! shadow-none transition-transform duration-200 hover:from-transparent hover:to-transparent':
-          isPopping,
+        'border-amber-400! transition-all duration-200': isPressing,
+        'border-transparent bg-transparent! transition-all duration-200': isPopping,
         'popping cursor-default': isPopping,
         jitter: isReadyToPop,
       }"
@@ -36,28 +35,54 @@
       @touchend="onPressEnd"
     >
       <div
-        v-if="!isWishTime"
-        class="text-text-tertiary outline-text-tertiary flex size-4.5 scale-75 items-center justify-center rounded-sm font-mono font-semibold outline"
-      >
-        ?
-      </div>
-      <span v-else class="z-10 inline-block text-[24px] transition-transform">🤞</span>
-
-      <div
-        class="pointer-events-none absolute bottom-0 w-full bg-amber-400"
-        :class="isPopping ? 'bg-transparent' : 'transition-all ease-linear'"
+        class="pointer-events-none absolute z-10 size-20 bg-amber-400"
+        :class="[
+          isPopping ? 'bg-transparent' : 'transition-all ease-linear',
+          isPressing ? 'translate-y-0' : 'translate-y-10',
+        ]"
         :style="{
-          height: isPressing || isPopping ? '40px' : '0px',
           transitionDuration: isPressing ? '5s' : '0s',
         }"
       ></div>
-    </button>
+
+      <div class="absolute inset-0 z-10 flex flex-col items-center justify-center">
+        <span class="text-h2">🤞</span>
+      </div>
+    </div>
+
+    <div class="text-text-tertiary text-ui-small flex flex-col gap-1">
+      <div class="flex flex-row gap-1 tabular-nums">
+        <component :is="currentTimeClockIcon" :size="16" />
+        {{ isWishTime ? currentTime.split(':').slice(0, -1).join(':') : currentTime }}
+      </div>
+      <div class="flex flex-row gap-1">
+        <MapPin :size="16" />
+        i'm in
+        {{ current_location.city }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { addDays, differenceInMinutes } from 'date-fns'
-import { onMounted, onUnmounted, ref } from 'vue'
+import {
+  Clock,
+  Clock1,
+  Clock2,
+  Clock3,
+  Clock4,
+  Clock5,
+  Clock6,
+  Clock7,
+  Clock8,
+  Clock9,
+  Clock10,
+  Clock11,
+  Clock12,
+  MapPin,
+} from '@lucide/vue'
+import { addDays, differenceInMinutes, differenceInSeconds } from 'date-fns'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { supabase } from '../supabase'
 
@@ -71,27 +96,51 @@ const current_location = ref<Location>({
   timezone: 'Asia/Kolkata',
 })
 
-const currentTime = ref('11:11')
-const timeTooltip = ref('')
+const currentTime = ref('11:11:11')
+const timeTooltip = ref<null | string>(null)
+const wishTooltip = ref<null | string>(null)
 
 const isWishTime = ref(false)
 const isPressing = ref(false)
 const isPopping = ref(false)
 const isButtonVisible = ref(true)
 const nextWishTimeStr = ref('')
+const lastWish = ref<null | string>(null)
 
-let holdTimeout: any = null
+const clockIcons = [
+  Clock12,
+  Clock1,
+  Clock2,
+  Clock3,
+  Clock4,
+  Clock5,
+  Clock6,
+  Clock7,
+  Clock8,
+  Clock9,
+  Clock10,
+  Clock11,
+]
+
+const currentTimeClockIcon = computed(() => {
+  const hour = parseInt(currentTime.value.split(':')[0], 10)
+  return clockIcons[hour % 12] || Clock
+})
+
+let holdTimeout: null | ReturnType<typeof setTimeout> = null
 const isReadyToPop = ref(false)
 
 const onPressStart = () => {
   if (!isWishTime.value) return
   isPressing.value = true
+  wishTooltip.value = 'focus on your wish'
   isPopping.value = false
   isReadyToPop.value = false
 
   if (holdTimeout) clearTimeout(holdTimeout)
   holdTimeout = setTimeout(() => {
     isReadyToPop.value = true
+    wishTooltip.value = null
   }, 4800)
 }
 
@@ -104,26 +153,38 @@ const onPressEnd = () => {
     isPopping.value = true
     isReadyToPop.value = false
 
+    lastWish.value = nextWishTimeStr.value
     localStorage.setItem('lastWishTime', nextWishTimeStr.value)
 
     setTimeout(() => {
       isPopping.value = false
       isButtonVisible.value = false
-    }, 1000)
+      isWishTime.value = false
+    }, 2500)
   }
 }
 
-let timer: ReturnType<typeof setInterval>
+let timer: null | ReturnType<typeof setInterval> = null
+let formatter: Intl.DateTimeFormat | null = null
+
+watch(
+  () => current_location.value.timezone,
+  (tz) => {
+    if (tz) {
+      formatter = new Intl.DateTimeFormat('en-US', {
+        hour: '2-digit',
+        hour12: false,
+        minute: '2-digit',
+        second: '2-digit',
+        timeZone: tz,
+      })
+    }
+  },
+  { immediate: true },
+)
 
 const updateTime = () => {
-  if (!current_location.value.timezone) return
-
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    hour: '2-digit',
-    hour12: false,
-    minute: '2-digit',
-    timeZone: current_location.value.timezone,
-  })
+  if (!formatter || isPopping.value) return
 
   const formatted = formatter.format(new Date())
   currentTime.value = formatted
@@ -131,7 +192,10 @@ const updateTime = () => {
   const parts = formatted.split(':')
   let h = parseInt(parts[0], 10)
   const m = parseInt(parts[1], 10)
+  const s = parseInt(parts[2], 10)
   if (h === 24) h = 0
+
+  const isCurrentlyWishTime = h === m
 
   let targetH = h
   let targetM = h
@@ -141,30 +205,37 @@ const updateTime = () => {
     targetM = targetH
   }
 
+  const targetS = targetH
+
   const nowMock = new Date()
-  nowMock.setHours(h, m, 0, 0)
+  nowMock.setHours(h, m, s, 0)
 
   let targetMock = new Date()
-  targetMock.setHours(targetH, targetM, 0, 0)
+  targetMock.setHours(targetH, targetM, targetS, 0)
 
   if (targetMock < nowMock) {
     targetMock = addDays(targetMock, 1)
   }
 
   const mins = differenceInMinutes(targetMock, nowMock)
-  nextWishTimeStr.value = `${String(targetH).padStart(2, '0')}:${String(targetM).padStart(2, '0')}`
-  const lastWish = localStorage.getItem('lastWishTime')
+  const seconds = differenceInSeconds(targetMock, nowMock) % 60
 
-  if (lastWish === nextWishTimeStr.value) {
+  const yyyy = targetMock.getFullYear()
+  const mm = String(targetMock.getMonth() + 1).padStart(2, '0')
+  const dd = String(targetMock.getDate()).padStart(2, '0')
+
+  nextWishTimeStr.value = `${yyyy}-${mm}-${dd} ${String(targetH).padStart(2, '0')}:${String(targetM).padStart(2, '0')}:${String(targetS).padStart(2, '0')}`
+
+  if (lastWish.value === nextWishTimeStr.value) {
     isButtonVisible.value = false
     isWishTime.value = false
   } else {
     isButtonVisible.value = true
-    if (mins === 0) {
-      timeTooltip.value = 'press and hold to make a wish'
+    if (isCurrentlyWishTime) {
+      if (!isPressing.value) wishTooltip.value = 'press and hold to make a wish'
       isWishTime.value = true
     } else {
-      timeTooltip.value = `come back to this in ${mins} minutes`
+      timeTooltip.value = `come back in ${mins}:${String(seconds).padStart(2, '0')}`
       isWishTime.value = false
     }
   }
@@ -184,12 +255,13 @@ async function getCurrentLocation() {
 }
 
 onMounted(() => {
+  lastWish.value = localStorage.getItem('lastWishTime')
   getCurrentLocation()
   timer = setInterval(updateTime, 1000)
 })
 
 onUnmounted(() => {
-  clearInterval(timer)
+  if (timer) clearInterval(timer)
 })
 </script>
 
@@ -219,7 +291,7 @@ onUnmounted(() => {
 }
 
 .popping {
-  animation: popWish 1s cubic-bezier(1, -0.5, 0, 1) forwards;
+  animation: popWish 2s cubic-bezier(1, -0.5, 0, 1) forwards;
 }
 
 @keyframes popWish {

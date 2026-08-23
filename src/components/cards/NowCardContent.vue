@@ -20,7 +20,7 @@
       @wheel="handleInteraction"
     >
       <div
-        class="flex h-full w-full flex-col transition-transform duration-500 ease-in-out"
+        class="flex h-full w-full flex-col transition-transform duration-1000 ease-in-out"
         :style="{ transform: `translateY(-${activeIndex * 100}%)` }"
       >
         <div

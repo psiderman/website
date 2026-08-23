@@ -4,7 +4,7 @@
     class="text-light/75 relative flex w-screen flex-col items-center justify-center gap-20 bg-gray-950 p-20 pb-0 dark:bg-zinc-950"
   >
     <button
-      class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors focus:outline-none"
+      class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors duration-200 focus:outline-none"
       @click="handleClick(`https://github.com/psiderman/website/commit/${commit}`)"
     >
       <div class="flex size-4 items-center justify-center">
