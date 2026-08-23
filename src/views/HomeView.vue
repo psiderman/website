@@ -33,8 +33,8 @@
         <div
           class="text-p text-text-secondary flex h-full w-full flex-col gap-5 overflow-scroll italic"
         >
-          <p class="text-text-primary -mb-1 font-semibold">{{ activeDescription.title }}</p>
-          <p v-for="(p, i) in activeDescription.content" :key="i">{{ p }}</p>
+          <p class="text-text-primary -mb-1 font-semibold" v-html="activeDescription.title"></p>
+          <p v-for="(p, i) in activeDescription.content" :key="i" v-html="p"></p>
         </div>
       </div>
 
