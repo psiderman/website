@@ -58,7 +58,7 @@
     "build-only": "vite build",
     "dev": "vite",
     "dev:all": "concurrently \"npm run dev -- --host\" \"npm run dev:api\"",
-    "dev:api": "vercel dev",
+    "dev:api": "vercel dev --listen 3001",
     "format": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

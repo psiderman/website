@@ -33,9 +33,8 @@ export const descriptionContent: DescriptionContent[] = [
   },
   {
     content: [
-      '“i first picked up a guitar when i was 14 to impress a girl. said girl wasn’t impressed by it.',
-      'this canon event sparked an interest in music where i taught myself enough guitar and keys, that i can work my way around a daw to make covers.',
-      'i’ve also fallen in love with making hyper-specific playlists on my spotify.”',
+      '“i first picked up a guitar when i was 14 to impress a girl. while said girl wasn’t impressed by it, this canon event sparked an interest in music where i taught myself enough guitar and keys, that i can work my way around a daw to make covers.',
+      'i’ve also fallen in love with making hyper-specific playlists on my spotify. i haven’t yet joined the vinyl bandwagon, though.”',
     ],
     id: 'music',
     title: 'to the beat',
