@@ -67,23 +67,20 @@ function rebuildSingleton(groupId: string) {
   const entry = groups.get(groupId)
   if (!entry) return
 
-  // Destroy old singleton before rebuilding
-  if (entry.singleton) {
-    entry.singleton.destroy()
-    entry.singleton = null
-  }
-
   const arr = Array.from(entry.instances)
-  if (arr.length < 2) return // singleton needs ≥ 2
 
-  entry.singleton = createSingleton(arr, {
-    allowHTML: false,
-    appendTo: () => document.body,
-    delay: [100, 0],
-    moveTransition: 'transform 0.15s ease-out',
-    overrides: ['content', 'placement', 'allowHTML'],
-    theme: 'tippy-small',
-  })
+  if (entry.singleton) {
+    entry.singleton.setInstances(arr)
+  } else if (arr.length >= 2) {
+    entry.singleton = createSingleton(arr, {
+      allowHTML: false,
+      appendTo: () => document.body,
+      delay: [100, 0],
+      moveTransition: 'transform 0.15s ease-out',
+      overrides: ['content', 'placement', 'allowHTML'],
+      theme: 'tippy-small',
+    })
+  }
 }
 
 function registerInGroup(groupId: string, instance: Instance) {
@@ -155,10 +152,7 @@ const tooltip: ObjectDirective<TooltipElement, TooltipValue> = {
 
     // Otherwise update the existing tippy instance. Only push the content when
     // it actually changed — trigger/hideOnClick/followCursor/delay are init-only
-    // (applied once in initTippy) re-setting them here makes tippy re-bind its
-    // mouse listeners mid-interaction (stuck/duplicated tooltips on re-render).
-    el._tippy.enable()
-
+    // (applied once in initTippy).
     const next = props.content
     if (next === el._tippy?.props.content) return
 

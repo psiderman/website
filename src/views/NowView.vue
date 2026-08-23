@@ -23,13 +23,13 @@
           <!-- Render images at the top -->
           <div
             v-if="images && images.length > 0"
-            class="mx-auto -mt-10 grid grow gap-4"
+            class="mx-auto -mt-10 grid min-w-full grow gap-4"
             :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
           >
             <div
               v-for="img in images"
               :key="img.name"
-              class="aspect-3/5 h-full w-full rounded-xl object-cover"
+              class="bg-surface-primary aspect-3/5 h-full w-full rounded-xl object-cover"
             >
               <img
                 class="aspect-3/5 h-full w-full rounded-xl object-cover"

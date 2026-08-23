@@ -53,13 +53,13 @@
         <component :is="card.content" v-if="card.content" :show-help="isIconHovered" />
       </CardContainer>
 
-      <div class="absolute top-0 left-0 h-full w-fit" style="left: calc(-50vw + 50%)">
+      <div class="absolute top-0 left-0 h-full w-fit pl-2" style="left: calc(-50vw + 50%)">
         <div class="sticky top-21 flex flex-col justify-start gap-4">
           <button
             v-for="emj in emojis"
             :key="emj.id"
             v-tooltip="{ group: 'filter', placement: 'right', content: emj.label }"
-            class="emoji-filter"
+            class="emoji-filter group"
             :class="{
               default: !activeFilter,
               active: activeFilter === emj.id,
@@ -281,18 +281,22 @@ const filteredCards = computed(() => {
 <style scoped>
 @reference "@/style.css";
 .emoji-filter {
-  @apply text-ui relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full rounded-l-none border border-l-0 bg-linear-0 pr-1.5 transition-colors duration-200 ease-in-out;
+  @apply bg-background text-ui relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-colors duration-200 ease-in-out;
+
+  & span {
+    @apply flex w-4.25 items-center justify-center text-center leading-none;
+  }
 
   &.default {
-    @apply bg-surface-primary border-border-primary hover:from-hover hover:to-hover active:from-press active:to-press;
+    @apply hover:from-hover hover:to-hover active:from-press active:to-press opacity-50 group-hover:opacity-100;
   }
 
   &.active {
-    @apply bg-surface-inverted hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted border-transparent;
+    @apply hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted;
   }
 
   &.inactive {
-    @apply bg-surface-secondary hover:from-hover hover:to-hover active:from-press active:to-press border-transparent;
+    @apply hover:from-hover hover:to-hover active:from-press active:to-press;
 
     span {
       @apply opacity-50 mix-blend-luminosity;
