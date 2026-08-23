@@ -615,7 +615,7 @@
 
 :root {
   font-size: 16px;
-  @apply bg-background text-text-primary;
+  @apply text-text-primary;
   @apply font-sans font-normal;
   @apply select-none;
   touch-action: manipulation;
@@ -627,6 +627,20 @@
   --text-size-21: 1.3125rem;
   --text-size-33: 2.0625rem;
   --text-size-42: 2.625rem;
+}
+
+/*
+ * Canvas color trick for macOS rubber-band overscroll:
+ * html has NO background → body bg promotes to canvas.
+ * Canvas = footer color → bottom overscroll seamless.
+ * #app paints the actual page background over it.
+ */
+body {
+  @apply bg-gray-950 dark:bg-zinc-950;
+}
+
+#app {
+  @apply bg-background;
 }
 
 input,
