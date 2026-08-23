@@ -56,20 +56,4 @@ const indicatorPos = computed(() => {
 button.theme-toggle > div {
   @apply z-10 flex size-8 items-center justify-center p-2;
 }
-
-.stretch {
-  animation: indicator-stretch 300ms ease-in-out 0ms;
-}
-
-@keyframe indicator-stretch {
-  0% {
-    width: 32px;
-  }
-  50% {
-    width: 40px;
-  }
-  100% {
-    width: 40px;
-  }
-}
 </style>

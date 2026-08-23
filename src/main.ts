@@ -1,7 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import {} from '@lucide/vue'
 import * as Sentry from '@sentry/vue'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 

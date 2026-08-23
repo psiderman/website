@@ -73,8 +73,8 @@ const generateColor = (id: string) => {
   }
 }
 
-let localId = sessionStorage.getItem('cursor_local_id')
-if (!localId) {
+let localId = typeof window !== 'undefined' ? sessionStorage.getItem('cursor_local_id') : null
+if (typeof window !== 'undefined' && !localId) {
   localId = `anon_${Math.random().toString(36).substring(2, 9)}`
   sessionStorage.setItem('cursor_local_id', localId)
 }
@@ -161,7 +161,6 @@ export const activeRoute = ref('')
 export const cursors = ref<Record<string, CursorData>>({})
 export const touches = ref<Record<string, TouchData>>({})
 const windowWidth = ref(window.innerWidth)
-const windowHeight = ref(window.innerHeight)
 const scrollY = ref(window.scrollY)
 const boxRects = ref(new Map<string, BoxRect>())
 const isMobile = ref(false)
@@ -341,7 +340,6 @@ export function useLive() {
   const handleResize = () => {
     isMobile.value = window.matchMedia('(pointer: coarse)').matches
     windowWidth.value = window.innerWidth
-    windowHeight.value = window.innerHeight
     updateBoxRects()
   }
 

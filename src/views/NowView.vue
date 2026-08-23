@@ -41,7 +41,9 @@
 
           <!-- Render parsed markdown -->
           <div class="text-p mx-auto w-full max-w-prose text-left">
-            <h1 class="text-display -mb-14">{{ format(slug, 'MMM ’yy').toLocaleLowerCase() }}</h1>
+            <h1 class="text-display -mb-14">
+              {{ format(new Date(slug + '-01'), 'MMM ’yy').toLocaleLowerCase() }}
+            </h1>
           </div>
           <div
             v-if="parsedMarkdown"
@@ -58,6 +60,7 @@
 <script setup lang="ts">
 import { ChevronRight } from '@lucide/vue'
 import { format } from 'date-fns'
+import DOMPurify from 'dompurify'
 import { marked } from 'marked'
 import { computed } from 'vue'
 
@@ -79,7 +82,8 @@ const {
 // Parse markdown to HTML
 const parsedMarkdown = computed(() => {
   if (!markdownContent.value) return ''
-  return marked.parse(markdownContent.value)
+  const raw = marked.parse(markdownContent.value)
+  return DOMPurify.sanitize(raw as string)
 })
 </script>
 

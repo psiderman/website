@@ -3,7 +3,7 @@ import { getSwatches } from 'colorthief'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function handler(req: any, res: any) {
   const origin = req.headers.origin || req.headers.referer || ''
-  if (origin && !origin.includes('psiderman.com') && !origin.includes('localhost')) {
+  if (!isAllowedOrigin(origin)) {
     return res.status(403).json({ error: 'Forbidden' })
   }
 
@@ -13,6 +13,12 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
+    const allowedHosts = ['i.scdn.co', 'lh3.googleusercontent.com']
+    const parsed = new URL(url)
+    if (!allowedHosts.includes(parsed.hostname)) {
+      return res.status(400).json({ error: 'URL not allowed' })
+    }
+
     const response = await fetch(url)
     if (!response.ok) throw new Error('Image fetch failed')
 
@@ -31,5 +37,18 @@ export default async function handler(req: any, res: any) {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     return res.status(500).json({ error: message })
+  }
+}
+
+function isAllowedOrigin(origin: string): boolean {
+  try {
+    const { hostname } = new URL(origin)
+    return (
+      hostname === 'psiderman.com' ||
+      hostname.endsWith('.psiderman.com') ||
+      hostname === 'localhost'
+    )
+  } catch {
+    return false
   }
 }

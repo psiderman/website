@@ -1,4 +1,4 @@
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 export type Theme = 'dark' | 'light' | 'system'
 
@@ -38,10 +38,18 @@ export const initTheme = () => {
     }
     updateTheme()
 
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (_e) => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const listener = () => {
       if (theme.value === 'system') {
         updateTheme()
       }
+    }
+
+    mediaQuery.addEventListener('change', listener)
+
+    // In case component is unmounted
+    onUnmounted(() => {
+      mediaQuery.removeEventListener('change', listener)
     })
   })
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row items-center justify-center gap-2" data-sync="wish">
+  <div class="group relative flex flex-row items-center justify-center gap-2" data-sync="wish">
     <Transition
       enter-active-class="transition duration-1000 ease-out"
       enter-from-class="opacity-0"
@@ -49,6 +49,10 @@
         <span class="text-h2">🤞</span>
       </div>
     </div>
+    <div
+      v-if="isWishTime"
+      class="absolute -left-5 -z-10 size-20 animate-ping! rounded-full bg-amber-200 group-hover:invisible"
+    ></div>
 
     <div class="text-text-tertiary text-ui-small flex flex-col gap-1">
       <div class="flex flex-row gap-1 tabular-nums">
@@ -56,7 +60,7 @@
         {{ isWishTime ? currentTime.split(':').slice(0, -1).join(':') : currentTime }}
       </div>
       <div class="flex flex-row gap-1">
-        <MapPin :size="16" />
+        <Globe2 :size="16" />
         i'm in
         {{ current_location.city }}
       </div>
@@ -79,7 +83,7 @@ import {
   Clock10,
   Clock11,
   Clock12,
-  MapPin,
+  Globe2,
 } from '@lucide/vue'
 import { addDays, differenceInMinutes, differenceInSeconds } from 'date-fns'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'

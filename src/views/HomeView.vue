@@ -1,7 +1,43 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
-    <AboutMe v-model:filter="activeFilter" :group-counts="groupCounts" />
-    <div class="grid w-full grid-flow-row-dense grid-cols-12 gap-8 px-20">
+    <div data-sync="about-me" class="flex w-full flex-row items-center justify-center gap-8 p-20">
+      <img
+        src="@/assets/images/public.webp"
+        alt="karan sanas"
+        class="border-border-primary aspect-auto h-50 rounded-[4.16rem] border"
+      />
+      <div class="flex w-120 flex-col items-start justify-center gap-4">
+        <div class="text-ui text-text-secondary flex flex-col gap-2">
+          <p>@psiderman</p>
+          <h1 class="text-display text-text-primary -mt-2">hi, i'm karan</h1>
+          <p class="text-p italic">
+            “i’m still searching for a one-liner to sum me up.<br />until then my life is a bento
+            box of endless interests,<br />neatly packed for display on my ever-evolving personal
+            website.”
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="relative grid w-full grid-flow-row-dense grid-cols-12 gap-8 px-20">
+      <div
+        v-if="activeFilter && activeDescription.id"
+        class="border-border-primary bg-surface-primary pointer-events-auto col-span-4 row-span-3 flex h-124 flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
+      >
+        <div class="aspect-video">
+          <img
+            :src="getImageUrl(activeDescription.id)"
+            class="border-border-primary h-full w-full rounded-lg border object-cover"
+            :alt="activeDescription.id"
+          />
+        </div>
+        <div
+          class="text-p text-text-secondary flex h-full w-full flex-col gap-5 overflow-scroll italic"
+        >
+          <p class="text-text-primary -mb-1 font-semibold">{{ activeDescription.title }}</p>
+          <p v-for="(p, i) in activeDescription.content" :key="i">{{ p }}</p>
+        </div>
+      </div>
+
       <CardContainer
         v-for="card in filteredCards"
         :key="card.id"
@@ -16,13 +52,35 @@
       >
         <component :is="card.content" v-if="card.content" :show-help="isIconHovered" />
       </CardContainer>
+
+      <div class="absolute top-0 left-0 h-full w-fit" style="left: calc(-50vw + 50%)">
+        <div class="sticky top-21 flex flex-col justify-start gap-4">
+          <button
+            v-for="emj in emojis"
+            :key="emj.id"
+            v-tooltip="{ group: 'filter', placement: 'right', content: emj.label }"
+            class="emoji-filter"
+            :class="{
+              default: !activeFilter,
+              active: activeFilter === emj.id,
+              inactive: activeFilter && activeFilter !== emj.id,
+            }"
+            @click="activeFilter = activeFilter === emj.id ? null : emj.id"
+          >
+            <span class="text-center">
+              {{ emj.emoji }}
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
     <ContactForm />
   </div>
 </template>
 
 <script setup lang="ts">
-import { type Component, computed, ref } from 'vue'
+import { type Component, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import DrawCardContent from '@/components/cards/DrawCardContent.vue'
 import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
@@ -31,13 +89,28 @@ import NowCardContent from '@/components/cards/NowCardContent.vue'
 import SpotifyCardContainer from '@/components/cards/SpotifyCardContainer.vue'
 import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
-import AboutMe from '@/components/home/AboutMe.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
+import { EMOJI_GROUPS } from '@/types'
 
 import type { EmojiGroupId } from '@/types'
 
-const activeFilter = ref<EmojiGroupId | null>(null)
+const emojis = EMOJI_GROUPS
+
+const route = useRoute()
+const router = useRouter()
+
+const activeFilter = computed<EmojiGroupId | null>({
+  get: () => (route.query.filter as EmojiGroupId) || null,
+  set: (val) => {
+    router.replace({
+      query: {
+        ...route.query,
+        filter: val || undefined,
+      },
+    })
+  },
+})
 
 interface Card {
   arrow?: 'external' | 'help' | 'none' | 'right'
@@ -56,7 +129,7 @@ const cards: Card[] = [
   {
     arrow: 'external',
     content: FoursightCardContent,
-    group: ['personal_finance', 'work'],
+    group: ['personal_finance'],
     id: 'foursight',
     link: 'https://foursight.money/about',
     size: 'lg',
@@ -173,6 +246,20 @@ const cards: Card[] = [
     title: 'blr maps',
   },
 ]
+import { descriptionContent } from '@/data/homeDescriptions'
+
+const activeDescription = computed(() => {
+  if (activeFilter.value) return descriptionContent.filter((a) => a.id === activeFilter.value)[0]
+  else
+    return {
+      content: null,
+      id: null,
+    }
+})
+
+const getImageUrl = (id: string) => {
+  return new URL(`../assets/images/groups/${id}.webp`, import.meta.url).href
+}
 
 const filteredCards = computed(() => {
   if (!activeFilter.value) return cards
@@ -181,20 +268,43 @@ const filteredCards = computed(() => {
 
   const sizeWeight = { lg: 3, md: 2, sm: 1 }
 
-  return visible.sort((a, b) => sizeWeight[b.size] - sizeWeight[a.size])
-})
+  const sorted = visible.sort((a, b) => sizeWeight[b.size] - sizeWeight[a.size])
 
-const groupCounts = computed(() => {
-  const counts: Record<string, number> = {}
-  for (const card of cards) {
-    for (const g of card.group) {
-      counts[g] = (counts[g] || 0) + 1
-    }
+  if (sorted.length === 1) {
+    return [{ ...sorted[0], span: 'col-span-8' }]
   }
-  return counts
+
+  return sorted
 })
 </script>
 
 <style scoped>
 @reference "@/style.css";
+.emoji-filter {
+  @apply text-ui relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full rounded-l-none border border-l-0 bg-linear-0 pr-1.5 transition-colors duration-200 ease-in-out;
+
+  &.default {
+    @apply bg-surface-primary border-border-primary hover:from-hover hover:to-hover active:from-press active:to-press;
+  }
+
+  &.active {
+    @apply bg-surface-inverted hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted border-transparent;
+  }
+
+  &.inactive {
+    @apply bg-surface-secondary hover:from-hover hover:to-hover active:from-press active:to-press border-transparent;
+
+    span {
+      @apply opacity-50 mix-blend-luminosity;
+    }
+
+    &:hover span {
+      @apply opacity-75;
+    }
+
+    &:active span {
+      @apply opacity-100 mix-blend-normal;
+    }
+  }
+}
 </style>

@@ -3,12 +3,7 @@ import { XMLParser } from 'fast-xml-parser'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function handler(req: any, res: any) {
   const origin = req.headers.origin || req.headers.referer || ''
-  if (
-    origin &&
-    !origin.includes('psiderman.com') &&
-    !origin.includes('localhost') &&
-    !origin.includes('vercel.app')
-  ) {
+  if (!isAllowedOrigin(origin)) {
     return res.status(403).json({ error: 'Forbidden' })
   }
 
@@ -65,5 +60,18 @@ export default async function handler(req: any, res: any) {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     return res.status(500).json({ error: errorMessage })
+  }
+}
+
+function isAllowedOrigin(origin: string): boolean {
+  try {
+    const { hostname } = new URL(origin)
+    return (
+      hostname === 'psiderman.com' ||
+      hostname.endsWith('.psiderman.com') ||
+      hostname === 'localhost'
+    )
+  } catch {
+    return false
   }
 }
