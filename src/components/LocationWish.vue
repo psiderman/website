@@ -51,7 +51,7 @@
     </div>
     <div
       v-if="isWishTime"
-      class="absolute -left-5 -z-10 size-20 animate-ping! rounded-full bg-amber-200 group-hover:invisible"
+      class="absolute -left-5 -z-10 size-20 animate-ping! rounded-full bg-amber-200 group-hover:invisible dark:bg-amber-500/20"
     ></div>
 
     <div class="text-text-tertiary text-ui-small flex flex-col gap-1">

@@ -25,10 +25,10 @@
           {{ user.name ? user.name.charAt(0).toUpperCase() : 'A' }}
         </span>
       </div>
-      <span v-if="sortedPresenceUsers.length > 5" class="text-text-secondary ml-1">
-        + {{ sortedPresenceUsers.length - 5 }} more...
-      </span>
     </div>
+    <span v-if="sortedPresenceUsers.length > 5" class="text-text-secondary ml-2 whitespace-nowrap text-sm">
+      + {{ sortedPresenceUsers.length - 5 }} more...
+    </span>
   </div>
 </template>
 

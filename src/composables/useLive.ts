@@ -29,6 +29,18 @@ export interface CursorData {
   y: number
 }
 
+export interface PresenceUser {
+  avatar: null | string
+  color: {
+    bg: string
+    fg: string
+  }
+  id: string
+  isStale?: boolean
+  name: string
+  route: string
+}
+
 export interface TouchData {
   box: string
   color: {
@@ -83,12 +95,38 @@ export const activeUserId = computed(() => currentUser.value?.id || localId!)
 
 const fallbackColor = computed(() => generateColor(activeUserId.value))
 
+const SPICE_NAMES = [
+  'Bay Leaf',
+  'Cinnamon',
+  'Clove',
+  'Dhaniya',
+  'Elaichi',
+  'Garlic',
+  'Ginger',
+  'Imli',
+  'Jeera',
+  'Mirchi',
+  'Mustard',
+  'Pepper',
+  'Saffron',
+  'Star Anise',
+]
+
+const getAnonName = (id: string) => {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) {
+    hash = id.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % SPICE_NAMES.length
+  return `Anonymous ${SPICE_NAMES[index]}`
+}
+
 const userName = computed(() => {
-  if (!currentUser.value) return 'Anon'
+  if (!currentUser.value) return getAnonName(activeUserId.value)
   return (
     currentUser.value.user_metadata?.full_name?.split(' ')[0] ||
     currentUser.value.email?.split('@')[0] ||
-    'Anon'
+    getAnonName(activeUserId.value)
   )
 })
 
@@ -156,7 +194,7 @@ watch(
 
 // Global reactive state
 export const hasOtherUsersOnRoute = ref(false)
-export const activePresenceUsers = ref<any[]>([])
+export const activePresenceUsers = ref<PresenceUser[]>([])
 export const activeRoute = ref('')
 export const cursors = ref<Record<string, CursorData>>({})
 export const touches = ref<Record<string, TouchData>>({})
@@ -454,7 +492,7 @@ export function useLive() {
         const activeIds = new Set<string>()
 
         for (const id in state) {
-          const presences = state[id] as any[]
+          const presences = state[id] as unknown as PresenceUser[]
           if (presences.length > 0) {
             const p = presences[0]
             users.push(p)
