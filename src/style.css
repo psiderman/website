@@ -95,6 +95,7 @@
 
   /* primitive colors */
   --color-dark: oklch(0.118 0.021 216);
+  --color-dark-dark: oklch(0.118 0.002 216);
   --color-light: oklch(1 0 0);
 
   --color-dark-5p: oklch(0.584 0.0962 249.8 / 0.05);
@@ -333,7 +334,7 @@
 
 @layer base {
   .dark {
-    --color-background: var(--color-dark);
+    --color-background: var(--color-dark-dark);
 
     --color-surface-primary: var(--color-zinc-950);
     --color-surface-secondary: var(--color-zinc-900);
@@ -353,10 +354,10 @@
 
     --color-hover: rgb(from var(--color-light) r g b / 0.05);
     --color-press: rgb(from var(--color-light) r g b / 0.1);
-    --color-hover-inverted: rgb(from var(--color-dark) r g b / 0.05);
-    --color-press-inverted: rgb(from var(--color-dark) r g b / 0.1);
+    --color-hover-inverted: rgb(from var(--color-dark-dark) r g b / 0.05);
+    --color-press-inverted: rgb(from var(--color-dark-dark) r g b / 0.1);
 
-    --color-overlay: rgb(from var(--color-dark) r g b / 0.5);
+    --color-overlay: rgb(from var(--color-dark-dark) r g b / 0.5);
   }
 
   input[type='number']::-webkit-inner-spin-button,

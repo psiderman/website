@@ -10,7 +10,11 @@
         </p>
       </div>
       <div class="flex flex-row gap-4">
-        <button v-tooltip="{ content: 'write me', group: 'contact-form' }" class="btn inverted">
+        <button
+          v-tooltip="{ content: 'write me', group: 'contact-form' }"
+          class="btn inverted"
+          @click="copyEmail"
+        >
           copy email
         </button>
         <button
@@ -67,7 +71,71 @@ const buttons = [
     id: 'reddit',
     link: 'https://www.youtube.com/watch?v=xvFZjo5PgG0',
     logo: faRedditAlien,
-    tooltip: 'maybe don’t click here',
+    tooltip: 'psychoanalyze me',
   },
 ]
+
+import { animate } from 'animejs'
+
+const random = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
+
+async function copyEmail(event: MouseEvent) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText('hi@psiderman.com')
+    } else {
+      // Fallback for insecure contexts (like local network IP testing)
+      const textArea = document.createElement('textarea')
+      textArea.value = 'hi@psiderman.com'
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+    }
+
+    const copiedMessage = document.createElement('span')
+    copiedMessage.textContent = 'Copied'
+    copiedMessage.classList.add(
+      'rounded-full',
+      'bg-emerald-600',
+      'px-2',
+      'py-0',
+      'text-ui-small',
+      'font-medium',
+      'text-light',
+      'z-50',
+      'pointer-events-none',
+    )
+
+    document.body.appendChild(copiedMessage)
+
+    const messageX = event.pageX - copiedMessage.offsetWidth / 2
+    const messageY = event.pageY - copiedMessage.offsetHeight / 2 - 20
+
+    // Set the position for the centered message
+    copiedMessage.style.position = 'absolute'
+    copiedMessage.style.top = `${messageY}px`
+    copiedMessage.style.left = `${messageX}px`
+
+    const direction = random(0, 1)
+    const plusminus = direction ? '+' : '-'
+    const flingYLength = random(20, 50)
+    const flingXLength = random(0, 50)
+    const rotation = random(10, 15) * (flingXLength / 50)
+
+    animate(copiedMessage, {
+      duration: random(500, 1000),
+      ease: 'out(2)',
+      onComplete: () => {
+        document.body.removeChild(copiedMessage)
+      },
+      opacity: [{ duration: 2000, ease: 'inOut(2)', to: 0 }],
+      rotate: `${plusminus}${rotation}deg`,
+      x: `${plusminus}=${flingXLength}px`,
+      y: `-=${flingYLength}px`,
+    })
+  } catch {
+    return
+  }
+}
 </script>

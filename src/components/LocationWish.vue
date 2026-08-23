@@ -21,9 +21,9 @@
         theme: 'tippy-small',
         hideOnClick: false,
       }"
-      class="relative size-10 shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-transparent bg-amber-200 dark:bg-amber-500/20"
+      class="relative size-10 shrink-0 cursor-cell overflow-hidden rounded-full border-2 border-transparent bg-amber-200 dark:bg-amber-500/20"
       :class="{
-        'border-amber-400! transition-all duration-200': isPressing,
+        'cursor-progress border-amber-400! transition-all duration-200': isPressing,
         'border-transparent bg-transparent! transition-all duration-200': isPopping,
         'popping cursor-default': isPopping,
         jitter: isReadyToPop,
@@ -61,7 +61,6 @@
       </div>
       <div class="flex flex-row gap-1">
         <Globe2 :size="16" />
-        i'm in
         {{ current_location.city }}
       </div>
     </div>
@@ -87,8 +86,6 @@ import {
 } from '@lucide/vue'
 import { addDays, differenceInMinutes, differenceInSeconds } from 'date-fns'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-
-import { supabase } from '../supabase'
 
 interface Location {
   city: string
@@ -144,7 +141,7 @@ const onPressStart = () => {
   if (holdTimeout) clearTimeout(holdTimeout)
   holdTimeout = setTimeout(() => {
     isReadyToPop.value = true
-    wishTooltip.value = null
+    wishTooltip.value = 'let go'
   }, 4800)
 }
 
@@ -245,22 +242,8 @@ const updateTime = () => {
   }
 }
 
-async function getCurrentLocation() {
-  try {
-    const { data } = await supabase.from('variables').select().eq('id', 'current_location')
-    if (data && data[0]) {
-      current_location.value.city = data[0].value.city || ''
-      current_location.value.timezone = data[0].value.time || data[0].value.timezone || ''
-      updateTime()
-    }
-  } catch (err) {
-    console.error('Error fetching location:', err)
-  }
-}
-
 onMounted(() => {
   lastWish.value = localStorage.getItem('lastWishTime')
-  getCurrentLocation()
   timer = setInterval(updateTime, 1000)
 })
 

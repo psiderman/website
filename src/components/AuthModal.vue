@@ -30,7 +30,7 @@
               <div class="flex flex-col gap-2 text-center">
                 <p class="text-display mb-2">🚪</p>
                 <DialogTitle as="h2" class="text-h2 text-text-primary">
-                  come in, <br />
+                  come on in, <br />
                   don't be a stranger</DialogTitle
                 >
                 <p class="text-ui text-text-secondary">

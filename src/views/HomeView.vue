@@ -1,5 +1,6 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
+    <!-- About me -->
     <div data-sync="about-me" class="flex w-full flex-row items-center justify-center gap-8 p-20">
       <img
         src="@/assets/images/public.webp"
@@ -18,7 +19,28 @@
         </div>
       </div>
     </div>
+    <!-- Grid -->
     <div class="relative grid w-full grid-flow-row-dense grid-cols-12 gap-8 px-20">
+      <!-- Filters -->
+      <div class="col-span-12 -mt-5 flex h-0 flex-row justify-center gap-1">
+        <button
+          v-for="emj in emojis"
+          :key="emj.id"
+          v-tooltip="{ group: 'filter', placement: 'top', content: emj.label }"
+          class="emoji-filter group"
+          :class="{
+            default: !activeFilter,
+            active: activeFilter === emj.id,
+            inactive: activeFilter && activeFilter !== emj.id,
+          }"
+          @click="activeFilter = activeFilter === emj.id ? null : emj.id"
+        >
+          <span class="text-center">
+            {{ emj.emoji }}
+          </span>
+        </button>
+      </div>
+      <!-- Description Card -->
       <div
         v-if="activeFilter && activeDescription.id"
         class="border-border-primary bg-surface-primary pointer-events-auto col-span-4 row-span-3 flex h-124 flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
@@ -37,7 +59,7 @@
           <p v-for="(p, i) in activeDescription.content" :key="i" v-html="p"></p>
         </div>
       </div>
-
+      <!-- All Cards -->
       <CardContainer
         v-for="card in filteredCards"
         :key="card.id"
@@ -53,26 +75,11 @@
         <component :is="card.content" v-if="card.content" :show-help="isIconHovered" />
       </CardContainer>
 
-      <div class="absolute top-0 left-0 h-full w-fit pl-2" style="left: calc(-50vw + 50%)">
-        <div class="sticky top-21 flex flex-col justify-start gap-4">
-          <button
-            v-for="emj in emojis"
-            :key="emj.id"
-            v-tooltip="{ group: 'filter', placement: 'right', content: emj.label }"
-            class="emoji-filter group"
-            :class="{
-              default: !activeFilter,
-              active: activeFilter === emj.id,
-              inactive: activeFilter && activeFilter !== emj.id,
-            }"
-            @click="activeFilter = activeFilter === emj.id ? null : emj.id"
-          >
-            <span class="text-center">
-              {{ emj.emoji }}
-            </span>
-          </button>
-        </div>
-      </div>
+      <!-- <div class="absolute top-0 left-0 h-full w-fit pl-2" style="left: calc(-50vw + 50%)"> -->
+      <!-- <div class="sticky top-21 flex flex-col justify-start gap-4"> -->
+
+      <!-- </div> -->
+      <!-- </div> -->
     </div>
     <ContactForm />
   </div>
@@ -258,7 +265,7 @@ const activeDescription = computed(() => {
 })
 
 const getImageUrl = (id: string) => {
-  return new URL(`../assets/images/groups/${id}.webp`, import.meta.url).href
+  return new URL(`../data/descriptions/${id}.webp`, import.meta.url).href
 }
 
 const filteredCards = computed(() => {
@@ -281,14 +288,14 @@ const filteredCards = computed(() => {
 <style scoped>
 @reference "@/style.css";
 .emoji-filter {
-  @apply bg-background text-ui relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-colors duration-200 ease-in-out;
+  @apply bg-background text-ui relative flex size-12 cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-colors duration-200 ease-in-out;
 
   & span {
     @apply flex w-4.25 items-center justify-center text-center leading-none;
   }
 
   &.default {
-    @apply hover:from-hover hover:to-hover active:from-press active:to-press opacity-50 group-hover:opacity-100;
+    @apply hover:from-hover hover:to-hover active:from-press active:to-press group-hover:opacity-100;
   }
 
   &.active {
@@ -299,7 +306,7 @@ const filteredCards = computed(() => {
     @apply hover:from-hover hover:to-hover active:from-press active:to-press;
 
     span {
-      @apply opacity-50 mix-blend-luminosity;
+      @apply opacity-30 mix-blend-luminosity;
     }
 
     &:hover span {
