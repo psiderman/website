@@ -14,7 +14,7 @@
           v-for="(t, i) in display_tracks"
           :key="t.track_id"
           class="text-ui-small text-light hover:bg-hover-inverted active:bg-press-inverted relative flex w-full cursor-pointer flex-row gap-3 rounded-lg px-2 py-1"
-          @click="handleClick(t.song_url)"
+          @click="openLink(t.song_url)"
         >
           <p class="h-4 w-4 shrink-0 text-right tabular-nums opacity-60">{{ i + 1 }}</p>
           <div class="flex grow flex-row items-center gap-1 truncate">
@@ -119,6 +119,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth.ts'
+import { openLink } from '@/utils'
 
 import GenericLoader from '../GenericLoader.vue'
 
@@ -231,19 +232,13 @@ const display_tracks = computed<DisplayTrack[]>(() => {
   }, [])
 })
 
-const handleClick = (link: null | string) => {
-  if (link) window.open(link, '_blank')
-}
-
 const playerClick = (link: null | string) => {
   if (!currentUser.value) {
     isAuthModalOpen.value = true
     return
   }
 
-  if (link) {
-    window.open(link, '_blank')
-  }
+  openLink(link)
 }
 </script>
 

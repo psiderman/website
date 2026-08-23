@@ -21,7 +21,7 @@
         v-for="movie in movies"
         :key="movie.id"
         class="group border-border-primary dark:border-surface-tertiary relative shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border"
-        @click="handleClick(movie.link)"
+        @click="openLink(movie.link)"
       >
         <img
           :src="movie.cover"
@@ -64,6 +64,7 @@ import { onMounted, onUnmounted, ref } from 'vue'
 
 import starHalf from '@/assets/svg/star-0.5.svg'
 import starFull from '@/assets/svg/star-1.svg'
+import { openLink } from '@/utils'
 
 import GenericLoader from '../GenericLoader.vue'
 
@@ -95,12 +96,6 @@ const { data: movies, isLoading: loading } = useQuery({
   },
   queryKey: ['movies'],
 })
-
-const handleClick = (link: null | string) => {
-  if (link) {
-    window.open(link, '_blank')
-  }
-}
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const isHovered = ref(false)

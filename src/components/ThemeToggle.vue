@@ -5,6 +5,7 @@
       :class="indicatorPos"
     ></div>
     <div
+      v-tooltip="{ content: 'dark mode', group: 'header-right' }"
       :class="{
         'text-text-inverted-primary rounded-full': theme === 'dark',
       }"
@@ -14,6 +15,7 @@
       <Moon :size="16" />
     </div>
     <div
+      v-tooltip="{ content: 'light mode', group: 'header-right' }"
       :class="{
         'text-text-inverted-primary rounded-full': theme === 'light',
       }"
@@ -23,6 +25,7 @@
       <Sun :size="16" />
     </div>
     <div
+      v-tooltip="{ content: 'auto mode', group: 'header-right' }"
       :class="{
         'text-text-inverted-primary rounded-full': theme === 'system',
       }"

@@ -13,15 +13,27 @@
         <HeaderAvatars />
 
         <!-- Multiplayer tools -->
-        <button
-          class="btn stroke icon-only"
-          :class="{ 'pointer-events-none opacity-50': !hasOtherUsersOnRoute }"
-          :disabled="!hasOtherUsersOnRoute"
-          @click="toggleMultiplayer()"
+        <div
+          v-tooltip="{
+            content: hasOtherUsersOnRoute
+              ? global.allowMultiplayer.value
+                ? 'hide live cursors and touches'
+                : 'show live cursors and touches'
+              : 'nobody else is online',
+            hideOnClick: false,
+            group: 'header-right',
+          }"
         >
-          <MousePointer2 v-if="global.allowMultiplayer.value" :size="16" />
-          <MousePointer2Off v-else :size="16" />
-        </button>
+          <button
+            class="btn stroke icon-only"
+            :class="{ 'pointer-events-none opacity-50': !hasOtherUsersOnRoute }"
+            :disabled="!hasOtherUsersOnRoute"
+            @click="toggleMultiplayer()"
+          >
+            <MousePointer2 v-if="global.allowMultiplayer.value" :size="16" />
+            <MousePointer2Off v-else :size="16" />
+          </button>
+        </div>
 
         <!-- Theme -->
         <ThemeToggle />

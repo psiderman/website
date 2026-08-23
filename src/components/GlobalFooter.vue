@@ -5,7 +5,7 @@
   >
     <button
       class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors duration-200 focus:outline-none"
-      @click="handleClick(`https://github.com/psiderman/website/commit/${commit}`)"
+      @click="openLink(`https://github.com/psiderman/website/commit/${commit}`)"
     >
       <div class="flex size-4 items-center justify-center">
         <FA class="size-4" :icon="['fab', 'github']" />
@@ -33,11 +33,7 @@
 </template>
 
 <script setup lang="ts">
-const commit = __COMMIT_HASH__
+import { openLink } from '@/utils'
 
-const handleClick = (link: null | string) => {
-  if (link) {
-    window.open(link, '_blank')
-  }
-}
+const commit = __COMMIT_HASH__
 </script>

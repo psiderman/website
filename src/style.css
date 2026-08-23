@@ -341,9 +341,9 @@
     --color-surface-inverted: var(--color-zinc-50);
     --color-surface-inverted-secondary: var(--color-zinc-200);
 
-    --color-text-primary: var(--color-zinc-50);
-    --color-text-secondary: var(--color-zinc-400);
-    --color-text-tertiary: var(--color-zinc-600);
+    --color-text-primary: var(--color-light);
+    --color-text-secondary: rgb(from var(--color-light) r g b / 0.67);
+    --color-text-tertiary: rgb(from var(--color-light) r g b / 0.5);
     --color-text-inverted-primary: var(--color-zinc-900);
     --color-text-inverted-secondary: var(--color-zinc-700);
 

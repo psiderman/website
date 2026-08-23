@@ -1,7 +1,7 @@
 <template>
   <button
     :data-sync="'card-' + title.toLowerCase().replace(/\s+/g, '-')"
-    class="border-border-primary bg-surface-primary pointer-events-auto flex flex-col gap-2 rounded-xl border p-2"
+    class="border-border-primary bg-surface-primary pointer-events-auto flex flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
     :class="[heightClass, { clickable: link }]"
     @click="handleClick"
   >
@@ -33,6 +33,7 @@ import { ArrowRight, ArrowUpRight, CircleHelp } from '@lucide/vue'
 import { computed, ref } from 'vue'
 
 import router from '@/router'
+import { openLink } from '@/utils'
 
 interface Props {
   arrow?: 'external' | 'help' | 'none' | 'right'
@@ -72,7 +73,7 @@ const handleClick = () => {
   if (!props.link) return
 
   if (props.link.startsWith('http')) {
-    window.open(props.link, '_blank')
+    openLink(props.link)
   } else {
     router.push(props.link)
   }
@@ -83,6 +84,6 @@ const handleClick = () => {
 @reference "@/style.css";
 
 button.clickable {
-  @apply cursor-pointer transition-colors duration-200 hover:shadow-sm;
+  @apply cursor-pointer hover:shadow-sm;
 }
 </style>

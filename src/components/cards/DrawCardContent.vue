@@ -22,7 +22,7 @@
           v-for="(points, i) in backgroundStrokes.slice(0, visibleBgStrokeIndex)"
           :key="'bg' + i"
           :d="getSvgPathFromStroke(points)"
-          class="fill-indigo-500 dark:fill-indigo-500"
+          class="fill-pink-800 dark:fill-pink-700"
         />
         <path
           v-if="visibleBgStrokeIndex < backgroundStrokes.length"
@@ -31,7 +31,7 @@
               backgroundStrokes[visibleBgStrokeIndex].slice(0, visibleBgPointIndex),
             )
           "
-          class="fill-indigo-500 dark:fill-indigo-500"
+          class="fill-pink-800 dark:fill-pink-700"
         />
       </g>
       <path
@@ -46,6 +46,7 @@
     <template v-if="strokes.length > 0">
       <button
         v-if="hasUnsavedChanges"
+        v-tooltip="'upload your drawing'"
         class="text-text-tertiary dark:text-text-secondary hover:text-text-primary absolute top-0 right-0 z-20 cursor-pointer p-3 transition-colors duration-200"
         :class="{ 'animate-pulse cursor-not-allowed opacity-50': isSaving }"
         :disabled="isSaving"

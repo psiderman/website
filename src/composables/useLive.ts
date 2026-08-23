@@ -186,7 +186,13 @@ const activeTouches = computed(() => {
 
 export const sortedPresenceUsers = computed(() => {
   if (!global.allowMultiplayer.value) return []
-  return [...activePresenceUsers.value]
+
+  const uniqueUsers = new Map()
+  for (const u of activePresenceUsers.value) {
+    uniqueUsers.set(u.id, u)
+  }
+
+  return Array.from(uniqueUsers.values())
     .map((u) => {
       const isLocal = u.id === activeUserId.value
       const cursor = cursors.value[u.id]
