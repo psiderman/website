@@ -1,59 +1,44 @@
 <template>
-  <button class="theme-toggle btn stroke relative p-0.75">
-    <div
-      class="bg-surface-inverted absolute -z-10 rounded-full transition-all duration-200 ease-in"
-      :class="indicatorPos"
-    ></div>
-    <div
-      v-tooltip="{ content: 'dark mode', group: 'header-right' }"
-      :class="{
-        'text-text-inverted-primary rounded-full': theme === 'dark',
-      }"
-      class="cursor-pointer"
-      @click="setTheme('dark')"
-    >
-      <Moon :size="16" />
-    </div>
-    <div
-      v-tooltip="{ content: 'light mode', group: 'header-right' }"
-      :class="{
-        'text-text-inverted-primary rounded-full': theme === 'light',
-      }"
-      class="cursor-pointer"
-      @click="setTheme('light')"
-    >
-      <Sun :size="16" />
-    </div>
-    <div
-      v-tooltip="{ content: 'auto mode', group: 'header-right' }"
-      :class="{
-        'text-text-inverted-primary rounded-full': theme === 'system',
-      }"
-      class="cursor-pointer"
-      @click="setTheme('system')"
-    >
-      <Monitor :size="16" />
-    </div>
+  <button
+    v-tooltip="{ content: `theme: ${theme}`, group: 'header-right' }"
+    class="btn stroke icon-only relative overflow-hidden"
+    @click="cycleTheme"
+  >
+    <Transition name="slide-up">
+      <div :key="theme" class="absolute inset-0 flex items-center justify-center">
+        <MonitorCog v-if="theme === 'system'" :size="16" />
+        <Sun v-else-if="theme === 'light'" :size="16" />
+        <Moon v-else-if="theme === 'dark'" :size="16" />
+      </div>
+    </Transition>
   </button>
 </template>
 
 <script setup lang="ts">
-import { Monitor, Moon, Sun } from '@lucide/vue'
-import { computed } from 'vue'
+import { MonitorCog, Moon, Sun } from '@lucide/vue'
 
 import { setTheme, theme } from '../composables/useTheme'
 
-const indicatorPos = computed(() => {
-  if (theme.value === 'dark') return '-translate-x-10'
-  if (theme.value === 'light') return 'translate-x-0'
-  if (theme.value === 'system') return 'translate-x-10'
-  return '-translate-x-10'
-})
+const cycleTheme = () => {
+  if (theme.value === 'system') setTheme('light')
+  else if (theme.value === 'light') setTheme('dark')
+  else setTheme('system')
+}
 </script>
 
 <style scoped>
 @reference "@/style.css";
-button.theme-toggle > div {
-  @apply z-10 flex size-8 items-center justify-center p-2;
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(100%);
+}
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-100%);
 }
 </style>
