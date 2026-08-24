@@ -25,9 +25,33 @@
             leave-to="opacity-0 scale-95"
           >
             <DialogPanel
-              class="bg-surface-primary border-border-primary flex h-90 w-80 flex-col items-center justify-center gap-8 rounded-xl border px-6 py-12 shadow-none!"
+              class="bg-surface-primary border-border-primary relative flex h-90 w-80 flex-col items-center justify-center gap-8 overflow-hidden rounded-xl border px-6 py-12 shadow-none!"
             >
-              <div class="flex flex-col gap-2 text-center">
+              <!-- BG DECOR -->
+              <div class="pointer-events-none absolute inset-0 z-0">
+                <img
+                  src="@/data/descriptions/music.webp"
+                  alt="life"
+                  class="image-print absolute -bottom-2 -left-22 aspect-auto w-32 -rotate-5"
+                />
+                <img
+                  src="@/data/descriptions/work.webp"
+                  alt="life"
+                  class="image-print absolute -bottom-7 -left-14 aspect-auto w-32 rotate-5"
+                />
+                <img
+                  src="@/data/descriptions/building.webp"
+                  alt="life"
+                  class="image-print absolute -top-5 -right-10 aspect-auto w-32 rotate-0"
+                />
+                <img
+                  src="@/data/descriptions/travel.webp"
+                  alt="life"
+                  class="image-print absolute -top-6 -right-14 aspect-auto w-32 -rotate-12"
+                />
+              </div>
+
+              <div class="z-10 flex flex-col gap-2 text-center">
                 <p class="text-display mb-2">🚪</p>
                 <DialogTitle as="h2" class="text-h2 text-text-primary">
                   come on in, <br />
@@ -39,7 +63,7 @@
                 </p>
               </div>
 
-              <div class="flex w-fit flex-col items-center gap-2">
+              <div class="z-10 flex w-fit flex-col items-center gap-2">
                 <button class="btn primary" @click="signInWithGoogle">
                   <FA :icon="['fab', 'google']" class="text-ui-small" />
                   Continue with Google

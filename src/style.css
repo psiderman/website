@@ -612,6 +612,11 @@
       @apply outline-gray-400! dark:outline-zinc-400!;
     }
   }
+
+  /* Image with borders */
+  img.image-print {
+    @apply bg-dark border-light outline-dark/15 rounded-lg border-4 shadow-md outline;
+  }
 }
 
 :root {
