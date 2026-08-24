@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue'
 export type Theme = 'dark' | 'light' | 'system'
 
 export const theme = ref<Theme>('system')
-export const isDark = ref(false)
+const isDark = ref(false)
 
 const updateTheme = () => {
   if (
@@ -16,12 +16,6 @@ const updateTheme = () => {
     document.documentElement.classList.remove('dark')
     isDark.value = false
   }
-}
-
-export const toggleTheme = () => {
-  const themes: Theme[] = ['light', 'dark', 'system']
-  const nextIndex = (themes.indexOf(theme.value) + 1) % themes.length
-  setTheme(themes[nextIndex])
 }
 
 export const setTheme = (newTheme: Theme) => {

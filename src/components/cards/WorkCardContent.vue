@@ -99,6 +99,7 @@
 </template>
 
 <script setup lang="ts">
+import { OctagonAlert } from '@lucide/vue'
 import { differenceInCalendarMonths, getYear, min } from 'date-fns'
 import { computed } from 'vue'
 

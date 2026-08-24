@@ -12,7 +12,7 @@ export interface BoxRect {
   width: number
 }
 
-export interface CursorData {
+interface CursorData {
   box: string
   color: {
     bg: string
@@ -28,7 +28,7 @@ export interface CursorData {
   y: number
 }
 
-export interface PresenceUser {
+interface PresenceUser {
   avatar: null | string
   color: {
     bg: string
@@ -40,7 +40,7 @@ export interface PresenceUser {
   room: string
 }
 
-export interface TouchData {
+interface TouchData {
   box: string
   color: {
     bg: string
@@ -54,7 +54,7 @@ export interface TouchData {
   y: number
 }
 
-export const LIVE_CONFIG = {
+const LIVE_CONFIG = {
   CURSOR_DELETE_MS: 60000,
   CURSOR_STALE_MS: 5000,
   MAX_CURSORS: 10,
@@ -138,7 +138,7 @@ const userAvatar = computed(() => {
 })
 
 const colorCache = ref<Record<string, { bg: string; fg: string }>>({})
-export const userColor = ref(fallbackColor.value)
+const userColor = ref(fallbackColor.value)
 
 watch(
   userAvatar,
@@ -193,7 +193,7 @@ watch(
 
 // Global reactive state
 export const hasOtherUsersOnRoom = ref(false)
-export const activePresenceUsers = ref<PresenceUser[]>([])
+const activePresenceUsers = ref<PresenceUser[]>([])
 export const activeRoomName = computed(() => {
   let name = `live:${router.currentRoute.value.path}`
   if (router.currentRoute.value.query.filter) {
@@ -204,14 +204,14 @@ export const activeRoomName = computed(() => {
   }
   return name
 })
-export const cursors = ref<Record<string, CursorData>>({})
-export const touches = ref<Record<string, TouchData>>({})
+const cursors = ref<Record<string, CursorData>>({})
+const touches = ref<Record<string, TouchData>>({})
 const windowWidth = ref(window.innerWidth)
 const scrollY = ref(window.scrollY)
 const boxRects = ref(new Map<string, BoxRect>())
 const isMobile = ref(false)
 
-export const reactiveNow = ref(Date.now())
+const reactiveNow = ref(Date.now())
 
 const activeCursors = computed(() => {
   const now = reactiveNow.value
@@ -319,14 +319,6 @@ export const renderTouches = computed(() => {
 })
 
 let channel: null | ReturnType<typeof supabase.channel> = null
-
-export const leaveChannel = async () => {
-  if (channel) {
-    await channel.untrack()
-    channel.unsubscribe()
-    channel = null
-  }
-}
 
 export const toggleMultiplayer = async () => {
   global.allowMultiplayer.value = !global.allowMultiplayer.value

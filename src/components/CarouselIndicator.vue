@@ -40,7 +40,7 @@ const props = withDefaults(
   defineProps<{
     activeIndex: number
     count: number
-    fastAnimation: boolean
+    fastAnimation?: boolean
     orientation?: 'horizontal' | 'vertical'
   }>(),
   {

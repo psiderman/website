@@ -1,9 +1,3 @@
-export interface GalleryImage {
-  caption?: string
-  landscape?: boolean
-  src: string
-}
-
 export interface WorkDetail {
   clickable?: boolean
   data?: {
@@ -27,13 +21,19 @@ export interface WorkDetail {
   startDate: string // ISO string '2025-02-01'
 }
 
-export interface WorkPerson {
+interface GalleryImage {
+  caption?: string
+  landscape?: boolean
+  src: string
+}
+
+interface WorkPerson {
   imageName: string
   linkedin?: string
   name: string
 }
 
-export interface WorkProject {
+interface WorkProject {
   link?: string
   name: string
 }

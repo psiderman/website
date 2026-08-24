@@ -1,0 +1,20 @@
+{
+  "entry": [
+    "index.html",
+    "api/**/*.ts",
+    "src/fonts.css",
+    "src/main.ts"
+  ],
+  "ignoreBinaries": [
+    "vercel"
+  ],
+  "ignoreDependencies": [
+    "@fontsource-variable/bricolage-grotesque",
+    "@fontsource/source-serif-pro",
+    "vue-tippy"
+  ],
+  "project": [
+    "src/**/*.{ts,vue}",
+    "api/**/*.ts"
+  ]
+}

@@ -8,5 +8,5 @@ export const EMOJI_GROUPS = [
   { emoji: '🎷', id: 'music', label: 'Music' },
 ] as const
 
-export type EmojiGroupDef = (typeof EMOJI_GROUPS)[number]
 export type EmojiGroupId = EmojiGroupDef['id']
+type EmojiGroupDef = (typeof EMOJI_GROUPS)[number]
