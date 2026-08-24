@@ -79,10 +79,12 @@
 
 <script setup lang="ts">
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { watch } from 'vue'
 
+import { global } from '@/composables/useGlobal'
 import { supabase } from '@/supabase'
 
-defineProps<{
+const props = defineProps<{
   isOpen: boolean
 }>()
 
@@ -93,6 +95,17 @@ const emit = defineEmits<{
 const closeModal = () => {
   emit('update:isOpen', false)
 }
+
+watch(
+  () => props.isOpen,
+  (val) => {
+    if (val) {
+      global.activeModal.value = 'auth'
+    } else if (global.activeModal.value === 'auth') {
+      global.activeModal.value = null
+    }
+  },
+)
 
 const signInWithGoogle = async () => {
   const { error } = await supabase.auth.signInWithOAuth({

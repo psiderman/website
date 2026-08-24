@@ -40,24 +40,13 @@
     </div>
 
     <!-- Custom Side Indicator -->
-    <div
+    <CarouselIndicator
       v-if="!isLoadingImages && originalLength > 1"
-      class="bg-dark/70 absolute top-1/2 left-2 flex w-4 -translate-y-1/2 flex-col items-center gap-1 rounded-full p-1 backdrop-blur-xs transition-opacity duration-1000"
-    >
-      <!-- The sliding active pill -->
-      <div
-        class="bg-light absolute z-10 mt-1 h-4 w-2 rounded-full shadow-sm transition-all duration-1000 ease-in-out"
-        :style="{ top: `${activeIndex * 12}px` }"
-      ></div>
-
-      <!-- The background dots -->
-      <div
-        v-for="(_, index) in originalLength"
-        :key="index"
-        class="bg-light h-2 w-2 rounded-full transition-all duration-1000 ease-in-out"
-        :class="activeIndex == index ? 'h-4 opacity-0' : 'h-2 opacity-40'"
-      ></div>
-    </div>
+      class="absolute top-1/2 left-2 -translate-y-1/2"
+      :active-index="activeIndex"
+      :count="originalLength"
+      orientation="vertical"
+    />
   </div>
 </template>
 
@@ -67,6 +56,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { useNow } from '@/composables/useNow'
 
+import CarouselIndicator from '../CarouselIndicator.vue'
 import GenericLoader from '../GenericLoader.vue'
 
 const { images, isLoadingImages, isLoadingSlug } = useNow()

@@ -7,6 +7,13 @@
   <VueQueryDevtools />
   <AuthModal v-model:is-open="isAuthModalOpen" />
   <LiveCursors />
+  <LightBox
+    v-model:is-open="isLightBoxOpen"
+    :title="lightBoxData.title"
+    :description="lightBoxData.description"
+    :images="lightBoxData.images"
+    :tags="lightBoxData.tags"
+  />
 </template>
 
 <script setup lang="ts">
@@ -16,8 +23,10 @@ import { RouterView } from 'vue-router'
 import AuthModal from './components/AuthModal.vue'
 import GlobalFooter from './components/GlobalFooter.vue'
 import GlobalHeader from './components/HeaderBar.vue'
+import LightBox from './components/LightBox.vue'
 import LiveCursors from './components/LiveCursors.vue'
 import { isAuthModalOpen } from './composables/useAuth'
+import { isLightBoxOpen, lightBoxData } from './composables/useGlobal'
 import { useLive } from './composables/useLive'
 import { initTheme } from './composables/useTheme'
 

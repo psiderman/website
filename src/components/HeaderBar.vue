@@ -15,7 +15,7 @@
         <!-- Multiplayer tools -->
         <div
           v-tooltip="{
-            content: hasOtherUsersOnRoute
+            content: hasOtherUsersOnRoom
               ? global.allowMultiplayer.value
                 ? 'hide live cursors and touches'
                 : 'show live cursors and touches'
@@ -26,8 +26,8 @@
         >
           <button
             class="btn stroke icon-only"
-            :class="{ 'pointer-events-none opacity-50': !hasOtherUsersOnRoute }"
-            :disabled="!hasOtherUsersOnRoute"
+            :class="{ 'pointer-events-none opacity-50': !hasOtherUsersOnRoom }"
+            :disabled="!hasOtherUsersOnRoom"
             @click="toggleMultiplayer()"
           >
             <MousePointer2 v-if="global.allowMultiplayer.value" :size="16" />
@@ -53,7 +53,7 @@ import { MousePointer2, MousePointer2Off } from '@lucide/vue'
 
 import { currentUser, isAuthModalOpen } from '../composables/useAuth'
 import { global } from '../composables/useGlobal'
-import { hasOtherUsersOnRoute, toggleMultiplayer } from '../composables/useLive'
+import { hasOtherUsersOnRoom, toggleMultiplayer } from '../composables/useLive'
 import { supabase } from '../supabase'
 import HeaderAvatars from './HeaderAvatars.vue'
 import LocationWish from './LocationWish.vue'

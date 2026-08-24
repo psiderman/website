@@ -1,4 +1,3 @@
-// removed getSwatchesSync import
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { currentUser } from '@/composables/useAuth'
@@ -38,7 +37,7 @@ export interface PresenceUser {
   id: string
   isStale?: boolean
   name: string
-  route: string
+  room: string
 }
 
 export interface TouchData {
@@ -181,7 +180,7 @@ watch(
             color: userColor.value,
             id: activeUserId.value,
             name: userName.value,
-            route: activeRoute.value,
+            room: activeRoomName.value,
           })
         }
       })
@@ -193,9 +192,18 @@ watch(
 )
 
 // Global reactive state
-export const hasOtherUsersOnRoute = ref(false)
+export const hasOtherUsersOnRoom = ref(false)
 export const activePresenceUsers = ref<PresenceUser[]>([])
-export const activeRoute = ref('')
+export const activeRoomName = computed(() => {
+  let name = `live:${router.currentRoute.value.path}`
+  if (router.currentRoute.value.query.filter) {
+    name += `?filter=${router.currentRoute.value.query.filter}`
+  }
+  if (global.activeModal.value) {
+    name += `&modal=${global.activeModal.value}`
+  }
+  return name
+})
 export const cursors = ref<Record<string, CursorData>>({})
 export const touches = ref<Record<string, TouchData>>({})
 const windowWidth = ref(window.innerWidth)
@@ -209,7 +217,7 @@ const activeCursors = computed(() => {
   const now = reactiveNow.value
   return Object.values(cursors.value)
     .filter(
-      (c) => now - c.updatedAt < LIVE_CONFIG.CURSOR_DELETE_MS && c.route === activeRoute.value,
+      (c) => now - c.updatedAt < LIVE_CONFIG.CURSOR_DELETE_MS, // We only receive cursors in the same room anyway
     )
     .map((c) => ({ ...c, isStale: now - c.updatedAt > LIVE_CONFIG.CURSOR_STALE_MS }))
 })
@@ -217,7 +225,7 @@ const activeCursors = computed(() => {
 const activeTouches = computed(() => {
   const now = reactiveNow.value
   return Object.values(touches.value)
-    .filter((t) => now - t.timestamp < LIVE_CONFIG.TOUCH_DELETE_MS && t.route === activeRoute.value)
+    .filter((t) => now - t.timestamp < LIVE_CONFIG.TOUCH_DELETE_MS)
     .map((t) => ({ ...t, isStale: now - t.timestamp > LIVE_CONFIG.TOUCH_STALE_MS }))
 })
 
@@ -329,7 +337,7 @@ export const toggleMultiplayer = async () => {
       color: userColor.value,
       id: activeUserId.value,
       name: userName.value,
-      route: activeRoute.value,
+      room: activeRoomName.value,
     })
   } else {
     await channel.untrack()
@@ -343,145 +351,24 @@ export function useLive() {
   let cleanupInterval: ReturnType<typeof setInterval>
   let driftInterval: ReturnType<typeof setInterval>
 
-  // Track route changes using router hooks instead of watchers
-  activeRoute.value = router.currentRoute.value.path
-  const removeAfterEach = router.afterEach((to) => {
-    activeRoute.value = to.path
-    if (channel && global.allowMultiplayer.value) {
-      channel.track({
-        avatar: userAvatar.value,
-        color: userColor.value,
-        id: activeUserId.value,
-        name: userName.value,
-        route: to.path,
-      })
+  const activeWatchers: (() => void)[] = []
+
+  const joinRoom = (roomName: string) => {
+    if (channel) {
+      channel.untrack()
+      channel.unsubscribe()
+      channel = null
     }
-  })
 
-  const updateBoxRects = () => {
-    const rects = new Map<string, BoxRect>()
-    document.querySelectorAll('[data-sync]').forEach((el) => {
-      const boxId = el.getAttribute('data-sync')
-      if (boxId) {
-        const rect = el.getBoundingClientRect()
-        rects.set(boxId, {
-          height: rect.height,
-          left: rect.left + window.scrollX,
-          top: rect.top + window.scrollY,
-          width: rect.width,
-        })
-      }
-    })
-    boxRects.value = rects
-  }
+    // Clear stale state from previous room
+    cursors.value = {}
+    touches.value = {}
+    activePresenceUsers.value = []
+    hasOtherUsersOnRoom.value = false
 
-  const handleResize = () => {
-    isMobile.value = window.matchMedia('(pointer: coarse)').matches
-    windowWidth.value = window.innerWidth
-    updateBoxRects()
-  }
-
-  const handleScroll = () => {
-    scrollY.value = window.scrollY
-  }
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isMobile.value) return // Mobile uses touchstart
     if (!global.allowMultiplayer.value) return
-    if (!hasOtherUsersOnRoute.value) return
-    if (!channel) return
 
-    const now = Date.now()
-    if (now - lastSent < THROTTLE_MS) return
-    lastSent = now
-
-    const target = (e.target as Element).closest('[data-sync]')
-    let box = 'viewport'
-    let x = e.pageX / windowWidth.value
-    let y = e.pageY
-
-    if (target) {
-      const boxId = target.getAttribute('data-sync')
-      if (boxId) {
-        const rect = target.getBoundingClientRect()
-        box = boxId
-        x = (e.clientX - rect.left) / rect.width
-        y = (e.clientY - rect.top) / rect.height
-      }
-    }
-
-    channel.send({
-      event: 'cursor',
-      payload: {
-        box,
-        color: userColor.value,
-        id: activeUserId.value,
-        name: userName.value,
-        route: activeRoute.value,
-        x,
-        y,
-      },
-      type: 'broadcast',
-    })
-  }
-
-  const handleTouchStart = (e: TouchEvent) => {
-    if (!isMobile.value) return
-    if (!global.allowMultiplayer.value) return
-    if (!hasOtherUsersOnRoute.value) return
-    if (!channel) return
-    if (e.changedTouches.length === 0) return
-
-    const now = Date.now()
-    if (now - lastSent < THROTTLE_MS) return
-    lastSent = now
-
-    const touch = e.changedTouches[0]
-    const target = (e.target as Element).closest('[data-sync]')
-    let box = 'viewport'
-    let x = touch.pageX / windowWidth.value
-    let y = touch.pageY
-
-    if (target) {
-      const boxId = target.getAttribute('data-sync')
-      if (boxId) {
-        const rect = target.getBoundingClientRect()
-        box = boxId
-        x = (touch.clientX - rect.left) / rect.width
-        y = (touch.clientY - rect.top) / rect.height
-      }
-    }
-
-    channel.send({
-      event: 'touch',
-      payload: {
-        box,
-        color: userColor.value,
-        id: activeUserId.value,
-        name: userName.value,
-        route: activeRoute.value,
-        timestamp: now,
-        x,
-        y,
-      },
-      type: 'broadcast',
-    })
-  }
-
-  onMounted(() => {
-    isMobile.value = window.matchMedia('(pointer: coarse)').matches
-    updateBoxRects()
-    resizeObserver = new ResizeObserver(() => {
-      updateBoxRects()
-    })
-    resizeObserver.observe(document.body)
-
-    window.addEventListener('resize', handleResize)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('touchstart', handleTouchStart, { passive: true })
-
-    channel = supabase.channel('room:live')
+    channel = supabase.channel(roomName)
 
     channel
       .on('presence', { event: 'sync' }, () => {
@@ -496,18 +383,16 @@ export function useLive() {
           if (presences.length > 0) {
             const p = presences[0]
             users.push(p)
-            if (p.route === activeRoute.value) {
-              activeIds.add(p.id)
-              if (p.id !== activeUserId.value) {
-                count++
-              }
+            activeIds.add(p.id)
+            if (p.id !== activeUserId.value) {
+              count++
             }
           }
         }
-        hasOtherUsersOnRoute.value = count > 0
+        hasOtherUsersOnRoom.value = count > 0
         activePresenceUsers.value = users
 
-        // Cleanup cursors and touches for users who left the route or disabled live
+        // Cleanup cursors and touches for users who left
         for (const id in cursors.value) {
           if (!activeIds.has(id)) {
             delete cursors.value[id]
@@ -541,10 +426,164 @@ export function useLive() {
             color: userColor.value,
             id: activeUserId.value,
             name: userName.value,
-            route: activeRoute.value,
+            room: activeRoomName.value,
           })
         }
       })
+  }
+
+  // Watch for room changes to rejoin
+  activeWatchers.push(
+    watch(
+      () => activeRoomName.value,
+      (newRoom) => {
+        joinRoom(newRoom)
+      },
+      { immediate: false },
+    ),
+  )
+
+  // Watch for toggle to rejoin/leave
+  activeWatchers.push(
+    watch(
+      () => global.allowMultiplayer.value,
+      (allow) => {
+        if (allow) joinRoom(activeRoomName.value)
+        else {
+          if (channel) {
+            channel.untrack()
+            channel.unsubscribe()
+            channel = null
+          }
+        }
+      },
+    ),
+  )
+
+  const updateBoxRects = () => {
+    const rects = new Map<string, BoxRect>()
+    document.querySelectorAll('[data-sync]').forEach((el) => {
+      const boxId = el.getAttribute('data-sync')
+      if (boxId) {
+        const rect = el.getBoundingClientRect()
+        rects.set(boxId, {
+          height: rect.height,
+          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY,
+          width: rect.width,
+        })
+      }
+    })
+    boxRects.value = rects
+  }
+
+  const handleResize = () => {
+    isMobile.value = window.matchMedia('(pointer: coarse)').matches
+    windowWidth.value = window.innerWidth
+    updateBoxRects()
+  }
+
+  const handleScroll = () => {
+    scrollY.value = window.scrollY
+  }
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isMobile.value) return // Mobile uses touchstart
+    if (!global.allowMultiplayer.value) return
+    if (!hasOtherUsersOnRoom.value) return
+    if (!channel) return
+
+    const now = Date.now()
+    if (now - lastSent < THROTTLE_MS) return
+    lastSent = now
+
+    const target = (e.target as Element).closest('[data-sync]')
+    let box = 'viewport'
+    let x = e.pageX / windowWidth.value
+    let y = e.pageY
+
+    if (target) {
+      const boxId = target.getAttribute('data-sync')
+      if (boxId) {
+        const rect = target.getBoundingClientRect()
+        box = boxId
+        x = (e.clientX - rect.left) / rect.width
+        y = (e.clientY - rect.top) / rect.height
+      }
+    }
+
+    channel.send({
+      event: 'cursor',
+      payload: {
+        box,
+        color: userColor.value,
+        id: activeUserId.value,
+        name: userName.value,
+        room: activeRoomName.value,
+        x,
+        y,
+      },
+      type: 'broadcast',
+    })
+  }
+
+  const handleTouchStart = (e: TouchEvent) => {
+    if (!isMobile.value) return
+    if (!global.allowMultiplayer.value) return
+    if (!hasOtherUsersOnRoom.value) return
+    if (!channel) return
+    if (e.changedTouches.length === 0) return
+
+    const now = Date.now()
+    if (now - lastSent < THROTTLE_MS) return
+    lastSent = now
+
+    const touch = e.changedTouches[0]
+    const target = (e.target as Element).closest('[data-sync]')
+    let box = 'viewport'
+    let x = touch.pageX / windowWidth.value
+    let y = touch.pageY
+
+    if (target) {
+      const boxId = target.getAttribute('data-sync')
+      if (boxId) {
+        const rect = target.getBoundingClientRect()
+        box = boxId
+        x = (touch.clientX - rect.left) / rect.width
+        y = (touch.clientY - rect.top) / rect.height
+      }
+    }
+
+    channel.send({
+      event: 'touch',
+      payload: {
+        box,
+        color: userColor.value,
+        id: activeUserId.value,
+        name: userName.value,
+        room: activeRoomName.value,
+        timestamp: now,
+        x,
+        y,
+      },
+      type: 'broadcast',
+    })
+  }
+
+  onMounted(() => {
+    isMobile.value = window.matchMedia('(pointer: coarse)').matches
+    updateBoxRects()
+    resizeObserver = new ResizeObserver(() => {
+      updateBoxRects()
+    })
+    resizeObserver.observe(document.body)
+
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+
+    joinRoom(activeRoomName.value)
 
     cleanupInterval = setInterval(() => {
       const now = Date.now()
@@ -615,7 +654,7 @@ export function useLive() {
     window.removeEventListener('touchstart', handleTouchStart)
     clearInterval(cleanupInterval)
     clearInterval(driftInterval)
-    removeAfterEach()
+    activeWatchers.forEach((unwatch) => unwatch())
 
     if (channel) {
       channel.unsubscribe()

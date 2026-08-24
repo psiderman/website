@@ -1,5 +1,5 @@
 <template>
-  <div v-if="hasOtherUsersOnRoute" class="avatar-stack flex flex-row items-center gap-0">
+  <div v-if="hasOtherUsersOnRoom" class="avatar-stack flex flex-row items-center gap-0">
     <div
       v-for="user in sortedPresenceUsers.slice(0, 5)"
       :key="user.id"
@@ -12,7 +12,7 @@
     >
       <div
         class="flex size-9 items-center justify-center"
-        :class="{ 'opacity-50': user.route !== activeRoute || user.isStale }"
+        :class="{ 'opacity-50': user.room !== activeRoomName || user.isStale }"
         :style="{ backgroundColor: user.color?.bg, color: user.color?.fg }"
       >
         <img
@@ -26,7 +26,10 @@
         </span>
       </div>
     </div>
-    <span v-if="sortedPresenceUsers.length > 5" class="text-text-secondary ml-2 whitespace-nowrap text-sm">
+    <span
+      v-if="sortedPresenceUsers.length > 5"
+      class="text-text-secondary ml-2 text-sm whitespace-nowrap"
+    >
       + {{ sortedPresenceUsers.length - 5 }} more...
     </span>
   </div>
@@ -34,9 +37,9 @@
 
 <script setup lang="ts">
 import {
-  activeRoute,
+  activeRoomName,
   activeUserId,
-  hasOtherUsersOnRoute,
+  hasOtherUsersOnRoom,
   sortedPresenceUsers,
 } from '../composables/useLive'
 </script>
