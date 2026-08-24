@@ -3,10 +3,7 @@
     class="border-border-primary bg-surface-secondary dark:bg-dark noscrollbar relative flex h-full w-full overflow-scroll rounded-lg border focus:outline-none"
     tabindex="-1"
   >
-    <!-- Loading State -->
-    <GenericLoader v-if="isLoading" />
-
-    <template v-else-if="careerData.length > 0">
+    <template v-if="careerData.length > 0">
       <!-- Gridlines -->
       <div class="absolute z-0 flex w-full flex-col gap-1.5 px-10 py-12">
         <!-- Top Gridlines -->
@@ -55,7 +52,8 @@
           >
             <div
               class="work-block text-ui-small"
-              :class="{ 'col-start-2': block.track == 'right' }"
+              :class="{ 'col-start-2': block.track == 'right', clickable: block.clickable }"
+              @click="openWorkModal(block.org_id)"
             >
               <div class="flex size-4 shrink-0 items-center justify-center">
                 <img
@@ -79,7 +77,7 @@
       </div>
 
       <!-- Today Indicator -->
-      <div class="absolute inset-0 z-20">
+      <div class="pointer-events-none absolute inset-0 z-20">
         <div class="absolute top-10 right-6 left-9 h-0.75 bg-red-500 dark:bg-red-600">
           <div
             class="absolute left-0 -mt-0.75 -ml-1 size-2.25 rounded-full bg-red-500 dark:bg-red-600"
@@ -101,30 +99,36 @@
 </template>
 
 <script setup lang="ts">
-import { OctagonAlert } from '@lucide/vue'
-import { useQuery } from '@tanstack/vue-query'
 import { differenceInCalendarMonths, getYear, min } from 'date-fns'
 import { computed } from 'vue'
 
-import { supabase } from '@/supabase'
+import { isWorkModalOpen, workData } from '@/composables/useGlobal'
+import { workHistory } from '@/data/work'
 
-import GenericLoader from '../GenericLoader.vue'
-
-interface WorkRow {
-  emoji: null | string
-  end_date: null | string
-  is_left: boolean
-  org_id: null | string
-  org_name: string
-  role: null | string
-  start_date: string
+const openWorkModal = (orgId: string) => {
+  const data = workHistory.find((w) => w.orgId === orgId)
+  if (data?.data)
+    if (data) {
+      workData.value = data
+      isWorkModalOpen.value = true
+    }
 }
 
-const getLogoUrl = (orgId: string) => {
-  return supabase.storage.from('logos').getPublicUrl(`${orgId}.webp`).data.publicUrl
-}
+const careerData = computed(() => {
+  return workHistory.map((item) => ({
+    clickable: item.clickable ?? false,
+    data: item.data ?? null,
+    emoji: item.emoji ?? undefined,
+    endDate: item.endDate ? new Date(item.endDate) : undefined,
+    org: item.orgName,
+    org_id: item.orgId,
+    role: item.role,
+    startDate: new Date(item.startDate),
+    track: item.isLeft ? 'left' : 'right',
+  }))
+})
 
-const getDuration = (start: Date, end: Date) => {
+const formatDuration = (start: Date, end: Date) => {
   const totalMonths = differenceInCalendarMonths(end, start) + 1
   const years = Math.floor(totalMonths / 12)
   const months = totalMonths % 12
@@ -135,28 +139,6 @@ const getDuration = (start: Date, end: Date) => {
 
   return parts.length > 0 ? parts.join(' ') : '1 mo'
 }
-
-const careerData = computed(() => {
-  if (!data.value) return []
-  return data.value.map((item: WorkRow) => ({
-    emoji: item.emoji ?? undefined,
-    endDate: item.end_date ? new Date(item.end_date) : undefined,
-    org: item.org_name,
-    org_id: item.org_id ?? undefined,
-    role: item.role ?? undefined,
-    startDate: new Date(item.start_date),
-    track: item.is_left ? 'left' : 'right',
-  }))
-})
-
-const { data, isLoading } = useQuery({
-  queryFn: async () => {
-    const { data, error } = await supabase.from('work').select('*')
-    if (error) throw error
-    return data as WorkRow[]
-  },
-  queryKey: ['work'],
-})
 
 const MONTH_HEIGHT = 7
 
@@ -220,11 +202,13 @@ const timelineData = computed(() => {
     const heightMonths = differenceInCalendarMonths(end, start) + 1
     const heightPx = heightMonths * MONTH_HEIGHT
 
-    const logoUrl = block.org_id ? getLogoUrl(block.org_id) : undefined
+    const logoUrl = block.org_id
+      ? new URL(`../../assets/logos/${block.org_id}.webp`, import.meta.url).href
+      : undefined
 
     return {
       ...block,
-      durationText: getDuration(start, end),
+      durationText: formatDuration(start, end),
       heightPx,
       logoUrl,
     }
@@ -243,7 +227,12 @@ const timelineData = computed(() => {
 @reference "@/style.css";
 
 .work-block {
-  @apply bg-surface-primary border-border-primary rounded-special relative flex flex-row gap-1 overflow-hidden border p-3;
+  @apply bg-surface-primary border-border-primary rounded-special relative flex flex-row gap-1 overflow-hidden border bg-linear-0 p-3;
+
+  &.clickable {
+    @apply cursor-pointer;
+    @apply hover:from-hover hover:to-hover;
+  }
 
   &::after {
     content: '';

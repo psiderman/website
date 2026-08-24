@@ -5,16 +5,16 @@
       <img
         src="@/assets/images/public.webp"
         alt="karan sanas"
-        class="border-border-primary aspect-auto h-50 rounded-[4.16rem] border"
+        class="border-border-primary dark:border-light/20 aspect-auto h-50 rounded-[4.16rem] border"
       />
       <div class="flex w-120 flex-col items-start justify-center gap-4">
         <div class="text-ui text-text-secondary flex flex-col gap-2">
           <p>@psiderman</p>
           <h1 class="text-display text-text-primary -mt-2">hi, i'm karan</h1>
-          <p class="text-p italic">
-            “i’m still searching for a one-liner to sum me up.<br />until then my life is a bento
-            box of endless interests,<br />neatly packed for display on my ever-evolving personal
-            website.”
+          <p class="text-ui">
+            i’m still searching for a one-liner to sum me up.<br />until then my life is a bento box
+            of endless interests,<br />neatly packed for display on my ever-evolving personal
+            website.
           </p>
         </div>
       </div>

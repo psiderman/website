@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 
 import type { LightBoxTag } from '@/components/LightBox.vue'
+import type { WorkDetail } from '@/data/work'
 
 const _allowMultiplayer = ref(localStorage.getItem('allowMultiplayer') !== 'false')
 
@@ -26,7 +27,8 @@ export const lightBoxData = ref<{
   title: '',
 })
 
-export const isWorkModalOpen = ref(true)
+export const isWorkModalOpen = ref(false)
+export const workData = ref<null | WorkDetail>(null)
 
 export const global = {
   activeModal,
@@ -34,4 +36,5 @@ export const global = {
   isLightBoxOpen,
   isWorkModalOpen,
   lightBoxData,
+  workData,
 }

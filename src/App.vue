@@ -7,7 +7,7 @@
   <VueQueryDevtools />
   <AuthModal v-model:is-open="isAuthModalOpen" />
   <LiveCursors />
-  <WorkModal v-model:is-open="isWorkModalOpen" />
+  <WorkModal v-model:is-open="isWorkModalOpen" :work="workData" />
   <LightBox
     v-model:is-open="isLightBoxOpen"
     :title="lightBoxData.title"
@@ -28,7 +28,7 @@ import LightBox from './components/LightBox.vue'
 import LiveCursors from './components/LiveCursors.vue'
 import WorkModal from './components/WorkModal.vue'
 import { isAuthModalOpen } from './composables/useAuth'
-import { isLightBoxOpen, isWorkModalOpen, lightBoxData } from './composables/useGlobal'
+import { isLightBoxOpen, isWorkModalOpen, lightBoxData, workData } from './composables/useGlobal'
 import { useLive } from './composables/useLive'
 import { initTheme } from './composables/useTheme'
 

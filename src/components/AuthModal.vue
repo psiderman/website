@@ -32,12 +32,12 @@
                 <img
                   src="@/data/descriptions/music.webp"
                   alt="life"
-                  class="image-print absolute -bottom-2 -left-22 aspect-auto w-32 -rotate-5"
+                  class="image-print absolute -bottom-2 -left-24 aspect-auto w-32 -rotate-5"
                 />
                 <img
                   src="@/data/descriptions/work.webp"
                   alt="life"
-                  class="image-print absolute -bottom-7 -left-14 aspect-auto w-32 rotate-5"
+                  class="image-print absolute -bottom-7 -left-20 aspect-auto w-32 rotate-5"
                 />
                 <img
                   src="@/data/descriptions/building.webp"
