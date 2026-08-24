@@ -77,7 +77,6 @@
                       v-for="(img, idx) in work.data?.galleryImages"
                       :key="idx"
                       ref="imageRefs"
-                      v-tooltip="{ content: img.caption || null }"
                       draggable="false"
                       :src="getWorkImageUrl(work.orgId, img.src)"
                       class="image-print absolute inset-0 m-auto object-cover select-none"
@@ -133,7 +132,7 @@
                         :is="person.linkedin ? 'a' : 'div'"
                         v-for="person in sortedPeople"
                         :key="person.name"
-                        v-tooltip="person.name"
+                        v-tooltip="{ content: person.name, trigger: 'mouseenter' }"
                         :href="person.linkedin"
                         :target="person.linkedin ? '_blank' : undefined"
                       >
@@ -175,7 +174,7 @@
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ArrowUpRight, Undo } from '@lucide/vue'
-import { createDraggable } from 'animejs'
+import { animate, createDraggable } from 'animejs'
 import { format } from 'date-fns'
 import { computed, nextTick, ref, watch } from 'vue'
 
@@ -209,8 +208,12 @@ const isMoved = ref(false)
 const resetImages = () => {
   isMoved.value = false
   draggables.forEach((d) => {
-    d.setX(0)
-    d.setY(0)
+    animate(d, {
+      duration: 600,
+      ease: 'outBack',
+      x: 0,
+      y: 0,
+    })
   })
 }
 

@@ -22,7 +22,6 @@ export interface WorkDetail {
 }
 
 interface GalleryImage {
-  caption?: string
   landscape?: boolean
   src: string
 }
@@ -53,12 +52,7 @@ export const workHistory: WorkDetail[] = [
         'I started my contribution to the product by designing the experience for tracking National Pension Scheme investments on the Wealth Monitor app.',
         'After that, I rebuilt the design infrastructure connecting four fragmented products, then used it to ship Dezerv Web, a desktop platform used by both clients and Relationship Managers.',
       ],
-      galleryImages: [
-        { caption: 'accidentally became important at work', src: '4.webp' },
-        { caption: '', src: '3.webp' },
-        { caption: '', src: '2.webp' },
-        { caption: 'super distracting coworkers', src: '1.webp' },
-      ],
+      galleryImages: [{ src: '4.webp' }, { src: '3.webp' }, { src: '2.webp' }, { src: '1.webp' }],
       people: [
         {
           imageName: 'adil',
@@ -170,10 +164,7 @@ export const workHistory: WorkDetail[] = [
         'Multiplier is a global employment and workforce management platform. It allows companies to hire, manage, and pay international employees and contractors in over 160 countries without needing to set up a local legal entity',
         'I worked on employee onboarding and invoicing experiences for full-time employees, contractors, and freelancers.',
       ],
-      galleryImages: [
-        { caption: '', src: '2.webp' },
-        { caption: '', src: '1.webp' },
-      ],
+      galleryImages: [{ src: '2.webp' }, { src: '1.webp' }],
       people: [
         {
           imageName: 'adrita',
@@ -236,10 +227,10 @@ export const workHistory: WorkDetail[] = [
         'I’ve also contributed to growing the design team from 2 to 20 and shaping its culture and rituals, including critical contributions such as using Harry Potter references instead of Lorem Ipsum in Figma files.',
       ],
       galleryImages: [
-        { caption: '', landscape: true, src: '4.webp' },
-        { caption: '', src: '3.webp' },
-        { caption: '', landscape: true, src: '2.webp' },
-        { caption: 'last day at work', src: '1.webp' },
+        { landscape: true, src: '4.webp' },
+        { src: '3.webp' },
+        { landscape: true, src: '2.webp' },
+        { src: '1.webp' },
       ],
       people: [
         {

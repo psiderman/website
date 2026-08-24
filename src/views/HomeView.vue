@@ -3,7 +3,7 @@
     <!-- About me -->
     <div data-sync="about-me" class="flex w-full flex-row items-center justify-center gap-8 p-20">
       <img
-        src="@/assets/images/public.webp"
+        src="@/assets/public.webp"
         alt="karan sanas"
         class="border-border-primary dark:border-light/20 aspect-auto h-50 rounded-[4.16rem] border"
       />
@@ -69,38 +69,49 @@
         :arrow="card.arrow"
         :size="card.size"
         :bg-class="card.bgClass"
-        :img="card.imageUrl"
+        :img="card.isExtra && card.size === 'md' ? undefined : card.imageUrl"
         :link="card.link"
+        @click="handleCardClick(card)"
       >
         <component :is="card.content" v-if="card.content" :show-help="isIconHovered" />
+        <template v-else-if="card.isExtra && card.size === 'md'">
+          <video
+            v-if="card.coverVid"
+            :src="card.coverVid"
+            class="pointer-events-none h-full w-full object-cover"
+            autoplay
+            loop
+            muted
+            playsinline
+          />
+          <img
+            v-else-if="card.imageUrl"
+            :src="card.imageUrl"
+            class="pointer-events-none h-full w-full object-cover"
+            :alt="card.title"
+          />
+        </template>
       </CardContainer>
-
-      <!-- <div class="absolute top-0 left-0 h-full w-fit pl-2" style="left: calc(-50vw + 50%)"> -->
-      <!-- <div class="sticky top-21 flex flex-col justify-start gap-4"> -->
-
-      <!-- </div> -->
-      <!-- </div> -->
     </div>
     <ContactForm />
   </div>
 </template>
 
 <script setup lang="ts">
-import { type Component, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import DrawCardContent from '@/components/cards/DrawCardContent.vue'
-import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
-import MoviesCardContent from '@/components/cards/MoviesCardContent.vue'
-import NowCardContent from '@/components/cards/NowCardContent.vue'
-import SpotifyCardContainer from '@/components/cards/SpotifyCardContainer.vue'
-import TravelCardContent from '@/components/cards/TravelCardContent.vue'
-import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
+import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
+import { type ExtraCard, extraCards as staticExtraCards } from '@/data/extraCards'
+import { type Card, cards as staticCards } from '@/data/homeCards'
 import { EMOJI_GROUPS } from '@/types'
 
 import type { EmojiGroupId } from '@/types'
+
+// Convert extraCards to reactive ref
+const extraCards = ref<Partial<Record<EmojiGroupId, ExtraCard[]>>>(staticExtraCards)
 
 const emojis = EMOJI_GROUPS
 
@@ -119,140 +130,6 @@ const activeFilter = computed<EmojiGroupId | null>({
   },
 })
 
-interface Card {
-  arrow?: 'external' | 'help' | 'none' | 'right'
-  bgClass?: string
-  content?: Component
-  group: EmojiGroupId[]
-  id: string
-  imageUrl?: string
-  link?: string
-  size: 'lg' | 'md' | 'sm'
-  span: string
-  title: string
-}
-
-const cards: Card[] = [
-  {
-    arrow: 'external',
-    content: FoursightCardContent,
-    group: ['personal_finance'],
-    id: 'foursight',
-    link: 'https://foursight.money/about',
-    size: 'lg',
-    span: 'col-span-7',
-    title: 'https://foursight.money',
-  },
-  {
-    content: WorkCardContent,
-    group: ['work'],
-    id: 'work',
-    size: 'lg',
-    span: 'col-span-5',
-    title: 'work & career',
-  },
-  {
-    content: NowCardContent,
-    group: ['life'],
-    id: 'now',
-    link: '/now',
-    size: 'md',
-    span: 'col-span-4',
-    title: 'what am i doing now?',
-  },
-  {
-    arrow: 'none',
-    content: SpotifyCardContainer,
-    group: ['music', 'building', 'life'],
-    id: 'music',
-    size: 'md',
-    span: 'col-span-4',
-    title: 'what have i been listening to?',
-  },
-  {
-    arrow: 'external',
-    content: MoviesCardContent,
-    group: ['life', 'building'],
-    id: 'movies',
-    link: 'https://letterboxd.com/_psiderman_/',
-    size: 'md',
-    span: 'col-span-4',
-    title: 'what have i been watching?',
-  },
-  {
-    arrow: 'none',
-    content: TravelCardContent,
-    group: ['travel'],
-    id: 'travel',
-    size: 'lg',
-    span: 'col-span-6',
-    title: 'travel & photography',
-  },
-  {
-    arrow: 'external',
-    bgClass: 'bg-amber-200 dark:bg-dark',
-    group: ['building'],
-    id: 'owensans',
-    imageUrl: new URL('@/assets/home/owensans.webp', import.meta.url).toString(),
-    link: 'https://owensans.vercel.app',
-    size: 'sm',
-    span: 'col-span-2',
-    title: 'owen sans',
-  },
-  {
-    arrow: 'external',
-    bgClass: 'bg-[#1ED760] dark:bg-linear-0 from-dark/50 to-dark/50',
-    group: ['music'],
-    id: 'playlists',
-    imageUrl: new URL('@/assets/home/spotify.webp', import.meta.url).toString(),
-    link: 'https://links.psiderman.com/playlists',
-    size: 'sm',
-    span: 'col-span-2',
-    title: 'playlists',
-  },
-  {
-    arrow: 'external',
-    bgClass: 'bg-orange-200 dark:bg-amber-950',
-    group: ['building'],
-    id: 'milestones',
-    imageUrl: new URL('@/assets/home/milestones.webp', import.meta.url).toString(),
-    link: 'https://milestones.psiderman.com',
-    size: 'sm',
-    span: 'col-span-2',
-    title: 'milestones',
-  },
-  {
-    arrow: 'external',
-    bgClass: 'bg-emerald-900 dark:bg-emerald-950',
-    group: ['personal_finance'],
-    id: 'pf',
-    imageUrl: new URL('@/assets/home/primer.webp', import.meta.url).toString(),
-    link: 'https://links.psiderman.com/primer',
-    size: 'sm',
-    span: 'col-span-2',
-    title: 'personal finance',
-  },
-  {
-    arrow: 'help',
-    content: DrawCardContent,
-    group: ['building'],
-    id: 'guestbook',
-    size: 'md',
-    span: 'col-span-4',
-    title: 'art by the visitor before you',
-  },
-  {
-    arrow: 'external',
-    bgClass: 'bg-rose-200 dark:bg-rose-950',
-    group: ['travel', 'life'],
-    id: 'blr',
-    imageUrl: new URL('@/assets/home/blr.webp', import.meta.url).toString(),
-    link: 'https://links.psiderman.com/blr',
-    size: 'sm',
-    span: 'col-span-2',
-    title: 'blr maps',
-  },
-]
 import { descriptionContent } from '@/data/homeDescriptions'
 
 const activeDescription = computed(() => {
@@ -268,21 +145,73 @@ const getImageUrl = (id: string) => {
   return new URL(`../data/descriptions/${id}.webp`, import.meta.url).href
 }
 
-const filteredCards = computed(() => {
-  if (!activeFilter.value) return cards
+// Watch global lightbox state is no longer needed to reset isOpen
 
-  const visible = cards.filter((card) => card.group.includes(activeFilter.value!))
+// Extended interface of Card that includes extra card properties
+interface GridCard extends Card {
+  coverVid?: string
+  extraIndex?: number
+  extraKey?: string
+  isExtra?: boolean
+}
+
+const filteredCards = computed<GridCard[]>(() => {
+  if (!activeFilter.value) return staticCards
+
+  const visible = staticCards.filter((card) => card.group.includes(activeFilter.value!))
 
   const sizeWeight = { lg: 3, md: 2, sm: 1 }
 
-  const sorted = visible.sort((a, b) => sizeWeight[b.size] - sizeWeight[a.size])
+  let sorted = visible.sort((a, b) => sizeWeight[b.size] - sizeWeight[a.size])
 
   if (sorted.length === 1) {
-    return [{ ...sorted[0], span: 'col-span-8' }]
+    sorted = [{ ...sorted[0], span: 'col-span-8' }]
+  }
+
+  // Filter extra cards for the active filter
+  const matchingExtras = extraCards.value[activeFilter.value]
+
+  if (matchingExtras && matchingExtras.length > 0) {
+    const extraGridCards = matchingExtras.map((extra, idx) => {
+      const extraCard: GridCard = {
+        arrow: extra.size === 'sm' ? 'external' : extra.title && extra.description ? 'up' : 'none',
+        bgClass: extra.bgClass,
+        coverVid: extra.coverVid,
+        extraIndex: idx,
+        extraKey: activeFilter.value!,
+        group: [activeFilter.value!],
+        id: `extra_${activeFilter.value}_${idx}`,
+        imageUrl:
+          extra.cover || (extra.images && extra.images.length > 0 ? extra.images[0] : undefined),
+        isExtra: true,
+        link: extra.link,
+        size: extra.size || 'sm',
+        span: extra.size === 'sm' ? 'col-span-2' : 'col-span-4 cursor-pointer',
+        title: extra.title || '',
+      }
+      return extraCard
+    })
+    return [...sorted, ...extraGridCards]
   }
 
   return sorted
 })
+
+const handleCardClick = (card: GridCard) => {
+  if (card.isExtra && card.size === 'md' && card.extraKey && card.extraIndex !== undefined) {
+    const extra = extraCards.value[card.extraKey as EmojiGroupId]?.[card.extraIndex]
+    if (extra) {
+      lightBoxData.value = {
+        description: extra.description || '',
+        images: extra.images || [],
+        tags: extra.tags,
+        title: extra.title || '',
+        videos: extra.videos || [],
+      }
+      isLightBoxOpen.value = true
+    }
+  }
+}
 </script>
 
 <style scoped>

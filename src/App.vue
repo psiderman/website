@@ -13,6 +13,7 @@
     :title="lightBoxData.title"
     :description="lightBoxData.description"
     :images="lightBoxData.images"
+    :videos="lightBoxData.videos"
     :tags="lightBoxData.tags"
   />
 </template>

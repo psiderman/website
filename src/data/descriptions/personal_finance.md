@@ -1,7 +1,7 @@
 # on personal finance
 
-“somewhere along the way, i became the person friends would come to for spreadsheets, budgeting, and investment questions.
+“somewhere along the way, i became the person who friends would come to for spreadsheets, budgeting, and investment questions. i found myself further down the rabbit hole, and i enjoyed it.
 
-inevitably, the kind of person i am, i tried to translate my obsession for managing your money into a product, foursight is that attempt.
+the kind of person i am, inevitably, i tried to translate my obsession for managing your money into a product.
 
-ps: yes. money plant.”
+foursight is that attempt.”

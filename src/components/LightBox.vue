@@ -14,7 +14,10 @@
       </TransitionChild>
 
       <div class="fixed inset-0 overflow-y-auto">
-        <div class="flex min-h-full items-start justify-center p-10 text-center">
+        <div
+          class="flex min-h-full justify-center p-10 text-center"
+          :class="title && description ? 'items-start' : 'items-center'"
+        >
           <TransitionChild
             as="template"
             enter="duration-300 ease-out"
@@ -34,19 +37,34 @@
                   @scroll="handleScroll"
                 >
                   <div
-                    v-for="(img, idx) in images"
+                    v-for="(item, idx) in mediaItems"
                     :key="idx"
-                    class="my-auto flex h-full w-full shrink-0 snap-center items-center justify-center"
+                    class="my-auto flex h-full w-full shrink-0 snap-center items-center justify-center overflow-hidden rounded-lg"
                   >
-                    <img :src="img" class="max-h-[calc(70svh)] object-contain" />
+                    <img
+                      v-if="item.type === 'image'"
+                      :src="item.src"
+                      class="max-h-[calc(75svh)] object-contain"
+                    />
+                    <video
+                      v-else-if="item.type === 'video'"
+                      :src="item.src"
+                      class="max-h-[calc(75svh)] object-contain"
+                      playsinline
+                      autoplay
+                      loop
+                      muted
+                    />
                   </div>
                 </div>
 
                 <!-- Custom Side Indicator -->
                 <CarouselIndicator
+                  v-if="mediaItems.length > 1"
                   class="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100"
+                  :class="{ 'opacity-50': activeIndex === 0 }"
                   :active-index="activeIndex"
-                  :count="images.length"
+                  :count="mediaItems.length"
                   orientation="horizontal"
                   fast-animation
                 />
@@ -65,17 +83,18 @@
 
                 <button
                   class="btn icon-only inverted bg-dark/50 absolute top-1/2 right-4 -translate-y-1/2 transition-opacity"
-                  :class="
-                    activeIndex === images.length - 1
+                  :class="[
+                    activeIndex === mediaItems.length - 1
                       ? 'pointer-events-none opacity-0'
-                      : 'opacity-0 group-hover:opacity-100'
-                  "
+                      : 'opacity-0 group-hover:opacity-100',
+                    activeIndex === 0 && mediaItems.length > 1 ? 'opacity-50' : '',
+                  ]"
                   @click="scrollToNext"
                 >
                   <ArrowRight :size="16" />
                 </button>
               </div>
-              <div class="flex flex-col items-start gap-6 p-4">
+              <div v-if="title && description" class="flex w-full flex-col items-start gap-6 p-4">
                 <div class="flex w-full flex-col gap-2 text-left">
                   <h2 class="text-h2 text-text-primary">{{ title }}</h2>
                   <p class="text-ui text-text-secondary">
@@ -108,7 +127,7 @@
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ArrowLeft, ArrowRight, ArrowUpRight } from '@lucide/vue'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import CarouselIndicator from '@/components/CarouselIndicator.vue'
 import { global } from '@/composables/useGlobal'
@@ -124,7 +143,19 @@ const props = defineProps<{
   isOpen: boolean
   tags?: LightBoxTag[]
   title: string
+  videos?: string[]
 }>()
+
+const mediaItems = computed(() => {
+  const items = []
+  if (props.images) {
+    items.push(...props.images.map((img) => ({ src: img, type: 'image' as const })))
+  }
+  if (props.videos) {
+    items.push(...props.videos.map((vid) => ({ src: vid, type: 'video' as const })))
+  }
+  return items
+})
 
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void

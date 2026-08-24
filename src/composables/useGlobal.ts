@@ -21,6 +21,7 @@ export const lightBoxData = ref<{
   images: string[]
   tags?: LightBoxTag[]
   title: string
+  videos?: string[]
 }>({
   description: '',
   images: [],

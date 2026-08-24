@@ -29,14 +29,14 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowRight, ArrowUpRight, CircleHelp } from '@lucide/vue'
+import { ArrowRight, ArrowUp, ArrowUpRight, CircleHelp } from '@lucide/vue'
 import { computed, ref } from 'vue'
 
 import router from '@/router'
 import { openLink } from '@/utils'
 
 interface Props {
-  arrow?: 'external' | 'help' | 'none' | 'right'
+  arrow?: 'external' | 'help' | 'none' | 'right' | 'up'
   bgClass?: string
   img?: string
   link?: string
@@ -54,6 +54,7 @@ const icon = computed(() => {
     help: CircleHelp,
     none: null,
     right: ArrowRight,
+    up: ArrowUp,
   }
   return icons[props.arrow]
 })
