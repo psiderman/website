@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-border-primary bg-surface-secondary dark:bg-dark noscrollbar relative flex h-full w-full overflow-scroll rounded-lg border focus:outline-none"
+    class="border-border-primary desktop:pointer-events-auto bg-surface-secondary dark:bg-dark noscrollbar pointer-events-none relative flex h-full w-full overflow-scroll rounded-lg border focus:outline-none"
     tabindex="-1"
   >
     <template v-if="careerData.length > 0">

@@ -1,28 +1,39 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
     <!-- About me -->
-    <div data-sync="about-me" class="flex w-full flex-row items-center justify-center gap-8 p-20">
+    <div
+      data-sync="about-me"
+      class="desktop:p-20 desktop:flex-row flex w-full flex-col items-center justify-center gap-8 p-6"
+    >
       <img
         src="@/assets/public.webp"
         alt="karan sanas"
         class="border-border-primary dark:border-light/20 aspect-auto h-50 rounded-[4.16rem] border"
       />
-      <div class="flex w-120 flex-col items-start justify-center gap-4">
-        <div class="text-ui text-text-secondary flex flex-col gap-2">
+      <div
+        class="desktop:w-120 desktop:items-start flex w-full flex-col items-center justify-center gap-4"
+      >
+        <div
+          class="text-ui text-text-secondary desktop:items-start desktop:text-left flex flex-col items-center gap-2 text-center"
+        >
           <p>@psiderman</p>
           <h1 class="text-display text-text-primary -mt-2">hi, i'm karan</h1>
           <p class="text-ui">
-            i’m still searching for a one-liner to sum me up.<br />until then my life is a bento box
-            of endless interests,<br />neatly packed for display on my ever-evolving personal
-            website.
+            i’m still searching for a one-liner to sum me up.
+            <br class="desktop:block hidden" />
+            until then my life is a bento box of endless interests,
+            <br class="desktop:block hidden" />
+            neatly packed for display on my ever-evolving personal website.
           </p>
         </div>
       </div>
     </div>
     <!-- Grid -->
-    <div class="relative grid w-full grid-flow-row-dense grid-cols-12 gap-8 px-20">
+    <div
+      class="desktop:grid desktop:px-20 relative flex w-full grid-flow-row-dense grid-cols-12 flex-col gap-8 px-4"
+    >
       <!-- Filters -->
-      <div class="col-span-12 -mt-5 flex h-0 flex-row justify-center gap-1">
+      <div class="desktop:h-0 desktop:-mt-5 col-span-12 flex flex-wrap justify-center gap-1">
         <button
           v-for="emj in emojis"
           :key="emj.id"

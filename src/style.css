@@ -93,6 +93,9 @@
   /* shadows */
   --drop-shadow-cursor: 0 0 3px rgba(0, 0, 0, 0.2);
 
+  /* breakpoints */
+  --breakpoint-desktop: 1280px;
+
   /* primitive colors */
   --color-dark: oklch(0.118 0.021 216);
   --color-dark-dark: oklch(0.118 0.002 216);

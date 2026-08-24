@@ -30,7 +30,7 @@
             <DialogPanel
               class="bg-surface-primary border-border-primary relative flex h-fit w-180 flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border p-2"
             >
-              <div class="bg-dark group relative h-fit min-h-80 w-full rounded-lg">
+              <div class="bg-dark group desktop:min-h-80 relative h-fit w-full rounded-lg">
                 <div
                   ref="scrollContainer"
                   class="noscrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden scroll-smooth"
@@ -44,12 +44,12 @@
                     <img
                       v-if="item.type === 'image'"
                       :src="item.src"
-                      class="max-h-[calc(75svh)] object-contain"
+                      class="desktop:max-h-[calc(75svh)] object-contain"
                     />
                     <video
                       v-else-if="item.type === 'video'"
                       :src="item.src"
-                      class="max-h-[calc(75svh)] object-contain"
+                      class="desktop:max-h-[calc(75svh)] object-contain"
                       playsinline
                       autoplay
                       loop
@@ -101,14 +101,14 @@
                     {{ description }}
                   </p>
                 </div>
-                <div v-if="tags && tags.length > 0" class="flex flex-row gap-2">
+                <div v-if="tags && tags.length > 0" class="desktop:flex-row flex flex-col gap-2">
                   <component
                     :is="tag.link ? 'a' : 'div'"
                     v-for="(tag, idx) in tags"
                     :key="idx"
                     :href="tag.link"
                     :target="tag.link ? '_blank' : undefined"
-                    class="bg-surface-secondary border-border-primary text-text-secondary text-ui hover:text-text-primary flex flex-row items-center justify-center gap-0.5 rounded-full border px-3 py-0.5 transition-colors"
+                    class="bg-surface-secondary border-border-primary text-text-secondary text-ui hover:text-text-primary flex w-fit flex-row items-center justify-center gap-0.5 rounded-full border px-3 py-0.5 transition-colors"
                     :class="{ 'hover:border-border-hover cursor-pointer': tag.link }"
                   >
                     {{ tag.value }}

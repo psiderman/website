@@ -1,18 +1,18 @@
 <template>
-  <div data-sync="contact-form" class="w-full p-20">
+  <div data-sync="contact-form" class="desktop:px-20 w-full px-4 py-10">
     <div
-      class="flex flex-col items-center justify-center gap-6 rounded-xl bg-gray-950 p-20 dark:bg-zinc-950"
+      class="desktop:p-20 desktop:gap-6 flex flex-col items-center justify-center gap-2 rounded-xl bg-gray-950 p-6 py-12 dark:bg-zinc-950"
     >
       <div class="flex flex-col gap-0 text-center">
         <span class="text-ui text-text-tertiary">come say hi</span>
-        <p class="text-display text-light h-14">
+        <p class="desktop:text-display text-h1 text-light">
           hi<span class="font-sans leading-14">@</span>psiderman.com
         </p>
       </div>
-      <div class="flex flex-row gap-4">
+      <div class="flex flex-row flex-wrap justify-center gap-4">
         <button
           v-tooltip="{ content: 'write me', group: 'contact-form' }"
-          class="btn inverted"
+          class="btn inverted desktop:flex hidden"
           @click="copyEmail"
         >
           copy email

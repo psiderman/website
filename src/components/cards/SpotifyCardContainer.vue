@@ -25,7 +25,7 @@
               >E</span
             >
           </div>
-          <p class="w-30 shrink-0 truncate opacity-60">{{ t.artist }}</p>
+          <p class="desktop:w-30 w-20 shrink-0 truncate opacity-60">{{ t.artist }}</p>
           <p class="w-8 shrink-0 text-right tabular-nums opacity-60">{{ t.duration }}</p>
         </div>
       </div>

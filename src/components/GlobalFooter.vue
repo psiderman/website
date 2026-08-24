@@ -22,13 +22,16 @@
       </div>
       <p>© 2026 Karan Sanas</p>
     </div>
-    <div class="pointer-events-none flex h-57.5 w-full items-start justify-center overflow-hidden">
+    <div
+      class="desktop:flex pointer-events-none hidden h-57.5 w-full items-start justify-center overflow-hidden"
+    >
       <img
         src="@/assets/svg/wordmark.svg"
         alt="psiderman wordmark"
         style="width: 1040px; height: 300px"
       />
     </div>
+    <div class="desktop:hidden h-10"></div>
   </footer>
 </template>
 

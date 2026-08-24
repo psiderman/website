@@ -1,16 +1,18 @@
 <template>
   <header
     data-sync="header"
-    class="bg-background/95 sticky top-0 z-50 flex w-screen flex-row items-center justify-center backdrop-blur-xs"
+    class="bg-background desktop:sticky top-0 z-50 flex w-screen flex-row items-center justify-center backdrop-blur-xs"
   >
-    <div class="max-w-container flex w-full flex-row items-center justify-between px-10 py-5">
+    <div
+      class="max-w-container desktop:px-10 flex w-full flex-row items-center justify-between px-4 py-5"
+    >
       <!-- Logo and Location Wish -->
       <LocationWish />
 
       <!-- Right side -->
-      <div class="flex flex-row items-center gap-4">
+      <div class="desktop:gap-4 flex flex-row items-center gap-2">
         <!-- Avatar stack -->
-        <HeaderAvatars />
+        <HeaderAvatars class="desktop:flex hidden" />
 
         <!-- Multiplayer tools -->
         <div
@@ -39,17 +41,27 @@
         <ThemeToggle />
 
         <!-- Login -->
-        <button v-if="!currentUser" class="btn primary" @click="isAuthModalOpen = true">
-          Log in
-        </button>
-        <button v-else class="btn stroke" @click="supabase.auth.signOut()">Log out</button>
+        <div class="desktop:flex hidden">
+          <button v-if="!currentUser" class="btn primary" @click="isAuthModalOpen = true">
+            Log in
+          </button>
+          <button v-else class="btn stroke" @click="supabase.auth.signOut()">Log out</button>
+        </div>
+        <div class="desktop:hidden flex">
+          <button v-if="!currentUser" class="btn icon-only primary" @click="isAuthModalOpen = true">
+            <LogIn :size="16" />
+          </button>
+          <button v-else class="btn icon-only stroke" @click="supabase.auth.signOut()">
+            <LogOut :size="16" />
+          </button>
+        </div>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { MousePointer2, MousePointer2Off } from '@lucide/vue'
+import { LogIn, LogOut, MousePointer2, MousePointer2Off } from '@lucide/vue'
 
 import { currentUser, isAuthModalOpen } from '../composables/useAuth'
 import { global } from '../composables/useGlobal'
