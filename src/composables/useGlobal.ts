@@ -26,9 +26,12 @@ export const lightBoxData = ref<{
   title: '',
 })
 
+export const isWorkModalOpen = ref(true)
+
 export const global = {
   activeModal,
   allowMultiplayer,
   isLightBoxOpen,
+  isWorkModalOpen,
   lightBoxData,
 }
