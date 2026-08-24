@@ -10,7 +10,7 @@
 <style scoped>
 @reference "@/style.css";
 .maps-bg {
-  background: url('@/assets/images/travel.webp');
+  background: url('@/assets/home/travel.webp');
   @apply bg-cover;
 }
 
