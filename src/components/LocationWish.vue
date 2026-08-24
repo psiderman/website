@@ -14,39 +14,62 @@
       </router-link>
     </Transition>
 
-    <div
-      v-if="isWishTime"
-      v-tooltip="{
-        content: isPopping ? null : wishTooltip,
-        theme: 'tippy-small',
-        hideOnClick: false,
-      }"
-      class="relative size-10 shrink-0 cursor-cell overflow-hidden rounded-full border-2 border-transparent bg-amber-200 dark:bg-amber-500/20"
-      :class="{
-        'cursor-progress border-amber-400! transition-all duration-200': isPressing,
-        'border-transparent bg-transparent! transition-all duration-200': isPopping,
-        'popping cursor-default': isPopping,
-        jitter: isReadyToPop,
-      }"
-      @mousedown="onPressStart"
-      @mouseup="onPressEnd"
-      @mouseleave="onPressEnd"
-      @touchstart="onPressStart"
-      @touchend="onPressEnd"
-    >
-      <div
-        class="pointer-events-none absolute z-10 size-20 bg-amber-400"
-        :class="[
-          isPopping ? 'bg-transparent' : 'transition-all ease-linear',
-          isPressing ? 'translate-y-0' : 'translate-y-10',
-        ]"
-        :style="{
-          transitionDuration: isPressing ? '5s' : '0s',
-        }"
-      ></div>
+    <div v-if="isWishTime" class="relative size-10 shrink-0">
+      <!-- Confetti Particles -->
+      <div v-if="particles.length > 0" class="z-00 pointer-events-none absolute inset-0">
+        <span
+          v-for="particle in particles"
+          :key="particle.id"
+          class="particle pointer-events-none absolute top-1/2 left-1/2 z-0 mt-0.5 -translate-1/2 text-amber-400 select-none dark:text-amber-300"
+          :style="{
+            '--dx': particle.dx + 'px',
+            '--dy': particle.dy + 'px',
+            '--delay': particle.delay + 'ms',
+            '--scale-start': particle.scaleStart,
+            '--scale-end': particle.scaleEnd,
+            '--duration': particle.duration + 'ms',
+            '--rotate-start': particle.rotateStart + 'deg',
+            '--rotate-end': particle.rotateEnd + 'deg',
+            fontSize: particle.size + 'px',
+          }"
+        >
+          {{ particle.char }}
+        </span>
+      </div>
 
-      <div class="absolute inset-0 z-10 flex flex-col items-center justify-center">
-        <span class="text-h2">🤞</span>
+      <div
+        v-tooltip="{
+          content: isPopping ? null : wishTooltip,
+          theme: 'tippy-small',
+          hideOnClick: false,
+        }"
+        class="relative size-full cursor-cell overflow-hidden rounded-full border-2 border-transparent bg-amber-200 dark:bg-amber-500/20"
+        :class="{
+          'cursor-progress border-amber-400! transition-all duration-200': isPressing,
+          'border-transparent bg-transparent! transition-all duration-200': isPopping,
+          'popping cursor-default': isPopping,
+          jitter: isReadyToPop,
+        }"
+        @mousedown="onPressStart"
+        @mouseup="onPressEnd"
+        @mouseleave="onPressEnd"
+        @touchstart="onPressStart"
+        @touchend="onPressEnd"
+      >
+        <div
+          class="pointer-events-none absolute z-10 size-20 bg-amber-400"
+          :class="[
+            isPopping ? 'bg-transparent' : 'transition-all ease-linear',
+            isPressing ? 'translate-y-0' : 'translate-y-10',
+          ]"
+          :style="{
+            transitionDuration: isPressing ? '5s' : '0s',
+          }"
+        ></div>
+
+        <div class="absolute inset-0 z-20 flex flex-col items-center justify-center">
+          <span class="text-h2">🤞</span>
+        </div>
       </div>
     </div>
     <div
@@ -131,6 +154,63 @@ const currentTimeClockIcon = computed(() => {
 let holdTimeout: null | ReturnType<typeof setTimeout> = null
 const isReadyToPop = ref(false)
 
+interface Particle {
+  char: string
+  delay: number
+  duration: number
+  dx: number
+  dy: number
+  id: string
+  rotateEnd: number
+  rotateStart: number
+  scaleEnd: number
+  scaleStart: number
+  size: number
+}
+
+const particles = ref<Particle[]>([])
+
+const generateParticles = () => {
+  const chars = ['✦', '✧']
+  const now = Date.now()
+  for (let i = 0; i < 16; i++) {
+    const angle = Math.random() * 6 * Math.PI
+    const distance = 20 + Math.random() * 40
+    const dx = Math.cos(angle) * distance
+    const dy = Math.sin(angle) * distance
+    const delay = 800
+    const duration = 5000 + Math.random() * 2000
+    const scaleStart = 0.6 + Math.random() * 0.8
+    const scaleEnd = 0.2
+    const size = 4 + Math.random() * 8
+    const char = chars[Math.floor(Math.random() * chars.length)]
+    const rotateStart = Math.random() * 360
+    const rotateEnd = rotateStart + (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 360)
+    const id = `${now}-${i}-${Math.random()}`
+
+    particles.value.push({
+      char,
+      delay,
+      duration,
+      dx,
+      dy,
+      id,
+      rotateEnd,
+      rotateStart,
+      scaleEnd,
+      scaleStart,
+      size,
+    })
+
+    setTimeout(
+      () => {
+        particles.value = particles.value.filter((p) => p.id !== id)
+      },
+      delay + duration + 100,
+    )
+  }
+}
+
 const onPressStart = () => {
   if (!isWishTime.value) return
   isPressing.value = true
@@ -151,6 +231,7 @@ const onPressEnd = () => {
   if (holdTimeout) clearTimeout(holdTimeout)
 
   if (isReadyToPop.value) {
+    generateParticles()
     isPopping.value = true
     isReadyToPop.value = false
 
@@ -288,6 +369,22 @@ onUnmounted(() => {
   }
   100% {
     transform: scale(5);
+    opacity: 0;
+  }
+}
+
+.particle {
+  animation: explode var(--duration) cubic-bezier(0.15, 0.85, 0.35, 1) var(--delay) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes explode {
+  0% {
+    transform: scale(var(--scale-start)) rotate(var(--rotate-start));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(var(--scale-end)) rotate(var(--rotate-end));
     opacity: 0;
   }
 }
