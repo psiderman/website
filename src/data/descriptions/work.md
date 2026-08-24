@@ -1,4 +1,4 @@
-#  professional rectangle maker
+# professional rectangle maker
 
 “my career has taken me through ed-tech, b2b saas, and fin-tech. i started out designing features, then systems, and eventually found myself designing products end-to-end.
 
