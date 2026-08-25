@@ -4,12 +4,6 @@ import { computed, type Ref } from 'vue'
 import { supabase } from '@/supabase'
 
 export interface TravelImage {
-  id: string
-  name: string
-  url: string
-}
-
-export interface TravelImage {
   dateTaken: Date | null
   id: string
   location: {

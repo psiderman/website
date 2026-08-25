@@ -20,12 +20,18 @@
       <!-- Main Layout -->
       <div
         v-else
-        class="desktop:grid desktop:px-0 desktop:grid-cols-[1fr_min(40%,400px)_min(60%,1020px)_1fr] noscrollbar h-full w-full grid-cols-2 gap-8 px-4"
+        id="mapbox-bounds"
+        class="desktop:grid desktop:px-0 desktop:grid-cols-[1fr_min(40%,400px)_min(60%,1020px)_1fr] noscrollbar border-border-primary h-full w-full grid-cols-2 gap-8 overflow-hidden border-t px-4"
       >
         <div></div>
-        <div
-          class="desktop:grid-cols-1 grid h-full grid-cols-2 flex-col gap-10 overflow-scroll py-10"
-        >
+        <div class="flex h-full flex-col gap-10 overflow-scroll pt-6 pb-10">
+          <div class="-mb-6 flex flex-col gap-2">
+            <h1 class="text-h2 text-text-primary -0">travel diaries</h1>
+            <p class="text-p text-text-secondary italic">
+              loads of people have told me that i should start putting my favorite places down
+              somewhere.
+            </p>
+          </div>
           <div v-for="year in sortedYears" :key="year" class="flex flex-col gap-10">
             <div class="text-text-tertiary text-ui -mb-7 px-2 py-1 tracking-wider">
               {{ year }}
@@ -34,6 +40,7 @@
               v-for="travel in travelsByYear[year]"
               :key="travel.slug"
               class="border-border-primary bg-surface-primary pointer-events-auto flex h-fit flex-col gap-2 rounded-xl border p-0 transition-colors duration-200"
+              :data-sync="travel.slug"
             >
               <!-- Card Image Gallery Row -->
               <div
@@ -55,7 +62,7 @@
               <!-- Card Body -->
               <div class="flex flex-col gap-3 p-6">
                 <div class="flex w-full flex-row items-start justify-between">
-                  <div class="flex flex-col gap-1">
+                  <div class="flex flex-col gap-0">
                     <h2 class="text-h2 text-text-primary">{{ travel.title }}</h2>
                     <p class="text-ui text-text-secondary">{{ travel.dateLabel }}</p>
                   </div>
@@ -63,7 +70,7 @@
                     <!-- Repeat status button -->
                     <div
                       v-tooltip="{
-                        content: travel.repeatVisit ? 'repeat visit' : 'visited for the first time',
+                        content: travel.repeatVisit ? 'repeat visit' : 'first visit',
                         group: travel.slug,
                       }"
                       class="action-btn"
@@ -89,7 +96,7 @@
                     <div
                       v-if="travel.mapsListLink"
                       v-tooltip="{
-                        content: 'saved places in my maps',
+                        content: 'google maps list',
                         group: travel.slug,
                       }"
                       class="action-btn text-text-primary"
@@ -99,7 +106,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="flex flex-col gap-2">
+                <div class="dark:text-text-secondary flex flex-col gap-3">
                   <p v-for="(p, p_id) in travel.description" :key="p_id" class="text-p">
                     {{ p }}
                   </p>
@@ -108,7 +115,11 @@
             </div>
           </div>
         </div>
-        <div class="desktop:flex col-span-2 hidden h-full bg-blue-200"></div>
+        <TravelMap
+          :travels-with-images="travelsWithImages"
+          class="desktop:flex col-span-2 hidden h-full"
+          data-sync="travel-map"
+        />
       </div>
     </div>
   </div>
@@ -119,6 +130,7 @@ import { Pin, PinOff, Repeat, RepeatOff } from '@lucide/vue'
 import { computed } from 'vue'
 
 import GenericLoader from '@/components/GenericLoader.vue'
+import TravelMap from '@/components/TravelMap.vue'
 import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
 import { useTravelsWithImages } from '@/composables/useTravel'
 import { openLink } from '@/utils'
