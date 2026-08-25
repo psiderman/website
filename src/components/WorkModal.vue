@@ -191,7 +191,6 @@ import { animate, createDraggable, type Draggable } from 'animejs'
 import { format } from 'date-fns'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import { global } from '@/composables/useGlobal'
 import { getStorageUrl, supabase } from '@/supabase'
 
 import type { WorkDetail, WorkPerson } from '@/data/work'
@@ -225,7 +224,6 @@ const { data: peopleData } = useQuery({
     return data as WorkPerson[]
   },
   queryKey: ['work-people', activeOrgId],
-  staleTime: 1000,
 })
 
 const sortedPeople = computed(() => {
@@ -253,7 +251,6 @@ watch(
   () => props.isOpen,
   async (isOpen) => {
     if (isOpen) {
-      global.activeModal.value = 'work'
       document.body.style.overflow = 'hidden'
       await nextTick()
 
@@ -269,9 +266,6 @@ watch(
         }),
       )
     } else {
-      if (global.activeModal.value === 'work') {
-        global.activeModal.value = null
-      }
       document.body.style.overflow = 'auto'
       draggables.forEach((d) => d.stop?.())
       draggables = []

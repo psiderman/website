@@ -131,12 +131,11 @@
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ArrowLeft, ArrowRight, ArrowUpRight } from '@lucide/vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 import CarouselIndicator from '@/components/CarouselIndicator.vue'
-import { global } from '@/composables/useGlobal'
 
 export interface LightBoxTag {
   link?: string
@@ -170,17 +169,6 @@ const emit = defineEmits<{
 const closeModal = () => {
   emit('update:isOpen', false)
 }
-
-watch(
-  () => props.isOpen,
-  (val) => {
-    if (val) {
-      global.activeModal.value = 'lightbox'
-    } else if (global.activeModal.value === 'lightbox') {
-      global.activeModal.value = null
-    }
-  },
-)
 
 const activeIndex = ref(0)
 const scrollContainer = ref<HTMLElement | null>(null)

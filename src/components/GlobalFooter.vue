@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import { openLink } from '@/utils'
 
@@ -105,12 +105,6 @@ const getRandomQuip = () => {
 }
 
 randomQuip.value = getRandomQuip()
-
-watch(showThwip, (newVal) => {
-  if (newVal) {
-    randomQuip.value = getRandomQuip()
-  }
-})
 
 let isSnapping = false
 let userCanScrollPast = false
@@ -167,6 +161,9 @@ const handleScroll = () => {
   const logoBoundaryScrollTop = Math.max(0, logoBottomOffset - window.innerHeight)
 
   if (currentScrollY > logoBoundaryScrollTop + 1) {
+    if (!showThwip.value) {
+      randomQuip.value = getRandomQuip()
+    }
     showThwip.value = true
     if (scrollTimeout) clearTimeout(scrollTimeout)
     scrollTimeout = window.setTimeout(() => {

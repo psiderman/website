@@ -1,5 +1,7 @@
 import { computed, ref } from 'vue'
 
+import { isAuthModalOpen } from '@/composables/useAuth'
+
 import type { LightBoxTag } from '@/components/LightBox.vue'
 import type { WorkDetail } from '@/data/work'
 
@@ -12,8 +14,6 @@ const allowMultiplayer = computed({
     localStorage.setItem('allowMultiplayer', newVal.toString())
   },
 })
-
-const activeModal = ref<null | string>(null)
 
 export const isLightBoxOpen = ref(false)
 export const lightBoxData = ref<{
@@ -30,6 +30,13 @@ export const lightBoxData = ref<{
 
 export const isWorkModalOpen = ref(false)
 export const workData = ref<null | WorkDetail>(null)
+
+const activeModal = computed(() => {
+  if (isWorkModalOpen.value) return 'work'
+  if (isLightBoxOpen.value) return 'lightbox'
+  if (isAuthModalOpen.value) return 'auth'
+  return null
+})
 
 export const global = {
   activeModal,

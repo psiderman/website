@@ -109,7 +109,7 @@ import {
   Globe2,
 } from '@lucide/vue'
 import { addDays, differenceInMinutes, differenceInSeconds } from 'date-fns'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 interface Location {
   city: string
@@ -248,23 +248,13 @@ const onPressEnd = () => {
 }
 
 let timer: null | ReturnType<typeof setInterval> = null
-let formatter: Intl.DateTimeFormat | null = null
-
-watch(
-  () => current_location.value.timezone,
-  (tz) => {
-    if (tz) {
-      formatter = new Intl.DateTimeFormat('en-US', {
-        hour: '2-digit',
-        hour12: false,
-        minute: '2-digit',
-        second: '2-digit',
-        timeZone: tz,
-      })
-    }
-  },
-  { immediate: true },
-)
+const formatter = new Intl.DateTimeFormat('en-US', {
+  hour: '2-digit',
+  hour12: false,
+  minute: '2-digit',
+  second: '2-digit',
+  timeZone: current_location.value.timezone,
+})
 
 const updateTime = () => {
   if (!formatter || isPopping.value) return
