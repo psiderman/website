@@ -129,7 +129,7 @@ async function copyEmail(event: MouseEvent) {
         },
         opacity: [
           { duration: 200, to: 1 },
-          { duration: 1300, to: 0 }
+          { duration: 1300, to: 0 },
         ],
       })
     } else {
