@@ -37,6 +37,7 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
     refetch,
   } = useQuery<TravelImage[]>({
     enabled: computed(() => !!slugRef.value),
+    gcTime: 1000 * 60 * 60, // Keep in garbage collection for 1 hour
     queryFn: async () => {
       // 1. Get current session to check auth state
       const {
@@ -133,6 +134,7 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
       return validImages
     },
     queryKey: ['travel-images', slugRef],
+    staleTime: 1000 * 60 * 30, // Cache for 30 minutes
   })
 
   return {
@@ -150,6 +152,7 @@ export function useTravelsWithImages() {
     isLoading,
     refetch,
   } = useQuery({
+    gcTime: 1000 * 60 * 60, // Keep in garbage collection for 1 hour
     queryFn: async () => {
       const {
         data: { session },
@@ -215,9 +218,6 @@ export function useTravelsWithImages() {
                   const response = await fetch(url)
                   const buffer = await response.arrayBuffer()
                   const tags = ExifReader.load(buffer)
-
-                  console.log(`EXIF tags for ${file.name}:`, tags)
-
                   dateTaken = getDateTaken(tags)
                   lat = getDecimalCoordinate(tags['GPSLatitude'], tags['GPSLatitudeRef'])
                   lng = getDecimalCoordinate(tags['GPSLongitude'], tags['GPSLongitudeRef'])
@@ -252,6 +252,7 @@ export function useTravelsWithImages() {
       )
     },
     queryKey: ['travels-with-images'],
+    staleTime: 1000 * 60 * 30, // Cache for 30 minutes
   })
 
   return {
