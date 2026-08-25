@@ -31,7 +31,7 @@ export const cards: Card[] = [
     id: 'foursight',
     link: 'https://foursight.money/about',
     size: 'lg',
-    span: 'col-span-7',
+    span: 'desktop:col-span-7 col-span-2',
     title: 'https://foursight.money',
   },
   {
@@ -40,7 +40,7 @@ export const cards: Card[] = [
     group: ['work'],
     id: 'work',
     size: 'lg',
-    span: 'col-span-5',
+    span: 'desktop:col-span-5 col-span-2',
     title: 'work & career',
   },
   {
@@ -49,7 +49,7 @@ export const cards: Card[] = [
     id: 'now',
     link: '/now',
     size: 'md',
-    span: 'col-span-4',
+    span: 'desktop:col-span-4 col-span-2',
     title: 'what am i doing now?',
   },
   {
@@ -58,7 +58,7 @@ export const cards: Card[] = [
     group: ['music', 'building', 'life'],
     id: 'music',
     size: 'md',
-    span: 'col-span-4',
+    span: 'desktop:col-span-4 col-span-2',
     title: 'what have i been listening to?',
   },
   {
@@ -68,7 +68,7 @@ export const cards: Card[] = [
     id: 'movies',
     link: 'https://letterboxd.com/_psiderman_/',
     size: 'md',
-    span: 'col-span-4',
+    span: 'desktop:col-span-4 col-span-2',
     title: 'what have i been watching?',
   },
   {
@@ -77,7 +77,7 @@ export const cards: Card[] = [
     group: ['travel'],
     id: 'travel',
     size: 'lg',
-    span: 'col-span-6',
+    span: 'desktop:col-span-6 col-span-2',
     title: 'travel & photography',
   },
   {
@@ -88,7 +88,7 @@ export const cards: Card[] = [
     imageUrl: new URL('../assets/home/owensans.webp', import.meta.url).href,
     link: 'https://owensans.vercel.app',
     size: 'sm',
-    span: 'col-span-2',
+    span: 'desktop:col-span-2 col-span-1',
     title: 'owen sans',
   },
   {
@@ -99,7 +99,7 @@ export const cards: Card[] = [
     imageUrl: new URL('../assets/home/spotify.webp', import.meta.url).href,
     link: 'https://links.psiderman.com/playlists',
     size: 'sm',
-    span: 'col-span-2',
+    span: 'desktop:col-span-2 col-span-1',
     title: 'playlists',
   },
   {
@@ -110,7 +110,7 @@ export const cards: Card[] = [
     imageUrl: new URL('../assets/home/milestones.webp', import.meta.url).href,
     link: 'https://milestones.psiderman.com',
     size: 'sm',
-    span: 'col-span-2',
+    span: 'desktop:col-span-2 col-span-1',
     title: 'milestones',
   },
   {
@@ -121,7 +121,7 @@ export const cards: Card[] = [
     imageUrl: new URL('../assets/home/primer.webp', import.meta.url).href,
     link: 'https://links.psiderman.com/primer',
     size: 'sm',
-    span: 'col-span-2',
+    span: 'desktop:col-span-2 col-span-1',
     title: 'personal finance',
   },
   {
@@ -130,7 +130,7 @@ export const cards: Card[] = [
     group: ['building'],
     id: 'guestbook',
     size: 'md',
-    span: 'col-span-4',
+    span: 'desktop:col-span-4 col-span-2',
     title: 'art by the visitor before you',
   },
   {
@@ -141,7 +141,7 @@ export const cards: Card[] = [
     imageUrl: new URL('../assets/home/blr.webp', import.meta.url).href,
     link: 'https://links.psiderman.com/blr',
     size: 'sm',
-    span: 'col-span-2',
+    span: 'desktop:col-span-2 col-span-1',
     title: 'blr maps',
   },
 ]

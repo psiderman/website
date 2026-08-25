@@ -32,10 +32,12 @@
     </div>
     <!-- Grid -->
     <div
-      class="desktop:grid desktop:px-20 relative flex w-full grid-flow-row-dense grid-cols-12 flex-col gap-8 px-4"
+      class="desktop:px-20 desktop:grid-cols-12 relative grid w-full grid-flow-row-dense grid-cols-2 gap-8 px-4"
     >
       <!-- Filters -->
-      <div class="desktop:h-0 desktop:-mt-5 col-span-12 flex flex-wrap justify-center gap-1">
+      <div
+        class="desktop:h-0 desktop:-mt-5 desktop:col-span-12 col-span-2 flex flex-wrap justify-center gap-1"
+      >
         <button
           v-for="emj in emojis"
           :key="emj.id"
@@ -57,7 +59,7 @@
       <!-- Description Card -->
       <div
         v-if="activeFilter && activeDescription.id"
-        class="border-border-primary bg-surface-primary pointer-events-auto col-span-4 row-span-3 flex h-124 flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
+        class="border-border-primary bg-surface-primary desktop:col-span-4 pointer-events-auto col-span-2 row-span-3 flex h-124 flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
       >
         <div class="aspect-video">
           <img
@@ -183,7 +185,7 @@ const filteredCards = computed<GridCard[]>(() => {
   let sorted = visible.sort((a, b) => sizeWeight[b.size] - sizeWeight[a.size])
 
   if (sorted.length === 1) {
-    sorted = [{ ...sorted[0], span: 'col-span-8' }]
+    sorted = [{ ...sorted[0], span: 'col-span-2 desktop:col-span-8' }]
   }
 
   // Filter extra cards for the active filter
@@ -204,7 +206,10 @@ const filteredCards = computed<GridCard[]>(() => {
         isExtra: true,
         link: extra.link,
         size: extra.size || 'sm',
-        span: extra.size === 'sm' ? 'col-span-2' : 'col-span-4 cursor-pointer',
+        span:
+          extra.size === 'sm'
+            ? 'col-span-1 desktop:col-span-2'
+            : 'col-span-2 desktop:col-span-4 cursor-pointer',
         title: extra.title || '',
       }
       return extraCard
