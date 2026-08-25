@@ -180,7 +180,7 @@
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ArrowUpRight, Undo } from '@lucide/vue'
-import { animate, createDraggable } from 'animejs'
+import { animate, createDraggable, type Draggable } from 'animejs'
 import { format } from 'date-fns'
 import { computed, nextTick, ref, watch } from 'vue'
 
@@ -208,7 +208,7 @@ const sortedPeople = computed(() => {
 })
 
 const imageRefs = ref<HTMLElement[]>([])
-let draggables: any[] = []
+let draggables: Draggable[] = []
 const isMoved = ref(false)
 
 const resetImages = () => {
