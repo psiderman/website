@@ -336,93 +336,216 @@ export const toggleMultiplayer = async () => {
   }
 }
 
-export function useLive() {
-  let resizeObserver: null | ResizeObserver = null
-  let lastSent = 0
-  const THROTTLE_MS = 2000
-  let cleanupInterval: ReturnType<typeof setInterval>
-  let driftInterval: ReturnType<typeof setInterval>
+let resizeObserver: null | ResizeObserver = null
+let lastSent = 0
+const THROTTLE_MS = 2000
+let cleanupInterval: null | ReturnType<typeof setInterval> = null
+let driftInterval: null | ReturnType<typeof setInterval> = null
+const activeWatchers: (() => void)[] = []
 
-  const activeWatchers: (() => void)[] = []
-
-  const joinRoom = (roomName: string) => {
-    if (channel) {
-      channel.untrack()
-      channel.unsubscribe()
-      channel = null
-    }
-
-    // Clear stale state from previous room
-    cursors.value = {}
-    touches.value = {}
-    activePresenceUsers.value = []
-    hasOtherUsersOnRoom.value = false
-
-    if (!global.allowMultiplayer.value) return
-
-    channel = supabase.channel(roomName)
-
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        if (!channel) return
-        const state = channel.presenceState()
-        let count = 0
-        const users = []
-        const activeIds = new Set<string>()
-
-        for (const id in state) {
-          const presences = state[id] as unknown as PresenceUser[]
-          if (presences.length > 0) {
-            const p = presences[0]
-            users.push(p)
-            activeIds.add(p.id)
-            if (p.id !== activeUserId.value) {
-              count++
-            }
-          }
-        }
-        hasOtherUsersOnRoom.value = count > 0
-        activePresenceUsers.value = users
-
-        // Cleanup cursors and touches for users who left
-        for (const id in cursors.value) {
-          if (!activeIds.has(id)) {
-            delete cursors.value[id]
-          }
-        }
-        for (const id in touches.value) {
-          if (!activeIds.has(id)) {
-            delete touches.value[id]
-          }
-        }
-      })
-      .on('broadcast', { event: 'cursor' }, ({ payload }) => {
-        if (payload.id === activeUserId.value) return
-
-        const existing = cursors.value[payload.id]
-        cursors.value[payload.id] = {
-          ...payload,
-          driftX: existing ? existing.driftX : 0,
-          driftY: existing ? existing.driftY : 0,
-          updatedAt: Date.now(),
-        }
-      })
-      .on('broadcast', { event: 'touch' }, ({ payload }) => {
-        if (payload.id === activeUserId.value) return
-        touches.value[payload.id] = { ...payload, timestamp: Date.now() }
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED' && global.allowMultiplayer.value) {
-          await channel!.track({
-            avatar: userAvatar.value,
-            color: userColor.value,
-            id: activeUserId.value,
-            name: userName.value,
-            room: activeRoomName.value,
-          })
-        }
-      })
+const joinRoom = (roomName: string) => {
+  if (channel) {
+    channel.untrack()
+    channel.unsubscribe()
+    channel = null
   }
+
+  // Clear stale state from previous room
+  cursors.value = {}
+  touches.value = {}
+  activePresenceUsers.value = []
+  hasOtherUsersOnRoom.value = false
+
+  if (!global.allowMultiplayer.value) return
+
+  channel = supabase.channel(roomName)
+
+  channel
+    .on('presence', { event: 'sync' }, () => {
+      if (!channel) return
+      const state = channel.presenceState()
+      let count = 0
+      const users = []
+      const activeIds = new Set<string>()
+
+      for (const id in state) {
+        const presences = state[id] as unknown as PresenceUser[]
+        if (presences.length > 0) {
+          const p = presences[0]
+          users.push(p)
+          activeIds.add(p.id)
+          if (p.id !== activeUserId.value) {
+            count++
+          }
+        }
+      }
+      hasOtherUsersOnRoom.value = count > 0
+      activePresenceUsers.value = users
+
+      // Cleanup cursors and touches for users who left
+      for (const id in cursors.value) {
+        if (!activeIds.has(id)) {
+          delete cursors.value[id]
+        }
+      }
+      for (const id in touches.value) {
+        if (!activeIds.has(id)) {
+          delete touches.value[id]
+        }
+      }
+    })
+    .on('broadcast', { event: 'cursor' }, ({ payload }) => {
+      if (payload.id === activeUserId.value) return
+
+      const existing = cursors.value[payload.id]
+      cursors.value[payload.id] = {
+        ...payload,
+        driftX: existing ? existing.driftX : 0,
+        driftY: existing ? existing.driftY : 0,
+        updatedAt: Date.now(),
+      }
+    })
+    .on('broadcast', { event: 'touch' }, ({ payload }) => {
+      if (payload.id === activeUserId.value) return
+      touches.value[payload.id] = { ...payload, timestamp: Date.now() }
+    })
+    .subscribe(async (status) => {
+      if (status === 'SUBSCRIBED' && global.allowMultiplayer.value) {
+        await channel!.track({
+          avatar: userAvatar.value,
+          color: userColor.value,
+          id: activeUserId.value,
+          name: userName.value,
+          room: activeRoomName.value,
+        })
+      }
+    })
+}
+
+const updateBoxRects = () => {
+  const rects = new Map<string, BoxRect>()
+  document.querySelectorAll('[data-sync]').forEach((el) => {
+    const boxId = el.getAttribute('data-sync')
+    if (boxId) {
+      const rect = el.getBoundingClientRect()
+      rects.set(boxId, {
+        height: rect.height,
+        left: rect.left + window.scrollX,
+        top: rect.top + window.scrollY,
+        width: rect.width,
+      })
+    }
+  })
+  boxRects.value = rects
+}
+
+const handleResize = () => {
+  isMobile.value = window.matchMedia('(pointer: coarse)').matches
+  windowWidth.value = window.innerWidth
+  updateBoxRects()
+}
+
+const handleScroll = () => {
+  scrollY.value = window.scrollY
+}
+
+const handleMouseMove = (e: MouseEvent) => {
+  if (isMobile.value) return // Mobile uses touchstart
+  if (!global.allowMultiplayer.value) return
+  if (!hasOtherUsersOnRoom.value) return
+  if (!channel) return
+
+  const now = Date.now()
+  if (now - lastSent < THROTTLE_MS) return
+  lastSent = now
+
+  const target = (e.target as Element).closest('[data-sync]')
+  let box = 'viewport'
+  let x = e.pageX / windowWidth.value
+  let y = e.pageY
+
+  if (target) {
+    const boxId = target.getAttribute('data-sync')
+    if (boxId) {
+      const rect = target.getBoundingClientRect()
+      box = boxId
+      x = (e.clientX - rect.left) / rect.width
+      y = (e.clientY - rect.top) / rect.height
+    }
+  }
+
+  channel.send({
+    event: 'cursor',
+    payload: {
+      box,
+      color: userColor.value,
+      id: activeUserId.value,
+      name: userName.value,
+      room: activeRoomName.value,
+      x,
+      y,
+    },
+    type: 'broadcast',
+  })
+}
+
+const handleTouchStart = (e: TouchEvent) => {
+  if (!isMobile.value) return
+  if (!global.allowMultiplayer.value) return
+  if (!hasOtherUsersOnRoom.value) return
+  if (!channel) return
+  if (e.changedTouches.length === 0) return
+
+  const now = Date.now()
+  if (now - lastSent < THROTTLE_MS) return
+  lastSent = now
+
+  const touch = e.changedTouches[0]
+  const target = (e.target as Element).closest('[data-sync]')
+  let box = 'viewport'
+  let x = touch.pageX / windowWidth.value
+  let y = touch.pageY
+
+  if (target) {
+    const boxId = target.getAttribute('data-sync')
+    if (boxId) {
+      const rect = target.getBoundingClientRect()
+      box = boxId
+      x = (touch.clientX - rect.left) / rect.width
+      y = (touch.clientY - rect.top) / rect.height
+    }
+  }
+
+  channel.send({
+    event: 'touch',
+    payload: {
+      box,
+      color: userColor.value,
+      id: activeUserId.value,
+      name: userName.value,
+      room: activeRoomName.value,
+      timestamp: now,
+      x,
+      y,
+    },
+    type: 'broadcast',
+  })
+}
+
+const startLiveSession = () => {
+  isMobile.value = window.matchMedia('(pointer: coarse)').matches
+  updateBoxRects()
+  resizeObserver = new ResizeObserver(() => {
+    updateBoxRects()
+  })
+  resizeObserver.observe(document.body)
+
+  window.addEventListener('resize', handleResize)
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('mousemove', handleMouseMove)
+  window.addEventListener('touchstart', handleTouchStart, { passive: true })
+
+  joinRoom(activeRoomName.value)
 
   // Watch for room changes to rejoin
   activeWatchers.push(
@@ -452,205 +575,102 @@ export function useLive() {
     ),
   )
 
-  const updateBoxRects = () => {
-    const rects = new Map<string, BoxRect>()
-    document.querySelectorAll('[data-sync]').forEach((el) => {
-      const boxId = el.getAttribute('data-sync')
-      if (boxId) {
-        const rect = el.getBoundingClientRect()
-        rects.set(boxId, {
-          height: rect.height,
-          left: rect.left + window.scrollX,
-          top: rect.top + window.scrollY,
-          width: rect.width,
-        })
-      }
-    })
-    boxRects.value = rects
-  }
-
-  const handleResize = () => {
-    isMobile.value = window.matchMedia('(pointer: coarse)').matches
-    windowWidth.value = window.innerWidth
-    updateBoxRects()
-  }
-
-  const handleScroll = () => {
-    scrollY.value = window.scrollY
-  }
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isMobile.value) return // Mobile uses touchstart
-    if (!global.allowMultiplayer.value) return
-    if (!hasOtherUsersOnRoom.value) return
-    if (!channel) return
-
+  cleanupInterval = setInterval(() => {
     const now = Date.now()
-    if (now - lastSent < THROTTLE_MS) return
-    lastSent = now
+    reactiveNow.value = now
 
-    const target = (e.target as Element).closest('[data-sync]')
-    let box = 'viewport'
-    let x = e.pageX / windowWidth.value
-    let y = e.pageY
-
-    if (target) {
-      const boxId = target.getAttribute('data-sync')
-      if (boxId) {
-        const rect = target.getBoundingClientRect()
-        box = boxId
-        x = (e.clientX - rect.left) / rect.width
-        y = (e.clientY - rect.top) / rect.height
+    // Cleanup stale cursors completely after timeout
+    for (const id in cursors.value) {
+      if (now - cursors.value[id].updatedAt > LIVE_CONFIG.CURSOR_DELETE_MS) {
+        delete cursors.value[id]
       }
     }
 
-    channel.send({
-      event: 'cursor',
-      payload: {
-        box,
-        color: userColor.value,
-        id: activeUserId.value,
-        name: userName.value,
-        room: activeRoomName.value,
-        x,
-        y,
-      },
-      type: 'broadcast',
-    })
-  }
-
-  const handleTouchStart = (e: TouchEvent) => {
-    if (!isMobile.value) return
-    if (!global.allowMultiplayer.value) return
-    if (!hasOtherUsersOnRoom.value) return
-    if (!channel) return
-    if (e.changedTouches.length === 0) return
-
-    const now = Date.now()
-    if (now - lastSent < THROTTLE_MS) return
-    lastSent = now
-
-    const touch = e.changedTouches[0]
-    const target = (e.target as Element).closest('[data-sync]')
-    let box = 'viewport'
-    let x = touch.pageX / windowWidth.value
-    let y = touch.pageY
-
-    if (target) {
-      const boxId = target.getAttribute('data-sync')
-      if (boxId) {
-        const rect = target.getBoundingClientRect()
-        box = boxId
-        x = (touch.clientX - rect.left) / rect.width
-        y = (touch.clientY - rect.top) / rect.height
+    // Cleanup stale touches completely after timeout
+    for (const id in touches.value) {
+      if (now - touches.value[id].timestamp > LIVE_CONFIG.TOUCH_DELETE_MS) {
+        delete touches.value[id]
       }
     }
 
-    channel.send({
-      event: 'touch',
-      payload: {
-        box,
-        color: userColor.value,
-        id: activeUserId.value,
-        name: userName.value,
-        room: activeRoomName.value,
-        timestamp: now,
-        x,
-        y,
-      },
-      type: 'broadcast',
-    })
-  }
+    // Enforce max cursors on screen
+    const cursorIds = Object.keys(cursors.value)
+    if (cursorIds.length > LIVE_CONFIG.MAX_CURSORS) {
+      cursorIds.sort((a, b) => cursors.value[b].updatedAt - cursors.value[a].updatedAt)
+      for (let i = LIVE_CONFIG.MAX_CURSORS; i < cursorIds.length; i++) {
+        delete cursors.value[cursorIds[i]]
+      }
+    }
 
+    // Enforce max touches on screen
+    const touchIds = Object.keys(touches.value)
+    if (touchIds.length > LIVE_CONFIG.MAX_TOUCHES) {
+      touchIds.sort((a, b) => touches.value[b].timestamp - touches.value[a].timestamp)
+      for (let i = LIVE_CONFIG.MAX_TOUCHES; i < touchIds.length; i++) {
+        delete touches.value[touchIds[i]]
+      }
+    }
+  }, 1000)
+
+  driftInterval = setInterval(() => {
+    const now = Date.now()
+    for (const id in cursors.value) {
+      if (id === activeUserId.value) continue
+
+      const c = cursors.value[id]
+      if (now - c.updatedAt > LIVE_CONFIG.CURSOR_STALE_MS) continue // Don't drift if stale
+
+      // Generate a pseudo-random seed from the ID so each cursor floats differently
+      let hash = 0
+      for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash)
+
+      // Different phase offsets and slight speed variations
+      const phaseX = hash % 100
+      const phaseY = (hash >> 4) % 100
+      const speedX = 0.0008 + (hash % 10) * 0.00005
+      const speedY = 0.0009 + ((hash >> 2) % 10) * 0.00005
+
+      // Smooth, continuous organic floating (max +/- 12px)
+      c.driftX = Math.sin(now * speedX + phaseX) * 12
+      c.driftY = Math.cos(now * speedY + phaseY) * 12
+    }
+  }, 50)
+}
+
+const stopLiveSession = () => {
+  window.removeEventListener('resize', handleResize)
+  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('mousemove', handleMouseMove)
+  window.removeEventListener('touchstart', handleTouchStart)
+  if (cleanupInterval) clearInterval(cleanupInterval)
+  if (driftInterval) clearInterval(driftInterval)
+  cleanupInterval = null
+  driftInterval = null
+  activeWatchers.forEach((unwatch) => unwatch())
+  activeWatchers.length = 0
+
+  if (channel) {
+    channel.unsubscribe()
+    channel = null
+  }
+  resizeObserver?.disconnect()
+  resizeObserver = null
+}
+
+let activeCallers = 0
+
+export function useLive() {
   onMounted(() => {
-    isMobile.value = window.matchMedia('(pointer: coarse)').matches
-    updateBoxRects()
-    resizeObserver = new ResizeObserver(() => {
-      updateBoxRects()
-    })
-    resizeObserver.observe(document.body)
-
-    window.addEventListener('resize', handleResize)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('touchstart', handleTouchStart, { passive: true })
-
-    joinRoom(activeRoomName.value)
-
-    cleanupInterval = setInterval(() => {
-      const now = Date.now()
-      reactiveNow.value = now
-
-      // Cleanup stale cursors completely after timeout
-      for (const id in cursors.value) {
-        if (now - cursors.value[id].updatedAt > LIVE_CONFIG.CURSOR_DELETE_MS) {
-          delete cursors.value[id]
-        }
-      }
-
-      // Cleanup stale touches completely after timeout
-      for (const id in touches.value) {
-        if (now - touches.value[id].timestamp > LIVE_CONFIG.TOUCH_DELETE_MS) {
-          delete touches.value[id]
-        }
-      }
-
-      // Enforce max cursors on screen
-      const cursorIds = Object.keys(cursors.value)
-      if (cursorIds.length > LIVE_CONFIG.MAX_CURSORS) {
-        cursorIds.sort((a, b) => cursors.value[b].updatedAt - cursors.value[a].updatedAt)
-        for (let i = LIVE_CONFIG.MAX_CURSORS; i < cursorIds.length; i++) {
-          delete cursors.value[cursorIds[i]]
-        }
-      }
-
-      // Enforce max touches on screen
-      const touchIds = Object.keys(touches.value)
-      if (touchIds.length > LIVE_CONFIG.MAX_TOUCHES) {
-        touchIds.sort((a, b) => touches.value[b].timestamp - touches.value[a].timestamp)
-        for (let i = LIVE_CONFIG.MAX_TOUCHES; i < touchIds.length; i++) {
-          delete touches.value[touchIds[i]]
-        }
-      }
-    }, 1000)
-
-    driftInterval = setInterval(() => {
-      const now = Date.now()
-      for (const id in cursors.value) {
-        if (id === activeUserId.value) continue
-
-        const c = cursors.value[id]
-        if (now - c.updatedAt > LIVE_CONFIG.CURSOR_STALE_MS) continue // Don't drift if stale
-
-        // Generate a pseudo-random seed from the ID so each cursor floats differently
-        let hash = 0
-        for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash)
-
-        // Different phase offsets and slight speed variations
-        const phaseX = hash % 100
-        const phaseY = (hash >> 4) % 100
-        const speedX = 0.0008 + (hash % 10) * 0.00005
-        const speedY = 0.0009 + ((hash >> 2) % 10) * 0.00005
-
-        // Smooth, continuous organic floating (max +/- 12px)
-        c.driftX = Math.sin(now * speedX + phaseX) * 12
-        c.driftY = Math.cos(now * speedY + phaseY) * 12
-      }
-    }, 50)
+    activeCallers++
+    if (activeCallers === 1) {
+      startLiveSession()
+    }
   })
 
   onUnmounted(() => {
-    window.removeEventListener('resize', handleResize)
-    window.removeEventListener('scroll', handleScroll)
-    window.removeEventListener('mousemove', handleMouseMove)
-    window.removeEventListener('touchstart', handleTouchStart)
-    clearInterval(cleanupInterval)
-    clearInterval(driftInterval)
-    activeWatchers.forEach((unwatch) => unwatch())
-
-    if (channel) {
-      channel.unsubscribe()
+    activeCallers--
+    if (activeCallers === 0) {
+      stopLiveSession()
     }
-    resizeObserver?.disconnect()
   })
 }
