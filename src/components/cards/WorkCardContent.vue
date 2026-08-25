@@ -50,7 +50,8 @@
             class="grid w-full grid-cols-2 pt-0.75 pb-0.5"
             :style="{ height: `${block.heightPx}px` }"
           >
-            <div
+            <component
+              :is="block.clickable ? 'button' : 'div'"
               class="work-block text-ui-small"
               :class="{ 'col-start-2': block.track == 'right', clickable: block.clickable }"
               @click="openWorkModal(block.org_id)"
@@ -61,6 +62,8 @@
                   :src="block.logoUrl"
                   :alt="`${block.org} Logo`"
                   class="size-3 rounded-sm"
+                  width="128"
+                  height="128"
                 />
                 <span v-else-if="block.emoji">{{ block.emoji }}</span>
               </div>
@@ -71,7 +74,7 @@
                   {{ block.durationText }}<span v-if="!block.endDate">...</span>
                 </p>
               </div>
-            </div>
+            </component>
           </div>
         </div>
       </div>

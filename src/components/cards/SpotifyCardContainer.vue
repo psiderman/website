@@ -1,20 +1,28 @@
 <template>
   <div
     ref="containerRef"
-    class="noscrollbar dark:bg-dark dark:border-border-primary relative h-full w-full overflow-scroll rounded-lg border border-transparent bg-[#121212] focus:outline-none"
-    tabindex="-1"
+    class="noscrollbar dark:bg-dark dark:border-border-primary relative h-full w-full overflow-scroll rounded-lg border border-transparent bg-[#121212]"
   >
     <GenericLoader v-if="isRecentLoading" theme="dark" />
     <template v-else-if="display_tracks.length > 0">
-      <div class="text-ui text-light dark:bg-dark sticky top-0 z-1 bg-[#121212] p-4 font-semibold">
+      <div
+        class="text-ui text-light dark:bg-dark sticky -top-4 z-1 bg-[#121212] p-4 pb-1 font-semibold"
+      >
         recently played
       </div>
-      <div class="flex flex-col gap-0 pr-4 pl-2">
-        <div
+      <div
+        class="flex flex-col gap-0 pt-3 pr-4 pl-2"
+        @keydown.down.prevent="focusSibling(1)"
+        @keydown.up.prevent="focusSibling(-1)"
+      >
+        <a
           v-for="(t, i) in display_tracks"
           :key="t.track_id"
-          class="text-ui-small text-light hover:bg-hover-inverted active:bg-press-inverted relative flex w-full cursor-pointer flex-row gap-3 rounded-lg px-2 py-1"
-          @click="openLink(t.song_url)"
+          class="text-ui-small focus-visible:outline-light/50! text-light hover:bg-hover-inverted active:bg-press-inverted relative flex w-full cursor-pointer flex-row gap-3 rounded-lg px-2 py-1"
+          :href="t.song_url"
+          target="_blank"
+          :tabindex="activeFocusIndex === i ? 0 : -1"
+          @focus="activeFocusIndex = i"
         >
           <p class="h-4 w-4 shrink-0 text-right tabular-nums opacity-60">{{ i + 1 }}</p>
           <div class="flex grow flex-row items-center gap-1 truncate">
@@ -27,7 +35,7 @@
           </div>
           <p class="desktop:w-30 w-20 shrink-0 truncate opacity-60">{{ t.artist }}</p>
           <p class="w-8 shrink-0 text-right tabular-nums opacity-60">{{ t.duration }}</p>
-        </div>
+        </a>
       </div>
     </template>
     <div
@@ -43,8 +51,8 @@
         v-if="!now_playing.is_loading && !isRecentLoading"
         class="group sticky bottom-0 mt-auto w-full p-3.5"
       >
-        <div
-          class="text-ui-small text-light bg-dark/50 border-light/20 relative flex h-12 flex-row items-center justify-between gap-2 overflow-hidden rounded-l-2xl rounded-r-xl border p-3 backdrop-blur-sm transition-all duration-200"
+        <button
+          class="text-ui-small text-light focus-visible:outline-light/50! bg-dark/50 border-light/20 relative flex h-12 w-full flex-row items-center justify-between gap-2 overflow-hidden rounded-l-2xl rounded-r-xl border p-3 backdrop-blur-sm transition-colors duration-200"
           :class="[
             now_playing.title || !currentUser
               ? 'group-hover:border-light/25 group-hover:bg-dark/80 cursor-pointer'
@@ -61,13 +69,21 @@
             }"
           ></div>
 
-          <img src="@/assets/svg/spotify.svg" alt="spotify" class="z-10 size-5" />
+          <img
+            src="@/assets/svg/spotify.svg"
+            alt="spotify"
+            class="z-10 size-5"
+            width="24"
+            height="24"
+          />
           <template v-if="now_playing.title">
             <img
               v-if="now_playing.cover"
               :src="now_playing.cover"
               alt="cover"
               class="z-10 size-8 rounded-sm"
+              width="128"
+              height="128"
             />
 
             <div class="z-10 flex min-w-0 grow flex-col text-left">
@@ -89,12 +105,12 @@
                 :key="i"
                 class="bg-light w-1 rounded-xs transition-all"
                 :class="[
-                  now_playing.is_playing ? 'animate-waveform' : '',
-                  !now_playing.is_playing ? 'h-0.75' : '',
+                  now_playing.is_playing && !prefersReducedMotion ? 'animate-waveform' : '',
+                  !now_playing.is_playing || prefersReducedMotion ? 'h-0.75' : '',
                 ]"
                 :style="{
-                  animationDelay: now_playing.is_playing ? `${i * -Math.random() * 300}ms` : '0s',
-                  animationDuration: now_playing.is_playing
+                  animationDelay: now_playing.is_playing && !prefersReducedMotion ? `${i * -Math.random() * 300}ms` : '0s',
+                  animationDuration: now_playing.is_playing && !prefersReducedMotion
                     ? `${Math.max(Math.random() * 1, 0.75)}s`
                     : '0s',
                 }"
@@ -102,12 +118,12 @@
             </div>
           </template>
           <template v-else-if="!currentUser">
-            <p class="text-light grow text-left">log in to see what i'm listening to right now</p>
+            <p class="text-light grow text-left">log in to see what i’m listening to right now</p>
           </template>
           <template v-else>
-            <p class="grow text-left opacity-50">i'm not using spotify right now</p>
+            <p class="grow text-left opacity-50">i’m not using spotify right now</p>
           </template>
-        </div>
+        </button>
       </div>
     </Transition>
   </div>
@@ -117,6 +133,8 @@
 import { OctagonAlert } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth.ts'
 import { openLink } from '@/utils'
@@ -239,6 +257,20 @@ const playerClick = (link: null | string) => {
   }
 
   openLink(link)
+}
+
+const activeFocusIndex = ref(0)
+
+const focusSibling = (direction: number) => {
+  if (containerRef.value) {
+    const focusable = Array.from(containerRef.value.querySelectorAll('a[href]')) as HTMLElement[]
+    const index = activeFocusIndex.value
+    const nextIndex = index + direction
+    if (nextIndex >= 0 && nextIndex < focusable.length) {
+      activeFocusIndex.value = nextIndex
+      focusable[nextIndex].focus()
+    }
+  }
 }
 </script>
 

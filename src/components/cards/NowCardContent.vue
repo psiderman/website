@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-surface-secondary relative h-full w-full overflow-hidden rounded-lg"
+    class="bg-surface-secondary relative h-full w-full rounded-lg"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
@@ -15,21 +15,26 @@
     <!-- Images Carousel -->
     <div
       v-else-if="images && images.length > 0"
-      class="pointer-events-none relative h-full w-full overflow-hidden"
+      ref="scrollContainer"
+      class="noscrollbar relative flex h-full w-full snap-y snap-mandatory flex-col overflow-x-hidden overflow-y-auto scroll-smooth"
+      tabindex="-1"
       @touchstart="handleInteraction"
       @wheel="handleInteraction"
+      @scroll="onScroll"
     >
       <div
-        class="flex h-full w-full flex-col transition-transform duration-1000 ease-in-out"
-        :style="{ transform: `translateY(-${activeIndex * 100}%)` }"
+        v-for="(img, idx) in images"
+        :key="`${img.name}-${idx}`"
+        class="h-full w-full shrink-0 snap-center"
       >
-        <div
-          v-for="(img, idx) in images"
-          :key="`${img.name}-${idx}`"
-          class="h-full w-full shrink-0"
-        >
-          <img class="h-full w-full object-cover" :src="img.url" :alt="img.name" />
-        </div>
+        <img
+          class="h-full w-full object-cover"
+          :src="img.url"
+          :alt="img.name"
+          width="300"
+          height="500"
+          draggable="false"
+        />
       </div>
     </div>
 
@@ -64,6 +69,7 @@ const { images, isLoadingImages, isLoadingSlug } = useNow()
 const activeIndex = ref(0)
 const isHovered = ref(false)
 const isInteracting = ref(false)
+const scrollContainer = ref<HTMLElement | null>(null)
 
 let autoPlayInterval: null | number = null
 let interactionTimeout: null | number = null
@@ -82,12 +88,63 @@ const handleInteraction = () => {
   }, 3000)
 }
 
-const scrollToNext = () => {
-  if (originalLength.value <= 1) return
-  activeIndex.value = (activeIndex.value + 1) % originalLength.value
+const handleScroll = () => {
+  if (scrollContainer.value) {
+    const index = Math.round(scrollContainer.value.scrollTop / scrollContainer.value.clientHeight)
+    activeIndex.value = index
+  }
 }
 
+const onScroll = () => {
+  handleScroll()
+  handleInteraction()
+}
+
+const scrollToNext = () => {
+  if (!scrollContainer.value || originalLength.value <= 1) return
+  const behavior = prefersReducedMotion ? 'auto' : 'smooth'
+
+  const { clientHeight, scrollHeight, scrollTop } = scrollContainer.value
+
+  if (scrollTop + clientHeight >= scrollHeight - 10) {
+    scrollContainer.value.scrollTo({ behavior, top: 0 })
+  } else {
+    scrollContainer.value.scrollBy({ behavior, top: clientHeight })
+  }
+}
+
+const scrollToPrev = () => {
+  if (!scrollContainer.value || originalLength.value <= 1) return
+  const behavior = prefersReducedMotion ? 'auto' : 'smooth'
+
+  const { clientHeight, scrollTop } = scrollContainer.value
+
+  if (scrollTop <= 10) {
+    scrollContainer.value.scrollTo({ behavior, top: scrollContainer.value.scrollHeight })
+  } else {
+    scrollContainer.value.scrollBy({ behavior, top: -clientHeight })
+  }
+}
+
+const handleGlobalKeyDown = (e: KeyboardEvent) => {
+  const activeEl = document.activeElement
+  if (!activeEl) return
+
+  if (scrollContainer.value && activeEl.contains(scrollContainer.value)) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      scrollToNext()
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      scrollToPrev()
+    }
+  }
+}
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 const startAutoPlay = () => {
+  if (prefersReducedMotion) return
   if (autoPlayInterval) clearInterval(autoPlayInterval)
   autoPlayInterval = window.setInterval(() => {
     if (!isHovered.value && !isInteracting.value && originalLength.value > 1) {
@@ -101,12 +158,14 @@ const stopAutoPlay = () => {
 }
 
 onMounted(() => {
+  window.addEventListener('keydown', handleGlobalKeyDown)
   setTimeout(() => {
     startAutoPlay()
   }, 2000)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeyDown)
   stopAutoPlay()
   if (interactionTimeout) clearTimeout(interactionTimeout)
 })

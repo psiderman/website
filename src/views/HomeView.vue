@@ -9,6 +9,8 @@
         src="@/assets/public.webp"
         alt="karan sanas"
         class="border-border-primary dark:border-light/20 aspect-auto h-50 rounded-[4.16rem] border"
+        width="140"
+        height="200"
       />
       <div
         class="desktop:w-120 desktop:items-start flex w-full flex-col items-center justify-center gap-4"
@@ -17,7 +19,7 @@
           class="text-ui text-text-secondary desktop:items-start desktop:text-left flex flex-col items-center gap-2 text-center"
         >
           <p>@psiderman</p>
-          <h1 class="text-display text-text-primary -mt-2">hi, i'm karan</h1>
+          <h1 class="text-display text-text-primary -mt-2">hi, i’m karan</h1>
           <p class="text-ui">
             i’m still searching for a one-liner to sum me up.
             <br class="desktop:block hidden" />
@@ -38,6 +40,7 @@
           v-for="emj in emojis"
           :key="emj.id"
           v-tooltip="{ group: 'filter', placement: 'top', content: emj.label }"
+          :aria-label="emj.label"
           class="emoji-filter group"
           :class="{
             default: !activeFilter,
@@ -61,6 +64,8 @@
             :src="getImageUrl(activeDescription.id)"
             class="border-border-primary h-full w-full rounded-lg border object-cover"
             :alt="activeDescription.id"
+            width="800"
+            height="450"
           />
         </div>
         <div
@@ -90,8 +95,8 @@
             v-if="card.coverVid"
             :src="card.coverVid"
             class="pointer-events-none h-full w-full object-cover"
-            autoplay
-            loop
+            :autoplay="!prefersReducedMotion"
+            :loop="!prefersReducedMotion"
             muted
             playsinline
           />
@@ -111,6 +116,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'

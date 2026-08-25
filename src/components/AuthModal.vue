@@ -32,22 +32,30 @@
                 <img
                   src="@/data/descriptions/music.webp"
                   alt="life"
-                  class="image-print absolute -bottom-2 -left-24 aspect-auto w-32 -rotate-5"
+                  class="image-polaroid absolute -bottom-11 -left-24 aspect-auto h-auto w-32 -rotate-5"
+                  width="128"
+                  height="72"
                 />
                 <img
                   src="@/data/descriptions/work.webp"
                   alt="life"
-                  class="image-print absolute -bottom-7 -left-20 aspect-auto w-32 rotate-5"
+                  class="image-polaroid absolute -bottom-16 -left-20 aspect-auto h-auto w-32 rotate-5"
+                  width="128"
+                  height="72"
                 />
                 <img
                   src="@/data/descriptions/building.webp"
                   alt="life"
-                  class="image-print absolute -top-5 -right-10 aspect-auto w-32 rotate-0"
+                  class="image-polaroid absolute -top-5 -right-10 aspect-auto h-auto w-32 rotate-0"
+                  width="128"
+                  height="72"
                 />
                 <img
                   src="@/data/descriptions/travel.webp"
                   alt="life"
-                  class="image-print absolute -top-6 -right-14 aspect-auto w-32 -rotate-12"
+                  class="image-polaroid absolute -top-6 -right-14 aspect-auto h-auto w-32 -rotate-12"
+                  width="128"
+                  height="72"
                 />
               </div>
 

@@ -5,8 +5,7 @@
   <div
     v-else
     :ref="setupObserver"
-    class="drawing-board focus:outline-none"
-    tabindex="-1"
+    class="drawing-board outline-surface-inverted focus-visible:outline-2 focus-visible:outline-offset-2"
     @keydown="handleKeyDown"
   >
     <!-- Drawing Surface -->
@@ -51,6 +50,7 @@
         :class="{ 'animate-pulse cursor-not-allowed opacity-50': isSaving }"
         :disabled="isSaving"
         title="Save Drawing"
+        aria-label="Save Drawing"
         @click="saveDrawing"
       >
         <CloudUpload :size="16" />
@@ -317,6 +317,11 @@ function saveDrawing() {
 }
 
 function startAnimation() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    visibleBgStrokeIndex.value = backgroundStrokes.value.length
+    visibleBgPointIndex.value = 0
+    return
+  }
   if (animInterval) return
   animInterval = window.setInterval(() => {
     if (visibleBgStrokeIndex.value < backgroundStrokes.value.length) {
@@ -376,7 +381,7 @@ onUnmounted(() => {
 
 onBeforeRouteLeave(() => {
   if (hasUnsavedChanges.value) {
-    const answer = window.confirm('You’r art wasn’t saved. Are you sure you want to leave?')
+    const answer = window.confirm('Your art wasn’t saved. Are you sure you want to leave?')
     if (!answer) return false
   }
 })

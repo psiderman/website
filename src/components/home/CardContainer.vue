@@ -1,5 +1,6 @@
 <template>
-  <button
+  <component
+    :is="link ? 'button' : 'div'"
     :data-sync="'card-' + title.toLowerCase().replace(/\s+/g, '-')"
     class="border-border-primary bg-surface-primary pointer-events-auto flex flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
     :class="[heightClass, { clickable: link }]"
@@ -9,7 +10,14 @@
       class="relative flex h-full w-full grow items-center justify-center overflow-hidden rounded-lg"
       :class="bgClass || 'bg-background'"
     >
-      <img v-if="img" :src="img" :alt="title" class="pointer-events-none h-3/5" />
+      <img
+        v-if="img"
+        :src="img"
+        :alt="title"
+        class="pointer-events-none h-3/5 w-auto"
+        width="160"
+        height="160"
+      />
       <slot :is-icon-hovered="isIconHovered" />
     </div>
     <div
@@ -18,14 +26,18 @@
       <span>{{ title }}</span>
       <div
         v-if="icon"
-        class="flex h-full items-center"
+        aria-hidden="true"
+        class="focus-within:outline-surface-inverted flex size-6 h-full shrink-0 items-center justify-center rounded-full"
+        :tabindex="arrow === 'help' ? 0 : -1"
+        @focus="isIconHovered = true"
+        @blur="isIconHovered = false"
         @mouseenter="isIconHovered = true"
         @mouseleave="isIconHovered = false"
       >
         <component :is="icon" :size="16" />
       </div>
     </div>
-  </button>
+  </component>
 </template>
 
 <script setup lang="ts">

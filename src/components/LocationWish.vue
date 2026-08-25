@@ -1,5 +1,5 @@
 <template>
-  <div class="group relative flex flex-row items-center justify-center gap-2" data-sync="wish">
+  <div class="group relative flex flex-row items-center justify-center gap-2">
     <Transition
       enter-active-class="transition duration-1000 ease-out"
       enter-from-class="opacity-0"
@@ -10,7 +10,7 @@
         to="/"
         class="size-10 shrink-0 overflow-hidden rounded-full hover:opacity-80 active:opacity-90"
       >
-        <img src="/psider.webp" class="size-10" />
+        <img src="/psider.webp" class="size-10" width="80" height="80" />
       </router-link>
     </Transition>
 
@@ -43,6 +43,7 @@
           theme: 'tippy-small',
           hideOnClick: false,
         }"
+        data-sync="wish"
         class="relative size-full cursor-cell overflow-hidden rounded-full border-2 border-transparent bg-amber-200 dark:bg-amber-500/20"
         :class="{
           'cursor-progress border-amber-400! transition-all duration-200': isPressing,

@@ -29,6 +29,8 @@
         src="@/assets/svg/wordmark.svg"
         alt="psiderman wordmark"
         style="width: 1040px; height: 300px"
+        width="1040"
+        height="300"
       />
     </div>
     <div class="desktop:hidden h-10"></div>

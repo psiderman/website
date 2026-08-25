@@ -29,12 +29,14 @@
             <div
               v-for="img in images"
               :key="img.name"
-              class="bg-surface-primary aspect-3/5 h-full w-full rounded-xl object-cover"
+              class="bg-dark aspect-3/5 h-full w-full rounded-xl object-cover"
             >
               <img
                 class="aspect-3/5 h-full w-full rounded-xl object-cover"
                 :src="img.url"
                 :alt="img.name"
+                width="300"
+                height="500"
               />
             </div>
           </div>

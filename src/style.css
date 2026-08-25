@@ -368,6 +368,11 @@
     -webkit-appearance: none;
     margin: 0;
   }
+
+  img {
+    user-select: none;
+    -webkit-user-drag: none;
+  }
 }
 
 @layer components {
@@ -617,8 +622,8 @@
   }
 
   /* Image with borders */
-  img.image-print {
-    @apply bg-dark border-light outline-dark/10 rounded-lg border-4 shadow-md outline;
+  img.image-polaroid {
+    @apply bg-dark border-light outline-dark/10 rounded-lg border-8 border-b-50 shadow-md outline;
   }
 }
 

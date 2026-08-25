@@ -44,16 +44,19 @@
                     <img
                       v-if="item.type === 'image'"
                       :src="item.src"
-                      class="desktop:max-h-[calc(75svh)] object-contain"
+                      :alt="`${title}-${idx}`"
+                      class="desktop:max-h-[calc(75svh)] w-auto object-contain"
                     />
                     <video
                       v-else-if="item.type === 'video'"
+                      :alt="`${title}-${idx}`"
                       :src="item.src"
-                      class="desktop:max-h-[calc(75svh)] object-contain"
+                      class="desktop:max-h-[calc(75svh)] w-auto object-contain"
                       playsinline
-                      autoplay
-                      loop
+                      :autoplay="!prefersReducedMotion"
+                      :loop="!prefersReducedMotion"
                       muted
+                      controls
                     />
                   </div>
                 </div>
@@ -66,7 +69,6 @@
                   :active-index="activeIndex"
                   :count="mediaItems.length"
                   orientation="horizontal"
-                  fast-animation
                 />
 
                 <button
@@ -76,6 +78,7 @@
                       ? 'pointer-events-none opacity-0'
                       : 'opacity-0 group-hover:opacity-100'
                   "
+                  aria-label="Previous"
                   @click="scrollToPrev"
                 >
                   <ArrowLeft :size="16" />
@@ -89,6 +92,7 @@
                       : 'opacity-0 group-hover:opacity-100',
                     activeIndex === 0 && mediaItems.length > 1 ? 'opacity-50' : '',
                   ]"
+                  aria-label="Next"
                   @click="scrollToNext"
                 >
                   <ArrowRight :size="16" />
@@ -128,6 +132,8 @@
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ArrowLeft, ArrowRight, ArrowUpRight } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 import CarouselIndicator from '@/components/CarouselIndicator.vue'
 import { global } from '@/composables/useGlobal'

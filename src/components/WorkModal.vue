@@ -35,6 +35,8 @@
                     <img
                       :src="getWorkLogoUrl(work.orgId)"
                       class="rounded-special dark:border-border-primary size-10 border border-transparent"
+                      width="128"
+                      height="128"
                     />
                     <div class="flex flex-col">
                       <h2 class="text-h2 text-text-primary">{{ work.orgName }}</h2>
@@ -79,8 +81,10 @@
                       ref="imageRefs"
                       draggable="false"
                       :src="getWorkImageUrl(work.orgId, img.src)"
-                      class="image-print absolute inset-0 m-auto object-cover select-none"
+                      class="image-polaroid absolute inset-0 m-auto object-cover select-none"
                       :class="img.landscape ? 'h-60 w-80' : 'h-80 w-60'"
+                      :height="img.landscape ? 240 : 320"
+                      :width="img.landscape ? 320 : 240"
                       :style="{ transform: `rotate(${[-5, 7, 1][idx % 3]}deg)` }"
                     />
                   </div>
@@ -139,6 +143,8 @@
                         <img
                           :src="getWorkPersonUrl(work.orgId, person.imageName)"
                           class="border-border-primary size-10 rounded-full border object-cover outline-0 transition-transform hover:scale-110"
+                          height="128"
+                          width="128"
                         />
                       </component>
                     </div>

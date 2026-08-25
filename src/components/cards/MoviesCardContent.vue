@@ -1,13 +1,14 @@
 <template>
   <div
     ref="scrollContainer"
-    class="bg-surface-primary noscrollbar relative flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-x-auto scroll-smooth focus:outline-none"
-    tabindex="-1"
+    class="bg-surface-primary noscrollbar relative flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-x-auto scroll-smooth"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
     @touchstart="handleInteraction"
     @wheel="handleInteraction"
     @scroll="handleInteraction"
+    @keydown.right.prevent="focusSibling(1)"
+    @keydown.left.prevent="focusSibling(-1)"
   >
     <div
       v-if="loading"
@@ -18,15 +19,21 @@
 
     <template v-else-if="movies">
       <div
-        v-for="movie in movies"
+        v-for="(movie, idx) in movies"
         :key="movie.id"
-        class="group border-border-primary dark:border-surface-tertiary relative shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border"
+        class="group border-border-primary dark:border-surface-tertiary outline-surface-inverted relative shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border focus-visible:opacity-80"
+        :tabindex="activeFocusIndex === idx ? 0 : -1"
         @click="openLink(movie.link)"
+        @keydown.enter="openLink(movie.link)"
+        @keydown.space.prevent="openLink(movie.link)"
+        @focus="activeFocusIndex = idx"
       >
         <img
           :src="movie.cover"
           :alt="`poster for ${movie.title}`"
           class="h-full w-auto group-hover:blur-xs"
+          width="600"
+          height="900"
         />
         <div
           class="bg-dark/70 text-p absolute inset-0 flex flex-col justify-between p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
@@ -34,13 +41,20 @@
           <p class="text-light line-clamp-8 text-ellipsis whitespace-pre-wrap">
             “{{ movie.review }}”
           </p>
-          <div v-if="movie.rating !== null" class="flex h-6 w-full flex-row gap-1">
+          <div
+            v-if="movie.rating !== null"
+            class="flex h-6 w-full flex-row gap-1"
+            :aria-label="movie.rating + ' stars'"
+          >
             <img
               v-for="(star, index) in getStars(movie.rating)"
               :key="index"
               :src="star"
               alt="star"
+              aria-hidden="true"
               class="h-6 w-6"
+              width="24"
+              height="24"
             />
           </div>
         </div>
@@ -116,16 +130,18 @@ const scrollToNext = () => {
   if (!scrollContainer.value || (movies.value?.length ?? 0) <= 1) return
 
   const { clientWidth, scrollLeft, scrollWidth } = scrollContainer.value
+  const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
 
   if (scrollLeft + clientWidth >= scrollWidth - 10) {
-    scrollContainer.value.scrollTo({ behavior: 'smooth', left: 0 })
+    scrollContainer.value.scrollTo({ behavior, left: 0 })
   } else {
     // Scroll by an amount large enough to trigger the next snap point.
-    scrollContainer.value.scrollBy({ behavior: 'smooth', left: 150 })
+    scrollContainer.value.scrollBy({ behavior, left: 150 })
   }
 }
 
 const startAutoPlay = () => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
   if (autoPlayInterval) clearInterval(autoPlayInterval)
   autoPlayInterval = window.setInterval(() => {
     if (!isHovered.value && !isInteracting.value && (movies.value?.length ?? 0) > 1) {
@@ -136,6 +152,22 @@ const startAutoPlay = () => {
 
 const stopAutoPlay = () => {
   if (autoPlayInterval) clearInterval(autoPlayInterval)
+}
+
+const activeFocusIndex = ref(0)
+
+const focusSibling = (direction: number) => {
+  if (scrollContainer.value) {
+    const focusable = Array.from(
+      scrollContainer.value.querySelectorAll('.cursor-pointer'),
+    ) as HTMLElement[]
+    const index = activeFocusIndex.value
+    const nextIndex = index + direction
+    if (nextIndex >= 0 && nextIndex < focusable.length) {
+      activeFocusIndex.value = nextIndex
+      focusable[nextIndex].focus()
+    }
+  }
 }
 
 onMounted(() => {

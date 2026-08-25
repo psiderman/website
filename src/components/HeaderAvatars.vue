@@ -20,6 +20,8 @@
           :src="user.avatar"
           referrerpolicy="no-referrer"
           class="bg-surface-tertiary absolute inset-0 size-full object-cover"
+          width="160"
+          height="160"
         />
         <span v-else>
           {{ user.name ? user.name.charAt(0).toUpperCase() : 'A' }}
