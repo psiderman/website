@@ -2,9 +2,9 @@
 
 Hi there,
 
-Why are you looking at my repo, when you could be looking at my [website](https://psiderman.com) instead? 
+Why are you looking at my repo, when you could be looking at my [website](https://psiderman.com) instead?
 
-- Go [here](https://psiderman.com). 
+- Go [here](https://psiderman.com).
 - [Now.](https://psiderman.com)
 - [Shoo.](https://psiderman.com)
 

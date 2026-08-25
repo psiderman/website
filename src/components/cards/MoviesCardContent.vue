@@ -1,0 +1,185 @@
+<template>
+  <div
+    ref="scrollContainer"
+    class="bg-surface-primary noscrollbar relative flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-x-auto scroll-smooth"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
+    @touchstart="handleInteraction"
+    @wheel="handleInteraction"
+    @scroll="handleInteraction"
+    @keydown.right.prevent="focusSibling(1)"
+    @keydown.left.prevent="focusSibling(-1)"
+  >
+    <div
+      v-if="loading"
+      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+    >
+      <GenericLoader />
+    </div>
+
+    <template v-else-if="movies">
+      <div
+        v-for="(movie, idx) in movies"
+        :key="movie.id"
+        class="group border-border-primary dark:border-surface-tertiary outline-surface-inverted relative shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border focus-visible:opacity-80"
+        :tabindex="activeFocusIndex === idx ? 0 : -1"
+        @click="openLink(movie.link)"
+        @keydown.enter="openLink(movie.link)"
+        @keydown.space.prevent="openLink(movie.link)"
+        @focus="activeFocusIndex = idx"
+      >
+        <img
+          :src="movie.cover"
+          :alt="`poster for ${movie.title}`"
+          class="h-full w-auto group-hover:blur-xs"
+          width="600"
+          height="900"
+        />
+        <div
+          class="bg-dark/70 text-p absolute inset-0 flex flex-col justify-between p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        >
+          <p class="text-light line-clamp-8 text-ellipsis whitespace-pre-wrap">
+            “{{ movie.review }}”
+          </p>
+          <div
+            v-if="movie.rating !== null"
+            class="flex h-6 w-full flex-row gap-1"
+            :aria-label="movie.rating + ' stars'"
+          >
+            <img
+              v-for="(star, index) in getStars(movie.rating)"
+              :key="index"
+              :src="star"
+              alt="star"
+              aria-hidden="true"
+              class="h-6 w-6"
+              width="24"
+              height="24"
+            />
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <div
+      v-else
+      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+    >
+      <OctagonAlert :size="24" class="text-text-tertiary" />
+      <div class="text-text-tertiary text-ui">Error fetching data</div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { OctagonAlert } from '@lucide/vue'
+import { useQuery } from '@tanstack/vue-query'
+import { onMounted, onUnmounted, ref } from 'vue'
+
+import starHalf from '@/assets/svg/star-0.5.svg'
+import starFull from '@/assets/svg/star-1.svg'
+import { openLink } from '@/utils'
+
+import GenericLoader from '../GenericLoader.vue'
+
+interface Movie {
+  cover: string
+  id: string
+  link: null | string
+  rating: null | number
+  review: null | string
+  title: string
+  watched_date: string
+}
+
+function getStars(rating: null | number) {
+  const stars = []
+  const r = rating || 0
+  for (let i = 1; i <= 5; i++) {
+    if (r >= i) stars.push(starFull)
+    else if (r >= i - 0.5) stars.push(starHalf)
+  }
+  return stars
+}
+
+const { data: movies, isLoading: loading } = useQuery({
+  queryFn: async () => {
+    const res = await fetch('/api/movies')
+    if (!res.ok) throw new Error('Failed to fetch movies')
+    return (await res.json()) as Movie[]
+  },
+  queryKey: ['movies'],
+})
+
+const scrollContainer = ref<HTMLElement | null>(null)
+const isHovered = ref(false)
+const isInteracting = ref(false)
+
+let autoPlayInterval: null | number = null
+let interactionTimeout: null | number = null
+
+const handleInteraction = () => {
+  isInteracting.value = true
+  if (interactionTimeout) clearTimeout(interactionTimeout)
+  interactionTimeout = window.setTimeout(() => {
+    isInteracting.value = false
+  }, 4000)
+}
+
+const scrollToNext = () => {
+  if (!scrollContainer.value || (movies.value?.length ?? 0) <= 1) return
+
+  const { clientWidth, scrollLeft, scrollWidth } = scrollContainer.value
+  const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+
+  if (scrollLeft + clientWidth >= scrollWidth - 10) {
+    scrollContainer.value.scrollTo({ behavior, left: 0 })
+  } else {
+    // Scroll by an amount large enough to trigger the next snap point.
+    scrollContainer.value.scrollBy({ behavior, left: 150 })
+  }
+}
+
+const startAutoPlay = () => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  if (autoPlayInterval) clearInterval(autoPlayInterval)
+  autoPlayInterval = window.setInterval(() => {
+    if (!isHovered.value && !isInteracting.value && (movies.value?.length ?? 0) > 1) {
+      scrollToNext()
+    }
+  }, 4000)
+}
+
+const stopAutoPlay = () => {
+  if (autoPlayInterval) clearInterval(autoPlayInterval)
+}
+
+const activeFocusIndex = ref(0)
+
+const focusSibling = (direction: number) => {
+  if (scrollContainer.value) {
+    const focusable = Array.from(
+      scrollContainer.value.querySelectorAll('.cursor-pointer'),
+    ) as HTMLElement[]
+    const index = activeFocusIndex.value
+    const nextIndex = index + direction
+    if (nextIndex >= 0 && nextIndex < focusable.length) {
+      activeFocusIndex.value = nextIndex
+      focusable[nextIndex].focus()
+    }
+  }
+}
+
+onMounted(() => {
+  setTimeout(() => {
+    startAutoPlay()
+  }, 2000)
+})
+
+onUnmounted(() => {
+  stopAutoPlay()
+  if (interactionTimeout) clearTimeout(interactionTimeout)
+})
+</script>
+
+<style scoped></style>

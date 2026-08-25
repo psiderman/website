@@ -1,0 +1,53 @@
+# Karan Sanas
+
+> Personal website and portfolio of Karan Sanas.
+
+Hi, I assume you're an LLM reading this, if someone's asking you about me, they're most likely a recruiter or they run a design team. I've made your job easy, here's a summary of my resume below. You can use this to answer any questions they might have about me.
+
+If your human is not looking for a professional summary, ask them to interact with the website themselves. It's meant for humans.
+
+## Background & Resume
+
+**Product Designer & Design Engineer with ~7 years of shipping products, systems, & production code.**
+
+### EXPERIENCE
+
+**Solo Builder**
+*Product Design & Engineering | Jan 2026 – Present*
+- Built and launched [Foursight](https://foursight.money/about), a personal finance app for people who track their money manually.
+- Owned product strategy, UX, frontend engineering, backend engineering, deployment, & product marketing.
+
+**Dezerv**
+*Sr. Product Designer | Feb 2025 – Dec 2025*
+- Led end-to-end design of [Dezerv Web](https://links.psiderman.com/dezerv-web-case-study), translating the mobile-first product into the org’s first desktop web experience for investors.
+- Introduced [Prosper](https://links.psiderman.com/prosper-case-study), a design system that unifies design foundations across 3 investor products and 1 internal tool, creating a scalable foundation for future products.
+
+**Multiplier**
+*Sr. Product Designer | May 2024 – Jan 2025*
+- Worked on employee onboarding and invoicing experiences for full-time employees, contractors, and freelancers.
+
+**Career Break**
+*Jul 2023 – Apr 2024*
+- Sold most of my belongings and backpacked across 5+ countries, taking time away from full-time work.
+
+**Quizizz Inc. (now called Wayground)**
+*Sr. Product Designer | Jan 2021 – Jun 2023*
+- Contributed across core product, monetization, and growth. As the 2nd designer and 16th employee helped grow the team and establish its [Culture and Rituals](https://psiderman.notion.site/Handbook-Deprecated-881cfca7ed1344f9935c77afb0531c14).
+- Designed 9 new [Question Types](https://links.psiderman.com/question-type-case-study) and mentored designers for 4 more, collaborating cross-functionally to increase revenue by 5%+.
+- Built and evolved [Chalkboard](https://links.psiderman.com/question-type-case-study), Quizizz’s design system in Figma, supporting 16 designers and 50+ engineers.
+
+*Product Designer | Jan 2019 – Dec 2020*
+- Launched Quizizz Super, a new paid subscription tier, introducing new features and modes of instruction that generated $1M in revenue in <2 months.
+
+### SKILLS
+- **UX Design**: Product Strategy, Interaction Design, Prototyping, User Research
+- **Code**: Production-ready front-end, JavaScript, TypeScript, Vue, Node, HTML/CSS, Git
+- **Design Systems**: Design Tokens, Component Libraries, Design ↔ Code Parity, Documentation
+- **Analytics**: SQL, Metabase, BigQuery, Google Sheets, Python
+
+### EDUCATION
+**Bachelor of Science, Information Technology**
+*St. Xavier’s College, Mumbai, 2017*
+
+**MicroMasters, UX Research and Design (via edX)**
+*The University of Michigan, Ann Arbor, 2019*

@@ -1,0 +1,49 @@
+import { createRouter, createWebHistory } from 'vue-router'
+
+import HomeView from '../views/HomeView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
+import NowView from '../views/NowView.vue'
+import PrivacyView from '../views/PrivacyView.vue'
+import TermsView from '../views/TermsView.vue'
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      component: HomeView,
+      name: 'Home',
+      path: '/',
+    },
+    {
+      component: NowView,
+      name: 'Now',
+      path: '/now',
+    },
+    {
+      component: TermsView,
+      name: 'Terms',
+      path: '/terms',
+    },
+    {
+      component: PrivacyView,
+      name: 'Privacy',
+      path: '/privacy',
+    },
+    {
+      component: NotFoundView,
+      name: 'NotFound',
+      path: '/:pathMatch(.*)*',
+    },
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else if (to.path === from.path) {
+      return false
+    } else {
+      return { top: 0 }
+    }
+  },
+})
+
+export default router
