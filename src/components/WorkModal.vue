@@ -98,7 +98,7 @@
                 </div>
 
                 <div
-                  v-if="work.data?.people || work.data?.projects"
+                  v-if="sortedPeople.length > 0 || work.data?.projects"
                   class="border-border-primary flex w-full flex-row gap-6 border-b p-10 text-left"
                 >
                   <div
@@ -127,7 +127,7 @@
                   </div>
 
                   <div
-                    v-if="work.data?.people"
+                    v-if="sortedPeople.length > 0"
                     class="text-text-primary text-ui-small flex w-full flex-col gap-2"
                   >
                     <p class="text-text-tertiary tracking-wider uppercase">People I worked with</p>
@@ -136,7 +136,13 @@
                         :is="person.linkedin ? 'a' : 'div'"
                         v-for="person in sortedPeople"
                         :key="person.name"
-                        v-tooltip="{ content: person.name, trigger: 'mouseenter' }"
+                        v-tooltip="{
+                          content: person.quote
+                            ? `<blockquote>“${person.quote}”</blockquote>–${person.name} `
+                            : person.name,
+                          trigger: 'mouseenter',
+                          allowHTML: true,
+                        }"
                         :href="person.linkedin"
                         :target="person.linkedin ? '_blank' : undefined"
                       >
@@ -180,14 +186,15 @@
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ArrowUpRight, Undo } from '@lucide/vue'
+import { useQuery } from '@tanstack/vue-query'
 import { animate, createDraggable, type Draggable } from 'animejs'
 import { format } from 'date-fns'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { global } from '@/composables/useGlobal'
-import { getStorageUrl } from '@/supabase'
+import { getStorageUrl, supabase } from '@/supabase'
 
-import type { WorkDetail } from '@/data/work'
+import type { WorkDetail, WorkPerson } from '@/data/work'
 
 const props = defineProps<{
   isOpen: boolean
@@ -202,9 +209,28 @@ const closeModal = () => {
   emit('update:isOpen', false)
 }
 
+const activeOrgId = computed(() => props.work?.orgId)
+
+const { data: peopleData } = useQuery({
+  enabled: computed(() => !!activeOrgId.value && props.isOpen),
+  queryFn: async () => {
+    const orgId = activeOrgId.value
+    if (!orgId) return []
+    const { data, error } = await supabase
+      .from('work_people')
+      .select('name, imageName, linkedin, quote')
+      .eq('orgId', orgId)
+
+    if (error) throw error
+    return data as WorkPerson[]
+  },
+  queryKey: ['work-people', activeOrgId],
+  staleTime: 1000,
+})
+
 const sortedPeople = computed(() => {
-  if (!props.work?.data?.people) return []
-  return [...props.work.data.people].sort((a, b) => a.name.localeCompare(b.name))
+  const list = peopleData.value || []
+  return [...list].sort((a, b) => a.name.localeCompare(b.name))
 })
 
 const imageRefs = ref<HTMLElement[]>([])

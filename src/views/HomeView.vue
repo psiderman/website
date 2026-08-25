@@ -194,7 +194,8 @@ const filteredCards = computed<GridCard[]>(() => {
   if (matchingExtras && matchingExtras.length > 0) {
     const extraGridCards = matchingExtras.map((extra, idx) => {
       const extraCard: GridCard = {
-        arrow: extra.size === 'sm' ? 'external' : extra.title && extra.description ? 'up' : 'none',
+        arrow:
+          extra.size === 'sm' ? 'external' : extra.title && extra.description ? 'right' : 'none',
         bgClass: extra.bgClass,
         coverVid: extra.coverVid,
         extraIndex: idx,

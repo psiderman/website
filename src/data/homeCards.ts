@@ -11,7 +11,7 @@ import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 import type { EmojiGroupId } from '@/types'
 
 export interface Card {
-  arrow?: 'external' | 'help' | 'none' | 'right' | 'up'
+  arrow?: 'external' | 'help' | 'none' | 'right'
   bgClass?: string
   content?: Component
   group: EmojiGroupId[]

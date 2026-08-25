@@ -18,7 +18,7 @@
     />
     <img
       src="@/assets/home/app.webp"
-      class="pointer-events-none z-10 rounded-lg shadow-xl"
+      class="desktop:h-auto desktop:mb-0 pointer-events-none z-10 -mb-4 h-full w-auto rounded-lg object-contain object-bottom shadow-xl"
       width="633"
       height="445"
       alt="foursight screenshot"

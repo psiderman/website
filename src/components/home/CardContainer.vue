@@ -41,14 +41,14 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowRight, ArrowUp, ArrowUpRight, CircleHelp } from '@lucide/vue'
+import { ArrowRight, ArrowUpRight, CircleHelp } from '@lucide/vue'
 import { computed, ref } from 'vue'
 
 import router from '@/router'
 import { openLink } from '@/utils'
 
 interface Props {
-  arrow?: 'external' | 'help' | 'none' | 'right' | 'up'
+  arrow?: 'external' | 'help' | 'none' | 'right'
   bgClass?: string
   img?: string
   link?: string
@@ -66,7 +66,6 @@ const icon = computed(() => {
     help: CircleHelp,
     none: null,
     right: ArrowRight,
-    up: ArrowUp,
   }
   return icons[props.arrow]
 })
@@ -75,7 +74,7 @@ const isIconHovered = ref(false)
 
 const heightClass = computed(() => {
   const heights = {
-    lg: 'h-124 row-span-3',
+    lg: 'h-124 row-span-2 desktop:row-span-3',
     md: 'h-80 row-span-2',
     sm: 'h-36 row-span-1',
   }

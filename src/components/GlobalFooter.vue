@@ -55,7 +55,12 @@
     <div
       class="text-mono text-text-tertiary border-light/15 relative z-0 -mt-20 flex h-80 max-h-80 w-full items-end justify-center overflow-hidden border-t pb-10"
     >
-      <p class="z-20 bg-gray-950 p-2 dark:bg-zinc-950">nothing to see here</p>
+      <p
+        class="z-20 bg-gray-950 transition-all duration-500 dark:bg-zinc-950"
+        :class="showThwip ? 'translate-y-0 opacity-100 delay-500' : 'translate-y-1 opacity-0'"
+      >
+        {{ randomQuip }}
+      </p>
 
       <img
         src="@/assets/svg/thwip.svg"
@@ -65,14 +70,14 @@
         class="absolute bottom-0 z-10 h-full w-auto transition-all ease-out"
         :class="[
           showThwip
-            ? 'translate-y-0 scale-100 delay-100 duration-500'
+            ? 'translate-y-0 scale-100 delay-500 duration-500'
             : 'duration-100ms translate-y-full scale-0',
         ]"
       />
       <div
         class="text-h1 text-surface-primary absolute bottom-0 z-0 -mb-2 ml-1 transition-transform ease-out"
         :class="[
-          showThwip ? 'translate-y-0 delay-100 duration-500' : 'translate-y-full duration-100',
+          showThwip ? 'translate-y-0 delay-500 duration-500' : 'translate-y-full duration-100',
         ]"
       >
         🤟
@@ -82,13 +87,30 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { openLink } from '@/utils'
 
 const commit = __COMMIT_HASH__
 const logoContainer = ref<HTMLElement | null>(null)
 const showThwip = ref(false)
+
+const quips = ['thwip', 'go web go', 'fly', 'shazam', 'up up and away web', 'web... stop...', '']
+
+const randomQuip = ref('')
+
+const getRandomQuip = () => {
+  const availableQuips = quips.filter((q) => q !== randomQuip.value)
+  return availableQuips[Math.floor(Math.random() * availableQuips.length)]
+}
+
+randomQuip.value = getRandomQuip()
+
+watch(showThwip, (newVal) => {
+  if (newVal) {
+    randomQuip.value = getRandomQuip()
+  }
+})
 
 let isSnapping = false
 let userCanScrollPast = false
@@ -113,7 +135,7 @@ const bounceBack = (targetY: number) => {
   isSnapping = true
   const startY = window.scrollY
   const distance = targetY - startY
-  const duration = 300
+  const duration = 300 // how quickly to pull back
   const startTime = performance.now()
 
   const animate = (currentTime: number) => {
@@ -149,7 +171,7 @@ const handleScroll = () => {
     if (scrollTimeout) clearTimeout(scrollTimeout)
     scrollTimeout = window.setTimeout(() => {
       bounceBack(logoBoundaryScrollTop)
-    }, 600)
+    }, 1500) // when to pull back
   } else {
     if (currentScrollY < logoBoundaryScrollTop - 10) {
       showThwip.value = false
