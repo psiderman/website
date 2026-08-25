@@ -5,6 +5,7 @@ import NotFoundView from '../views/NotFoundView.vue'
 import NowView from '../views/NowView.vue'
 import PrivacyView from '../views/PrivacyView.vue'
 import TermsView from '../views/TermsView.vue'
+import TravelView from '../views/TravelView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +19,11 @@ const router = createRouter({
       component: NowView,
       name: 'Now',
       path: '/now',
+    },
+    {
+      component: TravelView,
+      name: 'Travel',
+      path: '/travel',
     },
     {
       component: TermsView,

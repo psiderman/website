@@ -76,6 +76,7 @@ export const cards: Card[] = [
     content: TravelCardContent,
     group: ['travel'],
     id: 'travel',
+    link: '/travel',
     size: 'lg',
     span: 'desktop:col-span-6 col-span-2',
     title: 'travel & photography',
