@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import NowView from '../views/NowView.vue'
+import PrivacyView from '../views/PrivacyView.vue'
+import TermsView from '../views/TermsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,6 +18,16 @@ const router = createRouter({
       component: NowView,
       name: 'Now',
       path: '/now',
+    },
+    {
+      component: TermsView,
+      name: 'Terms',
+      path: '/terms',
+    },
+    {
+      component: PrivacyView,
+      name: 'Privacy',
+      path: '/privacy',
     },
     {
       component: NotFoundView,

@@ -19,9 +19,15 @@
     <!-- Footer Links -->
     <div class="text-ui flex flex-col items-center justify-center gap-4">
       <div class="flex w-full flex-row gap-3">
-        <button class="rounded-full px-2 outline-gray-400! dark:outline-zinc-400!">terms</button>
+        <router-link to="/terms" class="rounded-full px-2 outline-gray-400! dark:outline-zinc-400!"
+          >terms</router-link
+        >
         <span class="text-light/50">✦</span>
-        <button class="rounded-full px-2 outline-gray-400! dark:outline-zinc-400!">privacy</button>
+        <router-link
+          to="/privacy"
+          class="rounded-full px-2 outline-gray-400! dark:outline-zinc-400!"
+          >privacy</router-link
+        >
       </div>
       <p>© 2026 Karan Sanas</p>
     </div>
@@ -64,7 +70,7 @@
         ]"
       />
       <div
-        class="text-h1 absolute bottom-0 z-0 -mb-2 ml-1 transition-transform ease-out"
+        class="text-h1 text-surface-primary absolute bottom-0 z-0 -mb-2 ml-1 transition-transform ease-out"
         :class="[
           showThwip ? 'translate-y-0 delay-100 duration-500' : 'translate-y-full duration-100',
         ]"
