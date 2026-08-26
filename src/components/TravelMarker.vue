@@ -25,13 +25,15 @@ import { Star } from '@lucide/vue'
 interface Props {
   caption?: null | string
   closeFriends: boolean
+  height?: null | number
   imageUrl: string
+  width?: null | number
 }
 const props = defineProps<Props>()
 
 const tooltipContent = `
   <div class="bg-light border-light outline-dark/10 rounded-special flex w-fit flex-col items-center border-4 shadow-xl outline">
-    <img src="${props.imageUrl}" class="bg-dark max-h-[calc(50svh-40px)] w-auto rounded-lg object-contain" />
+    <img src="${props.imageUrl}" ${props.width ? `width="${props.width}"` : ''} ${props.height ? `height="${props.height}"` : ''} class="bg-dark max-h-[calc(50svh-40px)] w-auto rounded-lg object-contain" />
     <div class="text-p font-handwriting flex w-0 min-w-full flex-col items-center justify-center p-3 text-center align-middle text-gray-700 dark:text-zinc-700">
       <p class="line-clamp-3 w-full whitespace-normal leading-tight">${props.caption || '&nbsp;'}</p>
     </div>

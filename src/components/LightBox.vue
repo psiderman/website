@@ -51,8 +51,10 @@
                       class="relative flex max-h-full max-w-full items-center justify-center"
                     >
                       <img
-                        :src="item.src"
+                        v-lazy="item.src"
                         :alt="`${title}-${idx}`"
+                        :width="item.width ?? undefined"
+                        :height="item.height ?? undefined"
                         class="desktop:max-h-[calc(75svh)] w-auto object-contain"
                       />
                       <div class="absolute top-2 right-2 flex flex-row gap-2">
@@ -65,7 +67,7 @@
                         </div>
                         <div
                           v-if="item.closeFriends"
-                          v-tooltip="{ content: 'you’re on ‘the list’' }"
+                          v-tooltip="{ content: 'you’re on “the list”' }"
                           class="border-light flex size-8 items-center justify-center rounded-full border-3 bg-green-500 shadow-md"
                         >
                           <Star :size="20" fill="#fff" stroke-width="0" />
@@ -169,7 +171,13 @@ export interface LightBoxTag {
 
 const props = defineProps<{
   description?: string
-  images: { caption?: null | string; closeFriends?: boolean; url: string }[]
+  images: {
+    caption?: null | string
+    closeFriends?: boolean
+    height?: null | number
+    url: string
+    width?: null | number
+  }[]
   isOpen: boolean
   tags?: LightBoxTag[]
   title?: string
@@ -183,8 +191,10 @@ const mediaItems = computed(() => {
       ...props.images.map((img) => ({
         caption: img.caption,
         closeFriends: img.closeFriends,
+        height: img.height,
         src: img.url,
         type: 'image' as const,
+        width: img.width,
       })),
     )
   }

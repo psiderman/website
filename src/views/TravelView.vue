@@ -263,7 +263,9 @@ const triggerLightbox = (travel: any, clickedIdx: number) => {
   const allImages = travel.images.map((img: any) => ({
     caption: img.caption,
     closeFriends: img.closeFriends,
+    height: img.height,
     url: img.url,
+    width: img.width,
   }))
   // Reorder so that the clicked image starts at index 0 in the lightbox
   const orderedImages = [

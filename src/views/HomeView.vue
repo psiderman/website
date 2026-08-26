@@ -91,7 +91,11 @@
         :link="card.link"
         @click="handleCardClick(card)"
       >
-        <component :is="card.content" v-if="card.content" :show-help="isIconHovered" />
+        <component
+          :is="card.content"
+          v-if="card.content"
+          v-bind="card.id === 'guestbook' ? { 'show-help': isIconHovered } : {}"
+        />
         <template v-else-if="card.isExtra && card.size === 'md'">
           <video
             v-if="card.coverVid"

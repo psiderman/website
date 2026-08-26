@@ -70,8 +70,18 @@ function addMarkers() {
     markerApps.push(markerApp)
 
     const marker = new mapboxgl.Marker({ element: container }).setLngLat(coords).addTo(map)
-    marker.getElement().addEventListener('click', () => {
+    const el = marker.getElement()
+    el.setAttribute('tabindex', '0')
+    el.setAttribute('role', 'button')
+    el.setAttribute('aria-label', feature.properties.caption || 'Travel location marker')
+    el.addEventListener('click', () => {
       emit('markerClick', feature.properties.slug)
+    })
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        emit('markerClick', feature.properties.slug)
+      }
     })
     markers.push(marker)
   }

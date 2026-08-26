@@ -54,6 +54,9 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
     queryFn: async () => {
       if (!slugRef.value) return []
 
+      // Ensure session is fresh (refreshes token if expired, or clears it for anon request)
+      await supabase.auth.getSession()
+
       // 1. Fetch images from public.trip_images (RLS handles close_friends visibility)
       const { data: dbImages, error: dbError } = await supabase
         .from('trip_images')
@@ -114,6 +117,9 @@ export function useTravelsWithImages() {
   } = useQuery<TripWithImages[]>({
     gcTime: 1000 * 60 * 60, // 1 hour
     queryFn: async () => {
+      // Ensure session is fresh (refreshes token if expired, or clears it for anon request)
+      await supabase.auth.getSession()
+
       // 1. Fetch trips joined with trip_images (RLS filters close_friends automatically)
       const { data: tripsData, error: tripsError } = await supabase
         .from('trips')
@@ -211,6 +217,9 @@ export function useTrips() {
   } = useQuery<Trip[]>({
     gcTime: 1000 * 60 * 60,
     queryFn: async () => {
+      // Ensure session is fresh (refreshes token if expired, or clears it for anon request)
+      await supabase.auth.getSession()
+
       const { data, error } = await supabase
         .from('trips')
         .select('*')

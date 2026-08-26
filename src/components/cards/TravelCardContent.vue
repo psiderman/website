@@ -4,6 +4,8 @@
       v-if="previewUrl"
       v-lazy="previewUrl"
       alt="map view"
+      width="600"
+      height="400"
       class="absolute inset-0 h-full w-full object-cover dark:opacity-80"
     />
   </div>
