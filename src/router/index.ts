@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { isAuthModalOpen } from '@/composables/useAuth'
+import { isLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
+
 import HomeView from '../views/HomeView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import NowView from '../views/NowView.vue'
@@ -50,6 +53,12 @@ const router = createRouter({
       return { top: 0 }
     }
   },
+})
+
+router.afterEach(() => {
+  isLightBoxOpen.value = false
+  isWorkModalOpen.value = false
+  isAuthModalOpen.value = false
 })
 
 export default router

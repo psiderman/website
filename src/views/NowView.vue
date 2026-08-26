@@ -2,11 +2,11 @@
   <div class="max-w-container flex w-full flex-col gap-0">
     <div class="flex flex-col px-20">
       <div class="flex flex-col gap-20 pt-10">
-        <div class="text-ui flex flex-row items-center justify-start gap-2">
+        <!-- <div class="text-ui flex flex-row items-center justify-start gap-2">
           <router-link to="/" class="breadcrumb main">home</router-link>
           <ChevronRight class="text-text-secondary" :size="16" />
           <router-link to="/now" class="breadcrumb level">now</router-link>
-        </div>
+        </div> -->
 
         <div v-if="isLoadingSlug || isLoadingMarkdown || isLoadingImages" class="aspect-4/1 w-full">
           <GenericLoader />
@@ -21,9 +21,21 @@
 
         <template v-else-if="slug">
           <!-- Render images at the top -->
+          <div class="text-p mx-auto w-full max-w-prose text-left">
+            <span class="text-ui text-text-secondary tracking-wider uppercase">
+              {{ format(new Date(slug + '-01'), 'MMM ’yy').toLocaleLowerCase() }}
+            </span>
+            <h1
+              v-tooltip="{ content: 'you don’t have a now page?', placement: 'right' }"
+              class="text-display -mb-14 w-fit"
+            >
+              /<a href="https://nownownow.com/about" target="_blank" class="underline">now</a>
+            </h1>
+          </div>
+
           <div
             v-if="images && images.length > 0"
-            class="mx-auto -mt-10 grid min-w-full grow gap-4"
+            class="mx-auto grid min-w-full grow gap-4"
             :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
           >
             <div
@@ -42,11 +54,6 @@
           </div>
 
           <!-- Render parsed markdown -->
-          <div class="text-p mx-auto w-full max-w-prose text-left">
-            <h1 class="text-display -mb-14">
-              {{ format(new Date(slug + '-01'), 'MMM ’yy').toLocaleLowerCase() }}
-            </h1>
-          </div>
           <div
             v-if="parsedMarkdown"
             class="text-p markdown-content text-text-primary mx-auto max-w-prose overflow-hidden"
@@ -60,7 +67,6 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRight } from '@lucide/vue'
 import { format } from 'date-fns'
 import DOMPurify from 'dompurify'
 import { marked } from 'marked'

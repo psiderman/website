@@ -14,7 +14,7 @@
 
     <img
       v-if="previewUrl"
-      :src="previewUrl"
+      v-lazy="previewUrl"
       alt="map view"
       class="absolute inset-0 h-full w-full object-cover dark:opacity-80"
     />

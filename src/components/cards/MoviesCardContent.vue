@@ -29,7 +29,7 @@
         @focus="activeFocusIndex = idx"
       >
         <img
-          :src="movie.cover"
+          v-lazy="movie.cover"
           :alt="`poster for ${movie.title}`"
           class="h-full w-auto group-hover:blur-xs"
           width="600"

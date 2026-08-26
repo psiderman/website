@@ -22,6 +22,10 @@ const props = defineProps<{
   travelsWithImages: null | TravelWithImages[] | undefined
 }>()
 
+const emit = defineEmits<{
+  (e: 'markerClick', slug: string): void
+}>()
+
 const mapContainer = ref<HTMLDivElement | null>(null)
 let map: mapboxgl.Map | null = null
 let markers: mapboxgl.Marker[] = []
@@ -91,28 +95,14 @@ async function addMarkers() {
 
     const marker = new mapboxgl.Marker({ element: container }).setLngLat(coords).addTo(map)
     marker.getElement().addEventListener('click', () => {
-      const allImages: { closeFriends?: boolean; url: string }[] = JSON.parse(
-        feature.properties.travelImages,
-      )
-      const clickedUrl = feature.properties.imageUrl
-      const clickedImg = allImages.find((i) => i.url === clickedUrl) || {
-        closeFriends: feature.properties.closeFriends,
-        url: clickedUrl,
-      }
-      const ordered = [clickedImg, ...allImages.filter((u) => u.url !== clickedUrl)]
-      lightBoxData.value = {
-        description: feature.properties.travelSubtitle,
-        images: ordered,
-        title: feature.properties.travelTitle,
-      }
-      isLightBoxOpen.value = true
+      emit('markerClick', feature.properties.slug)
     })
     markers.push(marker)
   }
 
   map.fitBounds(bounds, {
     maxZoom: 10,
-    padding: 50,
+    padding: getMapPadding(),
     speed: 1.25,
   })
 }
@@ -123,6 +113,7 @@ function buildGeoJSON(travels: TravelWithImages[]) {
     properties: {
       closeFriends: boolean
       imageUrl: string
+      slug: string
       travelImages: string
     }
     type: 'Feature'
@@ -136,6 +127,7 @@ function buildGeoJSON(travels: TravelWithImages[]) {
         properties: {
           closeFriends: img.closeFriends,
           imageUrl: img.url,
+          slug: travel.slug,
           travelImages: JSON.stringify(
             travel.images.map((i) => ({ closeFriends: i.closeFriends, url: i.url })),
           ),
@@ -150,6 +142,11 @@ function buildGeoJSON(travels: TravelWithImages[]) {
 function clearMarkers() {
   markers.forEach((m) => m.remove())
   markers = []
+}
+
+function getMapPadding() {
+  const isDesktop = window.matchMedia('(min-width: 1280px)').matches
+  return isDesktop ? 50 : { bottom: 350, left: 50, right: 50, top: 50 }
 }
 
 function initMap() {
@@ -188,7 +185,7 @@ function zoomToTrip(slug: null | string | undefined) {
     if (hasCoords) {
       map.fitBounds(bounds, {
         maxZoom: 10,
-        padding: 50,
+        padding: getMapPadding(),
         speed: 2,
       })
     }
@@ -210,7 +207,7 @@ function zoomToTrip(slug: null | string | undefined) {
   if (hasCoords) {
     map.fitBounds(bounds, {
       maxZoom: 15,
-      padding: 50,
+      padding: getMapPadding(),
       speed: 2,
     })
   }

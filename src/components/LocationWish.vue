@@ -42,6 +42,7 @@
           content: isPopping ? null : wishTooltip,
           theme: 'tippy-small',
           hideOnClick: false,
+          placement: 'right',
         }"
         data-sync="wish"
         class="relative size-full cursor-cell overflow-hidden rounded-full border-2 border-transparent bg-amber-200 dark:bg-amber-500/20"

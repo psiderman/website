@@ -60,10 +60,12 @@ const persister = experimental_createQueryPersister({
   storage: window.localStorage,
 })
 
+import lazy from './directives/lazy'
 import tooltip from './directives/tooltip'
 
 app.use(router)
 app.directive('tooltip', tooltip)
+app.directive('lazy', lazy)
 app.use(VueQueryPlugin, {
   queryClientConfig: {
     defaultOptions: {

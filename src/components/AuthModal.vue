@@ -105,7 +105,7 @@ const closeModal = () => {
 const signInWithGoogle = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
     options: {
-      redirectTo: window.location.origin,
+      redirectTo: window.location.href,
     },
     provider: 'google',
   })
