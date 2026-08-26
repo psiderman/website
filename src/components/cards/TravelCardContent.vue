@@ -12,18 +12,27 @@
       <div class="text-text-tertiary text-ui">Error fetching data</div>
     </div>
 
-    <TravelMap
-      :travels-with-images="travelsWithImages"
-      class="desktop:flex col-span-2 hidden h-full"
+    <img
+      v-if="previewUrl"
+      :src="previewUrl"
+      alt="map view"
+      class="absolute inset-0 h-full w-full object-cover dark:opacity-80"
     />
   </div>
   <div class="pointer-events-auto absolute inset-0 bg-transparent"></div>
 </template>
 
 <script setup lang="ts">
-import { useTravelsWithImages } from '@/composables/useTravel'
+import { OctagonAlert } from '@lucide/vue'
+import { computed } from 'vue'
 
-import TravelMap from '../TravelMap.vue'
+import { useTravelsWithImages } from '@/composables/useTravel.ts'
+import { getStorageUrl } from '@/supabase.ts'
 
-const { error, isLoading, travelsWithImages } = useTravelsWithImages()
+import GenericLoader from '../GenericLoader.vue'
+
+const { error, isLoading } = useTravelsWithImages()
+const previewUrl = computed(() => {
+  return getStorageUrl('webp', 'map-preview.webp')
+})
 </script>

@@ -9,16 +9,16 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
 import { theme } from '@/composables/useTheme'
 
-import type { TravelImage } from '@/composables/useTravel'
-import type { Travel } from '@/data/travelCards'
+import type { TravelImage, Trip } from '@/composables/useTravel'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
-interface TravelWithImages extends Travel {
+interface TravelWithImages extends Trip {
   images: TravelImage[]
 }
 
 const props = defineProps<{
+  activeTripSlug?: null | string
   travelsWithImages: null | TravelWithImages[] | undefined
 }>()
 
@@ -34,13 +34,17 @@ function handleGlobalClick(e: MouseEvent) {
     if (!src) return
     const feature = currentFeatures.find((f: any) => f.properties.imageUrl === src)
     if (feature) {
-      const allUrls: string[] = JSON.parse(feature.properties.travelImages)
+      const allImages: { closeFriends?: boolean; url: string }[] = JSON.parse(
+        feature.properties.travelImages,
+      )
       const clickedUrl = feature.properties.imageUrl
-      const ordered = [clickedUrl, ...allUrls.filter((u: string) => u !== clickedUrl)]
+      const clickedImg = allImages.find((i) => i.url === clickedUrl) || {
+        closeFriends: feature.properties.closeFriends,
+        url: clickedUrl,
+      }
+      const ordered = [clickedImg, ...allImages.filter((u) => u.url !== clickedUrl)]
       lightBoxData.value = {
-        description: feature.properties.travelDateLabel,
         images: ordered,
-        title: feature.properties.travelTitle,
       }
       isLightBoxOpen.value = true
     }
@@ -75,8 +79,9 @@ async function addMarkers() {
     const container = document.createElement('div')
     const markerApp = createApp(
       h(TravelMarker, {
+        closeFriends: feature.properties.closeFriends,
         imageUrl: feature.properties.imageUrl,
-        travelDateLabel: feature.properties.travelDateLabel,
+        travelSubtitle: feature.properties.travelSubtitle,
         travelTitle: feature.properties.travelTitle,
       }),
     )
@@ -86,11 +91,17 @@ async function addMarkers() {
 
     const marker = new mapboxgl.Marker({ element: container }).setLngLat(coords).addTo(map)
     marker.getElement().addEventListener('click', () => {
-      const allUrls: string[] = JSON.parse(feature.properties.travelImages)
+      const allImages: { closeFriends?: boolean; url: string }[] = JSON.parse(
+        feature.properties.travelImages,
+      )
       const clickedUrl = feature.properties.imageUrl
-      const ordered = [clickedUrl, ...allUrls.filter((u: string) => u !== clickedUrl)]
+      const clickedImg = allImages.find((i) => i.url === clickedUrl) || {
+        closeFriends: feature.properties.closeFriends,
+        url: clickedUrl,
+      }
+      const ordered = [clickedImg, ...allImages.filter((u) => u.url !== clickedUrl)]
       lightBoxData.value = {
-        description: feature.properties.travelDateLabel,
+        description: feature.properties.travelSubtitle,
         images: ordered,
         title: feature.properties.travelTitle,
       }
@@ -110,10 +121,9 @@ function buildGeoJSON(travels: TravelWithImages[]) {
   const features: Array<{
     geometry: { coordinates: [number, number]; type: 'Point' }
     properties: {
+      closeFriends: boolean
       imageUrl: string
-      travelDateLabel: string
       travelImages: string
-      travelTitle: string
     }
     type: 'Feature'
   }> = []
@@ -124,10 +134,11 @@ function buildGeoJSON(travels: TravelWithImages[]) {
       features.push({
         geometry: { coordinates: [img.location.lng, img.location.lat], type: 'Point' },
         properties: {
+          closeFriends: img.closeFriends,
           imageUrl: img.url,
-          travelDateLabel: travel.dateLabel,
-          travelImages: JSON.stringify(travel.images.map((i) => i.url)),
-          travelTitle: travel.title,
+          travelImages: JSON.stringify(
+            travel.images.map((i) => ({ closeFriends: i.closeFriends, url: i.url })),
+          ),
         },
         type: 'Feature',
       })
@@ -159,6 +170,52 @@ function initMap() {
   })
 }
 
+function zoomToTrip(slug: null | string | undefined) {
+  if (!map || !props.travelsWithImages) return
+
+  if (!slug) {
+    // Zoom back out to fit all travels
+    const bounds = new mapboxgl.LngLatBounds()
+    let hasCoords = false
+    for (const travel of props.travelsWithImages) {
+      for (const img of travel.images) {
+        if (img.location.lat !== null && img.location.lng !== null) {
+          bounds.extend([img.location.lng, img.location.lat])
+          hasCoords = true
+        }
+      }
+    }
+    if (hasCoords) {
+      map.fitBounds(bounds, {
+        maxZoom: 10,
+        padding: 50,
+        speed: 2,
+      })
+    }
+    return
+  }
+
+  const travel = props.travelsWithImages.find((t) => t.slug === slug)
+  if (!travel) return
+
+  const bounds = new mapboxgl.LngLatBounds()
+  let hasCoords = false
+  for (const img of travel.images) {
+    if (img.location.lat !== null && img.location.lng !== null) {
+      bounds.extend([img.location.lng, img.location.lat])
+      hasCoords = true
+    }
+  }
+
+  if (hasCoords) {
+    map.fitBounds(bounds, {
+      maxZoom: 15,
+      padding: 50,
+      speed: 2,
+    })
+  }
+}
+
 onMounted(() => {
   initMap()
   document.addEventListener('click', handleGlobalClick)
@@ -175,6 +232,13 @@ watch(
   () => props.travelsWithImages,
   () => addMarkers(),
   { deep: true },
+)
+
+watch(
+  () => props.activeTripSlug,
+  (newSlug) => {
+    zoomToTrip(newSlug)
+  },
 )
 
 watch(isDarkTheme, (dark) => {

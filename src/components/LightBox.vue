@@ -28,9 +28,14 @@
             leave-to="opacity-0 scale-95"
           >
             <DialogPanel
-              class="bg-surface-primary border-border-primary relative flex h-fit w-180 flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border p-2"
+              class="bg-surface-primary relative flex h-full w-180 flex-col items-center justify-center gap-2 overflow-hidden border"
+              :class="
+                title && description
+                  ? 'border-border-primary rounded-xl p-2'
+                  : 'border-dark rounded-special p-0'
+              "
             >
-              <div class="bg-dark group desktop:min-h-80 relative h-fit w-full rounded-lg">
+              <div class="bg-dark group desktop:min-h-80 relative h-full w-full rounded-lg">
                 <div
                   ref="scrollContainer"
                   class="noscrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden scroll-smooth"
@@ -41,12 +46,23 @@
                     :key="idx"
                     class="my-auto flex h-full w-full shrink-0 snap-center items-center justify-center overflow-hidden rounded-lg"
                   >
-                    <img
+                    <div
                       v-if="item.type === 'image'"
-                      :src="item.src"
-                      :alt="`${title}-${idx}`"
-                      class="desktop:max-h-[calc(75svh)] w-auto object-contain"
-                    />
+                      class="relative flex max-h-full max-w-full items-center justify-center"
+                    >
+                      <img
+                        :src="item.src"
+                        :alt="`${title}-${idx}`"
+                        class="desktop:max-h-[calc(75svh)] w-auto object-contain"
+                      />
+                      <div
+                        v-if="item.closeFriends"
+                        v-tooltip="{ content: 'you’re on ‘the list’' }"
+                        class="border-light absolute top-2 right-2 flex size-8 items-center justify-center rounded-full border-3 bg-green-500 shadow-md"
+                      >
+                        <Star :size="20" fill="#fff" stroke-width="0" />
+                      </div>
+                    </div>
                     <video
                       v-else-if="item.type === 'video'"
                       :alt="`${title}-${idx}`"
@@ -130,7 +146,7 @@
 
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ArrowLeft, ArrowRight, ArrowUpRight } from '@lucide/vue'
+import { ArrowLeft, ArrowRight, ArrowUpRight, Star } from '@lucide/vue'
 import { computed, ref } from 'vue'
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -143,18 +159,24 @@ export interface LightBoxTag {
 }
 
 const props = defineProps<{
-  description: string
-  images: string[]
+  description?: string
+  images: { closeFriends?: boolean; url: string }[]
   isOpen: boolean
   tags?: LightBoxTag[]
-  title: string
+  title?: string
   videos?: string[]
 }>()
 
 const mediaItems = computed(() => {
   const items = []
   if (props.images) {
-    items.push(...props.images.map((img) => ({ src: img, type: 'image' as const })))
+    items.push(
+      ...props.images.map((img) => ({
+        closeFriends: img.closeFriends,
+        src: img.url,
+        type: 'image' as const,
+      })),
+    )
   }
   if (props.videos) {
     items.push(...props.videos.map((vid) => ({ src: vid, type: 'video' as const })))

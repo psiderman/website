@@ -4,6 +4,7 @@ import { computed, type Ref } from 'vue'
 import { supabase } from '@/supabase'
 
 export interface TravelImage {
+  closeFriends: boolean
   dateTaken: Date | null
   id: string
   location: {
@@ -14,9 +15,21 @@ export interface TravelImage {
   url: string
 }
 
+import { format } from 'date-fns'
 import ExifReader from 'exifreader'
 
-import { travels } from '@/data/travelCards'
+// Matches the public.trips table (snake_case from Supabase → camelCase here)
+export interface Trip {
+  closeFriends: boolean
+  date: Date
+  description: string[]
+  instagramLink: null | string
+  mapsListLink: null | string
+  repeatVisit: boolean
+  slug: string
+  subtitle: string
+  title: string
+}
 
 export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
   const slugRef = computed(() => {
@@ -46,9 +59,12 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
 
       if (publicError) throw publicError
 
-      const filesToProcess: { id: string; name: string; path: string }[] = (publicFiles || [])
+      const filesToProcess: { closeFriends: boolean; id: string; name: string; path: string }[] = (
+        publicFiles || []
+      )
         .filter((file) => !file.name.startsWith('.') && file.metadata) // Only files, skip directories
         .map((file) => ({
+          closeFriends: false,
           id: file.id || file.name,
           name: file.name,
           path: `${slugRef.value}/${file.name}`,
@@ -65,6 +81,7 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
           const mappedFriends = friendFiles
             .filter((file) => !file.name.startsWith('.'))
             .map((file) => ({
+              closeFriends: true,
               id: file.id || file.name,
               name: file.name,
               path: `${slugRef.value}/friends/${file.name}`,
@@ -108,6 +125,7 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
           }
 
           return {
+            closeFriends: file.closeFriends,
             dateTaken,
             id: file.id,
             location: { lat, lng },
@@ -128,7 +146,7 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
       return validImages
     },
     queryKey: ['travel-images', slugRef],
-    staleTime: 1000 * 60 * 30, // Cache for 30 minutes
+    staleTime: 0, //1000 * 60 * 30, // Cache for 30 minutes
   })
 
   return {
@@ -153,17 +171,32 @@ export function useTravelsWithImages() {
       } = await supabase.auth.getSession()
       const isAuthenticated = !!session?.user
 
+      // 1. Fetch trips from Supabase (RLS handles close_friends visibility)
+      const { data: tripsData, error: tripsError } = await supabase
+        .from('trips')
+        .select('*')
+        .order('date', { ascending: false })
+
+      if (tripsError) throw tripsError
+      const trips = (tripsData ?? []).map(rowToTrip)
+
       return await Promise.all(
-        travels.map(async (travel) => {
+        trips.map(async (travel) => {
           const { data: publicFiles, error: publicError } = await supabase.storage
             .from('travel')
             .list(`${travel.slug}`)
 
           if (publicError) throw publicError
 
-          const filesToProcess = (publicFiles || [])
+          const filesToProcess: {
+            closeFriends: boolean
+            id: string
+            name: string
+            path: string
+          }[] = (publicFiles || [])
             .filter((file) => !file.name.startsWith('.') && file.metadata)
             .map((file) => ({
+              closeFriends: false,
               id: file.id || file.name,
               name: file.name,
               path: `${travel.slug}/${file.name}`,
@@ -178,6 +211,7 @@ export function useTravelsWithImages() {
               const mappedFriends = friendFiles
                 .filter((file) => !file.name.startsWith('.'))
                 .map((file) => ({
+                  closeFriends: true,
                   id: file.id || file.name,
                   name: file.name,
                   path: `${travel.slug}/friends/${file.name}`,
@@ -221,6 +255,7 @@ export function useTravelsWithImages() {
               }
 
               return {
+                closeFriends: file.closeFriends,
                 dateTaken,
                 id: file.id,
                 location: { lat, lng },
@@ -246,7 +281,7 @@ export function useTravelsWithImages() {
       )
     },
     queryKey: ['travels-with-images'],
-    staleTime: 1000 * 60 * 30, // Cache for 30 minutes
+    staleTime: 0, //1000 * 60 * 30, // Cache for 30 minutes
   })
 
   return {
@@ -255,6 +290,30 @@ export function useTravelsWithImages() {
     refetch,
     travelsWithImages,
   }
+}
+
+export function useTrips() {
+  const {
+    data: trips,
+    error,
+    isLoading,
+    refetch,
+  } = useQuery<Trip[]>({
+    gcTime: 1000 * 60 * 60,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trips')
+        .select('*')
+        .order('date', { ascending: false })
+
+      if (error) throw error
+      return (data ?? []).map(rowToTrip)
+    },
+    queryKey: ['trips'],
+    staleTime: 1000 * 60 * 10, // 10 minutes
+  })
+
+  return { error, isLoading, refetch, trips }
 }
 
 function getDateTaken(tags: any): Date | null {
@@ -290,4 +349,20 @@ function getDecimalCoordinate(coordinateTag: any, refTag: any): null | number {
     }
   }
   return val
+}
+
+function rowToTrip(row: Record<string, unknown>): Trip {
+  return {
+    closeFriends: row.close_friends as boolean,
+    date: new Date(row.date as string),
+    description: (row.description as string[]) ?? [],
+    instagramLink: (row.instagram_link as null | string) ?? null,
+    mapsListLink: (row.maps_list_link as null | string) ?? null,
+    repeatVisit: row.repeat_visit as boolean,
+    slug: row.slug as string,
+    subtitle:
+      (row.subtitle as null | string) ||
+      (format(new Date(row.date as string), 'MMMM yyyy') as string),
+    title: row.title as string,
+  }
 }

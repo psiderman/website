@@ -17,10 +17,10 @@ const allowMultiplayer = computed({
 
 export const isLightBoxOpen = ref(false)
 export const lightBoxData = ref<{
-  description: string
-  images: string[]
+  description?: string
+  images: { closeFriends?: boolean; url: string }[]
   tags?: LightBoxTag[]
-  title: string
+  title?: string
   videos?: string[]
 }>({
   description: '',
