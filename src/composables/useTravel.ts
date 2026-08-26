@@ -1,22 +1,24 @@
 import { useQuery } from '@tanstack/vue-query'
+import { format } from 'date-fns'
 import { computed, type Ref } from 'vue'
 
 import { supabase } from '@/supabase'
 
 export interface TravelImage {
+  caption: null | string
   closeFriends: boolean
   dateTaken: Date | null
+  height: null | number
   id: string
   location: {
     lat: null | number
     lng: null | number
   }
   name: string
+  storagePath: string
   url: string
+  width: null | number
 }
-
-import { format } from 'date-fns'
-import ExifReader from 'exifreader'
 
 // Matches the public.trips table (snake_case from Supabase → camelCase here)
 export interface Trip {
@@ -29,6 +31,10 @@ export interface Trip {
   slug: string
   subtitle: string
   title: string
+}
+
+export interface TripWithImages extends Trip {
+  images: TravelImage[]
 }
 
 export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
@@ -44,109 +50,51 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
     refetch,
   } = useQuery<TravelImage[]>({
     enabled: computed(() => !!slugRef.value),
-    gcTime: 1000 * 60 * 60, // Keep in garbage collection for 1 hour
+    gcTime: 1000 * 60 * 60, // 1 hour
     queryFn: async () => {
-      // 1. Get current session to check auth state
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      const isAuthenticated = !!session?.user
+      if (!slugRef.value) return []
 
-      // 2. Fetch public folder files
-      const { data: publicFiles, error: publicError } = await supabase.storage
-        .from('travel')
-        .list(`${slugRef.value}`)
+      // 1. Fetch images from public.trip_images (RLS handles close_friends visibility)
+      const { data: dbImages, error: dbError } = await supabase
+        .from('trip_images')
+        .select('*')
+        .eq('trip_slug', slugRef.value)
+        .order('sort_order', { ascending: true, nullsFirst: false })
+        .order('date_taken', { ascending: true, nullsFirst: false })
 
-      if (publicError) throw publicError
+      if (dbError) throw dbError
+      if (!dbImages || dbImages.length === 0) return []
 
-      const filesToProcess: { closeFriends: boolean; id: string; name: string; path: string }[] = (
-        publicFiles || []
-      )
-        .filter((file) => !file.name.startsWith('.') && file.metadata) // Only files, skip directories
-        .map((file) => ({
-          closeFriends: false,
-          id: file.id || file.name,
-          name: file.name,
-          path: `${slugRef.value}/${file.name}`,
-        }))
-
-      // 3. If authenticated, attempt to fetch friends-only subfolder files
-      if (isAuthenticated) {
-        const { data: friendFiles, error: friendError } = await supabase.storage
-          .from('travel')
-          .list(`${slugRef.value}/friends`)
-
-        // Ignore errors if the friends folder doesn't exist yet
-        if (!friendError && friendFiles) {
-          const mappedFriends = friendFiles
-            .filter((file) => !file.name.startsWith('.'))
-            .map((file) => ({
-              closeFriends: true,
-              id: file.id || file.name,
-              name: file.name,
-              path: `${slugRef.value}/friends/${file.name}`,
-            }))
-          filesToProcess.push(...mappedFriends)
-        }
-      }
-
-      if (filesToProcess.length === 0) return []
-
-      // 4. Create signed URLs for all gathered files (valid for 1 hour)
-      const paths = filesToProcess.map((f) => f.path)
+      // 2. Create signed URLs in batch
+      const paths = dbImages.map((img) => img.storage_path as string)
       const { data: signedUrls, error: signError } = await supabase.storage
         .from('travel')
         .createSignedUrls(paths, 60 * 60)
 
       if (signError) throw signError
 
-      // Map signed URLs back to files with EXIF data
-      const mappedImages = await Promise.all(
-        filesToProcess.map(async (file) => {
-          const match = signedUrls.find((urlObj) => urlObj.path === file.path)
-          const url = match?.signedUrl || ''
-
-          let dateTaken: Date | null = null
-          let lat: null | number = null
-          let lng: null | number = null
-
-          if (url) {
-            try {
-              const response = await fetch(url)
-              const buffer = await response.arrayBuffer()
-              const tags = ExifReader.load(buffer)
-
-              dateTaken = getDateTaken(tags)
-              lat = getDecimalCoordinate(tags['GPSLatitude'], tags['GPSLatitudeRef'])
-              lng = getDecimalCoordinate(tags['GPSLongitude'], tags['GPSLongitudeRef'])
-            } catch (e) {
-              console.warn(`Failed to parse EXIF for ${file.name}:`, e)
-            }
-          }
-
-          return {
-            closeFriends: file.closeFriends,
-            dateTaken,
-            id: file.id,
-            location: { lat, lng },
-            name: file.name,
-            url,
-          }
-        }),
-      )
-
-      // Filter out images without a dateTaken
-      const validImages = mappedImages.filter((img) => img.dateTaken !== null)
-
-      // Sort images by dateTaken
-      validImages.sort((a, b) => {
-        return a.dateTaken!.getTime() - b.dateTaken!.getTime()
+      return dbImages.map((img) => {
+        const match = signedUrls.find((urlObj) => urlObj.path === img.storage_path)
+        const name = (img.storage_path as string).split('/').pop() || img.storage_path
+        return {
+          caption: (img.caption as null | string) ?? null,
+          closeFriends: img.close_friends as boolean,
+          dateTaken: img.date_taken ? new Date(img.date_taken as string) : null,
+          height: (img.height as null | number) ?? null,
+          id: img.id as string,
+          location: {
+            lat: (img.lat as null | number) ?? null,
+            lng: (img.lng as null | number) ?? null,
+          },
+          name,
+          storagePath: img.storage_path as string,
+          url: match?.signedUrl || '',
+          width: (img.width as null | number) ?? null,
+        }
       })
-
-      return validImages
     },
-    queryKey: ['travel-images', slugRef],
-    staleTime: 0, //1000 * 60 * 30, // Cache for 30 minutes
+    queryKey: ['trip-images', slugRef],
+    staleTime: 1000 * 60 * 15, // Cache for 15 minutes
   })
 
   return {
@@ -163,125 +111,87 @@ export function useTravelsWithImages() {
     error,
     isLoading,
     refetch,
-  } = useQuery({
-    gcTime: 1000 * 60 * 60, // Keep in garbage collection for 1 hour
+  } = useQuery<TripWithImages[]>({
+    gcTime: 1000 * 60 * 60, // 1 hour
     queryFn: async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      const isAuthenticated = !!session?.user
-
-      // 1. Fetch trips from Supabase (RLS handles close_friends visibility)
+      // 1. Fetch trips joined with trip_images (RLS filters close_friends automatically)
       const { data: tripsData, error: tripsError } = await supabase
         .from('trips')
-        .select('*')
+        .select('*, trip_images(*)')
         .order('date', { ascending: false })
 
       if (tripsError) throw tripsError
-      const trips = (tripsData ?? []).map(rowToTrip)
+      if (!tripsData) return []
 
-      return await Promise.all(
-        trips.map(async (travel) => {
-          const { data: publicFiles, error: publicError } = await supabase.storage
-            .from('travel')
-            .list(`${travel.slug}`)
+      // 2. Gather all storage paths across all trips to batch create signed URLs in ONE request
+      const allPaths: string[] = []
+      for (const trip of tripsData) {
+        const images = (trip.trip_images as Array<Record<string, unknown>>) || []
+        for (const img of images) {
+          if (img.storage_path) {
+            allPaths.push(img.storage_path as string)
+          }
+        }
+      }
 
-          if (publicError) throw publicError
+      const signedUrlMap = new Map<string, string>()
+      if (allPaths.length > 0) {
+        const { data: signedUrls, error: signError } = await supabase.storage
+          .from('travel')
+          .createSignedUrls(allPaths, 60 * 60)
 
-          const filesToProcess: {
-            closeFriends: boolean
-            id: string
-            name: string
-            path: string
-          }[] = (publicFiles || [])
-            .filter((file) => !file.name.startsWith('.') && file.metadata)
-            .map((file) => ({
-              closeFriends: false,
-              id: file.id || file.name,
-              name: file.name,
-              path: `${travel.slug}/${file.name}`,
-            }))
-
-          if (isAuthenticated) {
-            const { data: friendFiles, error: friendError } = await supabase.storage
-              .from('travel')
-              .list(`${travel.slug}/friends`)
-
-            if (!friendError && friendFiles) {
-              const mappedFriends = friendFiles
-                .filter((file) => !file.name.startsWith('.'))
-                .map((file) => ({
-                  closeFriends: true,
-                  id: file.id || file.name,
-                  name: file.name,
-                  path: `${travel.slug}/friends/${file.name}`,
-                }))
-              filesToProcess.push(...mappedFriends)
+        if (!signError && signedUrls) {
+          for (const s of signedUrls) {
+            if (s.path && s.signedUrl) {
+              signedUrlMap.set(s.path, s.signedUrl)
             }
           }
+        }
+      }
 
-          if (filesToProcess.length === 0) {
-            return { ...travel, images: [] as TravelImage[] }
+      // 3. Map trips and their images
+      return tripsData.map((row) => {
+        const trip = rowToTrip(row)
+        const rawImages = (row.trip_images as Array<Record<string, unknown>>) || []
+
+        // Sort images by sort_order or date_taken ASC
+        rawImages.sort((a, b) => {
+          if (a.sort_order !== null && b.sort_order !== null) {
+            return (a.sort_order as number) - (b.sort_order as number)
           }
+          const timeA = a.date_taken ? new Date(a.date_taken as string).getTime() : 0
+          const timeB = b.date_taken ? new Date(b.date_taken as string).getTime() : 0
+          return timeA - timeB
+        })
 
-          const paths = filesToProcess.map((f) => f.path)
-          const { data: signedUrls, error: signError } = await supabase.storage
-            .from('travel')
-            .createSignedUrls(paths, 60 * 60)
-
-          if (signError) throw signError
-
-          const mappedImages = await Promise.all(
-            filesToProcess.map(async (file) => {
-              const match = signedUrls.find((urlObj) => urlObj.path === file.path)
-              const url = match?.signedUrl || ''
-
-              let dateTaken: Date | null = null
-              let lat: null | number = null
-              let lng: null | number = null
-
-              if (url) {
-                try {
-                  // Fetch array buffer to parse EXIF
-                  const response = await fetch(url)
-                  const buffer = await response.arrayBuffer()
-                  const tags = ExifReader.load(buffer)
-                  dateTaken = getDateTaken(tags)
-                  lat = getDecimalCoordinate(tags['GPSLatitude'], tags['GPSLatitudeRef'])
-                  lng = getDecimalCoordinate(tags['GPSLongitude'], tags['GPSLongitudeRef'])
-                } catch (e) {
-                  console.warn(`Failed to parse EXIF for ${file.name}:`, e)
-                }
-              }
-
-              return {
-                closeFriends: file.closeFriends,
-                dateTaken,
-                id: file.id,
-                location: { lat, lng },
-                name: file.name,
-                url,
-              }
-            }),
-          )
-
-          // Filter out images without a dateTaken
-          const validImages = mappedImages.filter((img) => img.dateTaken !== null)
-
-          // Sort images by dateTaken (ascending)
-          validImages.sort((a, b) => {
-            return a.dateTaken!.getTime() - b.dateTaken!.getTime()
-          })
-
+        const mappedImages: TravelImage[] = rawImages.map((img) => {
+          const storagePath = img.storage_path as string
+          const name = storagePath.split('/').pop() || storagePath
           return {
-            ...travel,
-            images: validImages,
+            caption: (img.caption as null | string) ?? null,
+            closeFriends: img.close_friends as boolean,
+            dateTaken: img.date_taken ? new Date(img.date_taken as string) : null,
+            height: (img.height as null | number) ?? null,
+            id: img.id as string,
+            location: {
+              lat: (img.lat as null | number) ?? null,
+              lng: (img.lng as null | number) ?? null,
+            },
+            name,
+            storagePath,
+            url: signedUrlMap.get(storagePath) || '',
+            width: (img.width as null | number) ?? null,
           }
-        }),
-      )
+        })
+
+        return {
+          ...trip,
+          images: mappedImages,
+        }
+      })
     },
-    queryKey: ['travels-with-images'],
-    staleTime: 0, //1000 * 60 * 30, // Cache for 30 minutes
+    queryKey: ['trips-with-images'],
+    staleTime: 1000 * 60 * 15, // Cache for 15 minutes
   })
 
   return {
@@ -314,41 +224,6 @@ export function useTrips() {
   })
 
   return { error, isLoading, refetch, trips }
-}
-
-function getDateTaken(tags: any): Date | null {
-  const dateStr = tags['DateTimeOriginal']?.description || tags['DateTime']?.description
-  if (!dateStr) return null
-
-  // Convert "YYYY:MM:DD HH:MM:SS" to "YYYY-MM-DDTHH:MM:SS"
-  const formattedDate = dateStr.replace(':', '-').replace(':', '-')
-  const isoStr = formattedDate.replace(' ', 'T')
-
-  // Capture timezone offset (e.g. "+01:00") if present
-  const offset = tags['OffsetTimeOriginal']?.description || tags['OffsetTime']?.description || ''
-
-  const parsedDate = new Date(isoStr + offset)
-  if (!isNaN(parsedDate.getTime())) {
-    return parsedDate
-  }
-  return null
-}
-
-function getDecimalCoordinate(coordinateTag: any, refTag: any): null | number {
-  if (!coordinateTag) return null
-
-  // ExifReader pre-calculates the decimal degree value in description
-  const desc = Number(coordinateTag.description)
-  if (isNaN(desc)) return null
-
-  let val = desc
-  if (refTag && refTag.value && refTag.value.length > 0) {
-    const ref = refTag.value[0]
-    if (ref === 'S' || ref === 'W') {
-      val = -val
-    }
-  }
-  return val
 }
 
 function rowToTrip(row: Record<string, unknown>): Trip {

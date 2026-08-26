@@ -10,6 +10,9 @@ const observer = new IntersectionObserver(
           img.onload = () => {
             img.classList.remove('lazy-loading')
           }
+          img.onerror = () => {
+            img.classList.remove('lazy-loading')
+          }
           img.src = src
           img.removeAttribute('data-src')
         }

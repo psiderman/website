@@ -4,10 +4,11 @@
 
 <script setup lang="ts">
 import mapboxgl from 'mapbox-gl'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { type App, computed, createApp, h, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
+import TravelMarker from '@/components/TravelMarker.vue'
 import { theme } from '@/composables/useTheme'
+import tooltip from '@/directives/tooltip'
 
 import type { TravelImage, Trip } from '@/composables/useTravel'
 
@@ -29,31 +30,8 @@ const emit = defineEmits<{
 const mapContainer = ref<HTMLDivElement | null>(null)
 let map: mapboxgl.Map | null = null
 let markers: mapboxgl.Marker[] = []
+let markerApps: App[] = []
 let currentFeatures: any[] = []
-
-function handleGlobalClick(e: MouseEvent) {
-  const target = e.target as HTMLElement
-  if (target && target.tagName === 'IMG' && target.closest('.tippy-box')) {
-    const src = target.getAttribute('src')
-    if (!src) return
-    const feature = currentFeatures.find((f: any) => f.properties.imageUrl === src)
-    if (feature) {
-      const allImages: { closeFriends?: boolean; url: string }[] = JSON.parse(
-        feature.properties.travelImages,
-      )
-      const clickedUrl = feature.properties.imageUrl
-      const clickedImg = allImages.find((i) => i.url === clickedUrl) || {
-        closeFriends: feature.properties.closeFriends,
-        url: clickedUrl,
-      }
-      const ordered = [clickedImg, ...allImages.filter((u) => u.url !== clickedUrl)]
-      lightBoxData.value = {
-        images: ordered,
-      }
-      isLightBoxOpen.value = true
-    }
-  }
-}
 
 const isDarkTheme = computed(() => {
   return (
@@ -62,7 +40,7 @@ const isDarkTheme = computed(() => {
   )
 })
 
-async function addMarkers() {
+function addMarkers() {
   if (!map) return
   clearMarkers()
   const geojson = buildGeoJSON(props.travelsWithImages ?? [])
@@ -76,10 +54,6 @@ async function addMarkers() {
     const coords = feature.geometry.coordinates as [number, number]
     bounds.extend(coords)
 
-    const { createApp, h } = await import('vue')
-    const TravelMarker = (await import('@/components/TravelMarker.vue')).default
-    const tooltip = (await import('@/directives/tooltip')).default
-
     const container = document.createElement('div')
     const markerApp = createApp(
       h(TravelMarker, {
@@ -92,6 +66,7 @@ async function addMarkers() {
 
     markerApp.directive('tooltip', tooltip)
     markerApp.mount(container)
+    markerApps.push(markerApp)
 
     const marker = new mapboxgl.Marker({ element: container }).setLngLat(coords).addTo(map)
     marker.getElement().addEventListener('click', () => {
@@ -142,6 +117,8 @@ function buildGeoJSON(travels: TravelWithImages[]) {
 function clearMarkers() {
   markers.forEach((m) => m.remove())
   markers = []
+  markerApps.forEach((app) => app.unmount())
+  markerApps = []
 }
 
 function getMapPadding() {
@@ -215,14 +192,12 @@ function zoomToTrip(slug: null | string | undefined) {
 
 onMounted(() => {
   initMap()
-  document.addEventListener('click', handleGlobalClick)
 })
 
 onUnmounted(() => {
   clearMarkers()
   map?.remove()
   map = null
-  document.removeEventListener('click', handleGlobalClick)
 })
 
 watch(
@@ -245,11 +220,6 @@ watch(isDarkTheme, (dark) => {
 </script>
 
 <style>
-a.mapboxgl-ctrl-logo.mapboxgl-compact {
-  display: hidden !important;
-  opacity: 0 !important;
-}
-
 .mapboxgl-marker,
 .mapboxgl-marker * {
   cursor: pointer !important;

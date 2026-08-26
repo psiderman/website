@@ -187,8 +187,7 @@
 
 <script setup lang="ts">
 import { Pin, Repeat, RepeatOff } from '@lucide/vue'
-import { computed } from 'vue'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import GenericLoader from '@/components/GenericLoader.vue'
 import TravelMap from '@/components/TravelMap.vue'
@@ -280,10 +279,15 @@ const triggerLightbox = (travel: any, clickedIdx: number) => {
   isLightBoxOpen.value = true
 }
 
-onMounted(() => {
-  const scrollContainer = document.querySelector('#card-list-scroll-container')
+function setupIntersectionObserver() {
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
 
-  // Set up intersection observer to detect when cards occupy the viewport area
+  const scrollContainer = document.querySelector('#card-list-scroll-container')
+  if (!scrollContainer) return
+
   const rootMargin = '-10% -10% -10% -10%'
 
   observer = new IntersectionObserver(
@@ -316,7 +320,9 @@ onMounted(() => {
         }
 
         const target = visibleEntries.reduce((prev, curr) => {
-          return getCenterDist(curr.boundingClientRect) < getCenterDist(prev.boundingClientRect) ? curr : prev
+          return getCenterDist(curr.boundingClientRect) < getCenterDist(prev.boundingClientRect)
+            ? curr
+            : prev
         })
         const slug = target.target.getAttribute('data-sync')
         if (slug) {
@@ -340,6 +346,19 @@ onMounted(() => {
   Object.values(cardRefs.value).forEach((el) => {
     observer?.observe(el)
   })
+}
+
+watch(
+  () => travelsWithImages.value,
+  async () => {
+    await nextTick()
+    setupIntersectionObserver()
+  },
+)
+
+onMounted(async () => {
+  await nextTick()
+  setupIntersectionObserver()
 })
 
 onUnmounted(() => {
