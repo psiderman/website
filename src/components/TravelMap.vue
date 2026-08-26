@@ -71,6 +71,7 @@ function addMarkers() {
 
     const marker = new mapboxgl.Marker({ element: container }).setLngLat(coords).addTo(map)
     const el = marker.getElement()
+    el.style.zIndex = feature.properties.closeFriends ? '1' : '2'
     el.setAttribute('tabindex', '0')
     el.setAttribute('role', 'button')
     el.setAttribute('aria-label', feature.properties.caption || 'Travel location marker')
@@ -220,7 +221,6 @@ onUnmounted(() => {
 watch(
   () => props.travelsWithImages,
   () => addMarkers(),
-  { deep: true },
 )
 
 watch(

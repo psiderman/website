@@ -187,7 +187,7 @@
 
 <script setup lang="ts">
 import { Pin, Repeat, RepeatOff } from '@lucide/vue'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
 import GenericLoader from '@/components/GenericLoader.vue'
 import TravelMap from '@/components/TravelMap.vue'
@@ -350,14 +350,6 @@ function setupIntersectionObserver() {
     observer?.observe(el)
   })
 }
-
-watch(
-  () => travelsWithImages.value,
-  async () => {
-    await nextTick()
-    setupIntersectionObserver()
-  },
-)
 
 onMounted(async () => {
   await nextTick()

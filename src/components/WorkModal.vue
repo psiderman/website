@@ -251,7 +251,6 @@ watch(
   () => props.isOpen,
   async (isOpen) => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden'
       await nextTick()
 
       draggables.forEach((d) => d.stop?.())
@@ -266,7 +265,6 @@ watch(
         }),
       )
     } else {
-      document.body.style.overflow = 'auto'
       draggables.forEach((d) => d.stop?.())
       draggables = []
       isMoved.value = false
