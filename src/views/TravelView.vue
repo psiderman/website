@@ -261,6 +261,7 @@ const triggerLightbox = (travel: any, clickedIdx: number) => {
   if (!travel.images || travel.images.length === 0) return
 
   const allImages = travel.images.map((img: any) => ({
+    caption: img.caption,
     closeFriends: img.closeFriends,
     url: img.url,
   }))

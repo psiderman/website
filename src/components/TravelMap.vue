@@ -57,10 +57,11 @@ function addMarkers() {
     const container = document.createElement('div')
     const markerApp = createApp(
       h(TravelMarker, {
+        caption: feature.properties.caption,
         closeFriends: feature.properties.closeFriends,
+        height: feature.properties.height,
         imageUrl: feature.properties.imageUrl,
-        travelSubtitle: feature.properties.travelSubtitle,
-        travelTitle: feature.properties.travelTitle,
+        width: feature.properties.width,
       }),
     )
 
@@ -86,10 +87,13 @@ function buildGeoJSON(travels: TravelWithImages[]) {
   const features: Array<{
     geometry: { coordinates: [number, number]; type: 'Point' }
     properties: {
+      caption: null | string
       closeFriends: boolean
+      height: null | number
       imageUrl: string
       slug: string
       travelImages: string
+      width: null | number
     }
     type: 'Feature'
   }> = []
@@ -100,12 +104,15 @@ function buildGeoJSON(travels: TravelWithImages[]) {
       features.push({
         geometry: { coordinates: [img.location.lng, img.location.lat], type: 'Point' },
         properties: {
+          caption: img.caption,
           closeFriends: img.closeFriends,
+          height: img.height,
           imageUrl: img.url,
           slug: travel.slug,
           travelImages: JSON.stringify(
             travel.images.map((i) => ({ closeFriends: i.closeFriends, url: i.url })),
           ),
+          width: img.width,
         },
         type: 'Feature',
       })

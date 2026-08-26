@@ -53,6 +53,8 @@
   --font-mono:
     'Tiny', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
+  --font-handwriting:
+    'Kalam', cursive;
 
   /* weights */
   --font-weight-normal: 400;
@@ -702,6 +704,10 @@ a,
   }
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+@utility font-handwriting {
+  font-family: var(--font-handwriting);
 }
 
 *:focus,

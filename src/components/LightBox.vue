@@ -55,12 +55,21 @@
                         :alt="`${title}-${idx}`"
                         class="desktop:max-h-[calc(75svh)] w-auto object-contain"
                       />
-                      <div
-                        v-if="item.closeFriends"
-                        v-tooltip="{ content: 'you’re on ‘the list’' }"
-                        class="border-light absolute top-2 right-2 flex size-8 items-center justify-center rounded-full border-3 bg-green-500 shadow-md"
-                      >
-                        <Star :size="20" fill="#fff" stroke-width="0" />
+                      <div class="absolute top-2 right-2 flex flex-row gap-2">
+                        <div
+                          v-if="item.caption"
+                          v-tooltip="{ content: item.caption }"
+                          class="border-light bg-dark/50 text-light flex size-8 items-center justify-center rounded-full border-3 font-mono shadow-md"
+                        >
+                          i
+                        </div>
+                        <div
+                          v-if="item.closeFriends"
+                          v-tooltip="{ content: 'you’re on ‘the list’' }"
+                          class="border-light flex size-8 items-center justify-center rounded-full border-3 bg-green-500 shadow-md"
+                        >
+                          <Star :size="20" fill="#fff" stroke-width="0" />
+                        </div>
                       </div>
                     </div>
                     <video
@@ -160,7 +169,7 @@ export interface LightBoxTag {
 
 const props = defineProps<{
   description?: string
-  images: { closeFriends?: boolean; url: string }[]
+  images: { caption?: null | string; closeFriends?: boolean; url: string }[]
   isOpen: boolean
   tags?: LightBoxTag[]
   title?: string
@@ -172,6 +181,7 @@ const mediaItems = computed(() => {
   if (props.images) {
     items.push(
       ...props.images.map((img) => ({
+        caption: img.caption,
         closeFriends: img.closeFriends,
         src: img.url,
         type: 'image' as const,
