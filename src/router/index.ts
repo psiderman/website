@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import { isAuthModalOpen } from '@/composables/useAuth'
+import { ensureUserRole, isAuthModalOpen } from '@/composables/useAuth'
 import { isLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
 
 import HomeView from '../views/HomeView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import NowView from '../views/NowView.vue'
 import PrivacyView from '../views/PrivacyView.vue'
+import SuitladyView from '../views/SuitladyView.vue'
 import TermsView from '../views/TermsView.vue'
 import TravelView from '../views/TravelView.vue'
 
@@ -17,6 +18,11 @@ const router = createRouter({
       component: HomeView,
       name: 'Home',
       path: '/',
+    },
+    {
+      component: SuitladyView,
+      name: 'Suitlady',
+      path: '/suitlady',
     },
     {
       component: NowView,
@@ -55,6 +61,15 @@ const router = createRouter({
   },
 })
 
+router.beforeEach(async (to) => {
+  if (to.path === '/suitlady') {
+    const role = await ensureUserRole()
+    if (role !== 'admin') {
+      return { path: '/', replace: true }
+    }
+  }
+})
+
 router.afterEach(() => {
   isLightBoxOpen.value = false
   isWorkModalOpen.value = false
@@ -62,3 +77,4 @@ router.afterEach(() => {
 })
 
 export default router
+
