@@ -17,22 +17,6 @@ export interface ExtraCard {
 }
 
 export const extraCards: Partial<Record<EmojiGroupId, ExtraCard[]>> = {
-  travel: [
-    {
-      bgClass: 'bg-sky-200 dark:bg-sky-950',
-      cover: new URL('../assets/home/plane.webp', import.meta.url).href,
-      link: 'https://www.instagram.com/p/DV_EEAnElCY/',
-      size: 'sm',
-      title: 'most recent trip',
-    },
-    {
-      bgClass: 'bg-fuchsia-200 dark:bg-fuchsia-950',
-      cover: new URL('../assets/home/pin.webp', import.meta.url).href,
-      link: 'https://www.google.com/maps/@65.7943067,5.1156331,5.25z?entry=ttu&g_ep=EgoyMDI2MDgxOS4wIKXMDSoASAFQAw%3D%3D',
-      size: 'sm',
-      title: 'next maybe?',
-    },
-  ],
   work: [
     {
       cover: new URL('../assets/work/dweb/00.webp', import.meta.url).href,

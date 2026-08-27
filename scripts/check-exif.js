@@ -61,17 +61,25 @@ function processImage(filePath) {
     const lat = getDecimalCoordinate(tags['GPSLatitude'], tags['GPSLatitudeRef'])
     const lng = getDecimalCoordinate(tags['GPSLongitude'], tags['GPSLongitudeRef'])
 
+    const hasDate = dateTaken !== null
+    const hasLocation = lat !== null && lng !== null
+
     return {
       dateTaken: dateTaken ? dateTaken.toISOString() : null,
       fileName: path.basename(filePath),
-      hasRequiredData: dateTaken !== null, // Website filters out images without dateTaken
-      location: lat !== null && lng !== null ? { lat, lng } : null,
+      hasDate,
+      hasLocation,
+      hasRequiredData: hasDate && hasLocation,
+      location: hasLocation ? { lat, lng } : null,
       success: true,
     }
   } catch (err) {
     return {
       error: err.message,
       fileName: path.basename(filePath),
+      hasDate: false,
+      hasLocation: false,
+      hasRequiredData: false,
       success: false,
     }
   }
@@ -79,9 +87,9 @@ function processImage(filePath) {
 
 // CLI Arg Parsing
 const targetPath = process.argv[2]
-if (!targetPath) {
+if (!targetPath || targetPath === '--help' || targetPath === '-h') {
   console.log('Usage: node scripts/check-exif.js <path-to-folder-or-file>')
-  process.exit(1)
+  process.exit(targetPath ? 0 : 1)
 }
 
 const resolvedPath = path.resolve(targetPath)
@@ -108,7 +116,7 @@ if (filesToProcess.length === 0) {
   process.exit(0)
 }
 
-console.log(`Processing ${filesToProcess.length} image(s)...\n`)
+console.log(`Checking ${filesToProcess.length} image(s)...\n`)
 
 const results = filesToProcess.map(processImage)
 
@@ -119,19 +127,45 @@ console.log(
 )
 console.log('================================================================================')
 
+let invalidCount = 0
+
 results.forEach((res) => {
   if (!res.success) {
+    invalidCount++
     console.log(`${res.fileName.padEnd(30)} | ERROR: ${res.error.substring(0, 50)}`)
   } else {
     const dateStr = res.dateTaken ? res.dateTaken : 'MISSING'
     const gpsStr = res.location
       ? `${res.location.lat.toFixed(4)}, ${res.location.lng.toFixed(4)}`
       : 'MISSING'
-    const status = res.hasRequiredData ? '✅ Valid' : '❌ Filtered out (No Date)'
+
+    let status = '✅ Valid'
+    if (!res.hasDate && !res.hasLocation) {
+      status = '❌ Missing Date & GPS'
+      invalidCount++
+    } else if (!res.hasDate) {
+      status = '❌ Missing Date'
+      invalidCount++
+    } else if (!res.hasLocation) {
+      status = '❌ Missing GPS'
+      invalidCount++
+    }
+
     console.log(
       `${res.fileName.substring(0, 30).padEnd(30)} | ${dateStr.padEnd(25)} | ${gpsStr.padEnd(25)} | ${status}`,
     )
   }
 })
 console.log('================================================================================')
-console.log('Note: The website filters out any images that do not contain a valid Date Taken.')
+
+if (invalidCount > 0) {
+  console.error(
+    `\n❌ Failed: ${invalidCount} of ${results.length} image(s) missing required Date or GPS coordinates.`,
+  )
+  process.exit(1)
+} else {
+  console.log(
+    `\n✅ Success: All ${results.length} image(s) contain valid Date Taken and GPS coordinates.`,
+  )
+  process.exit(0)
+}

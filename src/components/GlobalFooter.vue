@@ -60,7 +60,8 @@
         :active="showThwip"
         :width="160"
         :height="322"
-        :duration="TIMING.webDuration"
+        :up-duration="TIMING.webUpDuration"
+        :down-duration="TIMING.webDownDuration"
         :frame4-delay="TIMING.webHoldDelay"
         stroke-color="#94A3B8"
         :stroke-width="2"
@@ -92,20 +93,22 @@ import { openLink } from '@/utils'
 const TIMING = {
   // 4. Page Scroll Bounce-back
   bounceDelay: 2000, // Delay from trigger until footer pulls/bounces page back up
-  bounceDuration: 350, // Duration of the page scroll snap-back
+  bounceDuration: 700, // Duration of the page scroll snap-back
 
   // 2. Hand (🤟) emoji
-  handEnterDuration: 500, // Time for hand to pop up
-  handExitDuration: 350, // Time for hand to retreat
+  handEnterDuration: 300, // Time for hand to pop up
+  handExitDuration: 200, // Time for hand to retreat
 
   // 3. Quip pill throw
-  quipFadeDuration: 3000, // Quip opacity fadeout duration
+  quipFadeDelay: 1500, // Delay before quip fades out
+  quipFadeDuration: 300, // Quick fadeout duration
   quipFlyDurationMax: 1500, // Slowest throw duration
   quipFlyDurationMin: 1000, // Fastest throw duration
 
+  webDownDuration: 300, // Pull down morph duration (Frame 4 -> 5)
+  webHoldDelay: 1100, // Hold delay at apex (between frame 4 & 5)
   // 1. Web strand animation
-  webDuration: 2000, // Total morph duration (75% upward to top, 25% pull down)
-  webHoldDelay: 200, // Hold delay at apex (between frame 4 & 5)
+  webUpDuration: 700, // Upward morph duration to apex (Frame 1 -> 4)
 }
 
 const commit = __COMMIT_HASH__
@@ -158,8 +161,8 @@ function spawnQuipThrow() {
   quipMessage.style.left = `${startX}px`
   quipMessage.style.top = `${startY}px`
 
-  const flingYLength = random(30, 60)
-  const flingXLength = random(15, 55)
+  const flingYLength = random(10, 20)
+  const flingXLength = random(40, 60)
   const rotation = random(10, 20) * (flingXLength / 55)
 
   animate(quipMessage, {
@@ -172,7 +175,7 @@ function spawnQuipThrow() {
     },
     opacity: [
       { duration: 200, to: 1 },
-      { duration: TIMING.quipFadeDuration, ease: 'inOut(2)', to: 0 },
+      { delay: TIMING.quipFadeDelay, duration: TIMING.quipFadeDuration, ease: 'inOut(2)', to: 0 },
     ],
     rotate: `${plusminus}${rotation}deg`,
     x: `${plusminus}=${flingXLength}px`,
@@ -194,9 +197,6 @@ function triggerThwipAnimation() {
 }
 
 let isSnapping = false
-let userCanScrollPast = false
-let lastWheelTime = 0
-let touchStartY = 0
 let scrollTimeout: null | number = null
 let animationFrameId: null | number = null
 
@@ -231,7 +231,6 @@ const bounceBack = (targetY: number) => {
     } else {
       animationFrameId = null
       isSnapping = false
-      userCanScrollPast = false
       showThwip.value = false
       dismissThwipAnimation()
     }
@@ -249,8 +248,8 @@ const handleScroll = () => {
   const logoBottomOffset = logoRect.bottom + window.scrollY
   const logoBoundaryScrollTop = Math.max(0, logoBottomOffset - window.innerHeight)
 
-  // Trigger ONLY when user scrolls to bottom (within 15px of max scroll)
-  if (currentScrollY >= maxScrollTop - 15) {
+  // Trigger when user scrolls to bottom
+  if (currentScrollY >= maxScrollTop - 2) {
     if (!showThwip.value) {
       showThwip.value = true
       triggerThwipAnimation()
@@ -274,75 +273,12 @@ const handleScroll = () => {
   }
 }
 
-const handleWheel = (e: WheelEvent) => {
-  if (!logoContainer.value) return
-
-  const now = Date.now()
-  const logoRect = logoContainer.value.getBoundingClientRect()
-  const logoBottomOffset = logoRect.bottom + window.scrollY
-  const logoBoundaryScrollTop = Math.max(0, logoBottomOffset - window.innerHeight)
-
-  if (now - lastWheelTime > 150) {
-    userCanScrollPast = window.scrollY >= logoBoundaryScrollTop - 4
-  }
-  lastWheelTime = now
-
-  if (isSnapping) {
-    return
-  }
-
-  if (e.deltaY > 0 && !userCanScrollPast && window.scrollY >= logoBoundaryScrollTop - 1) {
-    window.scrollTo(0, logoBoundaryScrollTop)
-    e.preventDefault()
-  }
-}
-
-const handleTouchStart = (e: TouchEvent) => {
-  if (isSnapping) {
-    cancelBounce()
-  }
-  if (e.touches.length > 0) {
-    touchStartY = e.touches[0].clientY
-
-    if (logoContainer.value) {
-      const logoRect = logoContainer.value.getBoundingClientRect()
-      const logoBottomOffset = logoRect.bottom + window.scrollY
-      const logoBoundaryScrollTop = Math.max(0, logoBottomOffset - window.innerHeight)
-      userCanScrollPast = window.scrollY >= logoBoundaryScrollTop - 4
-    } else {
-      userCanScrollPast = false
-    }
-  }
-}
-
-const handleTouchMove = (e: TouchEvent) => {
-  if (!logoContainer.value || userCanScrollPast || isSnapping) return
-
-  const currentY = e.touches[0].clientY
-  const deltaY = touchStartY - currentY
-
-  const logoRect = logoContainer.value.getBoundingClientRect()
-  const logoBottomOffset = logoRect.bottom + window.scrollY
-  const logoBoundaryScrollTop = Math.max(0, logoBottomOffset - window.innerHeight)
-
-  if (deltaY > 0 && window.scrollY >= logoBoundaryScrollTop - 1) {
-    window.scrollTo(0, logoBoundaryScrollTop)
-    e.preventDefault()
-  }
-}
-
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
-  window.addEventListener('wheel', handleWheel, { passive: false })
-  window.addEventListener('touchstart', handleTouchStart, { passive: true })
-  window.addEventListener('touchmove', handleTouchMove, { passive: false })
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('wheel', handleWheel)
-  window.removeEventListener('touchstart', handleTouchStart)
-  window.removeEventListener('touchmove', handleTouchMove)
   if (scrollTimeout) clearTimeout(scrollTimeout)
   cancelBounce()
 })

@@ -77,24 +77,28 @@ const props = withDefaults(
     active?: boolean
     alternate?: boolean
     autoplay?: boolean
+    downDuration?: number
     duration?: number
     frame4Delay?: number
     height?: number | string
     loop?: boolean
     strokeColor?: string
     strokeWidth?: number | string
+    upDuration?: number
     width?: number | string
   }>(),
   {
     active: undefined,
     alternate: false,
     autoplay: false,
+    downDuration: undefined,
     duration: 1800,
     frame4Delay: 400,
     height: 322,
     loop: false,
     strokeColor: '#ffffff',
     strokeWidth: 2,
+    upDuration: undefined,
     width: 160,
   },
 )
@@ -294,6 +298,9 @@ function start() {
   progress.value = 0
   const track = { val: 0 }
 
+  const upDur = props.upDuration ?? props.duration * 0.75
+  const downDur = props.downDuration ?? props.duration * 0.25
+
   tl = createTimeline({
     alternate: props.alternate,
     autoplay: true,
@@ -302,7 +309,7 @@ function start() {
 
   // Frame 1 -> 4 (progress 0 to 3)
   tl.add(track, {
-    duration: props.duration * 0.75,
+    duration: upDur,
     ease: 'inOutSine',
     onUpdate: () => {
       progress.value = track.val
@@ -314,7 +321,7 @@ function start() {
   tl.add(
     track,
     {
-      duration: props.duration * 0.25,
+      duration: downDur,
       ease: 'inOutSine',
       onUpdate: () => {
         progress.value = track.val
