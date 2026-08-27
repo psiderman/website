@@ -22,9 +22,6 @@
         <template v-else-if="slug">
           <!-- Render images at the top -->
           <div class="text-p mx-auto w-full max-w-prose text-left">
-            <span class="text-ui text-text-secondary tracking-wider uppercase">
-              {{ format(new Date(slug + '-01'), 'MMM ’yy').toLocaleLowerCase() }}
-            </span>
             <h1
               v-tooltip="{ content: 'you don’t have a now page?', placement: 'right' }"
               class="text-display -mb-14 w-fit"
@@ -51,6 +48,12 @@
                 height="500"
               />
             </div>
+          </div>
+
+          <div class="text-p text-text-secondary mx-auto -mb-12 w-full max-w-prose text-left">
+            <h2 class="text-h2">
+              {{ format(new Date(slug + '-01'), 'MMM ’yy').toLocaleLowerCase() }}
+            </h2>
           </div>
 
           <!-- Render parsed markdown -->
