@@ -44,13 +44,7 @@
                 :key="travel.slug"
                 :ref="(el) => setCardRef(el, travel.slug)"
                 class="border-border-primary bg-surface-primary desktop:h-fit noscrollbar desktop:w-full desktop:snap-start desktop:scroll-mt-14 pointer-events-auto flex h-80 w-[90svw] snap-center snap-always flex-col overflow-y-scroll rounded-xl border p-0 transition-colors duration-200"
-                :class="[
-                  {
-                    'ring-primary ring-2 ring-blue-500 ring-offset-2':
-                      activeTripSlug === travel.slug,
-                  },
-                  currentUser?.id ? 'cursor-pointer hover:shadow-xs' : '',
-                ]"
+                :class="[currentUser?.id ? 'cursor-pointer hover:shadow-xs' : '']"
                 :data-sync="travel.slug"
                 @click="handleTripClick(travel.slug)"
                 @focus="handleTripClick(travel.slug)"

@@ -36,13 +36,14 @@
             :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
           >
             <div
-              v-for="img in images"
+              v-for="(img, idx) in images"
               :key="img.name"
-              class="bg-dark aspect-3/5 h-full w-full rounded-xl object-cover"
+              class="bg-dark aspect-3/5 h-full w-full cursor-pointer rounded-xl object-cover transition-opacity hover:opacity-95"
+              @click="triggerLightbox(idx)"
             >
               <img
+                v-lazy="img.url"
                 class="aspect-3/5 h-full w-full rounded-xl object-cover"
-                :src="img.url"
                 :alt="img.name"
                 width="300"
                 height="500"
@@ -77,6 +78,7 @@ import { computed } from 'vue'
 
 import GenericLoader from '@/components/GenericLoader.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
+import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
 import { useNow } from '@/composables/useNow'
 
 const {
@@ -96,6 +98,25 @@ const parsedMarkdown = computed(() => {
   const raw = marked.parse(markdownContent.value)
   return DOMPurify.sanitize(raw as string)
 })
+
+const triggerLightbox = (clickedIdx: number) => {
+  if (!images.value || images.value.length === 0) return
+
+  const allImages = images.value.map((img) => ({
+    url: img.url,
+  }))
+
+  const orderedImages = [
+    allImages[clickedIdx],
+    ...allImages.slice(0, clickedIdx),
+    ...allImages.slice(clickedIdx + 1),
+  ]
+
+  lightBoxData.value = {
+    images: orderedImages,
+  }
+  isLightBoxOpen.value = true
+}
 </script>
 
 <style scoped>

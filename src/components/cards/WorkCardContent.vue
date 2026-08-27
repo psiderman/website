@@ -60,7 +60,7 @@
               <div class="flex size-4 shrink-0 items-center justify-center">
                 <img
                   v-if="block.logoUrl"
-                  :src="block.logoUrl"
+                  v-lazy="block.logoUrl"
                   :alt="`${block.org} Logo`"
                   class="size-3 rounded-sm"
                   width="128"

@@ -53,14 +53,17 @@
                       <img
                         v-lazy="{ src: item.src, placeholder: item.placeholder }"
                         :alt="`${title}-${idx}`"
-                        :width="item.width ?? undefined"
-                        :height="item.height ?? undefined"
                         :style="
                           item.width && item.height
-                            ? { aspectRatio: `${item.width}/${item.height}` }
-                            : {}
+                            ? { 
+                                width: `${item.width}px`, 
+                                height: `${item.height}px`,
+                                maxWidth: '100%',
+                                maxHeight: '75svh'
+                              }
+                            : { maxWidth: '100%', maxHeight: '75svh' }
                         "
-                        class="desktop:max-h-[calc(75svh)] w-auto object-contain"
+                        class="object-contain rounded-lg"
                       />
                       <div class="absolute top-2 right-2 flex flex-row gap-2">
                         <div
@@ -243,6 +246,35 @@ const handleScroll = () => {
     activeIndex.value = index
   }
 }
+
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (!props.isOpen) return
+  if (e.key === 'ArrowRight') {
+    e.preventDefault()
+    scrollToNext()
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault()
+    scrollToPrev()
+  }
+}
+
+import { onUnmounted, watch } from 'vue'
+
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown)
+    } else {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  },
+  { immediate: true },
+)
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <style scoped>

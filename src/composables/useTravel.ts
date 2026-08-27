@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { format } from 'date-fns'
 import { computed, type Ref } from 'vue'
 
-import { supabase } from '@/supabase'
+import { getStorageUrl, supabase } from '@/supabase'
 
 export type ClearanceLevel = 'admin' | 'auth' | 'close' | 'friends' | 'known' | 'public'
 
@@ -76,23 +76,10 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
       if (dbError) throw dbError
       if (!dbImages || dbImages.length === 0) return []
 
-      // 2. Create signed URLs in batch (originals + thumbnails)
-      const fullPaths = dbImages.map((img) => img.storage_path as string)
-      const thumbPaths = dbImages.map((img) => `thumb/${img.storage_path}`)
-      const allPaths = [...fullPaths, ...thumbPaths]
-
-      const { data: signedUrls, error: signError } = await supabase.storage
-        .from('travel')
-        .createSignedUrls(allPaths, 60 * 60)
-
-      if (signError) throw signError
-
       return dbImages.map((img) => {
-        const fullMatch = signedUrls.find((urlObj) => urlObj.path === img.storage_path)
-        const thumbMatch = signedUrls.find((urlObj) => urlObj.path === `thumb/${img.storage_path}`)
         const name = (img.storage_path as string).split('/').pop() || img.storage_path
-        const url = fullMatch?.signedUrl || ''
-        const thumbnailUrl = thumbMatch?.signedUrl || url
+        const url = getStorageUrl('travel', img.storage_path as string)
+        const thumbnailUrl = getStorageUrl('travel', `thumb/${img.storage_path}`)
         return {
           caption: (img.caption as null | string) ?? null,
           clearance: (img.clearance as ClearanceLevel) || 'public',
@@ -144,34 +131,7 @@ export function useTravelsWithImages() {
       if (tripsError) throw tripsError
       if (!tripsData) return []
 
-      // 2. Gather all storage paths (both full and thumb) to batch create signed URLs in ONE request
-      const allPaths: string[] = []
-      for (const trip of tripsData) {
-        const images = (trip.trip_images as Array<Record<string, unknown>>) || []
-        for (const img of images) {
-          if (img.storage_path) {
-            allPaths.push(img.storage_path as string)
-            allPaths.push(`thumb/${img.storage_path}`)
-          }
-        }
-      }
-
-      const signedUrlMap = new Map<string, string>()
-      if (allPaths.length > 0) {
-        const { data: signedUrls, error: signError } = await supabase.storage
-          .from('travel')
-          .createSignedUrls(allPaths, 60 * 60)
-
-        if (!signError && signedUrls) {
-          for (const s of signedUrls) {
-            if (s.path && s.signedUrl) {
-              signedUrlMap.set(s.path, s.signedUrl)
-            }
-          }
-        }
-      }
-
-      // 3. Map trips and their images
+      // 2. Map trips and their images using public storage URLs
       return tripsData.map((row) => {
         const trip = rowToTrip(row)
         const rawImages = (row.trip_images as Array<Record<string, unknown>>) || []
@@ -189,8 +149,8 @@ export function useTravelsWithImages() {
         const mappedImages: TravelImage[] = rawImages.map((img) => {
           const storagePath = img.storage_path as string
           const name = storagePath.split('/').pop() || storagePath
-          const url = signedUrlMap.get(storagePath) || ''
-          const thumbnailUrl = signedUrlMap.get(`thumb/${storagePath}`) || url
+          const url = getStorageUrl('travel', storagePath)
+          const thumbnailUrl = getStorageUrl('travel', `thumb/${storagePath}`)
           return {
             caption: (img.caption as null | string) ?? null,
             clearance: (img.clearance as ClearanceLevel) || 'public',

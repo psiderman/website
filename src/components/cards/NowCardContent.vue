@@ -28,8 +28,8 @@
         class="h-full w-full shrink-0 snap-center"
       >
         <img
+          v-lazy="img.url"
           class="h-full w-full object-cover"
-          :src="img.url"
           :alt="img.name"
           width="300"
           height="500"

@@ -63,7 +63,7 @@
       >
         <div class="aspect-video">
           <img
-            :src="getImageUrl(activeDescription.id)"
+            v-lazy="getImageUrl(activeDescription.id)"
             class="border-border-primary h-full w-full rounded-lg border object-cover"
             :alt="activeDescription.id"
             width="800"
@@ -113,7 +113,7 @@
           />
           <img
             v-else-if="card.imageUrl"
-            :src="card.imageUrl"
+            v-lazy="card.imageUrl"
             class="pointer-events-none h-full w-full object-cover"
             :alt="card.title"
           />

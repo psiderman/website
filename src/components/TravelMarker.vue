@@ -38,13 +38,15 @@ const props = defineProps<Props>()
 
 const tooltipContent = `
   <div class="bg-light border-light outline-dark/10 rounded-special flex w-fit flex-col items-center border-4 shadow-xl outline">
-    <img src="${props.thumbnailUrl || props.imageUrl}"
-         data-src="${props.imageUrl}"
-         onload="if(this.src !== this.dataset.src) { this.src = this.dataset.src; this.style.filter = 'blur(15px)'; } else { this.style.filter = 'none'; }"
-         ${props.width ? `width="${props.width}"` : ''}
-         ${props.height ? `height="${props.height}"` : ''}
-         style="filter: blur(15px); transition: filter 0.3s ease-out; ${props.width && props.height ? `aspect-ratio: ${props.width}/${props.height};` : ''}"
-         class="bg-dark max-h-[calc(50svh-40px)] w-auto rounded-lg object-contain" />
+    <div class="bg-dark max-h-[calc(50svh-40px)] overflow-hidden rounded-lg flex items-center justify-center">
+      <img src="${props.thumbnailUrl || props.imageUrl}"
+           data-src="${props.imageUrl}"
+           onload="if(!this.dataset.preloading && this.src !== this.dataset.src) { this.dataset.preloading = 'true'; const img = new Image(); img.onload = () => { this.src = img.src; }; img.src = this.dataset.src; }"
+           ${props.width ? `width="${props.width}"` : ''}
+           ${props.height ? `height="${props.height}"` : ''}
+           style="${props.width && props.height ? `aspect-ratio: ${props.width}/${props.height};` : ''}"
+           class="bg-dark overflow-hidden max-h-[calc(50svh-40px)] rounded-lg object-contain" />
+    </div>
     <div class="text-p font-handwriting flex w-0 min-w-full flex-col items-center justify-center p-3 text-center align-middle text-gray-700 dark:text-zinc-700">
       <p class="line-clamp-3 w-full whitespace-normal leading-tight">${props.caption || '&nbsp;'}</p>
     </div>

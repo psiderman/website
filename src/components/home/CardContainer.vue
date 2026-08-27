@@ -12,7 +12,7 @@
     >
       <img
         v-if="img"
-        :src="img"
+        v-lazy="img"
         :alt="title"
         class="pointer-events-none h-3/5 w-auto"
         width="160"

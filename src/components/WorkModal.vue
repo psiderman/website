@@ -33,7 +33,7 @@
                 >
                   <div class="flex flex-row gap-2 text-left">
                     <img
-                      :src="getWorkLogoUrl(work.orgId)"
+                      v-lazy="getWorkLogoUrl(work.orgId)"
                       class="rounded-special dark:border-border-primary size-10 border border-transparent"
                       width="128"
                       height="128"
@@ -79,8 +79,8 @@
                       v-for="(img, idx) in work.data?.galleryImages"
                       :key="idx"
                       ref="imageRefs"
+                      v-lazy="getWorkImageUrl(work.orgId, img.src)"
                       draggable="false"
-                      :src="getWorkImageUrl(work.orgId, img.src)"
                       class="image-polaroid absolute inset-0 m-auto object-cover select-none"
                       :class="img.landscape ? 'h-60 w-80' : 'h-80 w-60'"
                       :height="img.landscape ? 240 : 320"
@@ -147,7 +147,7 @@
                         :target="person.linkedin ? '_blank' : undefined"
                       >
                         <img
-                          :src="getWorkPersonUrl(work.orgId, person.imageName)"
+                          v-lazy="getWorkPersonUrl(work.orgId, person.imageName)"
                           class="border-border-primary size-10 rounded-full border object-cover outline-0 transition-transform hover:scale-110"
                           height="128"
                           width="128"
