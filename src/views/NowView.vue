@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
-    <div class="flex flex-col px-20">
+    <div class="desktop:px-20 flex flex-col px-4">
       <div class="flex flex-col gap-20 pt-10">
         <!-- <div class="text-ui flex flex-row items-center justify-start gap-2">
           <router-link to="/" class="breadcrumb main">home</router-link>
@@ -32,22 +32,26 @@
 
           <div
             v-if="images && images.length > 0"
-            class="mx-auto grid min-w-full grow gap-4"
-            :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
+            class="noscrollbar desktop:mx-0 desktop:w-full desktop:overflow-visible desktop:px-0 -mx-4 flex w-[calc(100%+2rem)] overflow-x-auto px-4"
           >
             <div
-              v-for="(img, idx) in images"
-              :key="img.name"
-              class="bg-dark aspect-3/5 h-full w-full cursor-pointer rounded-xl object-cover transition-opacity hover:opacity-95"
-              @click="triggerLightbox(idx)"
+              class="desktop:grid desktop:w-full desktop:min-w-full desktop:mx-0 mx-auto flex w-fit gap-4"
+              :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
             >
-              <img
-                v-lazy="img.url"
-                class="aspect-3/5 h-full w-full rounded-xl object-cover"
-                :alt="img.name"
-                width="300"
-                height="500"
-              />
+              <div
+                v-for="(img, idx) in images"
+                :key="img.name"
+                class="bg-dark desktop:h-full desktop:w-full desktop:shrink aspect-3/5 h-72 w-auto shrink-0 cursor-pointer rounded-xl object-cover transition-opacity hover:opacity-95"
+                @click="triggerLightbox(idx)"
+              >
+                <img
+                  v-lazy="img.url"
+                  class="aspect-3/5 h-full w-full rounded-xl object-cover"
+                  :alt="img.name"
+                  width="300"
+                  height="500"
+                />
+              </div>
             </div>
           </div>
 
