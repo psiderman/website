@@ -23,6 +23,7 @@ export interface TravelImage {
   width: null | number
 }
 
+
 // Matches the public.trips table (snake_case from Supabase → camelCase here)
 export interface Trip {
   clearance: ClearanceLevel
@@ -38,6 +39,10 @@ export interface Trip {
 
 export interface TripWithImages extends Trip {
   images: TravelImage[]
+}
+
+export function isHighClearance(level?: ClearanceLevel | null): boolean {
+  return !!level && ['admin', 'close', 'friends'].includes(level)
 }
 
 export function useTravel(slug: Ref<null | string> | Ref<string> | string) {

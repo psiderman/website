@@ -10,17 +10,19 @@
     }"
     class="border-light flex size-6 cursor-default items-center justify-center rounded-full border-3"
     :class="
-      clearance && clearance === 'close'
+      isHighClearance(clearance)
         ? 'bg-green-500 outline-8 outline-green-500/35'
         : 'bg-red-500 outline-8 outline-red-500/25 dark:bg-red-700 dark:outline-red-500/35'
     "
   >
-    <Star v-if="clearance && clearance === 'close'" :size="14" fill="#fff" stroke-width="0" />
+    <Star v-if="isHighClearance(clearance)" :size="14" fill="#fff" stroke-width="0" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { Star } from '@lucide/vue'
+
+import { isHighClearance } from '@/composables/useTravel'
 
 import type { ClearanceLevel } from '@/composables/useTravel'
 

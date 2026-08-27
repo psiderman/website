@@ -83,6 +83,18 @@
                       <p class="text-ui text-text-secondary">{{ travel.subtitle }}</p>
                     </div>
                     <div class="-mt-2 -mr-2 flex flex-row">
+                      <!-- Close Friends -->
+                      <div
+                        v-if="isHighClearance(travel.clearance)"
+                        v-tooltip="{ content: 'you’re on “the list”' }"
+                        class="flex size-10 shrink-0 items-center justify-center"
+                      >
+                        <div
+                          class="flex size-5 items-center justify-center rounded-full bg-green-500"
+                        >
+                          <Star :size="12" fill="#fff" stroke-width="0" />
+                        </div>
+                      </div>
                       <!-- Repeat status button -->
                       <div
                         v-if="travel.repeatVisit"
@@ -186,15 +198,15 @@
 </template>
 
 <script setup lang="ts">
-import { Pin, Repeat, RepeatOff } from '@lucide/vue'
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { Pin, Repeat, RepeatOff, Star } from '@lucide/vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import GenericLoader from '@/components/GenericLoader.vue'
 import TravelMap from '@/components/TravelMap.vue'
 import { currentUser } from '@/composables/useAuth'
 import { isAuthModalOpen } from '@/composables/useAuth'
 import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
-import { useTravelsWithImages } from '@/composables/useTravel'
+import { isHighClearance, useTravelsWithImages } from '@/composables/useTravel'
 import { getStorageUrl } from '@/supabase'
 import { openLink } from '@/utils'
 
@@ -207,6 +219,7 @@ const previewUrl = computed(() => {
 
 // Map to hold references to the DOM elements of the travel cards
 const cardRefs = ref<Record<string, HTMLElement>>({})
+const intersectingElements = new Set<Element>()
 let observer: IntersectionObserver | null = null
 let debounceTimer: null | number = null
 
@@ -287,6 +300,7 @@ function setupIntersectionObserver() {
     observer.disconnect()
     observer = null
   }
+  intersectingElements.clear()
 
   const scrollContainer = document.querySelector('#card-list-scroll-container')
   if (!scrollContainer) return
@@ -296,6 +310,16 @@ function setupIntersectionObserver() {
   observer = new IntersectionObserver(
     (entries) => {
       const isDesktop = window.matchMedia('(min-width: 1280px)').matches
+
+      // Update our set of currently intersecting elements
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          intersectingElements.add(entry.target)
+        } else {
+          intersectingElements.delete(entry.target)
+        }
+      })
+
       // Zoom out to whole only if scrolled all the way back to the start
       if (scrollContainer && scrollContainer.scrollTop === 0 && scrollContainer.scrollLeft === 0) {
         if (debounceTimer) {
@@ -307,34 +331,44 @@ function setupIntersectionObserver() {
 
       if (!currentUser.value?.id) return
 
-      const visibleEntries = entries.filter((e) => e.isIntersecting)
-      if (visibleEntries.length > 0) {
-        // Find the one closest to the center
-        const getCenterDist = (rect: DOMRect) => {
+      if (intersectingElements.size > 0) {
+        const containerRect = scrollContainer.getBoundingClientRect()
+
+        const getSnapDist = (rect: DOMRect) => {
           if (isDesktop) {
-            const viewportCenter = window.innerHeight / 2
-            const rectCenter = rect.top + rect.height / 2
-            return Math.abs(viewportCenter - rectCenter)
+            // Desktop snaps to top (with scroll margin)
+            const targetTop = containerRect.top + 56
+            return Math.abs(rect.top - targetTop)
           } else {
-            const viewportCenter = window.innerWidth / 2
+            // Mobile snaps to center
+            const targetCenter = containerRect.left + containerRect.width / 2
             const rectCenter = rect.left + rect.width / 2
-            return Math.abs(viewportCenter - rectCenter)
+            return Math.abs(rectCenter - targetCenter)
           }
         }
 
-        const target = visibleEntries.reduce((prev, curr) => {
-          return getCenterDist(curr.boundingClientRect) < getCenterDist(prev.boundingClientRect)
-            ? curr
-            : prev
-        })
-        const slug = target.target.getAttribute('data-sync')
-        if (slug) {
-          if (debounceTimer) {
-            clearTimeout(debounceTimer)
+        let bestElement: Element | null = null
+        let minDistance = Infinity
+
+        intersectingElements.forEach((el) => {
+          const rect = el.getBoundingClientRect()
+          const dist = getSnapDist(rect)
+          if (dist < minDistance) {
+            minDistance = dist
+            bestElement = el
           }
-          debounceTimer = window.setTimeout(() => {
-            activeTripSlug.value = slug
-          }, 500)
+        })
+
+        if (bestElement) {
+          const slug = (bestElement as Element).getAttribute('data-sync')
+          if (slug) {
+            if (debounceTimer) {
+              clearTimeout(debounceTimer)
+            }
+            debounceTimer = window.setTimeout(() => {
+              activeTripSlug.value = slug
+            }, 500)
+          }
         }
       }
     },
@@ -351,9 +385,22 @@ function setupIntersectionObserver() {
   })
 }
 
+watch(
+  () => travelsWithImages.value,
+  async (newTravels) => {
+    if (newTravels && newTravels.length > 0) {
+      await nextTick()
+      setupIntersectionObserver()
+    }
+  },
+  { immediate: true },
+)
+
 onMounted(async () => {
   await nextTick()
-  setupIntersectionObserver()
+  if (travelsWithImages.value && travelsWithImages.value.length > 0) {
+    setupIntersectionObserver()
+  }
 })
 
 onUnmounted(() => {

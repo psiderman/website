@@ -66,7 +66,7 @@
                           i
                         </div>
                         <div
-                          v-if="item.clearance && item.clearance === 'close'"
+                          v-if="isHighClearance(item.clearance)"
                           v-tooltip="{ content: 'you’re on “the list”' }"
                           class="border-light flex size-8 items-center justify-center rounded-full border-3 bg-green-500 shadow-md"
                         >
@@ -161,6 +161,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, Star } from '@lucide/vue'
 import { computed, ref } from 'vue'
 
 import CarouselIndicator from '@/components/CarouselIndicator.vue'
+import { isHighClearance } from '@/composables/useTravel'
 
 import type { ClearanceLevel } from '@/composables/useTravel'
 
