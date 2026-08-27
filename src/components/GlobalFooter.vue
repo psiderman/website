@@ -53,32 +53,25 @@
 
     <!-- Nothing to see -->
     <div
+      ref="thwipContainer"
       class="text-mono text-text-tertiary border-light/15 relative z-0 -mt-20 flex h-80 max-h-80 w-full items-end justify-center overflow-hidden border-t pb-10"
     >
-      <p
-        class="z-20 bg-gray-950 transition-all duration-500 dark:bg-zinc-950"
-        :class="showThwip ? 'translate-y-0 opacity-100 delay-500' : 'translate-y-1 opacity-0'"
-      >
-        {{ randomQuip }}
-      </p>
-
-      <img
-        src="@/assets/svg/thwip.svg"
-        width="80"
-        height="320"
-        alt="thwip"
-        class="absolute bottom-0 z-10 h-full w-auto transition-all ease-out"
-        :class="[
-          showThwip
-            ? 'translate-y-0 scale-100 delay-500 duration-500'
-            : 'duration-100ms translate-y-full scale-0',
-        ]"
+      <WebStrand
+        :active="showThwip"
+        :width="160"
+        :height="322"
+        :duration="TIMING.webDuration"
+        :frame4-delay="TIMING.webHoldDelay"
+        stroke-color="#94A3B8"
+        :stroke-width="2"
+        class="pointer-events-none absolute bottom-0 z-10 h-full w-auto transition-opacity duration-300"
+        :class="showThwip ? 'opacity-100' : 'opacity-0'"
       />
+
       <div
-        class="text-h1 text-surface-primary absolute bottom-0 z-0 -mb-2 ml-1 transition-transform ease-out"
-        :class="[
-          showThwip ? 'translate-y-0 delay-500 duration-500' : 'translate-y-full duration-100',
-        ]"
+        ref="handEl"
+        class="text-h1 text-light pointer-events-none absolute bottom-0 -z-20 -mb-1 ml-1 select-none"
+        style="transform: translateY(100%)"
       >
         🤟
       </div>
@@ -87,24 +80,118 @@
 </template>
 
 <script setup lang="ts">
+import { animate } from 'animejs'
 import { onMounted, onUnmounted, ref } from 'vue'
 
+import WebStrand from '@/components/WebStrand.vue'
 import { openLink } from '@/utils'
+
+// ==========================================
+// TIMING CONFIGURATION (edit values here)
+// ==========================================
+const TIMING = {
+  // 4. Page Scroll Bounce-back
+  bounceDelay: 2000, // Delay from trigger until footer pulls/bounces page back up
+  bounceDuration: 350, // Duration of the page scroll snap-back
+
+  // 2. Hand (🤟) emoji
+  handEnterDuration: 500, // Time for hand to pop up
+  handExitDuration: 350, // Time for hand to retreat
+
+  // 3. Quip pill throw
+  quipFadeDuration: 3000, // Quip opacity fadeout duration
+  quipFlyDurationMax: 1500, // Slowest throw duration
+  quipFlyDurationMin: 1000, // Fastest throw duration
+
+  // 1. Web strand animation
+  webDuration: 2000, // Total morph duration (75% upward to top, 25% pull down)
+  webHoldDelay: 200, // Hold delay at apex (between frame 4 & 5)
+}
 
 const commit = __COMMIT_HASH__
 const logoContainer = ref<HTMLElement | null>(null)
+const thwipContainer = ref<HTMLElement | null>(null)
+const handEl = ref<HTMLElement | null>(null)
 const showThwip = ref(false)
 
-const quips = ['thwip', 'go web go', 'fly', 'shazam', 'up up and away web', 'web... stop...', '']
+const quips = ['thwip', 'go web go', 'fly', 'shazam', 'up up and away web', 'web... stop...']
+let lastQuip = ''
 
-const randomQuip = ref('')
+const random = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
 
 const getRandomQuip = () => {
-  const availableQuips = quips.filter((q) => q !== randomQuip.value)
-  return availableQuips[Math.floor(Math.random() * availableQuips.length)]
+  const availableQuips = quips.filter((q) => q !== lastQuip)
+  const selected = availableQuips[Math.floor(Math.random() * availableQuips.length)]
+  lastQuip = selected
+  return selected
 }
 
-randomQuip.value = getRandomQuip()
+function dismissThwipAnimation() {
+  if (handEl.value) {
+    animate(handEl.value, {
+      duration: TIMING.handExitDuration,
+      ease: 'inQuad',
+      translateY: '100%',
+    })
+  }
+}
+
+function spawnQuipThrow() {
+  if (!thwipContainer.value) return
+
+  const direction = random(0, 1) // 1 = right, 0 = left
+  const plusminus = direction ? '+' : '-'
+  const tailClass = direction ? 'speech-bubble-left' : 'speech-bubble-right'
+
+  const quipMessage = document.createElement('span')
+  quipMessage.textContent = getRandomQuip()
+  quipMessage.ariaLive = 'polite'
+  quipMessage.className = `speech-bubble ${tailClass} rounded-full bg-light px-2.5 py-0.5 text-ui-small font-medium text-gray-950 z-30 pointer-events-none absolute shadow-md whitespace-nowrap`
+
+  thwipContainer.value.appendChild(quipMessage)
+
+  const containerRect = thwipContainer.value.getBoundingClientRect()
+  const startX = containerRect.width / 2 - quipMessage.offsetWidth / 2
+  const startY = containerRect.height - 48
+
+  quipMessage.style.position = 'absolute'
+  quipMessage.style.left = `${startX}px`
+  quipMessage.style.top = `${startY}px`
+
+  const flingYLength = random(30, 60)
+  const flingXLength = random(15, 55)
+  const rotation = random(10, 20) * (flingXLength / 55)
+
+  animate(quipMessage, {
+    duration: random(TIMING.quipFlyDurationMin, TIMING.quipFlyDurationMax),
+    ease: 'out(2)',
+    onComplete: () => {
+      if (quipMessage.parentNode === thwipContainer.value) {
+        thwipContainer.value?.removeChild(quipMessage)
+      }
+    },
+    opacity: [
+      { duration: 200, to: 1 },
+      { duration: TIMING.quipFadeDuration, ease: 'inOut(2)', to: 0 },
+    ],
+    rotate: `${plusminus}${rotation}deg`,
+    x: `${plusminus}=${flingXLength}px`,
+    y: `-=${flingYLength}px`,
+  })
+}
+
+function triggerThwipAnimation() {
+  if (handEl.value) {
+    animate(handEl.value, {
+      duration: TIMING.handEnterDuration,
+      ease: 'outBack(1.5)',
+      translateY: ['100%', '0%'],
+    })
+  }
+
+  // Fling quip from hand as web launches
+  spawnQuipThrow()
+}
 
 let isSnapping = false
 let userCanScrollPast = false
@@ -129,7 +216,7 @@ const bounceBack = (targetY: number) => {
   isSnapping = true
   const startY = window.scrollY
   const distance = targetY - startY
-  const duration = 300 // how quickly to pull back
+  const duration = TIMING.bounceDuration
   const startTime = performance.now()
 
   const animate = (currentTime: number) => {
@@ -146,6 +233,7 @@ const bounceBack = (targetY: number) => {
       isSnapping = false
       userCanScrollPast = false
       showThwip.value = false
+      dismissThwipAnimation()
     }
   }
 
@@ -156,22 +244,28 @@ const handleScroll = () => {
   if (!logoContainer.value || isSnapping) return
 
   const currentScrollY = window.scrollY
+  const maxScrollTop = document.documentElement.scrollHeight - window.innerHeight
   const logoRect = logoContainer.value.getBoundingClientRect()
   const logoBottomOffset = logoRect.bottom + window.scrollY
   const logoBoundaryScrollTop = Math.max(0, logoBottomOffset - window.innerHeight)
 
-  if (currentScrollY > logoBoundaryScrollTop + 1) {
+  // Trigger ONLY when user scrolls to bottom (within 15px of max scroll)
+  if (currentScrollY >= maxScrollTop - 15) {
     if (!showThwip.value) {
-      randomQuip.value = getRandomQuip()
+      showThwip.value = true
+      triggerThwipAnimation()
+      if (scrollTimeout) clearTimeout(scrollTimeout)
+      scrollTimeout = window.setTimeout(() => {
+        bounceBack(logoBoundaryScrollTop)
+      }, TIMING.bounceDelay)
     }
-    showThwip.value = true
-    if (scrollTimeout) clearTimeout(scrollTimeout)
-    scrollTimeout = window.setTimeout(() => {
-      bounceBack(logoBoundaryScrollTop)
-    }, 1500) // when to pull back
   } else {
+    // If scrolled back up before bottom
     if (currentScrollY < logoBoundaryScrollTop - 10) {
-      showThwip.value = false
+      if (showThwip.value) {
+        showThwip.value = false
+        dismissThwipAnimation()
+      }
       if (scrollTimeout) {
         clearTimeout(scrollTimeout)
         scrollTimeout = null
@@ -204,7 +298,9 @@ const handleWheel = (e: WheelEvent) => {
 }
 
 const handleTouchStart = (e: TouchEvent) => {
-  cancelBounce()
+  if (isSnapping) {
+    cancelBounce()
+  }
   if (e.touches.length > 0) {
     touchStartY = e.touches[0].clientY
 
@@ -251,3 +347,28 @@ onUnmounted(() => {
   cancelBounce()
 })
 </script>
+
+<style>
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  top: 95%;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+/* Flinging right -> tail on left pointing back toward hand */
+.speech-bubble-left::before {
+  left: 20%;
+  border-width: 6px 6px 0 1px;
+  border-color: var(--color-light, #ffffff) transparent transparent transparent;
+}
+
+/* Flinging left -> tail on right pointing back toward hand */
+.speech-bubble-right::before {
+  right: 20%;
+  border-width: 6px 1px 0 6px;
+  border-color: var(--color-light, #ffffff) transparent transparent transparent;
+}
+</style>
