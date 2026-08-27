@@ -1,10 +1,21 @@
 <template>
-  <div v-if="hasOtherUsersOnRoom" class="avatar-stack flex flex-row items-center gap-0">
+  <div class="avatar-stack flex flex-row items-center gap-0">
+    <div
+      v-if="!global.allowMultiplayer.value && !hasOtherUsersOnRoom"
+      v-tooltip="{
+        content: 'Wilson',
+        group: 'header-avatars',
+        placement: 'bottom',
+      }"
+      class="avatar outline-background relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-200 outline-4 dark:bg-zinc-200"
+    >
+      <img src="@/assets/svg/wilson.svg" class="z-10 size-9" />
+    </div>
     <div
       v-for="user in sortedPresenceUsers.slice(0, 5)"
       :key="user.id"
       v-tooltip="{
-        content: (user.name || 'Anonymous') + (user.id === activeUserId ? ' (You)' : ''),
+        content: getTooltipContent(user),
         group: 'header-avatars',
         placement: 'bottom',
       }"
@@ -23,11 +34,12 @@
           width="160"
           height="160"
         />
-        <span v-else>
-          {{ user.name ? user.name.charAt(0).toUpperCase() : 'A' }}
+        <span v-else class="text-sm font-semibold">
+          {{ getInitial(user.name) }}
         </span>
       </div>
     </div>
+
     <span
       v-if="sortedPresenceUsers.length > 5"
       class="text-text-secondary ml-2 text-sm whitespace-nowrap"
@@ -38,12 +50,29 @@
 </template>
 
 <script setup lang="ts">
+import { global } from '@/composables/useGlobal'
+
 import {
   activeRoomName,
   activeUserId,
   hasOtherUsersOnRoom,
   sortedPresenceUsers,
 } from '../composables/useLive'
+
+const getTooltipContent = (user: { id: string; name?: string }) => {
+  if (user.id === activeUserId.value) {
+    return `You (${user.name})`
+  }
+  return user.name || 'Anonymous'
+}
+
+const getInitial = (name?: string) => {
+  if (!name) return '?'
+  if (name.startsWith('Anonymous ')) {
+    return name.slice(10).charAt(0).toUpperCase()
+  }
+  return name.charAt(0).toUpperCase()
+}
 </script>
 
 <style scoped>
