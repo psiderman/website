@@ -1,7 +1,7 @@
 <template>
   <header
     data-sync="header"
-    class="bg-background desktop:sticky top-0 z-50 flex w-screen flex-row items-center justify-center backdrop-blur-xs"
+    class="bg-background z-50 flex w-screen flex-row items-center justify-center backdrop-blur-xs"
   >
     <div
       class="max-w-container desktop:px-10 flex w-full flex-row items-center justify-between px-4 py-5"

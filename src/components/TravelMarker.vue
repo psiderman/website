@@ -7,6 +7,7 @@
       theme: 'tippy-map',
       offset: [0, 0],
       interactive: true,
+      onMount: onTooltipMount,
     }"
     class="border-light flex size-4 cursor-default items-center justify-center rounded-full border-2"
     :class="
@@ -22,9 +23,11 @@
 <script setup lang="ts">
 import { Star } from '@lucide/vue'
 
+import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
 import { isHighClearance } from '@/composables/useTravel'
 
-import type { ClearanceLevel } from '@/composables/useTravel'
+import type { ClearanceLevel, TravelImage, Trip } from '@/composables/useTravel'
+import type { Instance } from 'tippy.js'
 
 interface Props {
   caption?: null | string
@@ -32,9 +35,41 @@ interface Props {
   height?: null | number
   imageUrl: string
   thumbnailUrl?: string
+  travel?: Trip & { images: TravelImage[] }
   width?: null | number
 }
 const props = defineProps<Props>()
+
+function onTooltipMount(instance: Instance) {
+  instance.popper.querySelector('img')?.addEventListener('click', () => {
+    instance.hide()
+    openLightbox()
+  })
+}
+
+function openLightbox() {
+  const images = props.travel?.images ?? [
+    {
+      caption: props.caption,
+      clearance: props.clearance || 'public',
+      height: props.height,
+      id: props.imageUrl,
+      thumbnailUrl: props.thumbnailUrl || props.imageUrl,
+      url: props.imageUrl,
+      width: props.width,
+    },
+  ]
+  const idx = images.findIndex((img) => img.url === props.imageUrl)
+  const startIdx = Math.max(0, idx)
+  const orderedImages = [...images.slice(startIdx), ...images.slice(0, startIdx)]
+
+  lightBoxData.value = {
+    description: props.travel?.subtitle || '',
+    images: orderedImages,
+    title: props.travel?.title || props.caption || '',
+  }
+  isLightBoxOpen.value = true
+}
 
 const tooltipContent = `
   <div class="bg-light border-light outline-dark/10 rounded-special flex w-fit flex-col items-center border-4 shadow-xl outline">
