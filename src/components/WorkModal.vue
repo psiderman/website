@@ -13,8 +13,15 @@
         <div class="bg-overlay fixed inset-0 backdrop-blur-xs" />
       </TransitionChild>
 
-      <div class="fixed inset-0 overflow-y-auto">
-        <div class="flex min-h-full items-start justify-center p-10 text-center">
+      <div
+        ref="scrollContainerRef"
+        class="fixed inset-0 overflow-y-auto"
+        @touchstart.passive="onTouchStart"
+        @touchmove="onTouchMove"
+        @touchend="onTouchEnd"
+        @touchcancel="onTouchEnd"
+      >
+        <div class="desktop:p-10 flex min-h-full items-start justify-center p-0 pt-8 text-center">
           <TransitionChild
             as="template"
             enter="duration-300 ease-out"
@@ -26,11 +33,22 @@
           >
             <DialogPanel
               class="bg-surface-primary border-border-primary relative flex h-fit w-180 flex-col items-center justify-center gap-0 overflow-hidden rounded-xl border"
+              :style="
+                translateY > 0
+                  ? {
+                      transform: `translateY(${translateY}px)`,
+                      transition: isDraggingDown ? 'none' : 'transform 0.2s ease-out',
+                    }
+                  : undefined
+              "
             >
               <template v-if="work">
                 <div
-                  class="bg-background border-border-primary flex h-20 w-full flex-row items-center justify-between border-b px-6 py-5"
+                  class="bg-background border-border-primary relative flex h-20 w-full flex-row items-center justify-between border-b px-6 py-5"
                 >
+                  <div
+                    class="desktop:hidden bg-border-primary/80 absolute top-2 left-1/2 h-1 w-10 -translate-x-1/2 rounded-full"
+                  />
                   <div class="flex flex-row gap-2 text-left">
                     <img
                       v-lazy="getWorkLogoUrl(work.orgId)"
@@ -45,9 +63,19 @@
                       </p>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    aria-label="Close modal"
+                    class="hover:bg-surface-secondary text-text-secondary hover:text-text-primary flex size-9 cursor-pointer items-center justify-center rounded-full transition-colors"
+                    @click="closeModal"
+                  >
+                    <X :size="20" />
+                  </button>
                 </div>
 
-                <div class="border-border-primary flex w-full flex-row gap-10 border-b p-10">
+                <div
+                  class="border-border-primary desktop:flex-row flex w-full flex-col gap-10 border-b p-10 items-center"
+                >
                   <div
                     class="bg-surface-secondary border-border-primary relative z-0 h-90 w-72 shrink-0 overflow-hidden rounded-lg border"
                   >
@@ -99,11 +127,11 @@
 
                 <div
                   v-if="sortedPeople.length > 0 || work.data?.projects"
-                  class="border-border-primary flex w-full flex-row gap-6 border-b p-10 text-left"
+                  class="border-border-primary desktop:flex-row desktop:gap-6 desktop:p-10 flex w-full flex-col border-b text-left"
                 >
                   <div
                     v-if="work.data?.projects"
-                    class="text-text-primary text-ui flex w-full flex-col gap-2"
+                    class="text-text-primary text-ui border-border-primary desktop:p-0 desktop:border-b-0 desktop:border-transparent flex w-full flex-col gap-2 border-b p-10"
                   >
                     <p class="text-ui-small text-text-tertiary tracking-wider uppercase">
                       Projects I worked on
@@ -128,9 +156,11 @@
 
                   <div
                     v-if="sortedPeople.length > 0"
-                    class="text-text-primary text-ui-small flex w-full flex-col gap-2"
+                    class="text-text-primary text-ui border-border-primary desktop:p-0 desktop:border-b-0 desktop:border-transparent flex w-full flex-col gap-2 border-b p-10"
                   >
-                    <p class="text-text-tertiary tracking-wider uppercase">People I worked with</p>
+                    <p class="text-text-tertiary text-ui-small tracking-wider uppercase">
+                      People I worked with
+                    </p>
                     <div class="flex flex-row flex-wrap gap-1">
                       <component
                         :is="person.linkedin ? 'a' : 'div'"
@@ -159,7 +189,7 @@
 
                 <div
                   v-if="work.data?.companyInfo"
-                  class="bg-background text-text-secondary flex w-full flex-row items-center justify-between p-10"
+                  class="bg-background text-text-secondary desktop:flex-row desktop:items-center desktop:gap-0 flex w-full flex-col items-start justify-between gap-8 p-10"
                 >
                   <div class="text-ui-small flex flex-col text-left">
                     <p>{{ work.data.companyInfo.legalName }}</p>
@@ -185,7 +215,7 @@
 
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ArrowUpRight, Undo } from '@lucide/vue'
+import { ArrowUpRight, Undo, X } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query'
 import { animate, createDraggable, type Draggable } from 'animejs'
 import { format } from 'date-fns'
@@ -206,6 +236,69 @@ const emit = defineEmits<{
 
 const closeModal = () => {
   emit('update:isOpen', false)
+}
+
+const scrollContainerRef = ref<HTMLElement | null>(null)
+const translateY = ref(0)
+const isDraggingDown = ref(false)
+const touchStartY = ref(0)
+const touchStartX = ref(0)
+const isTouching = ref(false)
+
+const onTouchStart = (e: TouchEvent) => {
+  if (e.touches.length !== 1) return
+  const target = e.target as HTMLElement
+  if (target.closest('.image-polaroid') || target.closest('button') || target.closest('a')) return
+
+  const container = scrollContainerRef.value
+  const atTop = !container || container.scrollTop <= 0
+
+  if (atTop) {
+    touchStartY.value = e.touches[0].clientY
+    touchStartX.value = e.touches[0].clientX
+    isTouching.value = true
+    isDraggingDown.value = false
+  }
+}
+
+const onTouchMove = (e: TouchEvent) => {
+  if (!isTouching.value) return
+  const currentY = e.touches[0].clientY
+  const currentX = e.touches[0].clientX
+  const deltaY = currentY - touchStartY.value
+  const deltaX = currentX - touchStartX.value
+
+  const container = scrollContainerRef.value
+  const atTop = !container || container.scrollTop <= 0
+
+  if (!isDraggingDown.value) {
+    if (atTop && deltaY > 10 && deltaY > Math.abs(deltaX) * 1.2) {
+      isDraggingDown.value = true
+    } else if (deltaY < 0 || Math.abs(deltaX) > deltaY) {
+      isTouching.value = false
+      return
+    }
+  }
+
+  if (isDraggingDown.value) {
+    if (deltaY > 0) {
+      if (e.cancelable) e.preventDefault()
+      translateY.value = Math.pow(deltaY, 0.9)
+    } else {
+      translateY.value = 0
+    }
+  }
+}
+
+const onTouchEnd = () => {
+  if (isDraggingDown.value) {
+    if (translateY.value > 80) {
+      closeModal()
+    }
+  }
+  isTouching.value = false
+  isDraggingDown.value = false
+  translateY.value = 0
 }
 
 const activeOrgId = computed(() => props.work?.orgId)
