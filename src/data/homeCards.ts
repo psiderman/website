@@ -7,14 +7,14 @@ import SpotifyCardContainer from '@/components/cards/SpotifyCardContainer.vue'
 import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 
-import type { EmojiGroupId } from '@/types'
+import type { FilterGroupId } from '@/types'
 
 export interface Card {
   arrow?: 'external' | 'help' | 'none' | 'right'
   bgClass?: string
   carousel?: boolean
   content?: Component
-  group: EmojiGroupId[]
+  group: FilterGroupId[]
   id: string
   images?: string[]
   imageUrl?: string

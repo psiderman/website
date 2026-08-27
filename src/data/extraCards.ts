@@ -1,7 +1,7 @@
 import { getStorageUrl } from '@/supabase'
 
 import type { LightBoxTag } from '@/components/LightBox.vue'
-import type { EmojiGroupId } from '@/types'
+import type { FilterGroupId } from '@/types'
 
 export interface ExtraCard {
   bgClass?: string
@@ -18,7 +18,7 @@ export interface ExtraCard {
   videos?: string[]
 }
 
-export const extraCards: Partial<Record<EmojiGroupId, ExtraCard[]>> = {
+export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
   travel: [
     {
       carousel: true,

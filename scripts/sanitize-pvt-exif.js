@@ -2,18 +2,21 @@
 /* eslint-disable no-console */
 
 /**
- * Sanitize & Chronological Rename Script
+ * Sanitize, Thumbnail Generation & Chronological Rename Script
  *
  * Scans travel folder(s) structured as <trip_slug>/[pvt/]<images>:
  * 1. Pre-validates all images against check-exif criteria (both Date Taken and GPS must exist).
  * 2. Strips extra telemetry, face recognition, MakerNotes, and thumbnails from ALL images.
- * 3. Coarsens GPS on private images (inside `pvt/`) to 2 decimal places (~1.1 km precision).
- * 4. Collects all images across <trip_slug>/ and <trip_slug>/pvt/.
- * 5. Sorts all images chronologically by Date Taken.
- * 6. Renames files sequentially (1..n) while preserving their public/pvt folder location.
+ * 3. Sorts all images (<trip_slug>/ and <trip_slug>/pvt/) chronologically by Date Taken.
+ * 4. Renames files to random 16-hex strings while preserving public/pvt folder location.
+ * 5. Generates low-resolution WebP thumbnails in thumb/<trip_slug>/[pvt/]<filename>.webp.
  *
  * Usage:
- *   node scripts/sanitize-pvt-exif.js <path-to-travel-folder-or-trip-folder>
+ *   node scripts/sanitize-pvt-exif.js <path-to-travel-folder-or-trip-folder> [options]
+ *
+ * Options:
+ *   --quality, -q <num>   Thumbnail WebP quality 1-100 (default: 70)
+ *   --help, -h            Show this help message
  */
 
 import { execFileSync, spawnSync } from 'child_process'
@@ -26,16 +29,20 @@ import ExifReader from 'exifreader'
 const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.heic', '.webp', '.tiff']
 
 function checkDependencies() {
+  const missing = []
   const checkCmd = (cmd) => {
     const res = spawnSync('which', [cmd], { stdio: 'ignore' })
-    if (res.status !== 0) {
-      console.error(`❌ Error: Missing required CLI tool: ${cmd}`)
-      console.error('Install via Homebrew: brew install exiftool')
-      process.exit(1)
-    }
+    if (res.status !== 0) missing.push(cmd)
   }
 
   checkCmd('exiftool')
+  checkCmd('magick')
+
+  if (missing.length > 0) {
+    console.error(`❌ Error: Missing required CLI tool(s): ${missing.join(', ')}`)
+    console.error('Install via Homebrew: brew install exiftool imagemagick')
+    process.exit(1)
+  }
 }
 
 function findImagesRecursively(dir) {
@@ -55,6 +62,33 @@ function findImagesRecursively(dir) {
   }
 
   return results
+}
+
+function generateThumbnail(sourcePath, targetThumbPath, quality = 70) {
+  const thumbDir = path.dirname(targetThumbPath)
+  if (!fs.existsSync(thumbDir)) {
+    fs.mkdirSync(thumbDir, { recursive: true })
+  }
+
+  execFileSync(
+    'magick',
+    [
+      sourcePath,
+      '-auto-orient',
+      // Reduce to ~4% then upscale to ~400% for placeholder blur
+      '-scale',
+      '4%',
+      '-scale',
+      '400%',
+      '-strip',
+      '-colorspace',
+      'sRGB',
+      '-quality',
+      quality.toString(),
+      targetThumbPath,
+    ],
+    { stdio: 'ignore' },
+  )
 }
 
 function getDateTaken(tags) {
@@ -109,9 +143,13 @@ function inspectImage(filePath) {
   }
 }
 
-function processTrip(tripDir, tripName) {
+function processTrip(tripDir, tripName, travelRootDir, options = {}) {
+  const { noRename = false, thumbQuality = 70, thumbsOnly = false } = options
+
   console.log(`\n================================================================================`)
-  console.log(`📁 Trip: ${tripName}`)
+  console.log(
+    `📁 Trip: ${tripName} ${thumbsOnly ? '[THUMBS ONLY]' : noRename ? '[NO RENAME]' : ''}`,
+  )
   console.log(`================================================================================`)
 
   const publicFiles = []
@@ -148,29 +186,27 @@ function processTrip(tripDir, tripName) {
 
   console.log(`  Found ${publicFiles.length} public and ${pvtFiles.length} private image(s).`)
 
-  // Step 1: Strip extra metadata (and coarsen GPS for private images)
+  // Step 1: Strip extra metadata (skipped if thumbsOnly)
   const allImagePaths = [...publicFiles, ...pvtFiles]
   const imageMetaMap = new Map()
 
   for (const filePath of allImagePaths) {
-    const meta = inspectImage(filePath)
-    const isPvt = filePath.startsWith(pvtDir)
-    sanitizeAndStripImage(filePath, isPvt, meta.location)
+    if (!thumbsOnly) {
+      sanitizeAndStripImage(filePath)
+    }
 
-    // Re-inspect metadata after stripping/sanitizing
     const updatedMeta = inspectImage(filePath)
     imageMetaMap.set(filePath, {
       ...updatedMeta,
       dir: path.dirname(filePath),
       ext: path.extname(filePath),
-      isPvt,
+      isPvt: filePath.startsWith(pvtDir),
       originalName: path.basename(filePath),
     })
   }
 
-  console.log(`  ✨ Stripped bloated metadata on all ${totalFiles} image(s).`)
-  if (pvtFiles.length > 0) {
-    console.log(`  🔒 Coarsened GPS on ${pvtFiles.length} private image(s).`)
+  if (!thumbsOnly) {
+    console.log(`  ✨ Stripped bloated metadata on all ${totalFiles} image(s).`)
   }
 
   // Step 2: Sort chronologically by Date Taken
@@ -181,6 +217,22 @@ function processTrip(tripDir, tripName) {
 
   allImages.sort((a, b) => a.dateTaken.getTime() - b.dateTaken.getTime())
 
+  if (noRename || thumbsOnly) {
+    console.log('\n  Generating Thumbnails (Preserving existing filenames):')
+    console.log('  ------------------------------------------------------------------------------')
+    allImages.forEach((img) => {
+      const subFolder = img.isPvt ? path.join(tripName, 'pvt') : tripName
+      const targetThumbPath = path.join(travelRootDir, 'thumb', subFolder, img.originalName)
+      generateThumbnail(img.filePath, targetThumbPath, thumbQuality)
+
+      const folderTag = img.isPvt ? '[pvt] ' : '[pub] '
+      console.log(
+        `  ${folderTag.padEnd(6)} ${img.originalName.padEnd(30)} ➔ Thumb generated in thumb/${path.join(subFolder, img.originalName)}`,
+      )
+    })
+    return
+  }
+
   // Step 3: Two-pass rename to avoid file collisions
   for (const img of allImages) {
     const tempName = `__tmp_${crypto.randomBytes(6).toString('hex')}${img.ext}`
@@ -189,7 +241,7 @@ function processTrip(tripDir, tripName) {
     img.tempPath = tempPath
   }
 
-  console.log('\n  Chronological Renaming (Obscured UUID):')
+  console.log('\n  Chronological Renaming & Thumbnail Generation:')
   console.log('  ------------------------------------------------------------------------------')
   allImages.forEach((img) => {
     // Generate a random 16-character hex string for the filename
@@ -197,36 +249,29 @@ function processTrip(tripDir, tripName) {
     const finalPath = path.join(img.dir, obscuredName)
     fs.renameSync(img.tempPath, finalPath)
 
+    // Generate thumbnail inside <travelRootDir>/thumb/<tripName>/[pvt/]<obscuredName>
+    const subFolder = img.isPvt ? path.join(tripName, 'pvt') : tripName
+    const targetThumbPath = path.join(travelRootDir, 'thumb', subFolder, obscuredName)
+    generateThumbnail(finalPath, targetThumbPath, thumbQuality)
+
     const folderTag = img.isPvt ? '[pvt] ' : '[pub] '
     const dateStr = img.dateTaken.toISOString().replace('T', ' ').substring(0, 19)
     console.log(
-      `  ${folderTag.padEnd(6)} ${img.originalName.padEnd(25)} ➔ ${obscuredName.padEnd(20)} (${dateStr})`,
+      `  ${folderTag.padEnd(6)} ${img.originalName.padEnd(25)} ➔ ${obscuredName.padEnd(20)} (${dateStr}) [Thumb created]`,
     )
   })
 }
 
-function sanitizeAndStripImage(filePath, isPvt, location) {
+function sanitizeAndStripImage(filePath) {
   const exifArgs = [
     '-MakerNotes:all=',
     '-XMP-mwg-rs:all=',
     '-ThumbnailImage=',
     '-PreviewImage=',
     '-IFD1:all=',
+    '-overwrite_original',
+    filePath,
   ]
-
-  // Coarsen GPS if inside pvt/
-  if (isPvt && location) {
-    const roundedLat = Math.round(location.lat * 100) / 100
-    const roundedLng = Math.round(location.lng * 100) / 100
-    exifArgs.push(
-      `-GPSLatitude=${Math.abs(roundedLat)}`,
-      `-GPSLatitudeRef=${roundedLat >= 0 ? 'N' : 'S'}`,
-      `-GPSLongitude=${Math.abs(roundedLng)}`,
-      `-GPSLongitudeRef=${roundedLng >= 0 ? 'E' : 'W'}`,
-    )
-  }
-
-  exifArgs.push('-overwrite_original', filePath)
 
   try {
     execFileSync('exiftool', exifArgs, { stdio: 'ignore' })
@@ -238,16 +283,42 @@ function sanitizeAndStripImage(filePath, isPvt, location) {
 }
 
 // CLI Arg Parsing
-const targetPath = process.argv[2]
-if (!targetPath || targetPath === '--help' || targetPath === '-h') {
-  console.log('Usage: node scripts/sanitize-pvt-exif.js <path-to-travel-folder-or-trip-folder>')
+const args = process.argv.slice(2)
+let targetPath = null
+let thumbQuality = 70
+let noRename = false
+let thumbsOnly = false
+
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i]
+  if (arg === '--quality' || arg === '-q') {
+    thumbQuality = parseInt(args[++i], 10) || 70
+  } else if (arg === '--no-rename') {
+    noRename = true
+  } else if (arg === '--thumbs-only') {
+    thumbsOnly = true
+  } else if (arg === '--help' || arg === '-h') {
+    targetPath = null
+    break
+  } else if (!targetPath && !arg.startsWith('-')) {
+    targetPath = arg
+  }
+}
+
+if (!targetPath) {
+  console.log(
+    'Usage: node scripts/sanitize-pvt-exif.js <path-to-travel-folder-or-trip-folder> [options]',
+  )
   console.log('\nOptions:')
-  console.log('  1. Pre-validates all images (requires Date Taken and GPS).')
-  console.log('  2. Strips extra telemetry, face recognition, MakerNotes, and thumbnails.')
-  console.log('  3. Coarsens GPS on all <trip>/pvt/ images to 2 decimal places.')
-  console.log('  4. Sorts all images (<trip>/ + <trip>/pvt/) chronologically.')
-  console.log('  5. Renames all images sequentially (1..n) in their respective folders.')
-  process.exit(targetPath ? 0 : 1)
+  console.log(
+    '  --no-rename           Keep existing filenames; only sanitize and generate thumbnails',
+  )
+  console.log(
+    '  --thumbs-only         Generate/refresh thumbnails only (do not modify or rename originals)',
+  )
+  console.log('  --quality, -q <num>   Thumbnail WebP quality 1-100 (default: 70)')
+  console.log('  --help, -h            Show this help message')
+  process.exit(0)
 }
 
 checkDependencies()
@@ -289,11 +360,15 @@ if (invalidFiles.length > 0) {
   console.error(
     'All images must have both a valid Date Taken and GPS coordinates before running sanitize-pvt-exif.\n',
   )
-  console.log('========================================================================================================================')
+  console.log(
+    '========================================================================================================================',
+  )
   console.log(
     `${'File Path'.padEnd(70)} | ${'Date Taken (UTC)'.padEnd(25)} | ${'GPS Coordinates'.padEnd(20)} | Issue`,
   )
-  console.log('========================================================================================================================')
+  console.log(
+    '========================================================================================================================',
+  )
   invalidFiles.forEach((f) => {
     const dateStr = f.dateTaken ? f.dateTaken.toISOString() : 'MISSING'
     const gpsStr = f.location
@@ -308,7 +383,9 @@ if (invalidFiles.length > 0) {
       `${f.filePath.padEnd(70)} | ${dateStr.padEnd(25)} | ${gpsStr.padEnd(20)} | ❌ ${issue}`,
     )
   })
-  console.log('========================================================================================================================')
+  console.log(
+    '========================================================================================================================',
+  )
   console.error(`\nPlease fix the ${invalidFiles.length} file(s) above before running this script.`)
   process.exit(1)
 }
@@ -324,14 +401,18 @@ const hasDirectImages = subEntries.some((e) =>
 )
 const hasPvtSubdir = subEntries.includes('pvt')
 
+const tripOptions = { noRename, thumbQuality, thumbsOnly }
+
 if (hasDirectImages || hasPvtSubdir) {
   // Single trip folder
-  processTrip(resolvedPath, path.basename(resolvedPath))
+  const travelRootDir = path.dirname(resolvedPath)
+  processTrip(resolvedPath, path.basename(resolvedPath), travelRootDir, tripOptions)
 } else {
   // Multi-trip root directory
+  const travelRootDir = resolvedPath
   const tripDirs = subEntries.filter((e) => {
     const p = path.join(resolvedPath, e)
-    return fs.statSync(p).isDirectory() && e !== 'processed' && !e.startsWith('.')
+    return fs.statSync(p).isDirectory() && e !== 'processed' && e !== 'thumb' && !e.startsWith('.')
   })
 
   if (tripDirs.length === 0) {
@@ -341,8 +422,10 @@ if (hasDirectImages || hasPvtSubdir) {
 
   for (const tripName of tripDirs) {
     const tripDir = path.join(resolvedPath, tripName)
-    processTrip(tripDir, tripName)
+    processTrip(tripDir, tripName, travelRootDir, tripOptions)
   }
 }
 
-console.log('\n🎉 Finished sanitizing and renaming!')
+console.log(
+  `\n🎉 Finished ${thumbsOnly ? 'generating thumbnails' : noRename ? 'sanitizing and generating thumbnails' : 'sanitizing, renaming, and generating thumbnails'}!`,
+)

@@ -1,10 +1,10 @@
 import { marked } from 'marked'
 
-import type { EmojiGroupId } from '@/types'
+import type { FilterGroupId } from '@/types'
 
 export interface DescriptionContent {
   content: string[]
-  id: EmojiGroupId
+  id: FilterGroupId
   title: string
 }
 
@@ -18,7 +18,7 @@ const markdownFiles = import.meta.glob('@/data/descriptions/*.md', {
 export const descriptionContent: DescriptionContent[] = Object.entries(markdownFiles).map(
   ([path, rawContent]) => {
     // Extract ID from filename (e.g., /src/data/descriptions/personal_finance.md -> personal_finance)
-    const id = path.split('/').pop()?.replace('.md', '') as EmojiGroupId
+    const id = path.split('/').pop()?.replace('.md', '') as FilterGroupId
 
     // Simple markdown parsing
     const lines = (rawContent as string)
