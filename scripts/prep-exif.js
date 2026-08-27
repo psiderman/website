@@ -111,22 +111,7 @@ function processImage(filePath, outDir, quality, deleteOriginal) {
       { stdio: 'ignore' },
     )
 
-    // 3. Strip privacy telemetry, face coordinates, MakerNotes, and bloated embedded thumbnails
-    execFileSync(
-      'exiftool',
-      [
-        '-MakerNotes:all=',
-        '-XMP-mwg-rs:all=',
-        '-ThumbnailImage=',
-        '-PreviewImage=',
-        '-IFD1:all=',
-        '-overwrite_original',
-        targetWebpPath,
-      ],
-      { stdio: 'ignore' },
-    )
-
-    // 4. Verify resulting WebP metadata
+    // 3. Verify resulting WebP metadata
     const finalMeta = inspectFile(targetWebpPath)
 
     if (deleteOriginal && path.resolve(filePath) !== path.resolve(targetWebpPath)) {

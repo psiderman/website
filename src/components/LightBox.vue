@@ -66,7 +66,7 @@
                           i
                         </div>
                         <div
-                          v-if="item.closeFriends"
+                          v-if="item.clearance && item.clearance === 'close'"
                           v-tooltip="{ content: 'you’re on “the list”' }"
                           class="border-light flex size-8 items-center justify-center rounded-full border-3 bg-green-500 shadow-md"
                         >
@@ -160,9 +160,11 @@ import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessu
 import { ArrowLeft, ArrowRight, ArrowUpRight, Star } from '@lucide/vue'
 import { computed, ref } from 'vue'
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
 import CarouselIndicator from '@/components/CarouselIndicator.vue'
+
+import type { ClearanceLevel } from '@/composables/useTravel'
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 export interface LightBoxTag {
   link?: string
@@ -173,7 +175,7 @@ const props = defineProps<{
   description?: string
   images: {
     caption?: null | string
-    closeFriends?: boolean
+    clearance?: ClearanceLevel
     height?: null | number
     url: string
     width?: null | number
@@ -190,7 +192,7 @@ const mediaItems = computed(() => {
     items.push(
       ...props.images.map((img) => ({
         caption: img.caption,
-        closeFriends: img.closeFriends,
+        clearance: img.clearance,
         height: img.height,
         src: img.url,
         type: 'image' as const,

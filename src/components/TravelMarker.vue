@@ -10,21 +10,23 @@
     }"
     class="border-light flex size-6 cursor-default items-center justify-center rounded-full border-3"
     :class="
-      closeFriends
+      clearance && clearance === 'close'
         ? 'bg-green-500 outline-8 outline-green-500/35'
         : 'bg-red-500 outline-8 outline-red-500/25 dark:bg-red-700 dark:outline-red-500/35'
     "
   >
-    <Star v-if="closeFriends" :size="14" fill="#fff" stroke-width="0" />
+    <Star v-if="clearance && clearance === 'close'" :size="14" fill="#fff" stroke-width="0" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { Star } from '@lucide/vue'
 
+import type { ClearanceLevel } from '@/composables/useTravel'
+
 interface Props {
   caption?: null | string
-  closeFriends: boolean
+  clearance?: ClearanceLevel
   height?: null | number
   imageUrl: string
   width?: null | number

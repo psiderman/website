@@ -231,7 +231,7 @@ const handleCardClick = (card: GridCard) => {
     if (extra) {
       lightBoxData.value = {
         description: extra.description || '',
-        images: extra.images?.map((url) => ({ closeFriends: false, url })) || [],
+        images: extra.images?.map((url) => ({ clearance: 'public' as const, url })) || [],
         tags: extra.tags,
         title: extra.title || '',
         videos: extra.videos || [],

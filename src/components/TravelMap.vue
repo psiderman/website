@@ -58,7 +58,7 @@ function addMarkers() {
     const markerApp = createApp(
       h(TravelMarker, {
         caption: feature.properties.caption,
-        closeFriends: feature.properties.closeFriends,
+        clearance: feature.properties.clearance,
         height: feature.properties.height,
         imageUrl: feature.properties.imageUrl,
         width: feature.properties.width,
@@ -71,7 +71,8 @@ function addMarkers() {
 
     const marker = new mapboxgl.Marker({ element: container }).setLngLat(coords).addTo(map)
     const el = marker.getElement()
-    el.style.zIndex = feature.properties.closeFriends ? '1' : '2'
+    el.style.zIndex =
+      feature.properties.clearance && feature.properties.clearance !== 'public' ? '1' : '2'
     el.setAttribute('tabindex', '0')
     el.setAttribute('role', 'button')
     el.setAttribute('aria-label', feature.properties.caption || 'Travel location marker')
@@ -99,7 +100,7 @@ function buildGeoJSON(travels: TravelWithImages[]) {
     geometry: { coordinates: [number, number]; type: 'Point' }
     properties: {
       caption: null | string
-      closeFriends: boolean
+      clearance: TravelImage['clearance']
       height: null | number
       imageUrl: string
       slug: string
@@ -116,12 +117,12 @@ function buildGeoJSON(travels: TravelWithImages[]) {
         geometry: { coordinates: [img.location.lng, img.location.lat], type: 'Point' },
         properties: {
           caption: img.caption,
-          closeFriends: img.closeFriends,
+          clearance: img.clearance,
           height: img.height,
           imageUrl: img.url,
           slug: travel.slug,
           travelImages: JSON.stringify(
-            travel.images.map((i) => ({ closeFriends: i.closeFriends, url: i.url })),
+            travel.images.map((i) => ({ clearance: i.clearance, url: i.url })),
           ),
           width: img.width,
         },

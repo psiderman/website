@@ -4,9 +4,11 @@ import { computed, type Ref } from 'vue'
 
 import { supabase } from '@/supabase'
 
+export type ClearanceLevel = 'admin' | 'auth' | 'close' | 'friends' | 'known' | 'public'
+
 export interface TravelImage {
   caption: null | string
-  closeFriends: boolean
+  clearance: ClearanceLevel
   dateTaken: Date | null
   height: null | number
   id: string
@@ -16,13 +18,14 @@ export interface TravelImage {
   }
   name: string
   storagePath: string
+  thumbnailUrl: string
   url: string
   width: null | number
 }
 
 // Matches the public.trips table (snake_case from Supabase → camelCase here)
 export interface Trip {
-  closeFriends: boolean
+  clearance: ClearanceLevel
   date: Date
   description: string[]
   instagramLink: null | string
@@ -57,7 +60,7 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
       // Ensure session is fresh (refreshes token if expired, or clears it for anon request)
       await supabase.auth.getSession()
 
-      // 1. Fetch images from public.trip_images (RLS handles close_friends visibility)
+      // 1. Fetch images from public.trip_images (RLS handles clearance visibility)
       const { data: dbImages, error: dbError } = await supabase
         .from('trip_images')
         .select('*')
@@ -68,20 +71,26 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
       if (dbError) throw dbError
       if (!dbImages || dbImages.length === 0) return []
 
-      // 2. Create signed URLs in batch
-      const paths = dbImages.map((img) => img.storage_path as string)
+      // 2. Create signed URLs in batch (originals + thumbnails)
+      const fullPaths = dbImages.map((img) => img.storage_path as string)
+      const thumbPaths = dbImages.map((img) => `thumb/${img.storage_path}`)
+      const allPaths = [...fullPaths, ...thumbPaths]
+
       const { data: signedUrls, error: signError } = await supabase.storage
         .from('travel')
-        .createSignedUrls(paths, 60 * 60)
+        .createSignedUrls(allPaths, 60 * 60)
 
       if (signError) throw signError
 
       return dbImages.map((img) => {
-        const match = signedUrls.find((urlObj) => urlObj.path === img.storage_path)
+        const fullMatch = signedUrls.find((urlObj) => urlObj.path === img.storage_path)
+        const thumbMatch = signedUrls.find((urlObj) => urlObj.path === `thumb/${img.storage_path}`)
         const name = (img.storage_path as string).split('/').pop() || img.storage_path
+        const url = fullMatch?.signedUrl || ''
+        const thumbnailUrl = thumbMatch?.signedUrl || url
         return {
           caption: (img.caption as null | string) ?? null,
-          closeFriends: img.close_friends as boolean,
+          clearance: (img.clearance as ClearanceLevel) || 'public',
           dateTaken: img.date_taken ? new Date(img.date_taken as string) : null,
           height: (img.height as null | number) ?? null,
           id: img.id as string,
@@ -91,7 +100,8 @@ export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
           },
           name,
           storagePath: img.storage_path as string,
-          url: match?.signedUrl || '',
+          thumbnailUrl,
+          url,
           width: (img.width as null | number) ?? null,
         }
       })
@@ -120,7 +130,7 @@ export function useTravelsWithImages() {
       // Ensure session is fresh (refreshes token if expired, or clears it for anon request)
       await supabase.auth.getSession()
 
-      // 1. Fetch trips joined with trip_images (RLS filters close_friends automatically)
+      // 1. Fetch trips joined with trip_images (RLS filters clearance automatically)
       const { data: tripsData, error: tripsError } = await supabase
         .from('trips')
         .select('*, trip_images(*)')
@@ -129,13 +139,14 @@ export function useTravelsWithImages() {
       if (tripsError) throw tripsError
       if (!tripsData) return []
 
-      // 2. Gather all storage paths across all trips to batch create signed URLs in ONE request
+      // 2. Gather all storage paths (both full and thumb) to batch create signed URLs in ONE request
       const allPaths: string[] = []
       for (const trip of tripsData) {
         const images = (trip.trip_images as Array<Record<string, unknown>>) || []
         for (const img of images) {
           if (img.storage_path) {
             allPaths.push(img.storage_path as string)
+            allPaths.push(`thumb/${img.storage_path}`)
           }
         }
       }
@@ -173,9 +184,11 @@ export function useTravelsWithImages() {
         const mappedImages: TravelImage[] = rawImages.map((img) => {
           const storagePath = img.storage_path as string
           const name = storagePath.split('/').pop() || storagePath
+          const url = signedUrlMap.get(storagePath) || ''
+          const thumbnailUrl = signedUrlMap.get(`thumb/${storagePath}`) || url
           return {
             caption: (img.caption as null | string) ?? null,
-            closeFriends: img.close_friends as boolean,
+            clearance: (img.clearance as ClearanceLevel) || 'public',
             dateTaken: img.date_taken ? new Date(img.date_taken as string) : null,
             height: (img.height as null | number) ?? null,
             id: img.id as string,
@@ -185,7 +198,8 @@ export function useTravelsWithImages() {
             },
             name,
             storagePath,
-            url: signedUrlMap.get(storagePath) || '',
+            thumbnailUrl,
+            url,
             width: (img.width as null | number) ?? null,
           }
         })
@@ -237,7 +251,7 @@ export function useTrips() {
 
 function rowToTrip(row: Record<string, unknown>): Trip {
   return {
-    closeFriends: row.close_friends as boolean,
+    clearance: (row.clearance as ClearanceLevel) || 'public',
     date: new Date(row.date as string),
     description: (row.description as string[]) ?? [],
     instagramLink: (row.instagram_link as null | string) ?? null,

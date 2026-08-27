@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { isAuthModalOpen } from '@/composables/useAuth'
 
 import type { LightBoxTag } from '@/components/LightBox.vue'
+import type { ClearanceLevel } from '@/composables/useTravel'
 import type { WorkDetail } from '@/data/work'
 
 const _allowMultiplayer = ref(localStorage.getItem('allowMultiplayer') !== 'false')
@@ -18,7 +19,7 @@ const allowMultiplayer = computed({
 export const isLightBoxOpen = ref(false)
 export const lightBoxData = ref<{
   description?: string
-  images: { closeFriends?: boolean; url: string }[]
+  images: { clearance?: ClearanceLevel; url: string }[]
   tags?: LightBoxTag[]
   title?: string
   videos?: string[]
