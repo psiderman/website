@@ -4,11 +4,19 @@
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
+    <!-- Loading State -->
+    <div
+      v-if="isLoading"
+      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+    >
+      <GenericLoader />
+    </div>
+
     <!-- Images Carousel -->
     <div
-      v-if="images && images.length > 0"
+      v-else-if="!isError && images && images.length > 0"
       ref="scrollContainer"
-      class="noscrollbar relative flex h-full w-full snap-y snap-mandatory flex-col overflow-x-hidden overflow-y-auto scroll-smooth"
+      class="noscrollbar desktop:flex-col desktop:snap-y desktop:overflow-x-hidden desktop:overflow-y-auto relative flex h-full w-full snap-x snap-mandatory flex-row overflow-x-auto overflow-y-hidden scroll-smooth"
       tabindex="-1"
       @touchstart="handleInteraction"
       @wheel="handleInteraction"
@@ -31,24 +39,45 @@
       </div>
     </div>
 
-    <!-- Custom Side Indicator -->
+    <!-- Empty / Error State -->
+    <div
+      v-else
+      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+    >
+      <OctagonAlert :size="24" class="text-text-tertiary" />
+      <div class="text-text-tertiary text-ui">Error fetching data</div>
+    </div>
+
+    <!-- Custom Side Indicator (Desktop) -->
     <CarouselIndicator
-      v-if="originalLength > 1"
-      class="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2"
+      v-if="!isLoading && !isError && originalLength > 1"
+      class="desktop:flex pointer-events-none absolute top-1/2 left-2 hidden -translate-y-1/2"
       :active-index="activeIndex"
       :count="originalLength"
       orientation="vertical"
+    />
+    <!-- Custom Bottom Indicator (Mobile) -->
+    <CarouselIndicator
+      v-if="!isLoading && !isError && originalLength > 1"
+      class="desktop:hidden pointer-events-none absolute bottom-2 left-1/2 flex -translate-x-1/2"
+      :active-index="activeIndex"
+      :count="originalLength"
+      orientation="horizontal"
     />
   </div>
 </template>
 
 <script setup lang="ts">
+import { OctagonAlert } from '@lucide/vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import CarouselIndicator from '../CarouselIndicator.vue'
+import GenericLoader from '../GenericLoader.vue'
 
 const props = defineProps<{
-  images: string[]
+  images?: string[]
+  isError?: boolean
+  isLoading?: boolean
   title?: string
 }>()
 
@@ -62,6 +91,8 @@ let interactionTimeout: null | number = null
 
 const originalLength = computed(() => props.images?.length || 0)
 
+const isHorizontal = () => window.innerWidth < 1280
+
 const handleInteraction = () => {
   isInteracting.value = true
 
@@ -74,8 +105,13 @@ const handleInteraction = () => {
 
 const handleScroll = () => {
   if (scrollContainer.value) {
-    const index = Math.round(scrollContainer.value.scrollTop / scrollContainer.value.clientHeight)
-    activeIndex.value = index
+    if (isHorizontal()) {
+      const index = Math.round(scrollContainer.value.scrollLeft / scrollContainer.value.clientWidth)
+      activeIndex.value = index
+    } else {
+      const index = Math.round(scrollContainer.value.scrollTop / scrollContainer.value.clientHeight)
+      activeIndex.value = index
+    }
   }
 }
 
@@ -88,12 +124,20 @@ const scrollToNext = () => {
   if (!scrollContainer.value || originalLength.value <= 1) return
   const behavior = prefersReducedMotion ? 'auto' : 'smooth'
 
-  const { clientHeight, scrollHeight, scrollTop } = scrollContainer.value
-
-  if (scrollTop + clientHeight >= scrollHeight - 10) {
-    scrollContainer.value.scrollTo({ behavior, top: 0 })
+  if (isHorizontal()) {
+    const { clientWidth, scrollLeft, scrollWidth } = scrollContainer.value
+    if (scrollLeft + clientWidth >= scrollWidth - 10) {
+      scrollContainer.value.scrollTo({ behavior, left: 0 })
+    } else {
+      scrollContainer.value.scrollBy({ behavior, left: clientWidth })
+    }
   } else {
-    scrollContainer.value.scrollBy({ behavior, top: clientHeight })
+    const { clientHeight, scrollHeight, scrollTop } = scrollContainer.value
+    if (scrollTop + clientHeight >= scrollHeight - 10) {
+      scrollContainer.value.scrollTo({ behavior, top: 0 })
+    } else {
+      scrollContainer.value.scrollBy({ behavior, top: clientHeight })
+    }
   }
 }
 
@@ -101,12 +145,20 @@ const scrollToPrev = () => {
   if (!scrollContainer.value || originalLength.value <= 1) return
   const behavior = prefersReducedMotion ? 'auto' : 'smooth'
 
-  const { clientHeight, scrollTop } = scrollContainer.value
-
-  if (scrollTop <= 10) {
-    scrollContainer.value.scrollTo({ behavior, top: scrollContainer.value.scrollHeight })
+  if (isHorizontal()) {
+    const { clientWidth, scrollLeft } = scrollContainer.value
+    if (scrollLeft <= 10) {
+      scrollContainer.value.scrollTo({ behavior, left: scrollContainer.value.scrollWidth })
+    } else {
+      scrollContainer.value.scrollBy({ behavior, left: -clientWidth })
+    }
   } else {
-    scrollContainer.value.scrollBy({ behavior, top: -clientHeight })
+    const { clientHeight, scrollTop } = scrollContainer.value
+    if (scrollTop <= 10) {
+      scrollContainer.value.scrollTo({ behavior, top: scrollContainer.value.scrollHeight })
+    } else {
+      scrollContainer.value.scrollBy({ behavior, top: -clientHeight })
+    }
   }
 }
 
@@ -115,12 +167,22 @@ const handleGlobalKeyDown = (e: KeyboardEvent) => {
   if (!activeEl) return
 
   if (scrollContainer.value && activeEl.contains(scrollContainer.value)) {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      scrollToNext()
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      scrollToPrev()
+    if (isHorizontal()) {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        scrollToNext()
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        scrollToPrev()
+      }
+    } else {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        scrollToNext()
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        scrollToPrev()
+      }
     }
   }
 }

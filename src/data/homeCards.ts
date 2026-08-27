@@ -3,7 +3,6 @@ import { type Component } from 'vue'
 import DrawCardContent from '@/components/cards/DrawCardContent.vue'
 import FoursightCardContent from '@/components/cards/FoursightCardContent.vue'
 import MoviesCardContent from '@/components/cards/MoviesCardContent.vue'
-import NowCardContent from '@/components/cards/NowCardContent.vue'
 import SpotifyCardContainer from '@/components/cards/SpotifyCardContainer.vue'
 import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
@@ -13,9 +12,11 @@ import type { EmojiGroupId } from '@/types'
 export interface Card {
   arrow?: 'external' | 'help' | 'none' | 'right'
   bgClass?: string
+  carousel?: boolean
   content?: Component
   group: EmojiGroupId[]
   id: string
+  images?: string[]
   imageUrl?: string
   link?: string
   size: 'lg' | 'md' | 'sm'
@@ -44,7 +45,7 @@ export const cards: Card[] = [
     title: 'work & career',
   },
   {
-    content: NowCardContent,
+    carousel: true,
     group: ['life'],
     id: 'now',
     link: '/now',

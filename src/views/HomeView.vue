@@ -87,7 +87,7 @@
         :arrow="card.arrow"
         :size="card.size"
         :bg-class="card.bgClass"
-        :img="card.isExtra && card.size === 'md' ? undefined : card.imageUrl"
+        :img="card.size === 'sm' ? card.imageUrl : undefined"
         :link="card.link"
         @click="handleCardClick(card)"
       >
@@ -96,14 +96,16 @@
           v-if="card.content"
           v-bind="card.id === 'guestbook' ? { 'show-help': isIconHovered } : {}"
         />
-        <template v-else-if="card.isExtra && card.size === 'md'">
-          <CardCarousel
-            v-if="card.carousel && card.images && card.images.length > 0"
-            :images="card.images"
-            :title="card.title"
-          />
+        <CardCarousel
+          v-else-if="card.carousel"
+          :images="card.images"
+          :is-error="card.isError"
+          :is-loading="card.isLoading"
+          :title="card.title"
+        />
+        <template v-else-if="card.size === 'md'">
           <video
-            v-else-if="card.coverVid"
+            v-if="card.coverVid"
             :src="card.coverVid"
             class="pointer-events-none h-full w-full object-cover"
             :autoplay="!prefersReducedMotion"
@@ -134,11 +136,19 @@ import CardCarousel from '@/components/cards/CardCarousel.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
 import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
+import { useNow } from '@/composables/useNow'
 import { type ExtraCard, extraCards as staticExtraCards } from '@/data/extraCards'
 import { type Card, cards as staticCards } from '@/data/homeCards'
 import { EMOJI_GROUPS } from '@/types'
 
 import type { EmojiGroupId } from '@/types'
+
+const {
+  images: nowImages,
+  isLoadingImages: isLoadingNowImages,
+  isLoadingSlug: isLoadingNowSlug,
+  slugError: nowSlugError,
+} = useNow()
 
 // Convert extraCards to reactive ref
 const extraCards = ref<Partial<Record<EmojiGroupId, ExtraCard[]>>>(staticExtraCards)
@@ -151,7 +161,7 @@ const router = useRouter()
 const activeFilter = computed<EmojiGroupId | null>({
   get: () => (route.query.filter as EmojiGroupId) || null,
   set: (val) => {
-    router.replace({
+    router.push({
       query: {
         ...route.query,
         filter: val || undefined,
@@ -179,18 +189,30 @@ const getImageUrl = (id: string) => {
 
 // Extended interface of Card that includes extra card properties
 interface GridCard extends Card {
-  carousel?: boolean
   coverVid?: string
   extraIndex?: number
   extraKey?: string
-  images?: string[]
+  isError?: boolean
   isExtra?: boolean
+  isLoading?: boolean
 }
 
 const filteredCards = computed<GridCard[]>(() => {
-  if (!activeFilter.value) return staticCards
+  const baseCards = staticCards.map((card) => {
+    if (card.id === 'now') {
+      return {
+        ...card,
+        images: nowImages.value?.map((img) => img.url) || [],
+        isError: !!nowSlugError.value,
+        isLoading: isLoadingNowImages.value || isLoadingNowSlug.value,
+      }
+    }
+    return card
+  })
 
-  const visible = staticCards.filter((card) => card.group.includes(activeFilter.value!))
+  if (!activeFilter.value) return baseCards
+
+  const visible = baseCards.filter((card) => card.group.includes(activeFilter.value!))
 
   const sizeWeight = { lg: 3, md: 2, sm: 1 }
 
