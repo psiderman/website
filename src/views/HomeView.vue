@@ -97,8 +97,13 @@
           v-bind="card.id === 'guestbook' ? { 'show-help': isIconHovered } : {}"
         />
         <template v-else-if="card.isExtra && card.size === 'md'">
+          <CardCarousel
+            v-if="card.carousel && card.images && card.images.length > 0"
+            :images="card.images"
+            :title="card.title"
+          />
           <video
-            v-if="card.coverVid"
+            v-else-if="card.coverVid"
             :src="card.coverVid"
             class="pointer-events-none h-full w-full object-cover"
             :autoplay="!prefersReducedMotion"
@@ -125,6 +130,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+import CardCarousel from '@/components/cards/CardCarousel.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
 import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
@@ -173,9 +179,11 @@ const getImageUrl = (id: string) => {
 
 // Extended interface of Card that includes extra card properties
 interface GridCard extends Card {
+  carousel?: boolean
   coverVid?: string
   extraIndex?: number
   extraKey?: string
+  images?: string[]
   isExtra?: boolean
 }
 
@@ -201,11 +209,13 @@ const filteredCards = computed<GridCard[]>(() => {
         arrow:
           extra.size === 'sm' ? 'external' : extra.title && extra.description ? 'right' : 'none',
         bgClass: extra.bgClass,
+        carousel: extra.carousel,
         coverVid: extra.coverVid,
         extraIndex: idx,
         extraKey: activeFilter.value!,
         group: [activeFilter.value!],
         id: `extra_${activeFilter.value}_${idx}`,
+        images: extra.images,
         imageUrl:
           extra.cover || (extra.images && extra.images.length > 0 ? extra.images[0] : undefined),
         isExtra: true,

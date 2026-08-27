@@ -5,18 +5,38 @@ import type { EmojiGroupId } from '@/types'
 
 export interface ExtraCard {
   bgClass?: string
+  carousel?: boolean
   cover?: string
   coverVid?: string
   description?: string
   images?: string[]
   link?: string
   size: 'md' | 'sm'
+  subtitle?: string
   tags?: LightBoxTag[]
   title: string
   videos?: string[]
 }
 
 export const extraCards: Partial<Record<EmojiGroupId, ExtraCard[]>> = {
+  travel: [
+    {
+      carousel: true,
+      images: Array.from({ length: 15 }, (_, i) =>
+        getStorageUrl('webp', 'japan_film', `${i + 1}.webp`),
+      ),
+      size: 'md',
+      title: 'japan on film',
+    },
+    {
+      carousel: true,
+      images: Array.from({ length: 8 }, (_, i) =>
+        getStorageUrl('webp', 'dad_paris', `${i + 1}.webp`),
+      ),
+      size: 'md',
+      title: 'dad in paris (25 yrs later)',
+    },
+  ],
   work: [
     {
       cover: new URL('../assets/work/dweb/00.webp', import.meta.url).href,
