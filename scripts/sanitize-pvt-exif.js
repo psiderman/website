@@ -46,7 +46,7 @@ function findImagesRecursively(dir) {
     const fullPath = path.join(dir, file)
     const stat = fs.statSync(fullPath)
     if (stat.isDirectory()) {
-      if (file !== 'processed' && !file.startsWith('.')) {
+      if (file !== 'processed' && file !== 'thumb' && !file.startsWith('.')) {
         results = results.concat(findImagesRecursively(fullPath))
       }
     } else if (SUPPORTED_EXTENSIONS.includes(path.extname(file).toLowerCase())) {
@@ -189,18 +189,18 @@ function processTrip(tripDir, tripName) {
     img.tempPath = tempPath
   }
 
-  console.log('\n  Chronological Renaming:')
+  console.log('\n  Chronological Renaming (Obscured UUID):')
   console.log('  ------------------------------------------------------------------------------')
-  allImages.forEach((img, idx) => {
-    const sequenceNum = idx + 1
-    const newName = `${sequenceNum}${img.ext}`
-    const finalPath = path.join(img.dir, newName)
+  allImages.forEach((img) => {
+    // Generate a random 16-character hex string for the filename
+    const obscuredName = `${crypto.randomBytes(8).toString('hex')}${img.ext}`
+    const finalPath = path.join(img.dir, obscuredName)
     fs.renameSync(img.tempPath, finalPath)
 
     const folderTag = img.isPvt ? '[pvt] ' : '[pub] '
     const dateStr = img.dateTaken.toISOString().replace('T', ' ').substring(0, 19)
     console.log(
-      `  ${folderTag.padEnd(6)} ${img.originalName.padEnd(25)} ➔ ${newName.padEnd(10)} (${dateStr})`,
+      `  ${folderTag.padEnd(6)} ${img.originalName.padEnd(25)} ➔ ${obscuredName.padEnd(20)} (${dateStr})`,
     )
   })
 }
@@ -289,11 +289,11 @@ if (invalidFiles.length > 0) {
   console.error(
     'All images must have both a valid Date Taken and GPS coordinates before running sanitize-pvt-exif.\n',
   )
-  console.log('================================================================================')
+  console.log('========================================================================================================================')
   console.log(
-    `${'File Name'.padEnd(30)} | ${'Date Taken (UTC)'.padEnd(25)} | ${'GPS Coordinates'.padEnd(20)} | Issue`,
+    `${'File Path'.padEnd(70)} | ${'Date Taken (UTC)'.padEnd(25)} | ${'GPS Coordinates'.padEnd(20)} | Issue`,
   )
-  console.log('================================================================================')
+  console.log('========================================================================================================================')
   invalidFiles.forEach((f) => {
     const dateStr = f.dateTaken ? f.dateTaken.toISOString() : 'MISSING'
     const gpsStr = f.location
@@ -305,10 +305,10 @@ if (invalidFiles.length > 0) {
     else if (!f.hasGps) issue = 'Missing GPS'
 
     console.log(
-      `${f.fileName.substring(0, 30).padEnd(30)} | ${dateStr.padEnd(25)} | ${gpsStr.padEnd(20)} | ❌ ${issue}`,
+      `${f.filePath.padEnd(70)} | ${dateStr.padEnd(25)} | ${gpsStr.padEnd(20)} | ❌ ${issue}`,
     )
   })
-  console.log('================================================================================')
+  console.log('========================================================================================================================')
   console.error(`\nPlease fix the ${invalidFiles.length} file(s) above before running this script.`)
   process.exit(1)
 }

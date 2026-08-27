@@ -7,5 +7,5 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 
 export const getStorageUrl = (bucket: string, ...paths: string[]) => {
   const fullPath = paths.join('/')
-  return supabase.storage.from(bucket).getPublicUrl(fullPath).data.publicUrl
+  return `https://media.psiderman.com/storage/v1/object/public/${bucket}/${fullPath}`
 }

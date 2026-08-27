@@ -348,7 +348,7 @@ async function main() {
       const { error: uploadError } = await supabase.storage
         .from('travel')
         .upload(item.remotePath, fileBuffer, {
-          cacheControl: '3600',
+          cacheControl: '31536000, public, immutable',
           contentType: 'image/webp',
           upsert: true,
         })
