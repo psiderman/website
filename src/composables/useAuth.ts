@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 
+import { queryClient } from '@/queryClient'
 import { supabase } from '@/supabase'
 
 import type { User } from '@supabase/supabase-js'
@@ -21,6 +22,10 @@ const initAuth = async () => {
   // Listen for auth changes (login, logout, token refresh)
   supabase.auth.onAuthStateChange((_event, session) => {
     currentUser.value = session?.user ?? null
+    
+    // Invalidate travel & images cache globally on auth state changes
+    queryClient.invalidateQueries({ queryKey: ['trips-with-images'] })
+    queryClient.invalidateQueries({ queryKey: ['trip-images'] })
   })
 }
 

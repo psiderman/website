@@ -1,10 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { isAuthModalOpen } from '@/composables/useAuth'
+import { isLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
+
 import HomeView from '../views/HomeView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import NowView from '../views/NowView.vue'
 import PrivacyView from '../views/PrivacyView.vue'
 import TermsView from '../views/TermsView.vue'
+import TravelView from '../views/TravelView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +22,11 @@ const router = createRouter({
       component: NowView,
       name: 'Now',
       path: '/now',
+    },
+    {
+      component: TravelView,
+      name: 'Travel',
+      path: '/travel',
     },
     {
       component: TermsView,
@@ -44,6 +53,12 @@ const router = createRouter({
       return { top: 0 }
     }
   },
+})
+
+router.afterEach(() => {
+  isLightBoxOpen.value = false
+  isWorkModalOpen.value = false
+  isAuthModalOpen.value = false
 })
 
 export default router

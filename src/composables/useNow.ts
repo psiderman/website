@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import { supabase } from '@/supabase'
+import { getStorageUrl, supabase } from '@/supabase'
 
 export function useNow() {
   // 1. Fetch latest post slug
@@ -38,12 +38,9 @@ export function useNow() {
       return data
         .filter((file) => !file.name.endsWith('.md'))
         .map((file) => {
-          const { data: urlData } = supabase.storage
-            .from('now')
-            .getPublicUrl(`${slug.value}/${file.name}`)
           return {
             name: file.name,
-            url: urlData.publicUrl,
+            url: getStorageUrl('now', slug.value!, file.name),
           }
         })
     },

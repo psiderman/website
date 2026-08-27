@@ -1,36 +1,40 @@
 import { getStorageUrl } from '@/supabase'
 
 import type { LightBoxTag } from '@/components/LightBox.vue'
-import type { EmojiGroupId } from '@/types'
+import type { FilterGroupId } from '@/types'
 
 export interface ExtraCard {
   bgClass?: string
+  carousel?: boolean
   cover?: string
   coverVid?: string
   description?: string
   images?: string[]
   link?: string
   size: 'md' | 'sm'
+  subtitle?: string
   tags?: LightBoxTag[]
   title: string
   videos?: string[]
 }
 
-export const extraCards: Partial<Record<EmojiGroupId, ExtraCard[]>> = {
+export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
   travel: [
     {
-      bgClass: 'bg-sky-200 dark:bg-sky-950',
-      cover: new URL('../assets/home/plane.webp', import.meta.url).href,
-      link: 'https://www.instagram.com/p/DV_EEAnElCY/',
-      size: 'sm',
-      title: 'most recent trip',
+      carousel: true,
+      images: Array.from({ length: 15 }, (_, i) =>
+        getStorageUrl('webp', 'japan_film', `${i + 1}.webp`),
+      ),
+      size: 'md',
+      title: 'japan on film',
     },
     {
-      bgClass: 'bg-fuchsia-200 dark:bg-fuchsia-950',
-      cover: new URL('../assets/home/pin.webp', import.meta.url).href,
-      link: 'https://www.google.com/maps/@65.7943067,5.1156331,5.25z?entry=ttu&g_ep=EgoyMDI2MDgxOS4wIKXMDSoASAFQAw%3D%3D',
-      size: 'sm',
-      title: 'next maybe?',
+      carousel: true,
+      images: Array.from({ length: 8 }, (_, i) =>
+        getStorageUrl('webp', 'dad_paris', `${i + 1}.webp`),
+      ),
+      size: 'md',
+      title: 'dad in paris (25 yrs later)',
     },
   ],
   work: [

@@ -1,6 +1,7 @@
 <template>
+  <!-- Disabled on mobile because Work Modal is not responsive -->
   <div
-    class="border-border-primary desktop:pointer-events-auto bg-surface-secondary dark:bg-dark noscrollbar pointer-events-none relative flex h-full w-full overflow-scroll rounded-lg border focus:outline-none"
+    class="border-border-primary desktop:pointer-events-auto bg-surface-secondary dark:bg-dark noscrollbar relative flex h-full w-full overflow-scroll rounded-lg border focus:outline-none"
     tabindex="-1"
   >
     <template v-if="careerData.length > 0">
@@ -59,7 +60,7 @@
               <div class="flex size-4 shrink-0 items-center justify-center">
                 <img
                   v-if="block.logoUrl"
-                  :src="block.logoUrl"
+                  v-lazy="block.logoUrl"
                   :alt="`${block.org} Logo`"
                   class="size-3 rounded-sm"
                   width="128"
@@ -231,7 +232,7 @@ const timelineData = computed(() => {
 @reference "@/style.css";
 
 .work-block {
-  @apply bg-surface-primary border-border-primary rounded-special relative flex flex-row gap-1 overflow-hidden border bg-linear-0 p-3;
+  @apply bg-surface-primary border-border-primary rounded-special desktop:flex-row relative flex flex-col gap-1 overflow-hidden border bg-linear-0 p-3;
 
   &.clickable {
     @apply cursor-pointer;

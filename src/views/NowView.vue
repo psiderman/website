@@ -1,12 +1,12 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
-    <div class="flex flex-col px-20">
+    <div class="desktop:px-20 flex flex-col px-4">
       <div class="flex flex-col gap-20 pt-10">
-        <div class="text-ui flex flex-row items-center justify-start gap-2">
+        <!-- <div class="text-ui flex flex-row items-center justify-start gap-2">
           <router-link to="/" class="breadcrumb main">home</router-link>
           <ChevronRight class="text-text-secondary" :size="16" />
           <router-link to="/now" class="breadcrumb level">now</router-link>
-        </div>
+        </div> -->
 
         <div v-if="isLoadingSlug || isLoadingMarkdown || isLoadingImages" class="aspect-4/1 w-full">
           <GenericLoader />
@@ -21,32 +21,47 @@
 
         <template v-else-if="slug">
           <!-- Render images at the top -->
+          <div class="text-p mx-auto w-full max-w-prose text-left">
+            <h1
+              v-tooltip="{ content: 'you don’t have a now page?', placement: 'right' }"
+              class="text-display -mb-14 w-fit"
+            >
+              /<a href="https://nownownow.com/about" target="_blank" class="underline">now</a>
+            </h1>
+          </div>
+
           <div
             v-if="images && images.length > 0"
-            class="mx-auto -mt-10 grid min-w-full grow gap-4"
-            :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
+            class="noscrollbar desktop:mx-0 desktop:w-full desktop:overflow-visible desktop:px-0 -mx-4 flex w-[calc(100%+2rem)] overflow-x-auto px-4"
           >
             <div
-              v-for="img in images"
-              :key="img.name"
-              class="bg-dark aspect-3/5 h-full w-full rounded-xl object-cover"
+              class="desktop:grid desktop:w-full desktop:min-w-full desktop:mx-0 mx-auto flex w-fit gap-4"
+              :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
             >
-              <img
-                class="aspect-3/5 h-full w-full rounded-xl object-cover"
-                :src="img.url"
-                :alt="img.name"
-                width="300"
-                height="500"
-              />
+              <div
+                v-for="(img, idx) in images"
+                :key="img.name"
+                class="bg-dark desktop:h-full desktop:w-full desktop:shrink aspect-3/5 h-72 w-auto shrink-0 cursor-pointer rounded-xl object-cover transition-opacity hover:opacity-95"
+                @click="triggerLightbox(idx)"
+              >
+                <img
+                  v-lazy="img.url"
+                  class="aspect-3/5 h-full w-full rounded-xl object-cover"
+                  :alt="img.name"
+                  width="300"
+                  height="500"
+                />
+              </div>
             </div>
           </div>
 
-          <!-- Render parsed markdown -->
-          <div class="text-p mx-auto w-full max-w-prose text-left">
-            <h1 class="text-display -mb-14">
+          <div class="text-p text-text-secondary mx-auto -mb-12 w-full max-w-prose text-left">
+            <h2 class="text-h2">
               {{ format(new Date(slug + '-01'), 'MMM ’yy').toLocaleLowerCase() }}
-            </h1>
+            </h2>
           </div>
+
+          <!-- Render parsed markdown -->
           <div
             v-if="parsedMarkdown"
             class="text-p markdown-content text-text-primary mx-auto max-w-prose overflow-hidden"
@@ -60,7 +75,6 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRight } from '@lucide/vue'
 import { format } from 'date-fns'
 import DOMPurify from 'dompurify'
 import { marked } from 'marked'
@@ -68,6 +82,7 @@ import { computed } from 'vue'
 
 import GenericLoader from '@/components/GenericLoader.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
+import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
 import { useNow } from '@/composables/useNow'
 
 const {
@@ -87,6 +102,25 @@ const parsedMarkdown = computed(() => {
   const raw = marked.parse(markdownContent.value)
   return DOMPurify.sanitize(raw as string)
 })
+
+const triggerLightbox = (clickedIdx: number) => {
+  if (!images.value || images.value.length === 0) return
+
+  const allImages = images.value.map((img) => ({
+    url: img.url,
+  }))
+
+  const orderedImages = [
+    allImages[clickedIdx],
+    ...allImages.slice(0, clickedIdx),
+    ...allImages.slice(clickedIdx + 1),
+  ]
+
+  lightBoxData.value = {
+    images: orderedImages,
+  }
+  isLightBoxOpen.value = true
+}
 </script>
 
 <style scoped>

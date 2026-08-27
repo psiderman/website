@@ -53,27 +53,13 @@ if (import.meta.env.PROD && ['psiderman.com'].includes(window.location.hostname)
   })
 }
 
-import { experimental_createQueryPersister } from '@tanstack/query-persist-client-core'
-
-const persister = experimental_createQueryPersister({
-  maxAge: 1000 * 60 * 60 * 12, // 12 hours
-  storage: window.localStorage,
-})
-
+import lazy from './directives/lazy'
 import tooltip from './directives/tooltip'
+import { queryClient } from './queryClient'
 
 app.use(router)
 app.directive('tooltip', tooltip)
-app.use(VueQueryPlugin, {
-  queryClientConfig: {
-    defaultOptions: {
-      queries: {
-        gcTime: 1000 * 60 * 60 * 24, // 24 hours
-        persister: persister.persisterFn,
-        staleTime: 1000 * 60 * 5, // 5 mins
-      },
-    },
-  },
-})
+app.directive('lazy', lazy)
+app.use(VueQueryPlugin, { queryClient })
 
 app.mount('#app')

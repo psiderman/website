@@ -118,6 +118,7 @@ export const workHistory: WorkDetail[] = [
         'I’ve also contributed to growing the design team from 2 to 20 and shaping its culture and rituals, including critical contributions such as using Harry Potter references instead of Lorem Ipsum in Figma files.',
       ],
       galleryImages: [
+        { landscape: true, src: '5.webp' },
         { landscape: true, src: '4.webp' },
         { src: '3.webp' },
         { landscape: true, src: '2.webp' },

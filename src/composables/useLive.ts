@@ -140,16 +140,43 @@ const userAvatar = computed(() => {
 const colorCache = ref<Record<string, { bg: string; fg: string }>>({})
 const userColor = ref(fallbackColor.value)
 
+let channel: null | ReturnType<typeof supabase.channel> = null
+
+export const activeRoomName = computed(() => {
+  let name = `live:${router.currentRoute.value.path}`
+  if (router.currentRoute.value.query.filter) {
+    name += `?filter=${router.currentRoute.value.query.filter}`
+  }
+  if (global.activeModal.value) {
+    name += `&modal=${global.activeModal.value}`
+  }
+  return name
+})
+
 watch(
-  userAvatar,
-  (avatar) => {
+  [activeUserId, userName, userAvatar],
+  ([id, name, avatar]) => {
+    const trackPresence = (color: { bg: string; fg: string }) => {
+      if (channel && global.allowMultiplayer.value) {
+        channel.track({
+          avatar,
+          color,
+          id,
+          name,
+          room: activeRoomName.value,
+        })
+      }
+    }
+
     if (!avatar) {
       userColor.value = fallbackColor.value
+      trackPresence(userColor.value)
       return
     }
 
     if (colorCache.value[avatar]) {
       userColor.value = colorCache.value[avatar]
+      trackPresence(userColor.value)
       return
     }
 
@@ -174,15 +201,7 @@ watch(
         colorCache.value[avatar] = extractedColor
         userColor.value = extractedColor
 
-        if (channel && global.allowMultiplayer.value) {
-          channel.track({
-            avatar: userAvatar.value,
-            color: userColor.value,
-            id: activeUserId.value,
-            name: userName.value,
-            room: activeRoomName.value,
-          })
-        }
+        trackPresence(extractedColor)
       })
       .catch((err) => {
         console.error('Failed to extract color via API', err)
@@ -194,16 +213,6 @@ watch(
 // Global reactive state
 export const hasOtherUsersOnRoom = ref(false)
 const activePresenceUsers = ref<PresenceUser[]>([])
-export const activeRoomName = computed(() => {
-  let name = `live:${router.currentRoute.value.path}`
-  if (router.currentRoute.value.query.filter) {
-    name += `?filter=${router.currentRoute.value.query.filter}`
-  }
-  if (global.activeModal.value) {
-    name += `&modal=${global.activeModal.value}`
-  }
-  return name
-})
 const cursors = ref<Record<string, CursorData>>({})
 const touches = ref<Record<string, TouchData>>({})
 const windowWidth = ref(window.innerWidth)
@@ -230,11 +239,24 @@ const activeTouches = computed(() => {
 })
 
 export const sortedPresenceUsers = computed(() => {
-  if (!global.allowMultiplayer.value) return []
+  const localUser: PresenceUser = {
+    avatar: userAvatar.value,
+    color: userColor.value,
+    id: activeUserId.value,
+    name: userName.value,
+    room: activeRoomName.value,
+  }
 
-  const uniqueUsers = new Map()
+  if (!global.allowMultiplayer.value) {
+    return [localUser]
+  }
+
+  const uniqueUsers = new Map<string, PresenceUser>()
   for (const u of activePresenceUsers.value) {
     uniqueUsers.set(u.id, u)
+  }
+  if (!uniqueUsers.has(localUser.id)) {
+    uniqueUsers.set(localUser.id, localUser)
   }
 
   return Array.from(uniqueUsers.values())
@@ -318,22 +340,8 @@ export const renderTouches = computed(() => {
   })
 })
 
-let channel: null | ReturnType<typeof supabase.channel> = null
-
-export const toggleMultiplayer = async () => {
+export const toggleMultiplayer = () => {
   global.allowMultiplayer.value = !global.allowMultiplayer.value
-  if (!channel) return
-  if (global.allowMultiplayer.value) {
-    await channel.track({
-      avatar: userAvatar.value,
-      color: userColor.value,
-      id: activeUserId.value,
-      name: userName.value,
-      room: activeRoomName.value,
-    })
-  } else {
-    await channel.untrack()
-  }
 }
 
 let resizeObserver: null | ResizeObserver = null

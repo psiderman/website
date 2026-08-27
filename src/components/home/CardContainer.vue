@@ -12,7 +12,7 @@
     >
       <img
         v-if="img"
-        :src="img"
+        v-lazy="img"
         :alt="title"
         class="pointer-events-none h-3/5 w-auto"
         width="160"
@@ -74,7 +74,7 @@ const isIconHovered = ref(false)
 
 const heightClass = computed(() => {
   const heights = {
-    lg: 'h-124 row-span-2 desktop:row-span-3',
+    lg: 'h-80 desktop:h-124 row-span-2 desktop:row-span-3',
     md: 'h-80 row-span-2',
     sm: 'h-36 row-span-1',
   }

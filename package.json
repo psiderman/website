@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource/kalam": "^5.3.0",
     "@fontsource/source-serif-pro": "^5.3.0",
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
     "@fortawesome/free-brands-svg-icons": "^7.3.1",
@@ -15,7 +16,9 @@
     "colorthief": "^3.5.0",
     "date-fns": "^4.4.0",
     "dompurify": "^3.4.14",
+    "exifreader": "^4.44.0",
     "fast-xml-parser": "^5.11.0",
+    "mapbox-gl": "^3.29.0",
     "marked": "^18.0.10",
     "perfect-freehand": "^1.2.3",
     "sharp": "^0.35.3",
@@ -29,6 +32,8 @@
     "@sentry/vite-plugin": "^5.4.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/vue-query-devtools": "^6.1.38",
+    "@types/geojson": "^7946.0.16",
+    "@types/mapbox-gl": "^3.4.1",
     "@types/node": "^26.2.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/eslint-config-prettier": "^10.2.0",

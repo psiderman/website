@@ -1,21 +1,23 @@
 <template>
-  <div
-    class="text-light maps-bg z-10 flex h-full w-full flex-col items-center justify-center gap-0"
-  >
-    <p class="text-h1">🚧</p>
-    <p class="text-h1">making smth cool here</p>
+  <div class="pointer-events-none relative h-full w-full grow">
+    <img
+      v-if="previewUrl"
+      v-lazy="previewUrl"
+      alt="map view"
+      width="600"
+      height="400"
+      class="absolute inset-0 h-full w-full object-cover dark:opacity-80"
+    />
   </div>
+  <div class="pointer-events-auto absolute inset-0 bg-transparent"></div>
 </template>
 
-<style scoped>
-@reference "@/style.css";
-.maps-bg {
-  background: url('@/assets/home/travel.webp');
-  @apply bg-cover;
-}
+<script setup lang="ts">
+import { computed } from 'vue'
 
-.maps-bg::before {
-  content: '';
-  @apply bg-dark/50 absolute inset-0 -z-10;
-}
-</style>
+import { getStorageUrl } from '@/supabase'
+
+const previewUrl = computed(() => {
+  return getStorageUrl('webp', 'map-preview.webp')
+})
+</script>

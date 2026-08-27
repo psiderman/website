@@ -28,9 +28,14 @@
             leave-to="opacity-0 scale-95"
           >
             <DialogPanel
-              class="bg-surface-primary border-border-primary relative flex h-fit w-180 flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border p-2"
+              class="bg-surface-primary relative flex h-full w-180 flex-col items-center justify-center gap-2 overflow-hidden border"
+              :class="
+                title && description
+                  ? 'border-border-primary rounded-xl p-2'
+                  : 'border-dark rounded-special p-0'
+              "
             >
-              <div class="bg-dark group desktop:min-h-80 relative h-fit w-full rounded-lg">
+              <div class="bg-dark group desktop:min-h-80 relative h-full w-full rounded-lg">
                 <div
                   ref="scrollContainer"
                   class="noscrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden scroll-smooth"
@@ -41,12 +46,42 @@
                     :key="idx"
                     class="my-auto flex h-full w-full shrink-0 snap-center items-center justify-center overflow-hidden rounded-lg"
                   >
-                    <img
+                    <div
                       v-if="item.type === 'image'"
-                      :src="item.src"
-                      :alt="`${title}-${idx}`"
-                      class="desktop:max-h-[calc(75svh)] w-auto object-contain"
-                    />
+                      class="relative flex max-h-full max-w-full items-center justify-center"
+                    >
+                      <img
+                        v-lazy="{ src: item.src, placeholder: item.placeholder }"
+                        :alt="`${title}-${idx}`"
+                        :style="
+                          item.width && item.height
+                            ? { 
+                                width: `${item.width}px`, 
+                                height: `${item.height}px`,
+                                maxWidth: '100%',
+                                maxHeight: '75svh'
+                              }
+                            : { maxWidth: '100%', maxHeight: '75svh' }
+                        "
+                        class="object-contain rounded-lg"
+                      />
+                      <div class="absolute top-2 right-2 flex flex-row gap-2">
+                        <div
+                          v-if="item.caption"
+                          v-tooltip="{ content: item.caption }"
+                          class="border-light bg-dark/50 text-light flex size-8 items-center justify-center rounded-full border-3 font-mono shadow-md"
+                        >
+                          i
+                        </div>
+                        <div
+                          v-if="isHighClearance(item.clearance)"
+                          v-tooltip="{ content: 'you’re on “the list”' }"
+                          class="border-light flex size-8 items-center justify-center rounded-full border-3 bg-green-500 shadow-md"
+                        >
+                          <Star :size="20" fill="#fff" stroke-width="0" />
+                        </div>
+                      </div>
+                    </div>
                     <video
                       v-else-if="item.type === 'video'"
                       :alt="`${title}-${idx}`"
@@ -130,12 +165,15 @@
 
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ArrowLeft, ArrowRight, ArrowUpRight } from '@lucide/vue'
+import { ArrowLeft, ArrowRight, ArrowUpRight, Star } from '@lucide/vue'
 import { computed, ref } from 'vue'
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
 import CarouselIndicator from '@/components/CarouselIndicator.vue'
+import { isHighClearance } from '@/composables/useTravel'
+
+import type { ClearanceLevel } from '@/composables/useTravel'
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 export interface LightBoxTag {
   link?: string
@@ -143,18 +181,35 @@ export interface LightBoxTag {
 }
 
 const props = defineProps<{
-  description: string
-  images: string[]
+  description?: string
+  images: {
+    caption?: null | string
+    clearance?: ClearanceLevel
+    height?: null | number
+    thumbnailUrl?: string
+    url: string
+    width?: null | number
+  }[]
   isOpen: boolean
   tags?: LightBoxTag[]
-  title: string
+  title?: string
   videos?: string[]
 }>()
 
 const mediaItems = computed(() => {
   const items = []
   if (props.images) {
-    items.push(...props.images.map((img) => ({ src: img, type: 'image' as const })))
+    items.push(
+      ...props.images.map((img) => ({
+        caption: img.caption,
+        clearance: img.clearance,
+        height: img.height,
+        placeholder: img.thumbnailUrl,
+        src: img.url,
+        type: 'image' as const,
+        width: img.width,
+      })),
+    )
   }
   if (props.videos) {
     items.push(...props.videos.map((vid) => ({ src: vid, type: 'video' as const })))
@@ -191,6 +246,35 @@ const handleScroll = () => {
     activeIndex.value = index
   }
 }
+
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (!props.isOpen) return
+  if (e.key === 'ArrowRight') {
+    e.preventDefault()
+    scrollToNext()
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault()
+    scrollToPrev()
+  }
+}
+
+import { onUnmounted, watch } from 'vue'
+
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown)
+    } else {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  },
+  { immediate: true },
+)
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <style scoped>

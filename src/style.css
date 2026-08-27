@@ -53,6 +53,7 @@
   --font-mono:
     'Tiny', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
+  --font-handwriting: 'Kalam', cursive;
 
   /* weights */
   --font-weight-normal: 400;
@@ -704,6 +705,10 @@ a,
   scrollbar-width: none; /* Firefox */
 }
 
+@utility font-handwriting {
+  font-family: var(--font-handwriting);
+}
+
 *:focus,
 *:focus-visible,
 *:focus-within {
@@ -719,4 +724,20 @@ input::-webkit-inner-spin-button {
 input[type='number'] {
   appearance: textfield;
   -moz-appearance: textfield;
+}
+
+/* Image Lazy Loading Shimmer Effect */
+img.lazy-loading {
+  background-size: 400% 100%;
+  animation: lazy-shimmer 1.4s ease infinite;
+  object-fit: contain !important;
+}
+
+@keyframes lazy-shimmer {
+  0% {
+    background-position: 100% 0%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

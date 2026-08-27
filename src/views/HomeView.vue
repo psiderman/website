@@ -30,40 +30,65 @@
         </div>
       </div>
     </div>
+
+    <!-- Filters -->
+    <div
+      ref="tabContainerRef"
+      class="bg-background border-border-primary desktop:justify-center desktop:px-20 sticky top-0 z-50 mb-10 flex w-screen flex-row items-start justify-between gap-1 border-b px-2"
+    >
+      <button
+        v-for="grp in filterGroups"
+        :key="grp.id"
+        :ref="(el) => setTabRef(grp.id, el)"
+        :aria-label="grp.label"
+        class="text-ui font-sans-alt desktop:shrink-0 desktop:px-5 relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl p-4 transition-colors duration-200"
+        :class="[
+          activeFilter === grp.id
+            ? 'text-text-primary font-normal'
+            : 'text-text-secondary hover:bg-hover opacity-60 hover:opacity-100',
+        ]"
+        @click="activeFilter = grp.id"
+      >
+        <div class="flex h-6 items-center justify-center">
+          <component :is="grp.icon" :size="20" />
+        </div>
+        <div
+          class="desktop:grid hidden transition-all duration-500 ease-out"
+          :class="
+            activeFilter === grp.id
+              ? 'grid-cols-[1fr] opacity-100'
+              : 'pointer-events-none -ml-2 grid-cols-[0fr] opacity-0'
+          "
+        >
+          <p class="overflow-hidden whitespace-nowrap">
+            {{ grp.label }}
+          </p>
+        </div>
+      </button>
+
+      <!-- Smooth moving indicator -->
+      <div
+        class="bg-surface-inverted pointer-events-none absolute bottom-0 left-0 h-1.5 rounded-t-lg transition-all duration-500 ease-out"
+        :style="{
+          transform: `translateX(${indicatorStyle.left}px)`,
+          width: `${indicatorStyle.width}px`,
+          opacity: indicatorStyle.ready ? 1 : 0,
+        }"
+      ></div>
+    </div>
+
     <!-- Grid -->
     <div
       class="desktop:px-20 desktop:grid-cols-12 relative grid w-full grid-flow-row-dense grid-cols-2 gap-8 px-4"
     >
-      <!-- Filters -->
-      <div
-        class="desktop:h-0 desktop:-mt-5 desktop:col-span-12 col-span-2 flex flex-wrap justify-center gap-1"
-      >
-        <button
-          v-for="emj in emojis"
-          :key="emj.id"
-          v-tooltip="{ group: 'filter', placement: 'top', content: emj.label }"
-          :aria-label="emj.label"
-          class="emoji-filter group"
-          :class="{
-            default: !activeFilter,
-            active: activeFilter === emj.id,
-            inactive: activeFilter && activeFilter !== emj.id,
-          }"
-          @click="activeFilter = activeFilter === emj.id ? null : emj.id"
-        >
-          <span class="text-center">
-            {{ emj.emoji }}
-          </span>
-        </button>
-      </div>
       <!-- Description Card -->
       <div
-        v-if="activeFilter && activeDescription.id"
+        v-if="activeFilter !== 'home' && activeDescription.id"
         class="border-border-primary bg-surface-primary desktop:col-span-4 pointer-events-auto col-span-2 row-span-3 flex h-124 flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
       >
         <div class="aspect-video">
           <img
-            :src="getImageUrl(activeDescription.id)"
+            v-lazy="getImageUrl(activeDescription.id)"
             class="border-border-primary h-full w-full rounded-lg border object-cover"
             :alt="activeDescription.id"
             width="800"
@@ -87,12 +112,23 @@
         :arrow="card.arrow"
         :size="card.size"
         :bg-class="card.bgClass"
-        :img="card.isExtra && card.size === 'md' ? undefined : card.imageUrl"
+        :img="card.size === 'sm' ? card.imageUrl : undefined"
         :link="card.link"
         @click="handleCardClick(card)"
       >
-        <component :is="card.content" v-if="card.content" :show-help="isIconHovered" />
-        <template v-else-if="card.isExtra && card.size === 'md'">
+        <component
+          :is="card.content"
+          v-if="card.content"
+          v-bind="card.id === 'guestbook' ? { 'show-help': isIconHovered } : {}"
+        />
+        <CardCarousel
+          v-else-if="card.carousel"
+          :images="card.images"
+          :is-error="card.isError"
+          :is-loading="card.isLoading"
+          :title="card.title"
+        />
+        <template v-else-if="card.size === 'md'">
           <video
             v-if="card.coverVid"
             :src="card.coverVid"
@@ -104,7 +140,7 @@
           />
           <img
             v-else-if="card.imageUrl"
-            :src="card.imageUrl"
+            v-lazy="card.imageUrl"
             class="pointer-events-none h-full w-full object-cover"
             :alt="card.title"
           />
@@ -116,44 +152,120 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+import CardCarousel from '@/components/cards/CardCarousel.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
 import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
+import { useNow } from '@/composables/useNow'
 import { type ExtraCard, extraCards as staticExtraCards } from '@/data/extraCards'
 import { type Card, cards as staticCards } from '@/data/homeCards'
-import { EMOJI_GROUPS } from '@/types'
+import { FILTER_GROUPS } from '@/types'
 
-import type { EmojiGroupId } from '@/types'
+import type { FilterGroupId } from '@/types'
+
+const {
+  images: nowImages,
+  isLoadingImages: isLoadingNowImages,
+  isLoadingSlug: isLoadingNowSlug,
+  slugError: nowSlugError,
+} = useNow()
 
 // Convert extraCards to reactive ref
-const extraCards = ref<Partial<Record<EmojiGroupId, ExtraCard[]>>>(staticExtraCards)
+const extraCards = ref<Partial<Record<FilterGroupId, ExtraCard[]>>>(staticExtraCards)
 
-const emojis = EMOJI_GROUPS
+const filterGroups = FILTER_GROUPS
 
 const route = useRoute()
 const router = useRouter()
 
-const activeFilter = computed<EmojiGroupId | null>({
-  get: () => (route.query.filter as EmojiGroupId) || null,
+const tabContainerRef = ref<HTMLElement | null>(null)
+const tabRefs = ref<Record<string, HTMLElement>>({})
+
+const setTabRef = (id: string, el: unknown) => {
+  if (el) {
+    tabRefs.value[id] = el as HTMLElement
+  }
+}
+
+const indicatorStyle = ref({
+  left: 0,
+  ready: false,
+  width: 0,
+})
+
+const updateIndicator = () => {
+  const container = tabContainerRef.value
+  const activeEl = tabRefs.value[activeFilter.value]
+  if (!container || !activeEl) return
+
+  const containerRect = container.getBoundingClientRect()
+  const activeRect = activeEl.getBoundingClientRect()
+
+  indicatorStyle.value = {
+    left: activeRect.left - containerRect.left,
+    ready: true,
+    width: activeRect.width,
+  }
+}
+
+let resizeObserver: null | ResizeObserver = null
+let settleTimeoutId: null | ReturnType<typeof setTimeout> = null
+
+onMounted(() => {
+  nextTick(() => {
+    updateIndicator()
+  })
+  window.addEventListener('resize', updateIndicator)
+
+  if (tabContainerRef.value && typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(() => {
+      updateIndicator()
+    })
+    resizeObserver.observe(tabContainerRef.value)
+    Object.values(tabRefs.value).forEach((el) => {
+      if (el) resizeObserver?.observe(el)
+    })
+  }
+})
+
+onUnmounted(() => {
+  if (settleTimeoutId) clearTimeout(settleTimeoutId)
+  window.removeEventListener('resize', updateIndicator)
+  resizeObserver?.disconnect()
+})
+
+const activeFilter = computed<FilterGroupId>({
+  get: () => (route.query.filter as FilterGroupId) || 'home',
   set: (val) => {
-    router.replace({
+    router.push({
       query: {
         ...route.query,
-        filter: val || undefined,
+        filter: val === 'home' ? undefined : val,
       },
     })
   },
 })
 
+watch(activeFilter, async () => {
+  if (settleTimeoutId) clearTimeout(settleTimeoutId)
+  await nextTick()
+  updateIndicator()
+  settleTimeoutId = setTimeout(() => {
+    updateIndicator()
+    settleTimeoutId = null
+  }, 320)
+})
+
 import { descriptionContent } from '@/data/homeDescriptions'
 
 const activeDescription = computed(() => {
-  if (activeFilter.value) return descriptionContent.filter((a) => a.id === activeFilter.value)[0]
+  if (activeFilter.value && activeFilter.value !== 'home')
+    return descriptionContent.filter((a) => a.id === activeFilter.value)[0]
   else
     return {
       content: null,
@@ -172,13 +284,27 @@ interface GridCard extends Card {
   coverVid?: string
   extraIndex?: number
   extraKey?: string
+  isError?: boolean
   isExtra?: boolean
+  isLoading?: boolean
 }
 
 const filteredCards = computed<GridCard[]>(() => {
-  if (!activeFilter.value) return staticCards
+  const baseCards = staticCards.map((card) => {
+    if (card.id === 'now') {
+      return {
+        ...card,
+        images: nowImages.value?.map((img) => img.url) || [],
+        isError: !!nowSlugError.value,
+        isLoading: isLoadingNowImages.value || isLoadingNowSlug.value,
+      }
+    }
+    return card
+  })
 
-  const visible = staticCards.filter((card) => card.group.includes(activeFilter.value!))
+  if (!activeFilter.value || activeFilter.value === 'home') return baseCards
+
+  const visible = baseCards.filter((card) => card.group.includes(activeFilter.value))
 
   const sizeWeight = { lg: 3, md: 2, sm: 1 }
 
@@ -197,11 +323,13 @@ const filteredCards = computed<GridCard[]>(() => {
         arrow:
           extra.size === 'sm' ? 'external' : extra.title && extra.description ? 'right' : 'none',
         bgClass: extra.bgClass,
+        carousel: extra.carousel,
         coverVid: extra.coverVid,
         extraIndex: idx,
-        extraKey: activeFilter.value!,
-        group: [activeFilter.value!],
+        extraKey: activeFilter.value,
+        group: [activeFilter.value],
         id: `extra_${activeFilter.value}_${idx}`,
+        images: extra.images,
         imageUrl:
           extra.cover || (extra.images && extra.images.length > 0 ? extra.images[0] : undefined),
         isExtra: true,
@@ -223,11 +351,11 @@ const filteredCards = computed<GridCard[]>(() => {
 
 const handleCardClick = (card: GridCard) => {
   if (card.isExtra && card.size === 'md' && card.extraKey && card.extraIndex !== undefined) {
-    const extra = extraCards.value[card.extraKey as EmojiGroupId]?.[card.extraIndex]
+    const extra = extraCards.value[card.extraKey as FilterGroupId]?.[card.extraIndex]
     if (extra) {
       lightBoxData.value = {
         description: extra.description || '',
-        images: extra.images || [],
+        images: extra.images?.map((url) => ({ clearance: 'public' as const, url })) || [],
         tags: extra.tags,
         title: extra.title || '',
         videos: extra.videos || [],
@@ -237,38 +365,3 @@ const handleCardClick = (card: GridCard) => {
   }
 }
 </script>
-
-<style scoped>
-@reference "@/style.css";
-.emoji-filter {
-  @apply bg-background text-ui relative flex size-12 cursor-pointer items-center justify-center rounded-full bg-linear-0 transition-colors duration-200 ease-in-out;
-
-  & span {
-    @apply flex w-4.25 items-center justify-center text-center leading-none;
-  }
-
-  &.default {
-    @apply hover:from-hover hover:to-hover active:from-press active:to-press group-hover:opacity-100;
-  }
-
-  &.active {
-    @apply hover:from-hover-inverted hover:to-hover-inverted active:from-press-inverted active:to-press-inverted;
-  }
-
-  &.inactive {
-    @apply hover:from-hover hover:to-hover active:from-press active:to-press;
-
-    span {
-      @apply opacity-30 mix-blend-luminosity;
-    }
-
-    &:hover span {
-      @apply opacity-75;
-    }
-
-    &:active span {
-      @apply opacity-100 mix-blend-normal;
-    }
-  }
-}
-</style>

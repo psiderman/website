@@ -5,7 +5,7 @@
   <div
     v-else
     :ref="setupObserver"
-    class="drawing-board outline-surface-inverted focus-visible:outline-2 focus-visible:outline-offset-2"
+    class="drawing-board desktop:pointer-events-auto outline-surface-inverted pointer-events-none focus-visible:outline-2 focus-visible:outline-offset-2"
     @keydown="handleKeyDown"
   >
     <!-- Drawing Surface -->
