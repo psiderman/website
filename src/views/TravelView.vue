@@ -63,7 +63,7 @@
                   <img
                     v-for="(img, idx) in travel.images"
                     :key="img.id"
-                    v-lazy="img.thumbnailUrl || img.url"
+                    v-lazy="img.thumbnailUrl"
                     :alt="img.name"
                     class="size-20 shrink-0 cursor-pointer snap-start object-cover transition-opacity hover:opacity-90"
                     width="80"
@@ -277,6 +277,7 @@ const triggerLightbox = (travel: any, clickedIdx: number) => {
     caption: img.caption,
     clearance: img.clearance,
     height: img.height,
+    thumbnailUrl: img.thumbnailUrl,
     url: img.url,
     width: img.width,
   }))

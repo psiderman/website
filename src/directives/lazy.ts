@@ -41,7 +41,21 @@ const observer = new IntersectionObserver(
   }
 )
 
-const lazyDirective: Directive<LazyHTMLImageElement, string> = {
+type LazyBindingValue = LazyValue | string
+
+interface LazyValue {
+  placeholder?: string
+  src: string
+}
+
+function resolveBinding(value: LazyBindingValue): { placeholder?: string; src: string; } {
+  if (typeof value === 'string') {
+    return { src: value }
+  }
+  return value || { src: '' }
+}
+
+const lazyDirective: Directive<LazyHTMLImageElement, LazyBindingValue> = {
   beforeUnmount(el) {
     observer.unobserve(el)
     if (el._lazyCleanup) {
@@ -50,20 +64,35 @@ const lazyDirective: Directive<LazyHTMLImageElement, string> = {
   },
   mounted(el, binding) {
     if (binding.value) {
-      el.dataset.src = binding.value
-      el.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+      const { placeholder, src } = resolveBinding(binding.value)
+      el.dataset.src = src
+      if (placeholder) {
+        el.src = placeholder
+      } else {
+        el.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+      }
       el.classList.add('lazy-loading')
       observer.observe(el)
     }
   },
   updated(el, binding) {
-    if (binding.value && binding.value !== binding.oldValue) {
-      if (el._lazyCleanup) {
-        el._lazyCleanup()
+    if (binding.value) {
+      const { placeholder, src } = resolveBinding(binding.value)
+      const oldVal = binding.oldValue ? resolveBinding(binding.oldValue) : null
+
+      if (src && (!oldVal || src !== oldVal.src)) {
+        if (el._lazyCleanup) {
+          el._lazyCleanup()
+        }
+        el.dataset.src = src
+        if (placeholder) {
+          el.src = placeholder
+        } else {
+          el.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+        }
+        el.classList.add('lazy-loading')
+        observer.observe(el)
       }
-      el.dataset.src = binding.value
-      el.classList.add('lazy-loading')
-      observer.observe(el)
     }
   },
 }

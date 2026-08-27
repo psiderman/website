@@ -12,25 +12,28 @@ interface GroupEntry {
 }
 
 interface TooltipElement extends HTMLElement {
+  _lazyContent?: () => Element | string
   _tippy?: Instance
   _tooltipGroup?: string
 }
 
 /** Extended options: pass a `group` string to share a singleton tooltip. */
-interface TooltipOptions extends Partial<Props> {
+interface TooltipOptions extends Omit<Partial<Props>, 'content'> {
+  content?: (() => Element | string) | Element | string
   group?: string
 }
 
-type TooltipValue = null | Partial<Props> | string | TooltipOptions
+type TooltipValue = (() => Element | string) | null | string | TooltipOptions
 
 const groups = new Map<string, GroupEntry>()
 
 function resolveOptions(value: TooltipValue): {
   group: string | undefined
-  props: Partial<Props>
+  props: Omit<Partial<Props>, 'content'> & { content?: (() => Element | string) | Element | string }
 } {
   if (!value) return { group: undefined, props: {} }
   if (typeof value === 'string') return { group: undefined, props: { content: value } }
+  if (typeof value === 'function') return { group: undefined, props: { content: value } }
 
   const { group, ...rest } = value as TooltipOptions
   return { group, props: rest }
@@ -54,7 +57,28 @@ function initTippy(el: TooltipElement, value: TooltipValue) {
 
   const plugins = props.followCursor ? [followCursor] : []
 
-  tippy(el, { ...BASE_PROPS, plugins, ...props })
+  if (typeof props.content === 'function') {
+    el._lazyContent = props.content
+  } else {
+    delete el._lazyContent
+  }
+
+  const instance = tippy(el, {
+    ...BASE_PROPS,
+    plugins,
+    ...props,
+    content: el._lazyContent ? '' : (props.content as Element | string),
+    onShow(instance) {
+      if (el._lazyContent && !instance.props.content) {
+        instance.setContent(el._lazyContent())
+      }
+      if (props.onShow) {
+        props.onShow(instance)
+      }
+    },
+  })
+
+  el._tippy = instance
 
   if (group && el._tippy) {
     el._tooltipGroup = group
@@ -140,6 +164,7 @@ const tooltip: ObjectDirective<TooltipElement, TooltipValue> = {
         }
         el._tippy.destroy()
         el._tippy = undefined
+        delete el._lazyContent
       }
       return
     }
@@ -150,13 +175,17 @@ const tooltip: ObjectDirective<TooltipElement, TooltipValue> = {
       return
     }
 
-    // Otherwise update the existing tippy instance. Only push the content when
-    // it actually changed — trigger/hideOnClick/followCursor/delay are init-only
-    // (applied once in initTippy).
     const next = props.content
-    if (next === el._tippy?.props.content) return
-
-    el._tippy.setProps({ content: next })
+    if (typeof next === 'function') {
+      el._lazyContent = next
+      if (el._tippy.props.content) {
+        el._tippy.setContent(next())
+      }
+    } else {
+      delete el._lazyContent
+      if (next === el._tippy.props.content) return
+      el._tippy.setProps({ content: next })
+    }
 
     // Handle group transitions
     if (group !== el._tooltipGroup) {

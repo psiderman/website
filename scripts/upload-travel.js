@@ -17,13 +17,12 @@
  * Options:
  *   --dry-run             Preview changes without uploading or deleting
  *   --service-key <key>   Explicit Supabase service role key (or loads from .env)
- *   --quality <num>       Thumbnail WebP quality 1-100 (default: 80)
+ *   --quality <num>       Thumbnail WebP quality 1-100 (default: 70)
  *   --help, -h            Show this help message
  */
 
 import { execFileSync, spawnSync } from 'child_process'
 import fs from 'fs'
-import os from 'os'
 import path from 'path'
 
 import { createClient } from '@supabase/supabase-js'
@@ -47,7 +46,13 @@ function findLocalFiles(dir) {
   const list = fs.readdirSync(dir)
 
   for (const entry of list) {
-    if (entry.startsWith('.') || entry === 'processed' || entry === 'node_modules') continue
+    if (
+      entry.startsWith('.') ||
+      entry === 'processed' ||
+      entry === 'node_modules' ||
+      entry === 'thumb'
+    )
+      continue
     const fullPath = path.join(dir, entry)
     const stat = fs.statSync(fullPath)
 
@@ -61,7 +66,7 @@ function findLocalFiles(dir) {
   return results
 }
 
-function generateThumbnail(sourcePath, targetThumbPath, quality = 80) {
+function generateThumbnail(sourcePath, targetThumbPath, quality = 70) {
   const thumbDir = path.dirname(targetThumbPath)
   if (!fs.existsSync(thumbDir)) {
     fs.mkdirSync(thumbDir, { recursive: true })
@@ -72,14 +77,24 @@ function generateThumbnail(sourcePath, targetThumbPath, quality = 80) {
     [
       sourcePath,
       '-auto-orient',
-      '-resize',
-      '80x80^',
-      '-gravity',
-      'center',
-      '-extent',
-      '80x80',
+
+      // Reduce to ~1% then upscale to ~600x800.
+      '-scale',
+      '4%',
+      '-scale',
+      '400%',
+
+      // Remove EXIF/IPTC/XMP/color-profile metadata.
+      '-strip',
+
+      // Consistent browser-friendly color space.
+      '-colorspace',
+      'sRGB',
+
+      // WebP encoding.
       '-quality',
       quality.toString(),
+
       targetThumbPath,
     ],
     { stdio: 'ignore' },
@@ -134,7 +149,8 @@ async function main() {
   let targetPath = null
   let dryRun = false
   let serviceKey = null
-  let thumbQuality = 80
+  let thumbQuality = 70
+  let forceThumbs = false
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]
@@ -143,7 +159,9 @@ async function main() {
     } else if (arg === '--service-key') {
       serviceKey = args[++i]
     } else if (arg === '--quality' || arg === '-q') {
-      thumbQuality = parseInt(args[++i], 10) || 80
+      thumbQuality = parseInt(args[++i], 10) || 70
+    } else if (arg === '--force-thumbs') {
+      forceThumbs = true
     } else if (arg === '--help' || arg === '-h') {
       targetPath = null
       break
@@ -157,7 +175,8 @@ async function main() {
     console.log('\nOptions:')
     console.log('  --dry-run             Preview actions without executing uploads or deletes')
     console.log('  --service-key <key>   Supabase Service Role Key (default: from .env)')
-    console.log('  --quality, -q <num>   Thumbnail WebP quality (default: 80)')
+    console.log('  --quality, -q <num>   Thumbnail WebP quality (default: 70)')
+    console.log('  --force-thumbs        Force regeneration and upload of all thumbnails')
     console.log('  --help, -h            Show this help message')
     process.exit(0)
   }
@@ -169,7 +188,9 @@ async function main() {
 
   if (!supabaseUrl || !supabaseKey) {
     console.error('❌ Error: Missing Supabase credentials.')
-    console.error('Please ensure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env or passed via --service-key.')
+    console.error(
+      'Please ensure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env or passed via --service-key.',
+    )
     process.exit(1)
   }
 
@@ -194,40 +215,6 @@ async function main() {
   const localFilePaths = findLocalFiles(resolvedPath)
   console.log(`  Found ${localFilePaths.length} local original image(s).`)
 
-  // Create temporary directory for thumbnails
-  const tempThumbDir = path.join(os.tmpdir(), `travel_thumbs_${Date.now()}`)
-  fs.mkdirSync(tempThumbDir, { recursive: true })
-
-  const localDesiredFiles = new Map()
-
-  console.log('🖼️  Generating 80x80 WebP thumbnails locally...')
-  for (let idx = 0; idx < localFilePaths.length; idx++) {
-    const filePath = localFilePaths[idx]
-    const relativePath = path.relative(resolvedPath, filePath)
-    const remoteOriginalPath = relativePath.split(path.sep).join('/')
-    const remoteThumbPath = `thumb/${remoteOriginalPath}`
-
-    // Original file entry
-    const stat = fs.statSync(filePath)
-    localDesiredFiles.set(remoteOriginalPath, {
-      fullPath: filePath,
-      isThumb: false,
-      size: stat.size,
-    })
-
-    // Generate local thumbnail
-    const localThumbPath = path.join(tempThumbDir, relativePath)
-    generateThumbnail(filePath, localThumbPath, thumbQuality)
-    const thumbStat = fs.statSync(localThumbPath)
-
-    localDesiredFiles.set(remoteThumbPath, {
-      fullPath: localThumbPath,
-      isThumb: true,
-      size: thumbStat.size,
-    })
-  }
-  console.log(`  Generated ${localFilePaths.length} thumbnail(s).`)
-
   // 2. Fetch remote storage state
   console.log('\n📡 Fetching remote files from Supabase Storage (bucket: travel)...')
   const remoteObjects = await listAllRemoteObjects(supabase, 'travel')
@@ -235,17 +222,62 @@ async function main() {
   remoteObjects.forEach((obj) => remoteObjectMap.set(obj.name, obj))
   console.log(`  Found ${remoteObjects.length} remote object(s).`)
 
-  // 3. Reconcile differences
+  // 3. Reconcile differences and determine which thumbnails to generate
   const toUpload = []
   const toDelete = []
+  const localDesiredFiles = new Set()
+  const thumbsToGenerate = []
+
+  const localThumbDir = path.join(resolvedPath, 'thumb')
   let upToDateCount = 0
 
-  for (const [remotePath, localInfo] of localDesiredFiles.entries()) {
-    const remoteObj = remoteObjectMap.get(remotePath)
-    if (!remoteObj) {
-      toUpload.push({ action: 'NEW', ...localInfo, remotePath })
-    } else if (remoteObj.size !== localInfo.size) {
-      toUpload.push({ action: 'MODIFIED', ...localInfo, remotePath })
+  for (const filePath of localFilePaths) {
+    const relativePath = path.relative(resolvedPath, filePath)
+    const remoteOriginalPath = relativePath.split(path.sep).join('/')
+    const remoteThumbPath = `thumb/${remoteOriginalPath}`
+
+    localDesiredFiles.add(remoteOriginalPath)
+    localDesiredFiles.add(remoteThumbPath)
+
+    const originalStat = fs.statSync(filePath)
+    const remoteOriginal = remoteObjectMap.get(remoteOriginalPath)
+
+    let originalNeedsUpload = false
+    let thumbNeedsUpload = false
+
+    if (!remoteOriginal) {
+      originalNeedsUpload = true
+      thumbNeedsUpload = true
+    } else if (remoteOriginal.size !== originalStat.size) {
+      originalNeedsUpload = true
+      thumbNeedsUpload = true
+    } else {
+      const remoteThumb = remoteObjectMap.get(remoteThumbPath)
+      if (!remoteThumb || forceThumbs) {
+        thumbNeedsUpload = true
+      }
+    }
+
+    if (originalNeedsUpload) {
+      toUpload.push({
+        action: remoteOriginal ? 'MODIFIED' : 'NEW',
+        fullPath: filePath,
+        isThumb: false,
+        remotePath: remoteOriginalPath,
+        size: originalStat.size,
+      })
+    } else {
+      upToDateCount++
+    }
+
+    if (thumbNeedsUpload) {
+      const localThumbPath = path.join(localThumbDir, relativePath)
+      thumbsToGenerate.push({
+        action: remoteObjectMap.has(remoteThumbPath) ? 'MODIFIED' : 'NEW',
+        filePath,
+        localThumbPath,
+        remoteThumbPath,
+      })
     } else {
       upToDateCount++
     }
@@ -257,11 +289,31 @@ async function main() {
     }
   }
 
-  // 4. Print Reconciliation Summary
+  // 4. Generate only the needed thumbnails
+  if (thumbsToGenerate.length > 0) {
+    console.log(`🖼️  Generating ${thumbsToGenerate.length} needed WebP thumbnail(s) locally...`)
+    for (const thumbInfo of thumbsToGenerate) {
+      generateThumbnail(thumbInfo.filePath, thumbInfo.localThumbPath, thumbQuality)
+      const thumbStat = fs.statSync(thumbInfo.localThumbPath)
+      toUpload.push({
+        action: thumbInfo.action,
+        fullPath: thumbInfo.localThumbPath,
+        isThumb: true,
+        remotePath: thumbInfo.remoteThumbPath,
+        size: thumbStat.size,
+      })
+    }
+  } else {
+    console.log('🖼️  No new thumbnails need to be generated.')
+  }
+
+  // 5. Print Reconciliation Summary
   console.log('\n================================================================================')
   console.log('📊 Sync Plan:')
   console.log(`   ✨ To Upload (New):       ${toUpload.filter((u) => u.action === 'NEW').length}`)
-  console.log(`   🔄 To Overwrite (Mod):    ${toUpload.filter((u) => u.action === 'MODIFIED').length}`)
+  console.log(
+    `   🔄 To Overwrite (Mod):    ${toUpload.filter((u) => u.action === 'MODIFIED').length}`,
+  )
   console.log(`   🗑️  To Delete (Orphans):   ${toDelete.length}`)
   console.log(`   ✅ Already In Sync:       ${upToDateCount}`)
   console.log('================================================================================\n')
@@ -269,7 +321,9 @@ async function main() {
   if (toUpload.length > 0) {
     console.log('⬆️  Uploads:')
     toUpload.forEach((item) => {
-      console.log(`   [${item.action.padEnd(8)}] ${item.remotePath} (${(item.size / 1024).toFixed(1)} KB)`)
+      console.log(
+        `   [${item.action.padEnd(8)}] ${item.remotePath} (${(item.size / 1024).toFixed(1)} KB)`,
+      )
     })
   }
 
@@ -280,11 +334,10 @@ async function main() {
 
   if (dryRun) {
     console.log('\n🔍 Dry run completed. No remote changes were made.')
-    fs.rmSync(tempThumbDir, { force: true, recursive: true })
     return
   }
 
-  // 5. Execute Uploads
+  // 6. Execute Uploads
   if (toUpload.length > 0) {
     console.log(`\n🚀 Uploading ${toUpload.length} file(s)...`)
     for (let i = 0; i < toUpload.length; i++) {
@@ -308,7 +361,7 @@ async function main() {
     }
   }
 
-  // 6. Execute Deletions
+  // 7. Execute Deletions
   if (toDelete.length > 0) {
     console.log(`\n🗑️  Deleting ${toDelete.length} orphaned remote file(s)...`)
     // Delete in chunks of 50
@@ -323,9 +376,6 @@ async function main() {
       }
     }
   }
-
-  // Cleanup temp files
-  fs.rmSync(tempThumbDir, { force: true, recursive: true })
 
   console.log('\n🎉 Storage sync completed successfully!')
 }

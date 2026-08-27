@@ -51,10 +51,15 @@
                       class="relative flex max-h-full max-w-full items-center justify-center"
                     >
                       <img
-                        v-lazy="item.src"
+                        v-lazy="{ src: item.src, placeholder: item.placeholder }"
                         :alt="`${title}-${idx}`"
                         :width="item.width ?? undefined"
                         :height="item.height ?? undefined"
+                        :style="
+                          item.width && item.height
+                            ? { aspectRatio: `${item.width}/${item.height}` }
+                            : {}
+                        "
                         class="desktop:max-h-[calc(75svh)] w-auto object-contain"
                       />
                       <div class="absolute top-2 right-2 flex flex-row gap-2">
@@ -178,6 +183,7 @@ const props = defineProps<{
     caption?: null | string
     clearance?: ClearanceLevel
     height?: null | number
+    thumbnailUrl?: string
     url: string
     width?: null | number
   }[]
@@ -195,6 +201,7 @@ const mediaItems = computed(() => {
         caption: img.caption,
         clearance: img.clearance,
         height: img.height,
+        placeholder: img.thumbnailUrl,
         src: img.url,
         type: 'image' as const,
         width: img.width,

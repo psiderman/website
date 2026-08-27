@@ -61,6 +61,7 @@ function addMarkers() {
         clearance: feature.properties.clearance,
         height: feature.properties.height,
         imageUrl: feature.properties.imageUrl,
+        thumbnailUrl: feature.properties.thumbnailUrl,
         width: feature.properties.width,
       }),
     )
@@ -104,6 +105,7 @@ function buildGeoJSON(travels: TravelWithImages[]) {
       height: null | number
       imageUrl: string
       slug: string
+      thumbnailUrl: string
       travelImages: string
       width: null | number
     }
@@ -121,6 +123,7 @@ function buildGeoJSON(travels: TravelWithImages[]) {
           height: img.height,
           imageUrl: img.url,
           slug: travel.slug,
+          thumbnailUrl: img.thumbnailUrl,
           travelImages: JSON.stringify(
             travel.images.map((i) => ({ clearance: i.clearance, url: i.url })),
           ),
