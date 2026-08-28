@@ -1,244 +1,477 @@
 <template>
-  <div class="mx-auto flex h-dvh w-full max-w-120 flex-col overflow-hidden">
-    <TabGroup
-      :selected-index="selectedTab"
-      as="div"
-      class="flex h-full w-full flex-col overflow-hidden"
-      @change="(index: number) => (selectedTab = index)"
-    >
-      <div
-        class="bg-surface-inverted text-text-inverted-primary text-ui flex items-center justify-center border-b border-transparent p-2"
+  <div class="flex h-screen w-screen items-center justify-center bg-zinc-950">
+    <div class="bg-background mx-auto flex h-dvh w-full max-w-120 flex-col overflow-hidden">
+      <TabGroup
+        :selected-index="selectedTab"
+        as="div"
+        class="flex h-full w-full flex-col overflow-hidden"
+        @change="(index: number) => (selectedTab = index)"
       >
-        suitlady v1.1
-      </div>
-      <TabList
-        class="border-border-primary noscrollbar flex w-full flex-row gap-1 overflow-scroll border-b"
-      >
-        <Tab v-for="tab in tabs" :key="tab.name" v-slot="{ selected }" as="template">
-          <button
-            class="text-ui flex cursor-pointer flex-row items-center justify-center gap-2 border-b-2 p-2 transition-colors outline-none"
-            :class="
-              selected
-                ? 'border-surface-inverted text-text-primary'
-                : 'text-text-tertiary hover:text-text-secondary border-transparent'
-            "
-          >
-            <component :is="tab.icon" :size="16" />
-            <span>{{ tab.name }}</span>
-          </button>
-        </Tab>
-      </TabList>
-
-      <TabPanels
-        ref="scrollContainer"
-        class="relative h-full w-full overflow-auto"
-        @touchstart.passive="onTouchStart"
-        @touchmove="onTouchMove"
-        @touchend="onTouchEnd"
-      >
-        <!-- Pull to Refresh Indicator -->
         <div
-          class="pointer-events-none absolute top-0 right-0 left-0 z-50 flex items-center justify-center transition-all duration-150 ease-out"
-          :style="{
-            height: `${pullDistance}px`,
-            opacity: pullDistance > 0 ? Math.min(pullDistance / pullThreshold, 1) : 0,
-            transform: `translateY(${Math.min(pullDistance, pullThreshold * 1.5)}px)`,
-          }"
+          class="bg-surface-inverted text-text-inverted-primary text-ui flex items-center justify-center border-b border-transparent p-2"
         >
-          <div
-            class="bg-surface-primary border-border-primary flex items-center gap-2 rounded-full border px-4 py-2 shadow-lg"
-          >
-            <Loader
-              :size="16"
-              :class="['text-text-primary', isRefreshing ? 'animate-spin' : '']"
-              :style="{
-                transform: !isRefreshing ? `rotate(${pullDistance * 3}deg)` : undefined,
-              }"
-            />
-            <span class="text-ui-small text-text-secondary">
-              {{
-                isRefreshing
-                  ? 'Refreshing...'
-                  : pullDistance > pullThreshold
-                    ? 'Release to refresh'
-                    : 'Pull to refresh'
-              }}
-            </span>
-          </div>
+          suitlady v1.1
         </div>
-
-        <!-- Roles Tab Panel -->
-        <TabPanel class="outline-none">
-          <div v-for="user in userRolesList" :key="user.user_id" class="px-4">
-            <!-- User / Image + Name -->
-            <div
-              class="border-border-primary relative flex w-full flex-row items-center justify-between gap-4 border-b py-4"
+        <TabList
+          class="border-border-primary noscrollbar flex w-full flex-row gap-1 overflow-scroll border-b"
+        >
+          <Tab v-for="tab in tabs" :key="tab.name" v-slot="{ selected }" as="template">
+            <button
+              class="text-ui flex cursor-pointer flex-row items-center justify-center gap-2 border-b-2 p-2 transition-colors outline-none"
+              :class="
+                selected
+                  ? 'border-surface-inverted text-text-primary'
+                  : 'text-text-tertiary hover:text-text-secondary border-transparent'
+              "
             >
-              <div class="relative flex min-w-0 flex-1 flex-row items-center gap-2">
-                <div
-                  class="border-border-primary bg-surface-secondary size-8 shrink-0 overflow-hidden rounded-full border"
-                >
-                  <img
-                    v-if="user.avatar_url"
-                    :src="user.avatar_url"
-                    :alt="user.full_name || 'User avatar'"
-                    class="size-full object-cover"
-                    @error="user.avatar_url = undefined"
-                  />
-                  <div
-                    v-else
-                    class="text-text-tertiary flex size-full items-center justify-center font-medium uppercase"
-                  >
-                    {{ (user.full_name || user.email || 'U').charAt(0) }}
-                  </div>
-                </div>
-                <div class="flex min-w-0 flex-1 flex-col">
-                  <p class="text-text-primary truncate font-medium">
-                    {{ user.full_name }}
-                  </p>
-                  <p class="text-text-tertiary text-mono truncate" :title="user.user_id">
-                    {{ user.email }}
-                  </p>
-                </div>
-              </div>
-              <div
-                class="text-ui border-border-primary bg-surface-primary relative inline-flex h-8 min-w-28 cursor-pointer items-center justify-between gap-3 rounded-lg border px-2.5 py-0"
-              >
-                <div class="flex flex-row items-center justify-start gap-1">
-                  <div
-                    :class="getRoleBadgeClass(pendingRoles[user.user_id] || user.role)"
-                    class="h-4 w-1.5 rounded-full"
-                  ></div>
-                  <span>{{ pendingRoles[user.user_id] || user.role }}</span>
-                </div>
+              <component :is="tab.icon" :size="16" />
+              <span>{{ tab.name }}</span>
+            </button>
+          </Tab>
+        </TabList>
 
-                <ChevronDown :size="14" class="shrink-0 opacity-70" />
-
-                <select
-                  v-model="pendingRoles[user.user_id]"
-                  class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                  @change="saveRole(user)"
-                >
-                  <option v-for="role in clearanceLevels" :key="role" :value="role">
-                    {{ role }}
-                  </option>
-                </select>
-              </div>
+        <TabPanels
+          ref="scrollContainer"
+          class="relative h-full w-full overflow-auto"
+          @touchstart.passive="onTouchStart"
+          @touchmove="onTouchMove"
+          @touchend="onTouchEnd"
+        >
+          <!-- Pull to Refresh Indicator -->
+          <div
+            class="pointer-events-none absolute top-0 right-0 left-0 z-50 flex items-center justify-center transition-all duration-150 ease-out"
+            :style="{
+              height: `${pullDistance}px`,
+              opacity: pullDistance > 0 ? Math.min(pullDistance / pullThreshold, 1) : 0,
+              transform: `translateY(${Math.min(pullDistance, pullThreshold * 1.5)}px)`,
+            }"
+          >
+            <div
+              class="bg-surface-primary border-border-primary flex items-center gap-2 rounded-full border px-4 py-2 shadow-lg"
+            >
+              <Loader
+                :size="16"
+                :class="['text-text-primary', isRefreshing ? 'animate-spin' : '']"
+                :style="{
+                  transform: !isRefreshing ? `rotate(${pullDistance * 3}deg)` : undefined,
+                }"
+              />
+              <span class="text-ui-small text-text-secondary">
+                {{
+                  isRefreshing
+                    ? 'Refreshing...'
+                    : pullDistance > pullThreshold
+                      ? 'Release to refresh'
+                      : 'Pull to refresh'
+                }}
+              </span>
             </div>
           </div>
-        </TabPanel>
 
-        <!-- People Tab Panel -->
-        <TabPanel class="outline-none">
-          <div class="flex snap-x snap-mandatory overflow-x-auto p-4 pb-24">
+          <!-- Roles Tab Panel -->
+          <TabPanel class="outline-none">
+            <div v-for="user in userRolesList" :key="user.user_id" class="px-4">
+              <!-- User / Image + Name -->
+              <div
+                class="border-border-primary relative flex w-full flex-row items-center justify-between gap-4 border-b py-4"
+              >
+                <div class="relative flex min-w-0 flex-1 flex-row items-center gap-2">
+                  <div
+                    class="border-border-primary bg-surface-secondary size-8 shrink-0 overflow-hidden rounded-full border"
+                  >
+                    <img
+                      v-if="user.avatar_url"
+                      :src="user.avatar_url"
+                      :alt="user.full_name || 'User avatar'"
+                      class="size-full object-cover"
+                      @error="user.avatar_url = undefined"
+                    />
+                    <div
+                      v-else
+                      class="text-text-tertiary flex size-full items-center justify-center font-medium uppercase"
+                    >
+                      {{ (user.full_name || user.email || 'U').charAt(0) }}
+                    </div>
+                  </div>
+                  <div class="flex min-w-0 flex-1 flex-col">
+                    <p class="text-text-primary truncate font-medium">
+                      {{ user.full_name }}
+                    </p>
+                    <p class="text-text-tertiary text-mono truncate" :title="user.user_id">
+                      {{ user.email }}
+                    </p>
+                  </div>
+                </div>
+                <div
+                  class="text-ui border-border-primary bg-surface-primary relative inline-flex h-8 min-w-28 cursor-pointer items-center justify-between gap-3 rounded-lg border px-2.5 py-0"
+                >
+                  <div class="flex flex-row items-center justify-start gap-1">
+                    <div
+                      :class="getRoleBadgeClass(pendingRoles[user.user_id] || user.role)"
+                      class="h-4 w-1.5 rounded-full"
+                    ></div>
+                    <span>{{ pendingRoles[user.user_id] || user.role }}</span>
+                  </div>
+
+                  <ChevronDown :size="14" class="shrink-0 opacity-70" />
+
+                  <select
+                    v-model="pendingRoles[user.user_id]"
+                    class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    @change="saveRole(user)"
+                  >
+                    <option v-for="role in clearanceLevels" :key="role" :value="role">
+                      {{ role }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </TabPanel>
+
+          <!-- People Tab Panel -->
+          <TabPanel class="outline-none">
+            <div class="flex snap-x snap-mandatory overflow-x-auto p-4 pb-24">
+              <div
+                v-for="org in orgsWithPeople"
+                :key="org.id"
+                class="flex w-full shrink-0 snap-start scroll-m-4 flex-col gap-1 p-4"
+              >
+                <h3 class="text-ui-small text-text-tertiary tracking-wider uppercase">
+                  {{ org.name }}
+                </h3>
+
+                <Disclosure
+                  v-for="person in org.people"
+                  :key="`${person.orgId}:${person.name}`"
+                  v-slot="{ close }"
+                  as="div"
+                  class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
+                >
+                  <DisclosureButton class="w-full p-2 text-left">
+                    <div class="flex items-center gap-2 not-last:pb-3">
+                      <img
+                        :src="getWorkPersonUrl(person.orgId, person.imageName)"
+                        :alt="person.name"
+                        class="size-8 rounded-full object-cover"
+                        @error="(e: Event) => ((e.target as HTMLElement).style.display = 'none')"
+                      />
+                      <div class="flex min-w-0 flex-col gap-0">
+                        <p class="text-ui text-text-primary">{{ person.name }}</p>
+                        <div
+                          class="inline-flex shrink-0 flex-row items-center justify-center gap-1"
+                        >
+                          <p
+                            v-if="person.linkedin"
+                            class="text-ui-small text-text-secondary w-full truncate"
+                          >
+                            {{ person.linkedin }}
+                          </p>
+                          <a
+                            v-if="person.linkedin"
+                            :href="person.linkedin"
+                            target="_blank"
+                            @click.stop
+                          >
+                            <ExternalLink :size="12" class="text-text-tertiary" />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-if="person.quote" class="border-border-primary border-t pt-3">
+                      <p class="text-p-small text-text-secondary border-l-2 pl-2 italic">
+                        {{ person.quote }}
+                      </p>
+                    </div>
+                  </DisclosureButton>
+
+                  <DisclosurePanel
+                    class="border-border-primary bg-surface-secondary flex flex-col gap-2 border-t p-4"
+                  >
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Name</span>
+                      <input
+                        v-model="getEditForm(person).name"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                      />
+                    </label>
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Image Name</span>
+                      <input
+                        v-model="getEditForm(person).imageName"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                      />
+                    </label>
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">LinkedIn URL</span>
+                      <input
+                        v-model="getEditForm(person).linkedin"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                      />
+                    </label>
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Quote</span>
+                      <textarea
+                        v-model="getEditForm(person).quote"
+                        rows="2"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                      ></textarea>
+                    </label>
+                    <div class="flex items-center justify-between gap-2 p-2">
+                      <div class="flex gap-2">
+                        <button
+                          class="btn primary"
+                          type="button"
+                          :disabled="savingPersonKey === `${person.orgId}:${person.name}`"
+                          @click="savePerson(person, close)"
+                        >
+                          {{
+                            savingPersonKey === `${person.orgId}:${person.name}`
+                              ? 'Saving...'
+                              : 'Save'
+                          }}
+                        </button>
+                        <button class="btn stroke" type="button" @click="resetPerson(person)">
+                          Reset
+                        </button>
+                      </div>
+                      <button
+                        class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
+                        type="button"
+                        @click="deletePerson(person)"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </DisclosurePanel>
+                </Disclosure>
+              </div>
+            </div>
             <div
-              v-for="org in orgsWithPeople"
-              :key="org.id"
-              class="flex w-full shrink-0 snap-start scroll-m-4 flex-col gap-1 p-4"
+              class="bg-surface-secondary border-border-high-contrast fixed bottom-0 left-1/2 z-20 w-full max-w-120 -translate-x-1/2 border-t p-4"
             >
-              <h3 class="text-ui-small text-text-tertiary tracking-wider uppercase">
-                {{ org.name }}
-              </h3>
+              <button class="btn primary w-full" type="button" @click="openAddPersonModal">
+                <Plus :size="16" /> Add person
+              </button>
+            </div>
+          </TabPanel>
 
+          <!-- Trip Tab Panel -->
+          <TabPanel class="outline-none">
+            <div class="flex flex-col gap-3 p-4">
               <Disclosure
-                v-for="person in org.people"
-                :key="`${person.orgId}:${person.name}`"
+                v-for="trip in tripsList"
+                :key="trip.slug"
                 v-slot="{ close }"
                 as="div"
                 class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
               >
-                <DisclosureButton class="w-full p-2 text-left">
-                  <div class="flex items-center gap-2 not-last:pb-3">
-                    <img
-                      :src="getWorkPersonUrl(person.orgId, person.imageName)"
-                      :alt="person.name"
-                      class="size-8 rounded-full object-cover"
-                      @error="(e: Event) => ((e.target as HTMLElement).style.display = 'none')"
-                    />
-                    <div class="flex min-w-0 flex-col gap-0">
-                      <p class="text-ui text-text-primary">{{ person.name }}</p>
-                      <div class="inline-flex shrink-0 flex-row items-center justify-center gap-1">
-                        <p
-                          v-if="person.linkedin"
-                          class="text-ui-small text-text-secondary w-full truncate"
-                        >
-                          {{ person.linkedin }}
-                        </p>
-                        <a
-                          v-if="person.linkedin"
-                          :href="person.linkedin"
-                          target="_blank"
-                          @click.stop
-                        >
-                          <ExternalLink :size="12" class="text-text-tertiary" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                  <div v-if="person.quote" class="border-border-primary border-t pt-3">
-                    <p class="text-p-small text-text-secondary border-l-2 pl-2 italic">
-                      {{ person.quote }}
+                <DisclosureButton
+                  class="flex w-full cursor-pointer flex-row items-center justify-between p-3 text-left"
+                >
+                  <div class="flex min-w-0 flex-col gap-0">
+                    <p class="text-ui text-text-primary truncate font-medium">{{ trip.title }}</p>
+                    <p class="text-ui-small text-text-secondary truncate">
+                      {{ trip.subtitle || formatTripDate(trip.date) }}
                     </p>
+                  </div>
+
+                  <div class="flex shrink-0 flex-row items-center gap-2">
+                    <!-- Close Friends -->
+                    <div
+                      v-if="isHighClearance(trip.clearance)"
+                      v-tooltip="{ content: 'you’re on “the list”' }"
+                      class="flex size-5 items-center justify-center rounded-full bg-green-500"
+                    >
+                      <Star :size="12" fill="#fff" stroke-width="0" />
+                    </div>
+
+                    <!-- Repeat status -->
+                    <div
+                      v-if="trip.repeat_visit"
+                      v-tooltip="{ content: 'Revisited' }"
+                      class="text-text-secondary flex size-6 items-center justify-center"
+                    >
+                      <Repeat :size="16" />
+                    </div>
+
+                    <!-- Instagram Link Button -->
+                    <a
+                      v-if="trip.instagram_link"
+                      v-tooltip="{ content: 'Instagram' }"
+                      :href="trip.instagram_link"
+                      target="_blank"
+                      class="text-text-secondary hover:text-text-primary flex size-6 items-center justify-center"
+                      @click.stop
+                    >
+                      <FA :icon="['fab', 'instagram']" class="text-ui" />
+                    </a>
+
+                    <!-- Google Maps list link button -->
+                    <a
+                      v-if="trip.maps_list_link"
+                      v-tooltip="{ content: 'Maps' }"
+                      :href="trip.maps_list_link"
+                      target="_blank"
+                      class="text-text-secondary hover:text-text-primary flex size-6 items-center justify-center"
+                      @click.stop
+                    >
+                      <Pin :size="16" />
+                    </a>
                   </div>
                 </DisclosureButton>
 
                 <DisclosurePanel
-                  class="border-border-primary bg-surface-secondary flex flex-col gap-2 border-t p-4"
+                  class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
                 >
+                  <div class="flex flex-col gap-2">
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Clearance</span>
+                      <div
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
+                      >
+                        <div class="flex flex-row gap-2">
+                          <div
+                            :class="getRoleBadgeClass(getEditTripForm(trip).clearance)"
+                            class="h-6 w-1.5 rounded-full"
+                          ></div>
+                          <span>{{ getEditTripForm(trip).clearance }}</span>
+                        </div>
+                        <ChevronDown :size="14" class="shrink-0 opacity-70" />
+                        <select
+                          v-model="getEditTripForm(trip).clearance"
+                          class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        >
+                          <option v-for="level in clearanceLevels" :key="level" :value="level">
+                            {{ level }}
+                          </option>
+                          <option value="public">public</option>
+                          <option value="admin">admin</option>
+                        </select>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Title</span>
+                      <input
+                        v-model="getEditTripForm(trip).title"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Subtitle</span>
+                      <input
+                        v-model="getEditTripForm(trip).subtitle"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                        placeholder="e.g. November 2024"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Slug</span>
+                      <input
+                        v-model="getEditTripForm(trip).slug"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Date</span>
+                      <input
+                        v-model="getEditTripForm(trip).date"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="date"
+                      />
+                    </label>
+                  </div>
+
+                  <div
+                    class="bg-surface-primary border-border-primary -mt-2 flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2 select-none"
+                    @click="
+                      getEditTripForm(trip).repeat_visit = !getEditTripForm(trip).repeat_visit
+                    "
+                  >
+                    <span class="text-ui text-text-primary">Repeat Visit</span>
+                    <div
+                      class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 ease-in-out"
+                      :class="
+                        getEditTripForm(trip).repeat_visit
+                          ? 'bg-surface-inverted'
+                          : 'bg-surface-secondary border-border-primary border'
+                      "
+                    >
+                      <span
+                        class="bg-surface-primary inline-block size-3.5 transform rounded-full shadow transition duration-200 ease-in-out"
+                        :class="
+                          getEditTripForm(trip).repeat_visit ? 'translate-x-4.5' : 'translate-x-0.5'
+                        "
+                      />
+                    </div>
+                  </div>
+
                   <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Name</span>
-                    <input
-                      v-model="getEditForm(person).name"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                    />
-                  </label>
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Image Name</span>
-                    <input
-                      v-model="getEditForm(person).imageName"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                    />
-                  </label>
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">LinkedIn URL</span>
-                    <input
-                      v-model="getEditForm(person).linkedin"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                    />
-                  </label>
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Quote</span>
+                    <span class="pl-1.5">Description (one line per paragraph)</span>
                     <textarea
-                      v-model="getEditForm(person).quote"
-                      rows="2"
+                      v-model="getEditTripForm(trip).descriptionText"
+                      rows="3"
                       class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                      @input="
+                        (e) =>
+                          handleSmartApostrophes(
+                            e,
+                            (val) => (getEditTripForm(trip).descriptionText = val),
+                          )
+                      "
                     ></textarea>
                   </label>
-                  <div class="flex items-center justify-between gap-2 p-2">
+
+                  <div class="flex flex-col gap-2">
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Instagram Link</span>
+                      <input
+                        v-model="getEditTripForm(trip).instagram_link"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Maps Link</span>
+                      <input
+                        v-model="getEditTripForm(trip).maps_list_link"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                      />
+                    </label>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-2 pt-2">
                     <div class="flex gap-2">
                       <button
                         class="btn primary"
                         type="button"
-                        :disabled="savingPersonKey === `${person.orgId}:${person.name}`"
-                        @click="savePerson(person, close)"
+                        :disabled="savingTripSlug === trip.slug"
+                        @click="saveTrip(trip, close)"
                       >
-                        {{
-                          savingPersonKey === `${person.orgId}:${person.name}`
-                            ? 'Saving...'
-                            : 'Save'
-                        }}
+                        {{ savingTripSlug === trip.slug ? 'Saving...' : 'Save' }}
                       </button>
-                      <button class="btn stroke" type="button" @click="resetPerson(person)">
+                      <button class="btn stroke" type="button" @click="resetTrip(trip)">
                         Reset
                       </button>
                     </div>
                     <button
                       class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
                       type="button"
-                      @click="deletePerson(person)"
+                      @click="deleteTrip(trip.slug)"
                     >
                       Delete
                     </button>
@@ -246,708 +479,395 @@
                 </DisclosurePanel>
               </Disclosure>
             </div>
-          </div>
-          <div
-            class="bg-surface-secondary border-border-high-contrast fixed bottom-0 left-1/2 z-20 w-full max-w-120 -translate-x-1/2 border-t p-4"
-          >
-            <button class="btn primary w-full" type="button" @click="openAddPersonModal">
-              <Plus :size="16" /> Add person
-            </button>
-          </div>
-        </TabPanel>
+          </TabPanel>
 
-        <!-- Trip Tab Panel -->
-        <TabPanel class="outline-none">
-          <div class="flex flex-col gap-3 p-4">
-            <Disclosure
-              v-for="trip in tripsList"
-              :key="trip.slug"
-              v-slot="{ close }"
-              as="div"
-              class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
+          <!-- Images Tab Panel -->
+          <TabPanel class="h-full overflow-hidden outline-none">
+            <div
+              v-if="currentVisibleTrip"
+              class="bg-surface-primary/95 border-border-primary fixed bottom-0 left-1/2 z-20 flex w-full max-w-120 -translate-x-1/2 flex-col gap-0.5 border-t p-4 backdrop-blur-xs"
             >
-              <DisclosureButton
-                class="flex w-full cursor-pointer flex-row items-center justify-between p-3 text-left"
+              <h3 class="text-ui text-text-primary font-medium">
+                {{ currentVisibleTrip.title }}
+              </h3>
+              <p class="text-ui-small text-text-tertiary">
+                {{ currentVisibleTrip.subtitle || formatTripDate(currentVisibleTrip.date) }}
+              </p>
+            </div>
+
+            <div
+              class="flex h-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden"
+              @scroll.passive="onImagesScroll"
+            >
+              <div
+                v-for="trip in tripsWithImagesGrouped"
+                :key="trip.slug"
+                class="flex h-full w-full shrink-0 snap-start scroll-m-4 flex-col gap-4 overflow-y-auto p-4 pb-28"
               >
-                <div class="flex min-w-0 flex-col gap-0">
-                  <p class="text-ui text-text-primary truncate font-medium">{{ trip.title }}</p>
-                  <p class="text-ui-small text-text-secondary truncate">
-                    {{ trip.subtitle || formatTripDate(trip.date) }}
-                  </p>
-                </div>
-
-                <div class="flex shrink-0 flex-row items-center gap-2">
-                  <!-- Close Friends -->
-                  <div
-                    v-if="isHighClearance(trip.clearance)"
-                    v-tooltip="{ content: 'you’re on “the list”' }"
-                    class="flex size-5 items-center justify-center rounded-full bg-green-500"
-                  >
-                    <Star :size="12" fill="#fff" stroke-width="0" />
-                  </div>
-
-                  <!-- Repeat status -->
-                  <div
-                    v-if="trip.repeat_visit"
-                    v-tooltip="{ content: 'Revisited' }"
-                    class="text-text-secondary flex size-6 items-center justify-center"
-                  >
-                    <Repeat :size="16" />
-                  </div>
-
-                  <!-- Instagram Link Button -->
-                  <a
-                    v-if="trip.instagram_link"
-                    v-tooltip="{ content: 'Instagram' }"
-                    :href="trip.instagram_link"
-                    target="_blank"
-                    class="text-text-secondary hover:text-text-primary flex size-6 items-center justify-center"
-                    @click.stop
-                  >
-                    <FA :icon="['fab', 'instagram']" class="text-ui" />
-                  </a>
-
-                  <!-- Google Maps list link button -->
-                  <a
-                    v-if="trip.maps_list_link"
-                    v-tooltip="{ content: 'Maps' }"
-                    :href="trip.maps_list_link"
-                    target="_blank"
-                    class="text-text-secondary hover:text-text-primary flex size-6 items-center justify-center"
-                    @click.stop
-                  >
-                    <Pin :size="16" />
-                  </a>
-                </div>
-              </DisclosureButton>
-
-              <DisclosurePanel
-                class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
-              >
-                <div class="flex flex-col gap-2">
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Clearance</span>
-                    <div
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
-                    >
-                      <div class="flex flex-row gap-2">
-                        <div
-                          :class="getRoleBadgeClass(getEditTripForm(trip).clearance)"
-                          class="h-6 w-1.5 rounded-full"
-                        ></div>
-                        <span>{{ getEditTripForm(trip).clearance }}</span>
-                      </div>
-                      <ChevronDown :size="14" class="shrink-0 opacity-70" />
-                      <select
-                        v-model="getEditTripForm(trip).clearance"
-                        class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                      >
-                        <option v-for="level in clearanceLevels" :key="level" :value="level">
-                          {{ level }}
-                        </option>
-                        <option value="public">public</option>
-                        <option value="admin">admin</option>
-                      </select>
-                    </div>
-                  </label>
-                </div>
-
-                <div class="flex flex-col gap-2">
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Title</span>
-                    <input
-                      v-model="getEditTripForm(trip).title"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                    />
-                  </label>
-
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Subtitle</span>
-                    <input
-                      v-model="getEditTripForm(trip).subtitle"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                      placeholder="e.g. November 2024"
-                    />
-                  </label>
-
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Slug</span>
-                    <input
-                      v-model="getEditTripForm(trip).slug"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                    />
-                  </label>
-
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Date</span>
-                    <input
-                      v-model="getEditTripForm(trip).date"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="date"
-                    />
-                  </label>
-                </div>
-
+                <!-- Public & Private Image Groups -->
                 <div
-                  class="bg-surface-primary border-border-primary -mt-2 flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2 select-none"
-                  @click="getEditTripForm(trip).repeat_visit = !getEditTripForm(trip).repeat_visit"
+                  v-for="group in [
+                    { title: 'Public Images', images: trip.publicImages, isPublic: true },
+                    { title: 'Private Images', images: trip.privateImages, isPublic: false },
+                  ]"
+                  :key="group.title"
+                  class="flex flex-col gap-2"
+                  :class="{ 'pt-2': !group.isPublic }"
                 >
-                  <span class="text-ui text-text-primary">Repeat Visit</span>
-                  <div
-                    class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 ease-in-out"
-                    :class="
-                      getEditTripForm(trip).repeat_visit
-                        ? 'bg-surface-inverted'
-                        : 'bg-surface-secondary border-border-primary border'
-                    "
+                  <span class="text-ui-small text-text-tertiary tracking-wider uppercase">
+                    {{ group.title }} ({{ group.images.length }})
+                  </span>
+
+                  <p
+                    v-if="group.images.length === 0"
+                    class="text-ui-small text-text-tertiary italic"
                   >
-                    <span
-                      class="bg-surface-primary inline-block size-3.5 transform rounded-full shadow transition duration-200 ease-in-out"
-                      :class="
-                        getEditTripForm(trip).repeat_visit ? 'translate-x-4.5' : 'translate-x-0.5'
-                      "
-                    />
-                  </div>
-                </div>
+                    No {{ group.isPublic ? 'public' : 'private' }} images
+                  </p>
 
-                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                  <span class="pl-1.5">Description (one line per paragraph)</span>
-                  <textarea
-                    v-model="getEditTripForm(trip).descriptionText"
-                    rows="3"
-                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                    @input="
-                      (e) =>
-                        handleSmartApostrophes(
-                          e,
-                          (val) => (getEditTripForm(trip).descriptionText = val),
-                        )
-                    "
-                  ></textarea>
-                </label>
-
-                <div class="flex flex-col gap-2">
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Instagram Link</span>
-                    <input
-                      v-model="getEditTripForm(trip).instagram_link"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                    />
-                  </label>
-
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Maps Link</span>
-                    <input
-                      v-model="getEditTripForm(trip).maps_list_link"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                    />
-                  </label>
-                </div>
-
-                <div class="flex items-center justify-between gap-2 pt-2">
-                  <div class="flex gap-2">
-                    <button
-                      class="btn primary"
-                      type="button"
-                      :disabled="savingTripSlug === trip.slug"
-                      @click="saveTrip(trip, close)"
+                  <div class="grid grid-cols-3 gap-2">
+                    <Disclosure
+                      v-for="img in group.images"
+                      :key="img.id"
+                      v-slot="{ close, open }"
+                      as="template"
                     >
-                      {{ savingTripSlug === trip.slug ? 'Saving...' : 'Save' }}
-                    </button>
-                    <button class="btn stroke" type="button" @click="resetTrip(trip)">Reset</button>
+                      <div
+                        :class="open ? 'col-span-3' : 'col-span-1'"
+                        class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
+                      >
+                        <DisclosureButton
+                          class="relative aspect-square w-full cursor-pointer overflow-hidden text-left"
+                        >
+                          <img
+                            :src="getTripThumbnailUrl(img.storage_path)"
+                            :alt="img.caption || img.storage_path"
+                            class="size-full object-cover"
+                          />
+                          <!-- Clearance overlay circle -->
+                          <div
+                            class="bg-light absolute top-1.5 right-1.5 flex size-4 items-center justify-center rounded-full p-0.5 backdrop-blur-xs"
+                          >
+                            <div
+                              :class="getRoleBadgeClass(img.clearance)"
+                              class="size-2.5 rounded-full"
+                            ></div>
+                          </div>
+                          <!-- Truncated caption overlay -->
+                          <div
+                            v-if="img.caption"
+                            class="from-dark/80 via-dark/40 absolute inset-x-0 bottom-0 bg-gradient-to-t to-transparent p-1.5 pt-4"
+                          >
+                            <p class="text-ui-small text-light truncate leading-tight italic">
+                              “{{ img.caption }}”
+                            </p>
+                          </div>
+                        </DisclosureButton>
+
+                        <DisclosurePanel
+                          class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
+                        >
+                          <label
+                            v-if="!group.isPublic"
+                            class="text-ui-small text-text-tertiary flex flex-col gap-1"
+                          >
+                            <span class="pl-1.5">Clearance</span>
+                            <div
+                              class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
+                            >
+                              <div class="flex flex-row items-center gap-2">
+                                <div
+                                  :class="getRoleBadgeClass(getEditImageForm(img).clearance)"
+                                  class="h-5 w-1.5 rounded-full"
+                                ></div>
+                                <span>{{ getEditImageForm(img).clearance }}</span>
+                              </div>
+                              <ChevronDown :size="14" class="shrink-0 opacity-70" />
+                              <select
+                                v-model="getEditImageForm(img).clearance"
+                                class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                              >
+                                <option
+                                  v-for="level in clearanceLevels"
+                                  :key="level"
+                                  :value="level"
+                                >
+                                  {{ level }}
+                                </option>
+                                <option value="admin">admin</option>
+                              </select>
+                            </div>
+                          </label>
+
+                          <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                            <div class="flex items-center justify-between pl-1.5">
+                              <span>Caption</span>
+                              <span class="text-ui-small text-text-tertiary">
+                                {{ getEditImageForm(img).caption.length }}/150
+                              </span>
+                            </div>
+                            <textarea
+                              v-model="getEditImageForm(img).caption"
+                              rows="3"
+                              maxlength="150"
+                              class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                              placeholder="Enter caption..."
+                              @input="
+                                (e) =>
+                                  handleSmartApostrophes(
+                                    e,
+                                    (val) => (getEditImageForm(img).caption = val),
+                                  )
+                              "
+                            ></textarea>
+                          </label>
+
+                          <div class="flex items-center justify-between gap-2 pt-1">
+                            <div class="flex gap-2">
+                              <button
+                                class="btn primary"
+                                type="button"
+                                :disabled="savingImageId === img.id"
+                                @click="saveImage(img, close)"
+                              >
+                                {{ savingImageId === img.id ? 'Saving...' : 'Save' }}
+                              </button>
+                              <button class="btn stroke" type="button" @click="resetImage(img)">
+                                Reset
+                              </button>
+                            </div>
+                            <button
+                              class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
+                              type="button"
+                              @click="deleteImage(img.id)"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </DisclosurePanel>
+                      </div>
+                    </Disclosure>
                   </div>
+                </div>
+              </div>
+            </div>
+          </TabPanel>
+
+          <!-- Guestbook Tab Panel -->
+          <TabPanel class="outline-none">
+            <div class="flex flex-col gap-4 p-4">
+              <div
+                v-for="entry in parsedGuestbookEntries"
+                :key="entry.id"
+                class="flex flex-col gap-2"
+              >
+                <div class="flex flex-row justify-between">
+                  <span class="text-text-secondary text-ui-small uppercase">{{
+                    format(new Date(entry.updated_at ?? ''), 'dd MMMM, yy HH:mm')
+                  }}</span>
                   <button
                     class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
-                    type="button"
-                    @click="deleteTrip(trip.slug)"
+                    @click="deleteGuestbookEntry(entry.id)"
                   >
                     Delete
                   </button>
                 </div>
-              </DisclosurePanel>
-            </Disclosure>
-          </div>
-        </TabPanel>
-
-        <!-- Images Tab Panel -->
-        <TabPanel class="h-full overflow-hidden outline-none">
-          <div
-            v-if="currentVisibleTrip"
-            class="bg-surface-primary/95 border-border-primary fixed bottom-0 left-1/2 z-20 flex w-full max-w-120 -translate-x-1/2 flex-col gap-0.5 border-t p-4 backdrop-blur-xs"
-          >
-            <h3 class="text-ui text-text-primary font-medium">
-              {{ currentVisibleTrip.title }}
-            </h3>
-            <p class="text-ui-small text-text-tertiary">
-              {{ currentVisibleTrip.subtitle || formatTripDate(currentVisibleTrip.date) }}
-            </p>
-          </div>
-
-          <div
-            class="flex h-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden"
-            @scroll="onImagesScroll"
-          >
-            <div
-              v-for="trip in tripsWithImagesGrouped"
-              :key="trip.slug"
-              class="flex h-full w-full shrink-0 snap-start scroll-m-4 flex-col gap-4 overflow-y-auto p-4 pb-28"
-            >
-              <!-- Public Images Group -->
-              <div class="flex flex-col gap-2">
-                <span class="text-ui-small text-text-tertiary tracking-wider uppercase">
-                  Public Images ({{ trip.publicImages.length }})
-                </span>
-
-                <p
-                  v-if="trip.publicImages.length === 0"
-                  class="text-ui-small text-text-tertiary italic"
-                >
-                  No public images
-                </p>
-
-                <div class="grid grid-cols-3 gap-2">
-                  <Disclosure
-                    v-for="img in trip.publicImages"
-                    :key="img.id"
-                    v-slot="{ close, open }"
-                    as="template"
+                <div class="drawing-board relative h-80! w-full">
+                  <svg class="h-full w-full">
+                    <path
+                      v-for="(pathD, idx) in entry.svgPaths"
+                      :key="idx"
+                      :d="pathD"
+                      class="fill-surface-inverted"
+                    />
+                  </svg>
+                  <div
+                    class="bg-surface-secondary text-ui text-text-tertiary border-border-high-contrast absolute right-0 bottom-0 flex flex-row items-center justify-center gap-1.5 rounded-tl-xl border-t border-l px-2 py-1"
                   >
-                    <div
-                      :class="open ? 'col-span-3' : 'col-span-1'"
-                      class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
-                    >
-                      <DisclosureButton
-                        class="relative aspect-square w-full cursor-pointer overflow-hidden text-left"
-                      >
-                        <img
-                          :src="getTripThumbnailUrl(img.storage_path)"
-                          :alt="img.caption || img.storage_path"
-                          class="size-full object-cover"
-                        />
-                        <!-- Clearance overlay circle -->
-                        <div
-                          class="bg-light absolute top-1.5 right-1.5 flex size-4 items-center justify-center rounded-full p-0.5 backdrop-blur-xs"
-                        >
-                          <div
-                            :class="getRoleBadgeClass(img.clearance)"
-                            class="size-2.5 rounded-full"
-                          ></div>
-                        </div>
-                        <!-- Truncated caption overlay -->
-                        <div
-                          v-if="img.caption"
-                          class="from-dark/80 absolute inset-x-0 bottom-0 bg-gradient-to-t via-black/40 to-transparent p-1.5 pt-4"
-                        >
-                          <p class="text-ui-small text-light truncate leading-tight italic">
-                            “{{ img.caption }}”
-                          </p>
-                        </div>
-                      </DisclosureButton>
-
-                      <DisclosurePanel
-                        class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
-                      >
-                        <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                          <div class="flex items-center justify-between pl-1.5">
-                            <span>Caption</span>
-                            <span class="text-ui-small text-text-tertiary">
-                              {{ getEditImageForm(img).caption.length }}/150
-                            </span>
-                          </div>
-                          <textarea
-                            v-model="getEditImageForm(img).caption"
-                            rows="3"
-                            maxlength="150"
-                            class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                            placeholder="Enter caption..."
-                            @input="
-                              (e) =>
-                                handleSmartApostrophes(
-                                  e,
-                                  (val) => (getEditImageForm(img).caption = val),
-                                )
-                            "
-                          ></textarea>
-                        </label>
-
-                        <div class="flex items-center justify-between gap-2 pt-1">
-                          <div class="flex gap-2">
-                            <button
-                              class="btn primary"
-                              type="button"
-                              :disabled="savingImageId === img.id"
-                              @click="saveImage(img, close)"
-                            >
-                              {{ savingImageId === img.id ? 'Saving...' : 'Save' }}
-                            </button>
-                            <button class="btn stroke" type="button" @click="resetImage(img)">
-                              Reset
-                            </button>
-                          </div>
-                          <button
-                            class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
-                            type="button"
-                            @click="deleteImage(img.id)"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </DisclosurePanel>
-                    </div>
-                  </Disclosure>
-                </div>
-              </div>
-
-              <!-- Private Images Group -->
-              <div class="flex flex-col gap-2 pt-2">
-                <span class="text-ui-small text-text-tertiary tracking-wider uppercase">
-                  Private Images ({{ trip.privateImages.length }})
-                </span>
-
-                <p
-                  v-if="trip.privateImages.length === 0"
-                  class="text-ui-small text-text-tertiary italic"
-                >
-                  No private images
-                </p>
-
-                <div class="grid grid-cols-3 gap-2">
-                  <Disclosure
-                    v-for="img in trip.privateImages"
-                    :key="img.id"
-                    v-slot="{ close, open }"
-                    as="template"
-                  >
-                    <div
-                      :class="open ? 'col-span-3' : 'col-span-1'"
-                      class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
-                    >
-                      <DisclosureButton
-                        class="relative aspect-square w-full cursor-pointer overflow-hidden text-left"
-                      >
-                        <img
-                          :src="getTripThumbnailUrl(img.storage_path)"
-                          :alt="img.caption || img.storage_path"
-                          class="size-full object-cover"
-                        />
-                        <!-- Clearance overlay circle -->
-                        <div
-                          class="bg-light absolute top-1.5 right-1.5 flex size-4 items-center justify-center rounded-full p-0.5 backdrop-blur-xs"
-                        >
-                          <div
-                            :class="getRoleBadgeClass(img.clearance)"
-                            class="size-2.5 rounded-full"
-                          ></div>
-                        </div>
-                        <!-- Truncated caption overlay -->
-                        <div
-                          v-if="img.caption"
-                          class="from-dark/80 via-dark/40 absolute inset-x-0 bottom-0 bg-gradient-to-t to-transparent p-1.5 pt-4"
-                        >
-                          <p class="text-ui-small text-light truncate leading-tight italic">
-                            “{{ img.caption }}”
-                          </p>
-                        </div>
-                      </DisclosureButton>
-
-                      <DisclosurePanel
-                        class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
-                      >
-                        <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                          <span class="pl-1.5">Clearance</span>
-                          <div
-                            class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
-                          >
-                            <div class="flex flex-row items-center gap-2">
-                              <div
-                                :class="getRoleBadgeClass(getEditImageForm(img).clearance)"
-                                class="h-5 w-1.5 rounded-full"
-                              ></div>
-                              <span>{{ getEditImageForm(img).clearance }}</span>
-                            </div>
-                            <ChevronDown :size="14" class="shrink-0 opacity-70" />
-                            <select
-                              v-model="getEditImageForm(img).clearance"
-                              class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                            >
-                              <option v-for="level in clearanceLevels" :key="level" :value="level">
-                                {{ level }}
-                              </option>
-                              <option value="admin">admin</option>
-                            </select>
-                          </div>
-                        </label>
-
-                        <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                          <div class="flex items-center justify-between pl-1.5">
-                            <span>Caption</span>
-                            <span class="text-ui-small text-text-tertiary">
-                              {{ getEditImageForm(img).caption.length }}/150
-                            </span>
-                          </div>
-                          <textarea
-                            v-model="getEditImageForm(img).caption"
-                            rows="3"
-                            maxlength="150"
-                            class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                            placeholder="Enter caption..."
-                            @input="
-                              (e) =>
-                                handleSmartApostrophes(
-                                  e,
-                                  (val) => (getEditImageForm(img).caption = val),
-                                )
-                            "
-                          ></textarea>
-                        </label>
-
-                        <div class="flex items-center justify-between gap-2 pt-1">
-                          <div class="flex gap-2">
-                            <button
-                              class="btn primary"
-                              type="button"
-                              :disabled="savingImageId === img.id"
-                              @click="saveImage(img, close)"
-                            >
-                              {{ savingImageId === img.id ? 'Saving...' : 'Save' }}
-                            </button>
-                            <button class="btn stroke" type="button" @click="resetImage(img)">
-                              Reset
-                            </button>
-                          </div>
-                          <button
-                            class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
-                            type="button"
-                            @click="deleteImage(img.id)"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </DisclosurePanel>
-                    </div>
-                  </Disclosure>
+                    <img
+                      v-if="entry.avatar_url"
+                      :src="entry.avatar_url"
+                      :alt="entry.display_name || 'User avatar'"
+                      class="border-border-primary size-5 rounded-full border object-cover"
+                      @error="entry.avatar_url = undefined"
+                    />
+                    <span class="max-w-60 truncate">
+                      {{ entry.email || entry.display_name || 'Anonymous' }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </TabPanel>
+          </TabPanel>
+        </TabPanels>
+      </TabGroup>
 
-        <!-- Guestbook Tab Panel -->
-        <TabPanel class="outline-none">
-          <div class="flex flex-col gap-4 p-4">
-            <div v-for="entry in guestbookEntries" :key="entry.id" class="flex flex-col gap-2">
-              <div class="flex flex-row justify-between">
-                <span class="text-text-secondary text-ui-small uppercase">{{
-                  format(new Date(entry.updated_at ?? ''), 'dd MMMM, yy HH:mm')
-                }}</span>
-                <button
-                  class="text-ui-small text-red-700 uppercase"
-                  @click="deleteGuestbookEntry(entry.id)"
-                >
-                  Delete
-                </button>
-                <!-- <button
-                type="button"
-                class="btn primary h-6 cursor-pointer"
-                title="Delete drawing"
-              ></button> -->
-              </div>
-              <div class="drawing-board relative h-80! w-full">
-                <svg class="h-full w-full">
-                  <path
-                    v-for="(points, idx) in parseStrokes(entry.strokes)"
-                    :key="idx"
-                    :d="getSvgPathFromStroke(points)"
-                    class="fill-surface-inverted"
-                  />
-                </svg>
-                <div
-                  class="bg-surface-secondary text-ui text-text-tertiary border-border-high-contrast absolute right-0 bottom-0 flex flex-row items-center justify-center gap-1.5 rounded-tl-xl border-t border-l px-2 py-1"
-                >
-                  <img
-                    v-if="entry.avatar_url"
-                    :src="entry.avatar_url"
-                    :alt="entry.display_name || 'User avatar'"
-                    class="border-border-primary size-5 rounded-full border object-cover"
-                    @error="entry.avatar_url = undefined"
-                  />
-                  <span class="max-w-60 truncate">
-                    {{ entry.email || entry.display_name || 'Anonymous' }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </TabPanel>
-      </TabPanels>
-    </TabGroup>
+      <!-- Add Person Bottom Sheet Modal -->
+      <TransitionRoot appear :show="isAddPersonModalOpen" as="template">
+        <Dialog as="div" class="relative z-50" @close="isAddPersonModalOpen = false">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0"
+            enter-to="opacity-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100"
+            leave-to="opacity-0"
+          >
+            <div class="bg-overlay fixed inset-0 backdrop-blur-xs" />
+          </TransitionChild>
 
-    <!-- Add Person Bottom Sheet Modal -->
-    <TransitionRoot appear :show="isAddPersonModalOpen" as="template">
-      <Dialog as="div" class="relative z-50" @close="isAddPersonModalOpen = false">
-        <TransitionChild
-          as="template"
-          enter="duration-300 ease-out"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="duration-200 ease-in"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="bg-overlay fixed inset-0 backdrop-blur-xs" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-end justify-center">
-            <TransitionChild
-              as="template"
-              enter="duration-300 ease-out"
-              enter-from="opacity-0 translate-y-full"
-              enter-to="opacity-100 translate-y-0"
-              leave="duration-200 ease-in"
-              leave-from="opacity-100 translate-y-0"
-              leave-to="opacity-0 translate-y-full"
-            >
-              <DialogPanel
-                class="bg-surface-primary border-border-primary text-text-primary flex w-full max-w-120 flex-col gap-4 rounded-t-2xl border p-6 shadow-2xl"
+          <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center">
+              <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0 translate-y-full"
+                enter-to="opacity-100 translate-y-0"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100 translate-y-0"
+                leave-to="opacity-0 translate-y-full"
               >
-                <div class="flex items-center justify-between">
-                  <h3 class="text-h3 font-semibold">Add Person</h3>
-                  <button
-                    type="button"
-                    aria-label="Close modal"
-                    class="hover:bg-surface-secondary text-text-secondary hover:text-text-primary flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors"
-                    @click="isAddPersonModalOpen = false"
-                  >
-                    <X :size="18" />
-                  </button>
-                </div>
-
-                <form class="flex flex-col gap-3" @submit.prevent="addPerson">
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Organization</span>
-                    <div
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
-                    >
-                      <span>
-                        {{
-                          availableOrgs.find((o) => o.id === newPersonForm.orgId)?.name ||
-                          'Select organization'
-                        }}
-                      </span>
-                      <ChevronDown :size="14" class="shrink-0 opacity-70" />
-                      <select
-                        v-model="newPersonForm.orgId"
-                        class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                        required
-                      >
-                        <option v-for="org in availableOrgs" :key="org.id" :value="org.id">
-                          {{ org.name }}
-                        </option>
-                      </select>
-                    </div>
-                  </label>
-
-                  <div class="flex items-center gap-4">
-                    <div
-                      class="bg-surface-secondary border-border-primary flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full border"
-                    >
-                      <img
-                        v-if="imagePreviewUrl"
-                        :src="imagePreviewUrl"
-                        alt="Preview"
-                        class="size-full object-cover"
-                      />
-                      <span v-else class="text-ui-small text-text-tertiary uppercase">
-                        {{ newPersonForm.name ? newPersonForm.name.charAt(0) : '?' }}
-                      </span>
-                    </div>
-
-                    <div class="flex flex-1 flex-col gap-1">
-                      <span class="text-ui-small text-text-tertiary pl-1.5">Profile Picture</span>
-                      <label
-                        class="btn stroke text-ui-small flex w-fit cursor-pointer items-center gap-2"
-                      >
-                        <Upload :size="14" />
-                        <span>{{
-                          isConvertingImage
-                            ? 'Converting...'
-                            : selectedImageFile
-                              ? 'Change image'
-                              : 'Select image'
-                        }}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          class="hidden"
-                          :disabled="isConvertingImage"
-                          @change="onImageFileSelected"
-                        />
-                      </label>
-                      <p
-                        v-if="selectedImageFile"
-                        class="text-ui-small text-text-secondary truncate"
-                      >
-                        {{ selectedImageFile.name }} (400×400 .webp)
-                      </p>
-                    </div>
-                  </div>
-
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Name</span>
-                    <input
-                      v-model="newPersonForm.name"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                      placeholder="Full name"
-                      required
-                    />
-                  </label>
-
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">LinkedIn URL</span>
-                    <input
-                      v-model="newPersonForm.linkedin"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      type="text"
-                      placeholder="https://linkedin.com/in/..."
-                    />
-                  </label>
-
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
-                    <span class="pl-1.5">Quote</span>
-                    <textarea
-                      v-model="newPersonForm.quote"
-                      rows="2"
-                      class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
-                      placeholder="Optional quote"
-                    ></textarea>
-                  </label>
-
-                  <div class="flex gap-2 pt-2">
+                <DialogPanel
+                  class="bg-surface-primary border-border-primary text-text-primary flex w-full max-w-120 flex-col gap-4 rounded-t-2xl border p-6 shadow-2xl"
+                >
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-h3 font-semibold">Add Person</h3>
                     <button
-                      class="btn primary"
-                      type="submit"
-                      :disabled="isAddingPerson || !newPersonForm.name || !newPersonForm.orgId"
+                      type="button"
+                      aria-label="Close modal"
+                      class="hover:bg-surface-secondary text-text-secondary hover:text-text-primary flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors"
+                      @click="isAddPersonModalOpen = false"
                     >
-                      {{ isAddingPerson ? 'Adding...' : 'Add Person' }}
-                    </button>
-                    <button class="btn stroke" type="button" @click="isAddPersonModalOpen = false">
-                      Cancel
+                      <X :size="18" />
                     </button>
                   </div>
-                </form>
-              </DialogPanel>
-            </TransitionChild>
+
+                  <form class="flex flex-col gap-3" @submit.prevent="addPerson">
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Organization</span>
+                      <div
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
+                      >
+                        <span>
+                          {{
+                            availableOrgs.find((o) => o.id === newPersonForm.orgId)?.name ||
+                            'Select organization'
+                          }}
+                        </span>
+                        <ChevronDown :size="14" class="shrink-0 opacity-70" />
+                        <select
+                          v-model="newPersonForm.orgId"
+                          class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                          required
+                        >
+                          <option v-for="org in availableOrgs" :key="org.id" :value="org.id">
+                            {{ org.name }}
+                          </option>
+                        </select>
+                      </div>
+                    </label>
+
+                    <div class="flex items-center gap-4">
+                      <div
+                        class="bg-surface-secondary border-border-primary flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full border"
+                      >
+                        <img
+                          v-if="imagePreviewUrl"
+                          :src="imagePreviewUrl"
+                          alt="Preview"
+                          class="size-full object-cover"
+                        />
+                        <span v-else class="text-ui-small text-text-tertiary uppercase">
+                          {{ newPersonForm.name ? newPersonForm.name.charAt(0) : '?' }}
+                        </span>
+                      </div>
+
+                      <div class="flex flex-1 flex-col gap-1">
+                        <span class="text-ui-small text-text-tertiary pl-1.5">Profile Picture</span>
+                        <label
+                          class="btn stroke text-ui-small flex w-fit cursor-pointer items-center gap-2"
+                        >
+                          <Upload :size="14" />
+                          <span>{{
+                            isConvertingImage
+                              ? 'Converting...'
+                              : selectedImageFile
+                                ? 'Change image'
+                                : 'Select image'
+                          }}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            class="hidden"
+                            :disabled="isConvertingImage"
+                            @change="onImageFileSelected"
+                          />
+                        </label>
+                        <p
+                          v-if="selectedImageFile"
+                          class="text-ui-small text-text-secondary truncate"
+                        >
+                          {{ selectedImageFile.name }} (400×400 .webp)
+                        </p>
+                      </div>
+                    </div>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Name</span>
+                      <input
+                        v-model="newPersonForm.name"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                        placeholder="Full name"
+                        required
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">LinkedIn URL</span>
+                      <input
+                        v-model="newPersonForm.linkedin"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                        placeholder="https://linkedin.com/in/..."
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Quote</span>
+                      <textarea
+                        v-model="newPersonForm.quote"
+                        rows="2"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        placeholder="Optional quote"
+                      ></textarea>
+                    </label>
+
+                    <div class="flex gap-2 pt-2">
+                      <button
+                        class="btn primary"
+                        type="submit"
+                        :disabled="isAddingPerson || !newPersonForm.name || !newPersonForm.orgId"
+                      >
+                        {{ isAddingPerson ? 'Adding...' : 'Add Person' }}
+                      </button>
+                      <button
+                        class="btn stroke"
+                        type="button"
+                        @click="isAddPersonModalOpen = false"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
           </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+        </Dialog>
+      </TransitionRoot>
+    </div>
   </div>
 </template>
 
@@ -1116,12 +1036,12 @@ watch(
 )
 
 const roleBadgeClasses: Record<ClearanceLevel, string> = {
-  admin: 'bg-red-500 dark:red-400',
-  auth: 'bg-yellow-500 dark:yellow-400',
-  close: 'bg-green-500 dark:green-400',
+  admin: 'bg-red-500 dark:bg-red-400',
+  auth: 'bg-yellow-500 dark:bg-yellow-400',
+  close: 'bg-green-500 dark:bg-green-400',
   friends: 'bg-purple-500 dark:purple-400',
   known: 'bg-blue-500 dark:blue-400',
-  public: 'bg-surface-inverted',
+  public: 'bg-dark',
 }
 
 interface PersonForm {
@@ -1694,18 +1614,23 @@ const tripsWithImagesGrouped = computed(() => {
 })
 
 const activeImageTripIndex = ref(0)
+let scrollRafId: null | number = null
 
 function onImagesScroll(e: Event) {
-  const el = e.target as HTMLElement
-  if (!el || el.clientWidth === 0) return
-  const index = Math.round(el.scrollLeft / el.clientWidth)
-  if (
-    index !== activeImageTripIndex.value &&
-    index >= 0 &&
-    index < tripsWithImagesGrouped.value.length
-  ) {
-    activeImageTripIndex.value = index
-  }
+  if (scrollRafId !== null) return
+  scrollRafId = requestAnimationFrame(() => {
+    scrollRafId = null
+    const el = e.target as HTMLElement
+    if (!el || el.clientWidth === 0) return
+    const index = Math.round(el.scrollLeft / el.clientWidth)
+    if (
+      index !== activeImageTripIndex.value &&
+      index >= 0 &&
+      index < tripsWithImagesGrouped.value.length
+    ) {
+      activeImageTripIndex.value = index
+    }
+  })
 }
 
 const currentVisibleTrip = computed(() => {
@@ -1808,6 +1733,17 @@ const { data: guestbookEntries } = useQuery({
     return (viewData || []) as GuestbookEntry[]
   },
   queryKey: ['admin-guestbook'],
+})
+
+const parsedGuestbookEntries = computed(() => {
+  return (guestbookEntries.value || []).map((entry) => {
+    const strokes = parseStrokes(entry.strokes)
+    const svgPaths = strokes.map(getSvgPathFromStroke).filter(Boolean)
+    return {
+      ...entry,
+      svgPaths,
+    }
+  })
 })
 
 async function deleteGuestbookEntry(id: string) {
