@@ -24,6 +24,7 @@ export default defineConfigWithVueTs(
       '**/.*/**',
       '**/*.yml',
       '**/*.yaml',
+      'supabase/functions/**',
     ],
 
     name: 'app/ignores',

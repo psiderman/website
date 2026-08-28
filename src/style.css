@@ -392,16 +392,19 @@
     @apply font-sans-alt;
     @apply font-semibold;
     @apply tracking-42 leading-42;
+    text-wrap: balance;
   }
   .text-h1 {
     @apply font-sans-alt;
     @apply font-semibold;
     @apply tracking-33 leading-33;
+    text-wrap: balance;
   }
   .text-h2 {
     @apply font-sans-alt;
     @apply font-semibold;
     @apply tracking-21 leading-21;
+    text-wrap: balance;
   }
   .text-p {
     @apply font-serif;

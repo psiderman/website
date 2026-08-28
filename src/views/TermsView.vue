@@ -38,7 +38,7 @@
           <p>
             If you log in to this website, you owe me a drink of your choice in a city of your
             choice. If you end up stalking me on this website, you must let me know and you now owe
-            me a snack as well. Scout's honor.
+            me a snack as well. Scout’s honor.
           </p>
 
           <h2 class="text-h2 pt-4 font-semibold">4. Limitation of Liability</h2>

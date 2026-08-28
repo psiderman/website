@@ -45,3 +45,6 @@ supabase/seed.sql
 .mcp.json
 opencode.json
 .claude/settings.json
+
+# Supabase (local-only copy: schema + edge functions, kept off GitHub)
+supabase/

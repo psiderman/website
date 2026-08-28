@@ -59,7 +59,7 @@
               <div class="flex flex-col gap-2 px-6 pt-8 pb-4">
                 <DialogTitle as="h2" class="text-h2 text-text-primary leading-7">
                   Everyone's welcome here <br />
-                  and you don't <em>have</em> to log in but..
+                  and you don’t <em>have</em> to log in but..
                 </DialogTitle>
                 <p class="text-ui text-text-secondary">
                   Some experiences may need you to interact with others. A login helps fight bots,

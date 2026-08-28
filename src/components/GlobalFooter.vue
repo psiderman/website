@@ -31,7 +31,7 @@
           >privacy</router-link
         >
       </div>
-      <p>© 2026 Karan Sanas</p>
+      <p>© {{ currentYear }} Karan Sanas</p>
     </div>
 
     <!-- Logo -->
@@ -120,6 +120,7 @@ const TIMING = {
 }
 
 const commit = __COMMIT_HASH__
+const currentYear = new Date().getFullYear()
 const logoContainer = ref<HTMLElement | null>(null)
 const thwipContainer = ref<HTMLElement | null>(null)
 const handEl = ref<HTMLElement | null>(null)
