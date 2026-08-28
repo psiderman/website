@@ -83,6 +83,7 @@
                       v-if="user.avatar_url"
                       :src="user.avatar_url"
                       :alt="user.full_name || 'User avatar'"
+                      referrerpolicy="no-referrer"
                       class="size-full object-cover"
                       @error="user.avatar_url = undefined"
                     />
@@ -688,6 +689,7 @@
                       v-if="entry.avatar_url"
                       :src="entry.avatar_url"
                       :alt="entry.display_name || 'User avatar'"
+                      referrerpolicy="no-referrer"
                       class="border-border-primary size-5 rounded-full border object-cover"
                       @error="entry.avatar_url = undefined"
                     />

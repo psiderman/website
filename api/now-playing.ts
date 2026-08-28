@@ -122,8 +122,9 @@ function isAllowedOrigin(origin: string): boolean {
     const { hostname } = new URL(origin)
     return (
       hostname === 'psiderman.com' ||
-      hostname.endsWith('.psiderman.com') ||
-      hostname === 'localhost'
+      hostname === 'www.psiderman.com' ||
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1'
     )
   } catch {
     return false
