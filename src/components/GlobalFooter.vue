@@ -92,7 +92,7 @@ import { openLink } from '@/utils'
 // ==========================================
 const TIMING = {
   // 4. Page Scroll Bounce-back
-  bounceDelay: 2000, // Delay from trigger until footer pulls/bounces page back up
+  bounceDelay: 1000, // Delay from trigger until footer pulls/bounces page back up
   bounceDuration: 700, // Duration of the page scroll snap-back
 
   // 2. Hand (🤟) emoji
@@ -106,7 +106,7 @@ const TIMING = {
   quipFlyDurationMin: 1000, // Fastest throw duration
 
   webDownDuration: 300, // Pull down morph duration (Frame 4 -> 5)
-  webHoldDelay: 1100, // Hold delay at apex (between frame 4 & 5)
+  webHoldDelay: 0, // Hold delay at apex (between frame 4 & 5)
   // 1. Web strand animation
   webUpDuration: 700, // Upward morph duration to apex (Frame 1 -> 4)
 }
