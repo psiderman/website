@@ -1,5 +1,10 @@
 <template>
-  <TabGroup v-model="selectedTab" as="div" class="flex h-screen w-screen flex-col">
+  <TabGroup
+    :selected-index="selectedTab"
+    as="div"
+    class="flex h-screen w-screen flex-col"
+    @change="(index: number) => (selectedTab = index)"
+  >
     <div
       class="bg-surface-inverted text-text-inverted-primary text-ui flex items-center justify-center border-b border-transparent p-2"
     >
@@ -139,7 +144,50 @@
 
       <!-- Guestbook Tab Panel -->
       <TabPanel class="outline-none">
-        <!-- Content for guestbook -->
+        <div class="flex flex-col gap-4 p-4">
+          <div v-for="entry in guestbookEntries" :key="entry.id" class="flex flex-col gap-2">
+            <div class="flex flex-row justify-between">
+              <span class="text-text-secondary text-ui-small uppercase">{{
+                format(new Date(entry.updated_at ?? ''), 'dd MMMM, yy HH:mm')
+              }}</span>
+              <button
+                class="text-ui-small text-red-700 uppercase"
+                @click="deleteGuestbookEntry(entry.id)"
+              >
+                Delete
+              </button>
+              <!-- <button
+                type="button"
+                class="btn primary h-6 cursor-pointer"
+                title="Delete drawing"
+              ></button> -->
+            </div>
+            <div class="drawing-board relative h-80! w-full">
+              <svg class="h-full w-full">
+                <path
+                  v-for="(points, idx) in parseStrokes(entry.strokes)"
+                  :key="idx"
+                  :d="getSvgPathFromStroke(points)"
+                  class="fill-surface-inverted"
+                />
+              </svg>
+              <div
+                class="bg-surface-secondary text-ui text-text-tertiary border-border-high-contrast absolute right-0 bottom-0 flex flex-row items-center justify-center gap-1.5 rounded-tl-xl border-t border-l px-2 py-1"
+              >
+                <img
+                  v-if="entry.avatar_url"
+                  :src="entry.avatar_url"
+                  :alt="entry.display_name || 'User avatar'"
+                  class="border-border-primary size-5 rounded-full border object-cover"
+                  @error="entry.avatar_url = undefined"
+                />
+                <span class="max-w-60 truncate">
+                  {{ entry.email || entry.display_name || 'Anonymous' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </TabPanel>
     </TabPanels>
   </TabGroup>
@@ -157,6 +205,8 @@ import {
   Pencil,
 } from '@lucide/vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { format } from 'date-fns'
+import { getStroke } from 'perfect-freehand'
 import { computed, reactive, ref, watch } from 'vue'
 
 import { isAdmin } from '@/composables/useAuth'
@@ -174,7 +224,7 @@ interface UserRoleRecord {
   user_id: string
 }
 
-const selectedTab = ref(0)
+const selectedTab = ref(4)
 const tabs = [
   { icon: KeyRound, name: 'roles' },
   { icon: BriefcaseBusiness, name: 'people' },
@@ -296,6 +346,20 @@ const roleBadgeClasses: Record<ClearanceLevel, string> = {
   public: '',
 }
 
+// ----------------------------------------------------
+// GUESTBOOK TAB
+// ----------------------------------------------------
+interface GuestbookEntry {
+  avatar_url?: string
+  created_at?: string
+  display_name?: string
+  email?: string
+  id: string
+  strokes: number[][][]
+  updated_at?: string
+  user_id?: string
+}
+
 function getRoleBadgeClass(role: ClearanceLevel) {
   return roleBadgeClasses[role] || roleBadgeClasses.public
 }
@@ -319,8 +383,102 @@ async function saveRole(user: UserRoleRecord) {
     await queryClient.invalidateQueries({ queryKey: ['admin-user-roles'] })
   }
 }
+
+const { data: guestbookEntries } = useQuery({
+  enabled: computed(() => isAdmin.value),
+  queryFn: async () => {
+    const { data: viewData, error: viewError } = await supabase
+      .from('admin_guestbook_view')
+      .select('*')
+      .order('updated_at', { ascending: false })
+
+    if (viewError) {
+      console.warn('admin_guestbook_view query failed, falling back:', viewError)
+      const { data, error } = await supabase
+        .from('guestbook')
+        .select('*')
+        .order('updated_at', { ascending: false })
+
+      if (error) throw error
+      return (data || []) as GuestbookEntry[]
+    }
+
+    return (viewData || []) as GuestbookEntry[]
+  },
+  queryKey: ['admin-guestbook'],
+})
+
+async function deleteGuestbookEntry(id: string) {
+  if (!confirm('Are you sure you want to delete this drawing?')) return
+
+  try {
+    const { error } = await supabase.from('guestbook').delete().eq('id', id)
+    if (error) throw error
+    await queryClient.invalidateQueries({ queryKey: ['admin-guestbook'] })
+    await queryClient.invalidateQueries({ queryKey: ['guestbook', 'latest'] })
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to delete drawing: ${errorMsg}`)
+  }
+}
+
+function getSvgPathFromStroke(points: number[][]) {
+  if (!points?.length) return ''
+  const outline = getStroke(points, {
+    simulatePressure: false,
+    size: 6,
+    smoothing: 0.7,
+    streamline: 0.3,
+    thinning: 0.5,
+  })
+  if (!outline.length) return ''
+
+  const d = outline.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i + 1) % arr.length]
+      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
+      return acc
+    },
+    ['M', ...outline[0], 'Q'],
+  )
+  d.push('Z')
+  return d.join(' ')
+}
+
+function parseStrokes(raw: unknown): number[][][] {
+  if (!raw) return []
+  if (typeof raw === 'string') {
+    try {
+      return JSON.parse(raw)
+    } catch {
+      return []
+    }
+  }
+  return raw as number[][][]
+}
 </script>
 
 <style scoped>
 @reference "@/style.css";
+
+.drawing-board {
+  @apply border-border-primary relative h-full w-full overflow-hidden rounded-lg border;
+  background: url('@/assets/patterns/dot_grid.webp');
+  background-size: 2.5%;
+  @apply bg-repeat;
+}
+
+.dark .drawing-board {
+  background: url('@/assets/patterns/dot_grid_dark.webp');
+  background-size: 2.5%;
+}
+
+.canvas {
+  @apply absolute inset-0 h-full w-full cursor-crosshair touch-none;
+}
+
+.keyboard-key {
+  @apply bg-surface-primary border-border-high-contrast rounded-special text-text-primary flex h-8 w-8.5 items-center justify-center border;
+  box-shadow: 0 4px 0 0 var(--color-border-high-contrast);
+}
 </style>
