@@ -250,7 +250,213 @@
 
       <!-- Trip Tab Panel -->
       <TabPanel class="outline-none">
-        <!-- Content for trip -->
+        <div class="flex flex-col gap-3 p-4">
+          <Disclosure
+            v-for="trip in tripsList"
+            :key="trip.slug"
+            v-slot="{ close }"
+            as="div"
+            class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
+          >
+            <DisclosureButton
+              class="flex w-full cursor-pointer flex-row items-center justify-between p-3 text-left"
+            >
+              <div class="flex min-w-0 flex-col gap-0">
+                <p class="text-ui text-text-primary truncate font-medium">{{ trip.title }}</p>
+                <p class="text-ui-small text-text-secondary truncate">
+                  {{ trip.subtitle || formatTripDate(trip.date) }}
+                </p>
+              </div>
+
+              <div class="flex shrink-0 flex-row items-center gap-2">
+                <!-- Close Friends -->
+                <div
+                  v-if="isHighClearance(trip.clearance)"
+                  v-tooltip="{ content: 'you’re on “the list”' }"
+                  class="flex size-5 items-center justify-center rounded-full bg-green-500"
+                >
+                  <Star :size="12" fill="#fff" stroke-width="0" />
+                </div>
+
+                <!-- Repeat status -->
+                <div
+                  v-if="trip.repeat_visit"
+                  v-tooltip="{ content: 'Revisited' }"
+                  class="text-text-secondary flex size-6 items-center justify-center"
+                >
+                  <Repeat :size="16" />
+                </div>
+
+                <!-- Instagram Link Button -->
+                <a
+                  v-if="trip.instagram_link"
+                  v-tooltip="{ content: 'Instagram' }"
+                  :href="trip.instagram_link"
+                  target="_blank"
+                  class="text-text-secondary hover:text-text-primary flex size-6 items-center justify-center"
+                  @click.stop
+                >
+                  <FA :icon="['fab', 'instagram']" class="text-ui" />
+                </a>
+
+                <!-- Google Maps list link button -->
+                <a
+                  v-if="trip.maps_list_link"
+                  v-tooltip="{ content: 'Maps' }"
+                  :href="trip.maps_list_link"
+                  target="_blank"
+                  class="text-text-secondary hover:text-text-primary flex size-6 items-center justify-center"
+                  @click.stop
+                >
+                  <Pin :size="16" />
+                </a>
+              </div>
+            </DisclosureButton>
+
+            <DisclosurePanel
+              class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
+            >
+              <div class="flex flex-col gap-2">
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Clearance</span>
+                  <div
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
+                  >
+                    <div class="flex flex-row gap-2">
+                      <div
+                        :class="getRoleBadgeClass(getEditTripForm(trip).clearance)"
+                        class="h-6 w-1.5 rounded-full"
+                      ></div>
+                      <span>{{ getEditTripForm(trip).clearance }}</span>
+                    </div>
+                    <ChevronDown :size="14" class="shrink-0 opacity-70" />
+                    <select
+                      v-model="getEditTripForm(trip).clearance"
+                      class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    >
+                      <option v-for="level in clearanceLevels" :key="level" :value="level">
+                        {{ level }}
+                      </option>
+                      <option value="public">public</option>
+                      <option value="admin">admin</option>
+                    </select>
+                  </div>
+                </label>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Title</span>
+                  <input
+                    v-model="getEditTripForm(trip).title"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                  />
+                </label>
+
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Subtitle</span>
+                  <input
+                    v-model="getEditTripForm(trip).subtitle"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                    placeholder="e.g. November 2024"
+                  />
+                </label>
+
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Slug</span>
+                  <input
+                    v-model="getEditTripForm(trip).slug"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                  />
+                </label>
+
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Date</span>
+                  <input
+                    v-model="getEditTripForm(trip).date"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="date"
+                  />
+                </label>
+              </div>
+
+              <div
+                class="bg-surface-primary border-border-primary -mt-2 flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2 select-none"
+                @click="getEditTripForm(trip).repeat_visit = !getEditTripForm(trip).repeat_visit"
+              >
+                <span class="text-ui text-text-primary">Repeat Visit</span>
+                <div
+                  class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 ease-in-out"
+                  :class="
+                    getEditTripForm(trip).repeat_visit
+                      ? 'bg-surface-inverted'
+                      : 'bg-surface-secondary border-border-primary border'
+                  "
+                >
+                  <span
+                    class="bg-surface-primary inline-block size-3.5 transform rounded-full shadow transition duration-200 ease-in-out"
+                    :class="
+                      getEditTripForm(trip).repeat_visit ? 'translate-x-4.5' : 'translate-x-0.5'
+                    "
+                  />
+                </div>
+              </div>
+
+              <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                <span class="pl-1.5">Description (one line per paragraph)</span>
+                <textarea
+                  v-model="getEditTripForm(trip).descriptionText"
+                  rows="3"
+                  class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                ></textarea>
+              </label>
+
+              <div class="flex flex-col gap-2">
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Instagram Link</span>
+                  <input
+                    v-model="getEditTripForm(trip).instagram_link"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                  />
+                </label>
+
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Maps Link</span>
+                  <input
+                    v-model="getEditTripForm(trip).maps_list_link"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                  />
+                </label>
+              </div>
+
+              <div class="flex items-center justify-between gap-2 pt-2">
+                <div class="flex gap-2">
+                  <button
+                    class="btn primary"
+                    type="button"
+                    :disabled="savingTripSlug === trip.slug"
+                    @click="saveTrip(trip, close)"
+                  >
+                    {{ savingTripSlug === trip.slug ? 'Saving...' : 'Save' }}
+                  </button>
+                  <button class="btn stroke" type="button" @click="resetTrip(trip)">Reset</button>
+                </div>
+                <button
+                  class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
+                  type="button"
+                  @click="deleteTrip(trip.slug)"
+                >
+                  Delete
+                </button>
+              </div>
+            </DisclosurePanel>
+          </Disclosure>
+        </div>
       </TabPanel>
 
       <!-- Images Tab Panel -->
@@ -324,18 +530,18 @@
       </TransitionChild>
 
       <div class="fixed inset-0 overflow-y-auto">
-        <div class="flex min-h-full items-end justify-center sm:items-center sm:p-4">
+        <div class="flex min-h-full items-end justify-center">
           <TransitionChild
             as="template"
             enter="duration-300 ease-out"
-            enter-from="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
-            enter-to="opacity-100 translate-y-0 sm:scale-100"
+            enter-from="opacity-0 translate-y-full"
+            enter-to="opacity-100 translate-y-0"
             leave="duration-200 ease-in"
-            leave-from="opacity-100 translate-y-0 sm:scale-100"
-            leave-to="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
+            leave-from="opacity-100 translate-y-0"
+            leave-to="opacity-0 translate-y-full"
           >
             <DialogPanel
-              class="bg-surface-primary border-border-primary text-text-primary flex w-full max-w-lg flex-col gap-4 rounded-t-2xl border p-6 shadow-2xl sm:rounded-2xl"
+              class="bg-surface-primary border-border-primary text-text-primary flex w-full flex-col gap-4 rounded-t-2xl border p-6 shadow-2xl"
             >
               <div class="flex items-center justify-between">
                 <h3 class="text-h3 font-semibold">Add Person</h3>
@@ -353,7 +559,7 @@
                 <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
                   <span class="pl-1.5">Organization</span>
                   <div
-                    class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-[42px] cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
                   >
                     <span>
                       {{
@@ -519,7 +725,7 @@ interface UserRoleRecord {
   user_id: string
 }
 
-const selectedTab = ref(1)
+const selectedTab = ref(2)
 const tabs = [
   { icon: KeyRound, name: 'roles' },
   { icon: BriefcaseBusiness, name: 'people' },
@@ -633,12 +839,12 @@ watch(
 )
 
 const roleBadgeClasses: Record<ClearanceLevel, string> = {
-  admin: '',
-  auth: 'bg-yellow-500 dark:text-yellow-400',
-  close: 'bg-green-500 dark:text-green-400',
-  friends: 'bg-purple-500 dark:text-purple-400',
-  known: 'bg-blue-500 dark:text-blue-400',
-  public: '',
+  admin: 'bg-red-500 dark:red-400',
+  auth: 'bg-yellow-500 dark:yellow-400',
+  close: 'bg-green-500 dark:green-400',
+  friends: 'bg-purple-500 dark:purple-400',
+  known: 'bg-blue-500 dark:blue-400',
+  public: 'bg-surface-inverted',
 }
 
 interface PersonForm {
@@ -744,6 +950,134 @@ const availableOrgs = computed(() => {
   })
   return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
 })
+
+interface TripForm {
+  clearance: ClearanceLevel
+  date: string
+  descriptionText: string
+  instagram_link: string
+  maps_list_link: string
+  repeat_visit: boolean
+  slug: string
+  subtitle: string
+  title: string
+}
+
+// ----------------------------------------------------
+// TRIPS TAB
+// ----------------------------------------------------
+interface TripRecord {
+  clearance: ClearanceLevel
+  date: string
+  description: string[]
+  instagram_link: null | string
+  maps_list_link: null | string
+  repeat_visit: boolean
+  slug: string
+  subtitle: null | string
+  title: string
+}
+
+async function addPerson() {
+  if (!newPersonForm.orgId || !newPersonForm.name) return
+
+  isAddingPerson.value = true
+  try {
+    const cleanImageName = selectedImageFile.value
+      ? selectedImageFile.value.name.replace(/\.[^/.]+$/, '').trim()
+      : newPersonForm.name.toLowerCase().trim().replace(/\s+/g, '-')
+
+    if (selectedImageFile.value) {
+      const { error: uploadError } = await supabase.storage
+        .from('webp')
+        .upload(`${newPersonForm.orgId}/${cleanImageName}.webp`, selectedImageFile.value, {
+          contentType: 'image/webp',
+          upsert: true,
+        })
+
+      if (uploadError) throw uploadError
+    }
+
+    const { error } = await supabase.from('work_people').insert({
+      imageName: cleanImageName,
+      linkedin: newPersonForm.linkedin.trim() || null,
+      name: newPersonForm.name.trim(),
+      orgId: newPersonForm.orgId,
+      quote: newPersonForm.quote.trim() || null,
+    })
+
+    if (error) throw error
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-work-people'] })
+    await queryClient.invalidateQueries({ queryKey: ['work-people'] })
+
+    newPersonForm.name = ''
+    newPersonForm.linkedin = ''
+    newPersonForm.quote = ''
+    selectedImageFile.value = null
+    if (imagePreviewUrl.value) {
+      URL.revokeObjectURL(imagePreviewUrl.value)
+      imagePreviewUrl.value = null
+    }
+    isAddPersonModalOpen.value = false
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to add person: ${errorMsg}`)
+  } finally {
+    isAddingPerson.value = false
+  }
+}
+
+async function onImageFileSelected(e: Event) {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  isConvertingImage.value = true
+  try {
+    const webpFile = await convertToSquareWebp(file)
+    selectedImageFile.value = webpFile
+
+    if (imagePreviewUrl.value) {
+      URL.revokeObjectURL(imagePreviewUrl.value)
+    }
+    imagePreviewUrl.value = URL.createObjectURL(webpFile)
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to convert image: ${errorMsg}`)
+    target.value = ''
+  } finally {
+    isConvertingImage.value = false
+  }
+}
+
+function openAddPersonModal() {
+  if (!newPersonForm.orgId && availableOrgs.value.length > 0) {
+    newPersonForm.orgId = availableOrgs.value[0].id
+  }
+  selectedImageFile.value = null
+  if (imagePreviewUrl.value) {
+    URL.revokeObjectURL(imagePreviewUrl.value)
+    imagePreviewUrl.value = null
+  }
+  isAddPersonModalOpen.value = true
+}
+
+const editTripForms = reactive<Record<string, TripForm>>({})
+const savingTripSlug = ref<null | string>(null)
+
+const { data: tripsList } = useQuery({
+  enabled: computed(() => isAdmin.value),
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from('trips')
+      .select('*')
+      .order('date', { ascending: false })
+
+    if (error) throw error
+    return (data || []) as TripRecord[]
+  },
+  queryKey: ['admin-trips'],
 })
 
 // ----------------------------------------------------
@@ -822,6 +1156,23 @@ function getEditForm(person: WorkPersonRecord): PersonForm {
   return editForms[key]
 }
 
+function getEditTripForm(trip: TripRecord): TripForm {
+  if (!editTripForms[trip.slug]) {
+    editTripForms[trip.slug] = {
+      clearance: trip.clearance || 'public',
+      date: trip.date ? (trip.date.length >= 10 ? trip.date.slice(0, 10) : trip.date) : '',
+      descriptionText: (trip.description || []).join('\n'),
+      instagram_link: trip.instagram_link || '',
+      maps_list_link: trip.maps_list_link || '',
+      repeat_visit: !!trip.repeat_visit,
+      slug: trip.slug,
+      subtitle: trip.subtitle || '',
+      title: trip.title || '',
+    }
+  }
+  return editTripForms[trip.slug]
+}
+
 function getPersonKey(person: { name: string; orgId: string }) {
   return `${person.orgId}:${person.name}`
 }
@@ -843,6 +1194,20 @@ function resetPerson(person: WorkPersonRecord) {
     linkedin: person.linkedin || '',
     name: person.name || '',
     quote: person.quote || '',
+  }
+}
+
+function resetTrip(trip: TripRecord) {
+  editTripForms[trip.slug] = {
+    clearance: trip.clearance || 'public',
+    date: trip.date ? (trip.date.length >= 10 ? trip.date.slice(0, 10) : trip.date) : '',
+    descriptionText: (trip.description || []).join('\n'),
+    instagram_link: trip.instagram_link || '',
+    maps_list_link: trip.maps_list_link || '',
+    repeat_visit: !!trip.repeat_visit,
+    slug: trip.slug,
+    subtitle: trip.subtitle || '',
+    title: trip.title || '',
   }
 }
 
@@ -903,6 +1268,60 @@ async function saveRole(user: UserRoleRecord) {
     const errorMsg = err instanceof Error ? err.message : 'Unknown error'
     alert(`Failed to update role: ${errorMsg}`)
     await queryClient.invalidateQueries({ queryKey: ['admin-user-roles'] })
+  }
+}
+
+async function saveTrip(trip: TripRecord, close?: () => void) {
+  const form = getEditTripForm(trip)
+  savingTripSlug.value = trip.slug
+
+  const descArray = form.descriptionText
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+
+  try {
+    const { error } = await supabase
+      .from('trips')
+      .update({
+        clearance: form.clearance,
+        date: form.date,
+        description: descArray,
+        instagram_link: form.instagram_link || null,
+        maps_list_link: form.maps_list_link || null,
+        repeat_visit: form.repeat_visit,
+        slug: form.slug,
+        subtitle: form.subtitle || null,
+        title: form.title,
+      })
+      .eq('slug', trip.slug)
+
+    if (error) throw error
+
+    trip.title = form.title
+    trip.subtitle = form.subtitle || null
+    trip.slug = form.slug
+    trip.date = form.date
+    trip.description = descArray
+    trip.instagram_link = form.instagram_link || null
+    trip.maps_list_link = form.maps_list_link || null
+    trip.repeat_visit = form.repeat_visit
+    trip.clearance = form.clearance
+
+    if (form.slug !== trip.slug) {
+      delete editTripForms[trip.slug]
+    }
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-trips'] })
+    await queryClient.invalidateQueries({ queryKey: ['trips'] })
+    await queryClient.invalidateQueries({ queryKey: ['trips-with-images'] })
+
+    close?.()
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to save trip: ${errorMsg}`)
+  } finally {
+    savingTripSlug.value = null
   }
 }
 
