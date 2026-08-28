@@ -129,7 +129,7 @@
 
       <!-- People Tab Panel -->
       <TabPanel class="outline-none">
-        <div class="flex snap-x snap-mandatory overflow-x-auto p-4">
+        <div class="flex snap-x snap-mandatory overflow-x-auto p-4 pb-24">
           <div
             v-for="org in orgsWithPeople"
             :key="org.id"
@@ -211,24 +211,40 @@
                     class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
                   ></textarea>
                 </label>
-                <div class="flex gap-2 p-2">
+                <div class="flex items-center justify-between gap-2 p-2">
+                  <div class="flex gap-2">
+                    <button
+                      class="btn primary"
+                      type="button"
+                      :disabled="savingPersonKey === `${person.orgId}:${person.name}`"
+                      @click="savePerson(person, close)"
+                    >
+                      {{
+                        savingPersonKey === `${person.orgId}:${person.name}` ? 'Saving...' : 'Save'
+                      }}
+                    </button>
+                    <button class="btn stroke" type="button" @click="resetPerson(person)">
+                      Reset
+                    </button>
+                  </div>
                   <button
-                    class="btn primary"
+                    class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
                     type="button"
-                    :disabled="savingPersonKey === `${person.orgId}:${person.name}`"
-                    @click="savePerson(person, close)"
+                    @click="deletePerson(person)"
                   >
-                    {{
-                      savingPersonKey === `${person.orgId}:${person.name}` ? 'Saving...' : 'Save'
-                    }}
-                  </button>
-                  <button class="btn stroke" type="button" @click="resetPerson(person)">
-                    Reset
+                    Delete
                   </button>
                 </div>
               </DisclosurePanel>
             </Disclosure>
           </div>
+        </div>
+        <div
+          class="bg-surface-secondary border-border-high-contrast fixed bottom-0 w-full border-t p-4"
+        >
+          <button class="btn primary w-full" type="button" @click="openAddPersonModal">
+            <Plus :size="16" /> Add person
+          </button>
         </div>
       </TabPanel>
 
@@ -291,10 +307,171 @@
       </TabPanel>
     </TabPanels>
   </TabGroup>
+
+  <!-- Add Person Bottom Sheet Modal -->
+  <TransitionRoot appear :show="isAddPersonModalOpen" as="template">
+    <Dialog as="div" class="relative z-50" @close="isAddPersonModalOpen = false">
+      <TransitionChild
+        as="template"
+        enter="duration-300 ease-out"
+        enter-from="opacity-0"
+        enter-to="opacity-100"
+        leave="duration-200 ease-in"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
+      >
+        <div class="bg-overlay fixed inset-0 backdrop-blur-xs" />
+      </TransitionChild>
+
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center sm:items-center sm:p-4">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
+            enter-to="opacity-100 translate-y-0 sm:scale-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100 translate-y-0 sm:scale-100"
+            leave-to="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
+          >
+            <DialogPanel
+              class="bg-surface-primary border-border-primary text-text-primary flex w-full max-w-lg flex-col gap-4 rounded-t-2xl border p-6 shadow-2xl sm:rounded-2xl"
+            >
+              <div class="flex items-center justify-between">
+                <h3 class="text-h3 font-semibold">Add Person</h3>
+                <button
+                  type="button"
+                  aria-label="Close modal"
+                  class="hover:bg-surface-secondary text-text-secondary hover:text-text-primary flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors"
+                  @click="isAddPersonModalOpen = false"
+                >
+                  <X :size="18" />
+                </button>
+              </div>
+
+              <form class="flex flex-col gap-3" @submit.prevent="addPerson">
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Organization</span>
+                  <div
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-[42px] cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
+                  >
+                    <span>
+                      {{
+                        availableOrgs.find((o) => o.id === newPersonForm.orgId)?.name ||
+                        'Select organization'
+                      }}
+                    </span>
+                    <ChevronDown :size="14" class="shrink-0 opacity-70" />
+                    <select
+                      v-model="newPersonForm.orgId"
+                      class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      required
+                    >
+                      <option v-for="org in availableOrgs" :key="org.id" :value="org.id">
+                        {{ org.name }}
+                      </option>
+                    </select>
+                  </div>
+                </label>
+
+                <div class="flex items-center gap-4">
+                  <div
+                    class="bg-surface-secondary border-border-primary flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full border"
+                  >
+                    <img
+                      v-if="imagePreviewUrl"
+                      :src="imagePreviewUrl"
+                      alt="Preview"
+                      class="size-full object-cover"
+                    />
+                    <span v-else class="text-ui-small text-text-tertiary uppercase">
+                      {{ newPersonForm.name ? newPersonForm.name.charAt(0) : '?' }}
+                    </span>
+                  </div>
+
+                  <div class="flex flex-1 flex-col gap-1">
+                    <span class="text-ui-small text-text-tertiary pl-1.5">Profile Picture</span>
+                    <label
+                      class="btn stroke text-ui-small flex w-fit cursor-pointer items-center gap-2"
+                    >
+                      <Upload :size="14" />
+                      <span>{{
+                        isConvertingImage
+                          ? 'Converting...'
+                          : selectedImageFile
+                            ? 'Change image'
+                            : 'Select image'
+                      }}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        class="hidden"
+                        :disabled="isConvertingImage"
+                        @change="onImageFileSelected"
+                      />
+                    </label>
+                    <p v-if="selectedImageFile" class="text-ui-small text-text-secondary truncate">
+                      {{ selectedImageFile.name }} (400×400 .webp)
+                    </p>
+                  </div>
+                </div>
+
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Name</span>
+                  <input
+                    v-model="newPersonForm.name"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                    placeholder="Full name"
+                    required
+                  />
+                </label>
+
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">LinkedIn URL</span>
+                  <input
+                    v-model="newPersonForm.linkedin"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                    placeholder="https://linkedin.com/in/..."
+                  />
+                </label>
+
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Quote</span>
+                  <textarea
+                    v-model="newPersonForm.quote"
+                    rows="2"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    placeholder="Optional quote"
+                  ></textarea>
+                </label>
+
+                <div class="flex gap-2 pt-2">
+                  <button
+                    class="btn primary"
+                    type="submit"
+                    :disabled="isAddingPerson || !newPersonForm.name || !newPersonForm.orgId"
+                  >
+                    {{ isAddingPerson ? 'Adding...' : 'Add Person' }}
+                  </button>
+                  <button class="btn stroke" type="button" @click="isAddPersonModalOpen = false">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
 </template>
 
 <script setup lang="ts">
 import {
+  Dialog,
+  DialogPanel,
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
@@ -303,6 +480,8 @@ import {
   TabList,
   TabPanel,
   TabPanels,
+  TransitionChild,
+  TransitionRoot,
 } from '@headlessui/vue'
 import {
   BriefcaseBusiness,
@@ -313,6 +492,12 @@ import {
   Loader,
   Luggage,
   Pencil,
+  Pin,
+  Plus,
+  Repeat,
+  Star,
+  Upload,
+  X,
 } from '@lucide/vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { format } from 'date-fns'
@@ -320,10 +505,9 @@ import { getStroke } from 'perfect-freehand'
 import { computed, reactive, ref, watch } from 'vue'
 
 import { isAdmin } from '@/composables/useAuth'
+import { type ClearanceLevel, isHighClearance } from '@/composables/useTravel'
 import { workHistory } from '@/data/work'
 import { getStorageUrl, supabase } from '@/supabase'
-
-import type { ClearanceLevel } from '@/composables/useTravel'
 
 interface UserRoleRecord {
   avatar_url?: string
@@ -509,7 +693,57 @@ const orgsWithPeople = computed(() => {
     orgMap.get(p.orgId)!.people.push(p)
   })
 
-  return Array.from(orgMap.values()).filter((org) => org.people.length > 0)
+  return Array.from(orgMap.values())
+    .filter((org) => org.people.length > 0)
+    .sort((a, b) => a.name.localeCompare(b.name))
+})
+
+const isAddPersonModalOpen = ref(false)
+const isAddingPerson = ref(false)
+const isConvertingImage = ref(false)
+const selectedImageFile = ref<File | null>(null)
+const imagePreviewUrl = ref<null | string>(null)
+
+async function convertToSquareWebp(file: File, size = 400, quality = 0.85): Promise<File> {
+  const bitmap = await createImageBitmap(file)
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Canvas context not available')
+
+  const minDim = Math.min(bitmap.width, bitmap.height)
+  const sx = (bitmap.width - minDim) / 2
+  const sy = (bitmap.height - minDim) / 2
+  ctx.drawImage(bitmap, sx, sy, minDim, minDim, 0, 0, size, size)
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return reject(new Error('Canvas conversion failed'))
+        const baseName = file.name.replace(/\.[^/.]+$/, '')
+        resolve(new File([blob], `${baseName}.webp`, { type: 'image/webp' }))
+      },
+      'image/webp',
+      quality,
+    )
+  })
+}
+
+const newPersonForm = reactive({
+  linkedin: '',
+  name: '',
+  orgId: '',
+  quote: '',
+})
+
+const availableOrgs = computed(() => {
+  const map = new Map<string, string>()
+  workHistory.forEach((w) => {
+    if (w.orgId) map.set(w.orgId, w.orgName)
+  })
+  return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
+})
 })
 
 // ----------------------------------------------------
@@ -524,6 +758,55 @@ interface GuestbookEntry {
   strokes: number[][][]
   updated_at?: string
   user_id?: string
+}
+
+async function deletePerson(person: WorkPersonRecord) {
+  if (!confirm(`Are you sure you want to delete ${person.name}?`)) return
+
+  try {
+    const { error } = await supabase
+      .from('work_people')
+      .delete()
+      .eq('orgId', person.orgId)
+      .eq('name', person.name)
+
+    if (error) throw error
+
+    delete editForms[getPersonKey(person)]
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-work-people'] })
+    await queryClient.invalidateQueries({ queryKey: ['work-people'] })
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to delete person: ${errorMsg}`)
+  }
+}
+
+async function deleteTrip(slug: string) {
+  if (!confirm(`Are you sure you want to delete trip "${slug}"?`)) return
+
+  try {
+    const { error } = await supabase.from('trips').delete().eq('slug', slug)
+    if (error) throw error
+
+    delete editTripForms[slug]
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-trips'] })
+    await queryClient.invalidateQueries({ queryKey: ['trips'] })
+    await queryClient.invalidateQueries({ queryKey: ['trips-with-images'] })
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to delete trip: ${errorMsg}`)
+  }
+}
+
+function formatTripDate(dateStr?: null | string) {
+  if (!dateStr) return ''
+  try {
+    return format(new Date(dateStr), 'MMMM yyyy')
+  } catch {
+    return dateStr
+  }
 }
 
 function getEditForm(person: WorkPersonRecord): PersonForm {
