@@ -1,25 +1,33 @@
 import { getSwatches } from 'colorthief'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function handler(req: any, res: any) {
-  const origin = req.headers.origin || req.headers.referer || ''
-  if (!isAllowedOrigin(origin)) {
+import { assertAllowedOrigin } from './_lib/origin'
+import { safeFetch } from './_lib/safety'
+
+import type { VercelRequest, VercelResponse } from './_lib/http'
+
+const ALLOWED_HOSTS = new Set(['i.scdn.co', 'lh3.googleusercontent.com'])
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (!assertAllowedOrigin(req)) {
     return res.status(403).json({ error: 'Forbidden' })
   }
 
-  const { url } = req.query
-  if (!url) {
+  const param = req.query.url
+  if (!param) {
     return res.status(400).json({ error: 'Missing url parameter' })
   }
+  const url = Array.isArray(param) ? param[0] : param
 
   try {
-    const allowedHosts = ['i.scdn.co', 'lh3.googleusercontent.com']
     const parsed = new URL(url)
-    if (!allowedHosts.includes(parsed.hostname)) {
+    if (
+      !ALLOWED_HOSTS.has(parsed.hostname) ||
+      (parsed.protocol !== 'http:' && parsed.protocol !== 'https:')
+    ) {
       return res.status(400).json({ error: 'URL not allowed' })
     }
 
-    const response = await fetch(url)
+    const response = await safeFetch(url)
     if (!response.ok) throw new Error('Image fetch failed')
 
     const arrayBuffer = await response.arrayBuffer()
@@ -38,19 +46,5 @@ export default async function handler(req: any, res: any) {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     return res.status(500).json({ error: message })
-  }
-}
-
-function isAllowedOrigin(origin: string): boolean {
-  try {
-    const { hostname } = new URL(origin)
-    return (
-      hostname === 'psiderman.com' ||
-      hostname === 'www.psiderman.com' ||
-      hostname === 'localhost' ||
-      hostname === '127.0.0.1'
-    )
-  } catch {
-    return false
   }
 }

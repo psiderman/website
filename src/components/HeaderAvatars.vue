@@ -62,6 +62,7 @@
 
 <script setup lang="ts">
 import { Star } from '@lucide/vue'
+import DOMPurify from 'dompurify'
 
 import { global } from '@/composables/useGlobal'
 import { isHighClearance } from '@/composables/useTravel'
@@ -73,9 +74,16 @@ import {
   sortedPresenceUsers,
 } from '../composables/useLive'
 
+// Presence names are user-supplied — reduce to plain text before it's
+// interpolated into the allowHTML tooltip.
+const TEXT_CLEAN = { ALLOWED_ATTR: [], ALLOWED_TAGS: [] }
+
 const getTooltipContent = (user: PresenceUser) => {
   const isMe = user.id === activeUserId.value
-  const name = isMe ? `You (${user.name})` : user.name || 'Anonymous'
+  const name = DOMPurify.sanitize(
+    isMe ? `You (${user.name})` : user.name || 'Anonymous',
+    TEXT_CLEAN,
+  )
   if (isHighClearance(user.role) && isMe) {
     return `${name}<br />are on “the list”`
   }

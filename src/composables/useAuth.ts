@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 
-import { queryClient } from '@/queryClient'
+import { clearPersistedCache, queryClient } from '@/queryClient'
 import { supabase } from '@/supabase'
 
 import type { User } from '@supabase/supabase-js'
@@ -13,6 +13,15 @@ export const currentUser = ref<null | User>(null)
 export const currentUserRole = ref<null | string>(null)
 export const isRoleLoading = ref(false)
 export const isAdmin = computed(() => currentUserRole.value === 'admin')
+
+// Sign out and wipe all cached query data (incl. localStorage persistence)
+// so the next user never sees this user's trips, travel images, etc.
+export async function signOut() {
+  await supabase.auth.signOut()
+  currentUser.value = null
+  currentUserRole.value = null
+  clearPersistedCache()
+}
 
 export const fetchUserRole = async (userId?: string) => {
   const uid = userId ?? currentUser.value?.id
@@ -57,7 +66,7 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
       typeof window !== 'undefined' && sessionStorage.getItem('requested_clearance') === 'true'
     const requestedFromMeta = Boolean(
       session?.user?.user_metadata?.requested_clearance ??
-        session?.user?.user_metadata?.requestedClearance,
+      session?.user?.user_metadata?.requestedClearance,
     )
 
     if (requestedFromUrl || requestedFromStorage || requestedFromMeta) {
@@ -110,6 +119,3 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
   queryClient.invalidateQueries({ queryKey: ['trips-with-images'] })
   queryClient.invalidateQueries({ queryKey: ['trip-images'] })
 })
-
-
-

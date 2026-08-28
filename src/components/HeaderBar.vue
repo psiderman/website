@@ -36,13 +36,13 @@
           <button v-if="!currentUser" class="btn primary" @click="isAuthModalOpen = true">
             Log in
           </button>
-          <button v-else class="btn stroke" @click="supabase.auth.signOut()">Log out</button>
+          <button v-else class="btn stroke" @click="signOut()">Log out</button>
         </div>
         <div class="desktop:hidden flex">
           <button v-if="!currentUser" class="btn icon-only primary" @click="isAuthModalOpen = true">
             <LogIn :size="16" />
           </button>
-          <button v-else class="btn icon-only stroke" @click="supabase.auth.signOut()">
+          <button v-else class="btn icon-only stroke" @click="signOut()">
             <LogOut :size="16" />
           </button>
         </div>
@@ -54,10 +54,9 @@
 <script setup lang="ts">
 import { LogIn, LogOut, MousePointer2, MousePointer2Off } from '@lucide/vue'
 
-import { currentUser, isAuthModalOpen } from '../composables/useAuth'
+import { currentUser, isAuthModalOpen, signOut } from '../composables/useAuth'
 import { global } from '../composables/useGlobal'
 import { toggleMultiplayer } from '../composables/useLive'
-import { supabase } from '../supabase'
 import HeaderAvatars from './HeaderAvatars.vue'
 import LocationWish from './LocationWish.vue'
 import ThemeToggle from './ThemeToggle.vue'

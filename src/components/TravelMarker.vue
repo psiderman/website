@@ -1,7 +1,7 @@
 <template>
   <div
     v-tooltip="{
-      content: () => tooltipContent,
+      content: () => buildTooltipContent(),
       hideOnClick: false,
       allowHTML: true,
       theme: 'tippy-map',
@@ -40,6 +40,49 @@ interface Props {
 }
 const props = defineProps<Props>()
 
+// Build tooltip content as a DOM Element so captions (DB-supplied) are
+// assigned via textContent and images are preloaded programmatically —
+// no inline `onload` handler, no HTML-string interpolation.
+function buildTooltipContent(): Element {
+  const wrap = document.createElement('div')
+  wrap.className =
+    'bg-light border-light outline-dark/10 rounded-special flex w-fit flex-col items-center border-4 shadow-xl outline'
+
+  const media = document.createElement('div')
+  media.className =
+    'bg-dark max-h-[calc(50svh-40px)] overflow-hidden rounded-lg flex items-center justify-center'
+
+  const img = document.createElement('img')
+  img.className = 'bg-dark max-h-[calc(50svh-40px)] overflow-hidden rounded-lg object-contain'
+  if (props.width) img.width = props.width
+  if (props.height) img.height = props.height
+  if (props.width && props.height) img.style.aspectRatio = `${props.width}/${props.height}`
+  img.src = props.thumbnailUrl || props.imageUrl
+
+  // Lazy-load the full-resolution image only when a distinct thumbnail exists
+  if (props.thumbnailUrl && props.thumbnailUrl !== props.imageUrl) {
+    const preload = new Image()
+    preload.onload = () => {
+      img.src = preload.src
+    }
+    preload.src = props.imageUrl
+  }
+
+  media.appendChild(img)
+
+  const captionWrap = document.createElement('div')
+  captionWrap.className =
+    'text-p font-handwriting flex w-0 min-w-full flex-col items-center justify-center p-3 text-center align-middle text-gray-700 dark:text-zinc-700'
+  const cap = document.createElement('p')
+  cap.className = 'line-clamp-3 w-full whitespace-normal leading-tight'
+  cap.textContent = props.caption ? `“${props.caption}”` : ''
+  captionWrap.appendChild(cap)
+
+  wrap.appendChild(media)
+  wrap.appendChild(captionWrap)
+  return wrap
+}
+
 function onTooltipMount(instance: Instance) {
   instance.popper.querySelector('img')?.addEventListener('click', () => {
     instance.hide()
@@ -70,23 +113,6 @@ function openLightbox() {
   }
   isLightBoxOpen.value = true
 }
-
-const tooltipContent = `
-  <div class="bg-light border-light outline-dark/10 rounded-special flex w-fit flex-col items-center border-4 shadow-xl outline">
-    <div class="bg-dark max-h-[calc(50svh-40px)] overflow-hidden rounded-lg flex items-center justify-center">
-      <img src="${props.thumbnailUrl || props.imageUrl}"
-           data-src="${props.imageUrl}"
-           onload="if(!this.dataset.preloading && this.src !== this.dataset.src) { this.dataset.preloading = 'true'; const img = new Image(); img.onload = () => { this.src = img.src; }; img.src = this.dataset.src; }"
-           ${props.width ? `width="${props.width}"` : ''}
-           ${props.height ? `height="${props.height}"` : ''}
-           style="${props.width && props.height ? `aspect-ratio: ${props.width}/${props.height};` : ''}"
-           class="bg-dark overflow-hidden max-h-[calc(50svh-40px)] rounded-lg object-contain" />
-    </div>
-    <div class="text-p font-handwriting flex w-0 min-w-full flex-col items-center justify-center p-3 text-center align-middle text-gray-700 dark:text-zinc-700">
-      <p class="line-clamp-3 w-full whitespace-normal leading-tight">${props.caption ? `“${props.caption}”` : '&nbsp;'}</p>
-    </div>
-  </div>
-`
 </script>
 
 <style>

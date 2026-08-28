@@ -1046,24 +1046,10 @@ function onTouchStart(e: TouchEvent) {
 const { data: userRolesList } = useQuery({
   enabled: computed(() => isAdmin.value),
   queryFn: async () => {
-    // Query view with auth profile joined
-    const { data: viewData, error: viewError } = await supabase
-      .from('admin_user_roles_view')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (viewError) {
-      console.warn('admin_user_roles_view query failed, falling back:', viewError)
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      return (data || []) as UserRoleRecord[]
-    }
-
-    return (viewData || []) as UserRoleRecord[]
+    // Admin-guarded RPC (replaces the previously anon-exposed view)
+    const { data, error } = await supabase.rpc('admin_user_roles')
+    if (error) throw error
+    return (data || []) as UserRoleRecord[]
   },
   queryKey: ['admin-user-roles'],
 })
@@ -1564,16 +1550,19 @@ async function saveRole(user: UserRoleRecord) {
   const newRole = pendingRoles[user.user_id]
   if (!newRole) return
 
+  const prevRole = user.role
   user.role = newRole
 
   try {
-    const { error } = await supabase
-      .from('user_roles')
-      .upsert({ role: newRole, user_id: user.user_id })
+    const { error } = await supabase.rpc('admin_set_role', {
+      new_role: newRole,
+      target_user_id: user.user_id,
+    })
 
     if (error) throw error
     await queryClient.invalidateQueries({ queryKey: ['admin-user-roles'] })
   } catch (err: unknown) {
+    user.role = prevRole
     const errorMsg = err instanceof Error ? err.message : 'Unknown error'
     alert(`Failed to update role: ${errorMsg}`)
     await queryClient.invalidateQueries({ queryKey: ['admin-user-roles'] })
@@ -1788,23 +1777,14 @@ async function saveImage(img: TripImageRecord, close?: () => void) {
 const { data: guestbookEntries } = useQuery({
   enabled: computed(() => isAdmin.value),
   queryFn: async () => {
-    const { data: viewData, error: viewError } = await supabase
-      .from('admin_guestbook_view')
-      .select('*')
-      .order('updated_at', { ascending: false })
-
-    if (viewError) {
-      console.warn('admin_guestbook_view query failed, falling back:', viewError)
-      const { data, error } = await supabase
-        .from('guestbook')
-        .select('*')
-        .order('updated_at', { ascending: false })
-
-      if (error) throw error
-      return (data || []) as GuestbookEntry[]
-    }
-
-    return (viewData || []) as GuestbookEntry[]
+    // Admin-guarded RPC (replaces the previously anon-exposed view)
+    const { data, error } = await supabase.rpc('admin_guestbook')
+    if (error) throw error
+    return ((data || []) as GuestbookEntry[]).sort((a, b) => {
+      const bTime = b.updated_at ? new Date(b.updated_at).getTime() : 0
+      const aTime = a.updated_at ? new Date(a.updated_at).getTime() : 0
+      return bTime - aTime
+    })
   },
   queryKey: ['admin-guestbook'],
 })

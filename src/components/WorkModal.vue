@@ -74,7 +74,7 @@
                 </div>
 
                 <div
-                  class="border-border-primary desktop:flex-row flex w-full flex-col gap-10 border-b p-10 items-center"
+                  class="border-border-primary desktop:flex-row flex w-full flex-col items-center gap-10 border-b p-10"
                 >
                   <div
                     class="bg-surface-secondary border-border-primary relative z-0 h-90 w-72 shrink-0 overflow-hidden rounded-lg border"
@@ -167,9 +167,7 @@
                         v-for="person in sortedPeople"
                         :key="person.name"
                         v-tooltip="{
-                          content: person.quote
-                            ? `<blockquote>“${person.quote}”</blockquote>–${person.name} `
-                            : person.name,
+                          content: personTooltip(person),
                           trigger: 'mouseenter',
                           allowHTML: true,
                         }"
@@ -219,11 +217,23 @@ import { ArrowUpRight, Undo, X } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query'
 import { animate, createDraggable, type Draggable } from 'animejs'
 import { format } from 'date-fns'
+import DOMPurify from 'dompurify'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { getStorageUrl, supabase } from '@/supabase'
 
 import type { WorkDetail, WorkPerson } from '@/data/work'
+
+// People names/quotes are DB-supplied — reduce them to plain text before
+// they're interpolated into the allowHTML tooltip.
+const TEXT_CLEAN = { ALLOWED_ATTR: [], ALLOWED_TAGS: [] }
+
+const personTooltip = (person: WorkPerson) => {
+  const name = DOMPurify.sanitize(person.name, TEXT_CLEAN)
+  if (!person.quote) return name
+  const quote = DOMPurify.sanitize(person.quote, TEXT_CLEAN)
+  return `<blockquote>“${quote}”</blockquote>–${name}`
+}
 
 const props = defineProps<{
   isOpen: boolean

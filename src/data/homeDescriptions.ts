@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify'
 import { marked } from 'marked'
 
 import type { FilterGroupId } from '@/types'
@@ -15,6 +16,10 @@ const markdownFiles = import.meta.glob('@/data/descriptions/*.md', {
   query: '?raw',
 })
 
+// Parse inline markdown and sanitize the resulting HTML before it's
+// rendered via v-html anywhere.
+const renderInline = (src: string) => DOMPurify.sanitize(marked.parseInline(src) as string)
+
 export const descriptionContent: DescriptionContent[] = Object.entries(markdownFiles).map(
   ([path, rawContent]) => {
     // Extract ID from filename (e.g., /src/data/descriptions/personal_finance.md -> personal_finance)
@@ -27,9 +32,9 @@ export const descriptionContent: DescriptionContent[] = Object.entries(markdownF
       .filter(Boolean)
 
     const titleRaw = lines[0].replace(/^#\s*/, '')
-    const title = marked.parseInline(titleRaw) as string
+    const title = renderInline(titleRaw)
 
-    const content = lines.slice(1).map((p) => marked.parseInline(p) as string)
+    const content = lines.slice(1).map((p) => renderInline(p))
 
     return {
       content,
