@@ -73,7 +73,7 @@
           <div
             class="border-border-primary relative flex w-full flex-row items-center justify-between gap-4 border-b py-4"
           >
-            <div class="relative flex min-w-0 flex-1 flex-row items-center gap-4">
+            <div class="relative flex min-w-0 flex-1 flex-row items-center gap-2">
               <div
                 class="border-border-primary bg-surface-secondary size-8 shrink-0 overflow-hidden rounded-full border"
               >
@@ -129,7 +129,107 @@
 
       <!-- People Tab Panel -->
       <TabPanel class="outline-none">
-        <!-- Content for people -->
+        <div class="flex snap-x snap-mandatory overflow-x-auto p-4">
+          <div
+            v-for="org in orgsWithPeople"
+            :key="org.id"
+            class="flex w-full shrink-0 snap-start scroll-m-4 flex-col gap-1 p-4"
+          >
+            <h3 class="text-ui-small text-text-tertiary tracking-wider uppercase">
+              {{ org.name }}
+            </h3>
+
+            <Disclosure
+              v-for="person in org.people"
+              :key="`${person.orgId}:${person.name}`"
+              v-slot="{ close }"
+              as="div"
+              class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
+            >
+              <DisclosureButton class="w-full p-2 text-left">
+                <div class="flex items-center gap-2 not-last:pb-3">
+                  <img
+                    :src="getWorkPersonUrl(person.orgId, person.imageName)"
+                    :alt="person.name"
+                    class="size-8 rounded-full object-cover"
+                    @error="(e: Event) => ((e.target as HTMLElement).style.display = 'none')"
+                  />
+                  <div class="flex min-w-0 flex-col gap-0">
+                    <p class="text-ui text-text-primary">{{ person.name }}</p>
+                    <div class="inline-flex shrink-0 flex-row items-center justify-center gap-1">
+                      <p
+                        v-if="person.linkedin"
+                        class="text-ui-small text-text-secondary w-full truncate"
+                      >
+                        {{ person.linkedin }}
+                      </p>
+                      <a v-if="person.linkedin" :href="person.linkedin" target="_blank" @click.stop>
+                        <ExternalLink :size="12" class="text-text-tertiary" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="person.quote" class="border-border-primary border-t pt-3">
+                  <p class="text-p-small text-text-secondary border-l-2 pl-2 italic">
+                    {{ person.quote }}
+                  </p>
+                </div>
+              </DisclosureButton>
+
+              <DisclosurePanel
+                class="border-border-primary bg-surface-secondary flex flex-col gap-2 border-t p-4"
+              >
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Name</span>
+                  <input
+                    v-model="getEditForm(person).name"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                  />
+                </label>
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Image Name</span>
+                  <input
+                    v-model="getEditForm(person).imageName"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                  />
+                </label>
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">LinkedIn URL</span>
+                  <input
+                    v-model="getEditForm(person).linkedin"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                    type="text"
+                  />
+                </label>
+                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <span class="pl-1.5">Quote</span>
+                  <textarea
+                    v-model="getEditForm(person).quote"
+                    rows="2"
+                    class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                  ></textarea>
+                </label>
+                <div class="flex gap-2 p-2">
+                  <button
+                    class="btn primary"
+                    type="button"
+                    :disabled="savingPersonKey === `${person.orgId}:${person.name}`"
+                    @click="savePerson(person, close)"
+                  >
+                    {{
+                      savingPersonKey === `${person.orgId}:${person.name}` ? 'Saving...' : 'Save'
+                    }}
+                  </button>
+                  <button class="btn stroke" type="button" @click="resetPerson(person)">
+                    Reset
+                  </button>
+                </div>
+              </DisclosurePanel>
+            </Disclosure>
+          </div>
+        </div>
       </TabPanel>
 
       <!-- Trip Tab Panel -->
@@ -194,10 +294,20 @@
 </template>
 
 <script setup lang="ts">
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
+} from '@headlessui/vue'
 import {
   BriefcaseBusiness,
   ChevronDown,
+  ExternalLink,
   GalleryHorizontal,
   KeyRound,
   Loader,
@@ -210,7 +320,8 @@ import { getStroke } from 'perfect-freehand'
 import { computed, reactive, ref, watch } from 'vue'
 
 import { isAdmin } from '@/composables/useAuth'
-import { supabase } from '@/supabase'
+import { workHistory } from '@/data/work'
+import { getStorageUrl, supabase } from '@/supabase'
 
 import type { ClearanceLevel } from '@/composables/useTravel'
 
@@ -224,7 +335,7 @@ interface UserRoleRecord {
   user_id: string
 }
 
-const selectedTab = ref(4)
+const selectedTab = ref(1)
 const tabs = [
   { icon: KeyRound, name: 'roles' },
   { icon: BriefcaseBusiness, name: 'people' },
@@ -346,6 +457,61 @@ const roleBadgeClasses: Record<ClearanceLevel, string> = {
   public: '',
 }
 
+interface PersonForm {
+  imageName: string
+  linkedin: string
+  name: string
+  quote: string
+}
+
+// ----------------------------------------------------
+// PEOPLE TAB
+// ----------------------------------------------------
+interface WorkPersonRecord {
+  imageName: string
+  linkedin: null | string
+  name: string
+  orgId: string
+  quote: null | string
+}
+
+const editForms = reactive<Record<string, PersonForm>>({})
+const savingPersonKey = ref<null | string>(null)
+
+const { data: peopleList } = useQuery({
+  enabled: computed(() => isAdmin.value),
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from('work_people')
+      .select('*')
+      .order('name', { ascending: true })
+
+    if (error) throw error
+    return (data || []) as WorkPersonRecord[]
+  },
+  queryKey: ['admin-work-people'],
+})
+
+const orgsWithPeople = computed(() => {
+  const people = peopleList.value || []
+  const orgMap = new Map<string, { id: string; name: string; people: WorkPersonRecord[] }>()
+
+  workHistory.forEach((w) => {
+    if (w.orgId && !orgMap.has(w.orgId)) {
+      orgMap.set(w.orgId, { id: w.orgId, name: w.orgName, people: [] })
+    }
+  })
+
+  people.forEach((p) => {
+    if (!orgMap.has(p.orgId)) {
+      orgMap.set(p.orgId, { id: p.orgId, name: p.orgId, people: [] })
+    }
+    orgMap.get(p.orgId)!.people.push(p)
+  })
+
+  return Array.from(orgMap.values()).filter((org) => org.people.length > 0)
+})
+
 // ----------------------------------------------------
 // GUESTBOOK TAB
 // ----------------------------------------------------
@@ -360,8 +526,81 @@ interface GuestbookEntry {
   user_id?: string
 }
 
+function getEditForm(person: WorkPersonRecord): PersonForm {
+  const key = getPersonKey(person)
+  if (!editForms[key]) {
+    editForms[key] = {
+      imageName: person.imageName || '',
+      linkedin: person.linkedin || '',
+      name: person.name || '',
+      quote: person.quote || '',
+    }
+  }
+  return editForms[key]
+}
+
+function getPersonKey(person: { name: string; orgId: string }) {
+  return `${person.orgId}:${person.name}`
+}
+
 function getRoleBadgeClass(role: ClearanceLevel) {
   return roleBadgeClasses[role] || roleBadgeClasses.public
+}
+
+function getWorkPersonUrl(orgId: string, filename?: string) {
+  if (!filename) return ''
+  const name = filename.replace(/\.[^/.]+$/, '')
+  return getStorageUrl('webp', orgId, `${name}.webp`)
+}
+
+function resetPerson(person: WorkPersonRecord) {
+  const key = getPersonKey(person)
+  editForms[key] = {
+    imageName: person.imageName || '',
+    linkedin: person.linkedin || '',
+    name: person.name || '',
+    quote: person.quote || '',
+  }
+}
+
+async function savePerson(person: WorkPersonRecord, close?: () => void) {
+  const key = getPersonKey(person)
+  const form = getEditForm(person)
+  savingPersonKey.value = key
+
+  try {
+    const { error } = await supabase
+      .from('work_people')
+      .update({
+        imageName: form.imageName,
+        linkedin: form.linkedin || null,
+        name: form.name,
+        quote: form.quote || null,
+      })
+      .eq('orgId', person.orgId)
+      .eq('name', person.name)
+
+    if (error) throw error
+
+    person.name = form.name
+    person.imageName = form.imageName
+    person.linkedin = form.linkedin || null
+    person.quote = form.quote || null
+
+    if (form.name !== person.name) {
+      delete editForms[key]
+    }
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-work-people'] })
+    await queryClient.invalidateQueries({ queryKey: ['work-people'] })
+
+    close?.()
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to save person: ${errorMsg}`)
+  } finally {
+    savingPersonKey.value = null
+  }
 }
 
 async function saveRole(user: UserRoleRecord) {

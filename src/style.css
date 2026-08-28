@@ -660,6 +660,7 @@ body {
 
 input,
 button,
+textarea,
 a,
 [role='button'] {
   @apply outline-surface-inverted text-left focus-visible:outline-2 focus-visible:outline-offset-2 dark:outline-zinc-400;
