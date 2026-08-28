@@ -19,6 +19,30 @@ export interface ExtraCard {
 }
 
 export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
+  // life: [
+  //   {
+  //     carousel: true,
+  //     images: [
+  //       new URL('@/assets/gaming/arkham.webp', import.meta.url).href,
+  //       new URL('@/assets/gaming/budokai.webp', import.meta.url).href,
+  //       new URL('@/assets/gaming/hitman3.webp', import.meta.url).href,
+  //       new URL('@/assets/gaming/lis.webp', import.meta.url).href,
+  //       new URL('@/assets/gaming/spiderman.webp', import.meta.url).href,
+  //       new URL('@/assets/gaming/valo.webp', import.meta.url).href,
+  //     ],
+  //     size: 'md',
+  //     title: 'favorite',
+  //   },
+  // ],
+  personal_finance: [
+    {
+      bgClass: 'bg-orange-500',
+      cover: new URL('@/assets/logos/foursight.webp', import.meta.url).href,
+      link: 'https://cal.com/foursight.money/onboarding-call',
+      size: 'sm',
+      title: 'talk foursight?',
+    },
+  ],
   travel: [
     {
       carousel: true,

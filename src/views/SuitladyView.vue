@@ -70,7 +70,7 @@
 
           <!-- Roles Tab Panel -->
           <TabPanel class="outline-none">
-            <div v-for="user in userRolesList" :key="user.user_id" class="px-4">
+            <div v-for="user in sortedUserRolesList" :key="user.user_id" class="px-4">
               <!-- User / Image + Name -->
               <div
                 class="border-border-primary relative flex w-full flex-row items-center justify-between gap-4 border-b py-4"
@@ -95,9 +95,26 @@
                     </div>
                   </div>
                   <div class="flex min-w-0 flex-1 flex-col">
-                    <p class="text-text-primary truncate font-medium">
-                      {{ user.full_name }}
-                    </p>
+                    <div class="flex items-center gap-1.5">
+                      <p class="text-text-primary truncate font-medium">
+                        {{ user.full_name }}
+                      </p>
+                      <span
+                        v-if="
+                          user.role === 'auth' &&
+                          (user.requested_clearance || user.requestedClearance)
+                        "
+                        v-tooltip="{ content: 'Requested access to “the list”', allowHTML: true }"
+                        class="relative flex size-2 shrink-0 items-center justify-center"
+                      >
+                        <span
+                          class="absolute inline-flex size-full animate-ping rounded-full bg-green-500 opacity-75"
+                        ></span>
+                        <span
+                          class="relative inline-flex size-1.5 rounded-full bg-green-500"
+                        ></span>
+                      </span>
+                    </div>
                     <p class="text-text-tertiary text-mono truncate" :title="user.user_id">
                       {{ user.email }}
                     </p>
@@ -486,17 +503,41 @@
           <TabPanel class="h-full overflow-hidden outline-none">
             <div
               v-if="currentVisibleTrip"
-              class="bg-surface-primary/95 border-border-primary fixed bottom-0 left-1/2 z-20 flex w-full max-w-120 -translate-x-1/2 flex-col gap-0.5 border-t p-4 backdrop-blur-xs"
+              class="bg-surface-primary/95 border-border-primary fixed bottom-0 left-1/2 z-20 flex w-full max-w-120 -translate-x-1/2 items-center justify-between gap-2 border-t p-4 backdrop-blur-xs"
             >
-              <h3 class="text-ui text-text-primary font-medium">
-                {{ currentVisibleTrip.title }}
-              </h3>
-              <p class="text-ui-small text-text-tertiary">
-                {{ currentVisibleTrip.subtitle || formatTripDate(currentVisibleTrip.date) }}
-              </p>
+              <div class="flex min-w-0 flex-col gap-0.5">
+                <h3 class="text-ui text-text-primary truncate font-medium">
+                  {{ currentVisibleTrip.title }}
+                </h3>
+                <p class="text-ui-small text-text-tertiary truncate">
+                  {{ currentVisibleTrip.subtitle || formatTripDate(currentVisibleTrip.date) }}
+                </p>
+              </div>
+
+              <div class="flex shrink-0 items-center gap-1">
+                <button
+                  class="btn stroke icon-only"
+                  :disabled="activeImageTripIndex <= 0"
+                  aria-label="Previous trip"
+                  type="button"
+                  @click="scrollToTripIndex(activeImageTripIndex - 1)"
+                >
+                  <ChevronLeft :size="16" />
+                </button>
+                <button
+                  class="btn stroke icon-only"
+                  :disabled="activeImageTripIndex >= tripsWithImagesGrouped.length - 1"
+                  aria-label="Next trip"
+                  type="button"
+                  @click="scrollToTripIndex(activeImageTripIndex + 1)"
+                >
+                  <ChevronRight :size="16" />
+                </button>
+              </div>
             </div>
 
             <div
+              ref="imagesScrollContainer"
               class="flex h-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden"
               @scroll.passive="onImagesScroll"
             >
@@ -557,7 +598,7 @@
                           <!-- Truncated caption overlay -->
                           <div
                             v-if="img.caption"
-                            class="from-dark/80 via-dark/40 absolute inset-x-0 bottom-0 bg-gradient-to-t to-transparent p-1.5 pt-4"
+                            class="from-dark/80 via-dark/40 absolute inset-x-0 bottom-0 bg-linear-to-t to-transparent p-1.5 pt-4"
                           >
                             <p class="text-ui-small text-light truncate leading-tight italic">
                               “{{ img.caption }}”
@@ -611,8 +652,9 @@
                               v-model="getEditImageForm(img).caption"
                               rows="3"
                               maxlength="150"
-                              class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                              class="bg-surface-primary font-handwriting border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2 font-normal"
                               placeholder="Enter caption..."
+                              @keydown.enter.exact.prevent="saveImage(img, close)"
                               @input="
                                 (e) =>
                                   handleSmartApostrophes(
@@ -891,6 +933,8 @@ import {
 import {
   BriefcaseBusiness,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ExternalLink,
   GalleryHorizontal,
   KeyRound,
@@ -920,11 +964,13 @@ interface UserRoleRecord {
   email?: string
   full_name?: string
   last_sign_in_at?: string
+  requested_clearance?: boolean
+  requestedClearance?: boolean
   role: ClearanceLevel
   user_id: string
 }
 
-const selectedTab = ref(3)
+const selectedTab = ref(0)
 const tabs = [
   { icon: KeyRound, name: 'roles' },
   { icon: BriefcaseBusiness, name: 'people' },
@@ -1020,6 +1066,21 @@ const { data: userRolesList } = useQuery({
     return (viewData || []) as UserRoleRecord[]
   },
   queryKey: ['admin-user-roles'],
+})
+
+const sortedUserRolesList = computed(() => {
+  return (userRolesList.value || [])
+    .filter((u) => u.role !== 'admin')
+    .sort((a, b) => {
+      const aRequested = a.role === 'auth' && Boolean(a.requested_clearance ?? a.requestedClearance)
+      const bRequested = b.role === 'auth' && Boolean(b.requested_clearance ?? b.requestedClearance)
+
+      if (aRequested !== bRequested) return aRequested ? -1 : 1
+
+      const timeA = a.created_at ? Date.parse(a.created_at) : 0
+      const timeB = b.created_at ? Date.parse(b.created_at) : 0
+      return timeB - timeA
+    })
 })
 
 // Sync pending roles when data loads
@@ -1616,6 +1677,7 @@ const tripsWithImagesGrouped = computed(() => {
 })
 
 const activeImageTripIndex = ref(0)
+const imagesScrollContainer = ref<HTMLElement | null>(null)
 let scrollRafId: null | number = null
 
 function onImagesScroll(e: Event) {
@@ -1632,6 +1694,16 @@ function onImagesScroll(e: Event) {
     ) {
       activeImageTripIndex.value = index
     }
+  })
+}
+
+function scrollToTripIndex(index: number) {
+  if (!imagesScrollContainer.value) return
+  const targetIndex = Math.max(0, Math.min(index, tripsWithImagesGrouped.value.length - 1))
+  const containerWidth = imagesScrollContainer.value.clientWidth
+  imagesScrollContainer.value.scrollTo({
+    behavior: 'smooth',
+    left: targetIndex * containerWidth,
   })
 }
 

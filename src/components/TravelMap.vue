@@ -31,7 +31,7 @@ const mapContainer = ref<HTMLDivElement | null>(null)
 let map: mapboxgl.Map | null = null
 let markers: mapboxgl.Marker[] = []
 let markerApps: App[] = []
-let currentFeatures: any[] = []
+let currentFeatures: Array<ReturnType<typeof buildGeoJSON>['features'][number]> = []
 
 const isDarkTheme = computed(() => {
   return (
@@ -44,7 +44,7 @@ function addMarkers() {
   if (!map) return
   clearMarkers()
   const geojson = buildGeoJSON(props.travelsWithImages ?? [])
-  currentFeatures = (geojson as any).features
+  currentFeatures = geojson.features
 
   if (currentFeatures.length === 0) return
 

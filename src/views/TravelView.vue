@@ -200,7 +200,12 @@ import TravelMap from '@/components/TravelMap.vue'
 import { currentUser } from '@/composables/useAuth'
 import { isAuthModalOpen } from '@/composables/useAuth'
 import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
-import { isHighClearance, useTravelsWithImages } from '@/composables/useTravel'
+import {
+  isHighClearance,
+  type TravelImage,
+  type TripWithImages,
+  useTravelsWithImages,
+} from '@/composables/useTravel'
 import { getStorageUrl } from '@/supabase'
 import { openLink } from '@/utils'
 
@@ -230,9 +235,10 @@ function handleTripClick(slug: string) {
   }
 }
 
-function setCardRef(el: any, slug: string) {
+function setCardRef(el: unknown, slug: string) {
   if (el) {
-    cardRefs.value[slug] = el.$el || el
+    const htmlEl = (el as { $el?: HTMLElement }).$el || (el as HTMLElement)
+    cardRefs.value[slug] = htmlEl
   } else {
     delete cardRefs.value[slug]
   }
@@ -264,10 +270,10 @@ const sortedYears = computed(() => {
     .sort((a, b) => b - a)
 })
 
-const triggerLightbox = (travel: any, clickedIdx: number) => {
+const triggerLightbox = (travel: TripWithImages, clickedIdx: number) => {
   if (!travel.images || travel.images.length === 0) return
 
-  const allImages = travel.images.map((img: any) => ({
+  const allImages = travel.images.map((img: TravelImage) => ({
     caption: img.caption,
     clearance: img.clearance,
     height: img.height,
@@ -283,7 +289,7 @@ const triggerLightbox = (travel: any, clickedIdx: number) => {
   ]
 
   lightBoxData.value = {
-    description: travel.dateLabel,
+    description: travel.subtitle,
     images: orderedImages,
     title: travel.title,
   }

@@ -1,9 +1,9 @@
 <template>
-  <div class="max-w-container flex w-full flex-col gap-0">
+  <div class="flex w-full flex-col items-center gap-0">
     <!-- About me -->
     <div
       data-sync="about-me"
-      class="desktop:p-20 desktop:flex-row flex w-full flex-col items-center justify-center gap-8 p-6"
+      class="max-w-container desktop:p-20 desktop:flex-row flex w-full flex-col items-center justify-center gap-8 p-6"
     >
       <img
         src="@/assets/public.webp"
@@ -33,53 +33,57 @@
 
     <!-- Filters -->
     <div
-      ref="tabContainerRef"
-      class="bg-background border-border-primary desktop:justify-center desktop:px-20 sticky top-0 z-50 mb-10 flex w-screen flex-row items-start justify-between gap-1 border-b px-2"
+      class="bg-background border-border-primary sticky top-0 z-50 mb-10 flex w-full justify-center border-b px-2"
     >
-      <button
-        v-for="grp in filterGroups"
-        :key="grp.id"
-        :ref="(el) => setTabRef(grp.id, el)"
-        :aria-label="grp.label"
-        class="text-ui font-sans-alt desktop:shrink-0 desktop:px-5 relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl p-4 transition-colors duration-200"
-        :class="[
-          activeFilter === grp.id
-            ? 'text-text-primary font-normal'
-            : 'text-text-secondary hover:bg-hover opacity-60 hover:opacity-100',
-        ]"
-        @click="activeFilter = grp.id"
-      >
-        <div class="flex h-6 items-center justify-center">
-          <component :is="grp.icon" :size="20" />
-        </div>
-        <div
-          class="desktop:grid hidden transition-all duration-500 ease-out"
-          :class="
-            activeFilter === grp.id
-              ? 'grid-cols-[1fr] opacity-100'
-              : 'pointer-events-none -ml-2 grid-cols-[0fr] opacity-0'
-          "
-        >
-          <p class="overflow-hidden whitespace-nowrap">
-            {{ grp.label }}
-          </p>
-        </div>
-      </button>
-
-      <!-- Smooth moving indicator -->
       <div
-        class="bg-surface-inverted pointer-events-none absolute bottom-0 left-0 h-1.5 rounded-t-lg transition-all duration-500 ease-out"
-        :style="{
-          transform: `translateX(${indicatorStyle.left}px)`,
-          width: `${indicatorStyle.width}px`,
-          opacity: indicatorStyle.ready ? 1 : 0,
-        }"
-      ></div>
+        ref="tabContainerRef"
+        class="max-w-container desktop:justify-center desktop:px-20 relative flex w-full flex-row items-start justify-between gap-1"
+      >
+        <button
+          v-for="grp in filterGroups"
+          :key="grp.id"
+          :ref="(el) => setTabRef(grp.id, el)"
+          :aria-label="grp.label"
+          class="text-ui font-sans-alt desktop:shrink-0 desktop:px-5 relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl p-4 transition-colors duration-200"
+          :class="[
+            activeFilter === grp.id
+              ? 'text-text-primary font-normal'
+              : 'text-text-secondary hover:bg-hover opacity-60 hover:opacity-100',
+          ]"
+          @click="activeFilter = grp.id"
+        >
+          <div class="flex h-6 items-center justify-center">
+            <component :is="grp.icon" :size="20" />
+          </div>
+          <div
+            class="desktop:grid hidden transition-all duration-500 ease-out"
+            :class="
+              activeFilter === grp.id
+                ? 'grid-cols-[1fr] opacity-100'
+                : 'pointer-events-none -ml-2 grid-cols-[0fr] opacity-0'
+            "
+          >
+            <p class="overflow-hidden whitespace-nowrap">
+              {{ grp.label }}
+            </p>
+          </div>
+        </button>
+
+        <!-- Smooth moving indicator -->
+        <div
+          class="bg-surface-inverted pointer-events-none absolute bottom-0 left-0 h-1.5 rounded-t-lg transition-all duration-500 ease-out"
+          :style="{
+            transform: `translateX(${indicatorStyle.left}px)`,
+            width: `${indicatorStyle.width}px`,
+            opacity: indicatorStyle.ready ? 1 : 0,
+          }"
+        ></div>
+      </div>
     </div>
 
     <!-- Grid -->
     <div
-      class="desktop:px-20 desktop:grid-cols-12 relative grid w-full grid-flow-row-dense grid-cols-2 gap-8 px-4"
+      class="max-w-container desktop:px-20 desktop:grid-cols-12 relative grid w-full grid-flow-row-dense grid-cols-2 gap-8 px-4"
     >
       <!-- Description Card -->
       <div

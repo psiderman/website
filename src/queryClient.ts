@@ -17,10 +17,13 @@ export const queryClient = new QueryClient({
     },
   },
   queryCache: new QueryCache({
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       // If we get an unauthorized error or a JWT expired error from Supabase, automatically sign out
-      if (error?.code === 'PGRST303' || error?.message === 'JWT expired' || error?.status === 401) {
-        supabase.auth.signOut()
+      if (error && typeof error === 'object') {
+        const err = error as { code?: string; message?: string; status?: number }
+        if (err.code === 'PGRST303' || err.message === 'JWT expired' || err.status === 401) {
+          supabase.auth.signOut()
+        }
       }
     },
   }),

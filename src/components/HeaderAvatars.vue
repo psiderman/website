@@ -1,7 +1,7 @@
 <template>
   <div class="avatar-stack flex flex-row items-center gap-0">
     <div
-      v-if="!global.allowMultiplayer.value && !hasOtherUsersOnRoom"
+      v-if="!global.allowMultiplayer.value"
       v-tooltip="{
         content: 'Wilson',
         group: 'header-avatars',
@@ -15,14 +15,15 @@
       v-for="user in sortedPresenceUsers.slice(0, 5)"
       :key="user.id"
       v-tooltip="{
+        allowHTML: true,
         content: getTooltipContent(user),
         group: 'header-avatars',
         placement: 'bottom',
       }"
-      class="avatar bg-background outline-background relative size-9 shrink-0 overflow-hidden rounded-full outline-4 not-first:-ml-2"
+      class="avatar bg-background outline-background relative size-9 shrink-0 rounded-full outline-4 not-first:-ml-2"
     >
       <div
-        class="flex size-9 items-center justify-center"
+        class="flex size-9 items-center justify-center rounded-full"
         :class="{ 'opacity-50': user.room !== activeRoomName || user.isStale }"
         :style="{ backgroundColor: user.color?.bg, color: user.color?.fg }"
       >
@@ -30,13 +31,23 @@
           v-if="user.avatar"
           v-lazy="user.avatar"
           referrerpolicy="no-referrer"
-          class="bg-surface-tertiary absolute inset-0 size-full object-cover"
+          class="bg-surface-tertiary absolute inset-0 size-full rounded-full object-cover"
           width="160"
           height="160"
         />
         <span v-else class="text-sm font-semibold">
           {{ getInitial(user.name) }}
         </span>
+        <div
+          v-if="isHighClearance(user.role) && user.id === activeUserId"
+          class="bg-background absolute -right-2 -bottom-2 z-10 flex size-5.25 items-center justify-center rounded-full"
+        >
+          <div
+            class="border-light flex size-4 items-center justify-center rounded-full border bg-green-500 shadow-sm"
+          >
+            <Star :size="10" fill="#fff" stroke-width="0" />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -50,20 +61,25 @@
 </template>
 
 <script setup lang="ts">
+import { Star } from '@lucide/vue'
+
 import { global } from '@/composables/useGlobal'
+import { isHighClearance } from '@/composables/useTravel'
 
 import {
   activeRoomName,
   activeUserId,
-  hasOtherUsersOnRoom,
+  type PresenceUser,
   sortedPresenceUsers,
 } from '../composables/useLive'
 
-const getTooltipContent = (user: { id: string; name?: string }) => {
-  if (user.id === activeUserId.value) {
-    return `You (${user.name})`
+const getTooltipContent = (user: PresenceUser) => {
+  const isMe = user.id === activeUserId.value
+  const name = isMe ? `You (${user.name})` : user.name || 'Anonymous'
+  if (isHighClearance(user.role) && isMe) {
+    return `${name}<br />are on “the list”`
   }
-  return user.name || 'Anonymous'
+  return name
 }
 
 const getInitial = (name?: string) => {

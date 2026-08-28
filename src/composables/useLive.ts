@@ -1,6 +1,6 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import { currentUser } from '@/composables/useAuth'
+import { currentUser, currentUserRole } from '@/composables/useAuth'
 import { global } from '@/composables/useGlobal'
 import router from '@/router'
 import { supabase } from '@/supabase'
@@ -10,6 +10,19 @@ export interface BoxRect {
   left: number
   top: number
   width: number
+}
+
+export interface PresenceUser {
+  avatar: null | string
+  color: {
+    bg: string
+    fg: string
+  }
+  id: string
+  isStale?: boolean
+  name: string
+  role?: null | string
+  room: string
 }
 
 interface CursorData {
@@ -26,18 +39,6 @@ interface CursorData {
   updatedAt: number
   x: number
   y: number
-}
-
-interface PresenceUser {
-  avatar: null | string
-  color: {
-    bg: string
-    fg: string
-  }
-  id: string
-  isStale?: boolean
-  name: string
-  room: string
 }
 
 interface TouchData {
@@ -154,8 +155,8 @@ export const activeRoomName = computed(() => {
 })
 
 watch(
-  [activeUserId, userName, userAvatar],
-  ([id, name, avatar]) => {
+  [activeUserId, userName, userAvatar, currentUserRole],
+  ([id, name, avatar, role]) => {
     const trackPresence = (color: { bg: string; fg: string }) => {
       if (channel && global.allowMultiplayer.value) {
         channel.track({
@@ -163,6 +164,7 @@ watch(
           color,
           id,
           name,
+          role,
           room: activeRoomName.value,
         })
       }
@@ -244,6 +246,7 @@ export const sortedPresenceUsers = computed(() => {
     color: userColor.value,
     id: activeUserId.value,
     name: userName.value,
+    role: currentUserRole.value,
     room: activeRoomName.value,
   }
 
@@ -255,9 +258,10 @@ export const sortedPresenceUsers = computed(() => {
   for (const u of activePresenceUsers.value) {
     uniqueUsers.set(u.id, u)
   }
-  if (!uniqueUsers.has(localUser.id)) {
-    uniqueUsers.set(localUser.id, localUser)
-  }
+  uniqueUsers.set(localUser.id, {
+    ...(uniqueUsers.get(localUser.id) || {}),
+    ...localUser,
+  })
 
   return Array.from(uniqueUsers.values())
     .map((u) => {
@@ -424,6 +428,7 @@ const joinRoom = (roomName: string) => {
           color: userColor.value,
           id: activeUserId.value,
           name: userName.value,
+          role: currentUserRole.value,
           room: activeRoomName.value,
         })
       }

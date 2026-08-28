@@ -41,7 +41,7 @@ export interface TripWithImages extends Trip {
   images: TravelImage[]
 }
 
-export function isHighClearance(level?: ClearanceLevel | null): boolean {
+export function isHighClearance(level?: ClearanceLevel | null | string): boolean {
   return !!level && ['admin', 'close', 'friends'].includes(level)
 }
 
