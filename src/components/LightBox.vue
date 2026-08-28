@@ -38,7 +38,7 @@
               <div class="bg-dark group desktop:min-h-80 relative h-full w-full rounded-lg">
                 <div
                   ref="scrollContainer"
-                  class="noscrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden scroll-smooth"
+                  class="noscrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden scroll-smooth overscroll-x-contain"
                   @scroll="handleScroll"
                 >
                   <div
@@ -52,7 +52,7 @@
                     >
                       <img
                         v-lazy="{ src: item.src, placeholder: item.placeholder }"
-                        :alt="`${title}-${idx}`"
+                        :alt="item.caption || ''"
                         :style="
                           item.width && item.height
                             ? { 

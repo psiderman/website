@@ -1,5 +1,7 @@
 <template>
-  <div
+  <button
+    type="button"
+    aria-label="Play spider logo animation"
     class="psider-logo z-50 h-20 w-20 shrink-0 cursor-pointer bg-contain"
     @click="spiderAnimation"
   >
@@ -73,10 +75,10 @@
         d="M28.906 64C22.9407 56.0525 29.7813 41.4646 39.706 40.9681C49.8818 40.4591 58.0617 55.8511 51.946 64"
         stroke="white"
         stroke-width="2.30542"
-        stroke-linecap="round"
+            stroke-linecap="round"
       />
     </svg>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -101,6 +103,8 @@ const spiderF1El = ref<null | SVGPathElement>(null)
 
 function spiderAnimation() {
   if (!spiderAnimationFlag.value) return
+  // Skip the long animation entirely for reduced-motion users
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
   spiderAnimationFlag.value = false
   emit('animationStart')
 

@@ -15,7 +15,7 @@
 
       <div
         ref="scrollContainerRef"
-        class="fixed inset-0 overflow-y-auto"
+        class="fixed inset-0 overflow-y-auto overscroll-y-contain"
         @touchstart.passive="onTouchStart"
         @touchmove="onTouchMove"
         @touchend="onTouchEnd"
@@ -52,6 +52,7 @@
                   <div class="flex flex-row gap-2 text-left">
                     <img
                       v-lazy="getWorkLogoUrl(work.orgId)"
+                      :alt="`${work.orgName} logo`"
                       class="rounded-special dark:border-border-primary size-10 border border-transparent"
                       width="128"
                       height="128"
@@ -109,6 +110,7 @@
                       ref="imageRefs"
                       v-lazy="getWorkImageUrl(work.orgId, img.src)"
                       draggable="false"
+                      :alt="`${work.orgName} photo ${idx + 1}`"
                       class="image-polaroid absolute inset-0 m-auto object-cover select-none"
                       :class="img.landscape ? 'h-60 w-80' : 'h-80 w-60'"
                       :height="img.landscape ? 240 : 320"
@@ -176,6 +178,7 @@
                       >
                         <img
                           v-lazy="getWorkPersonUrl(work.orgId, person.imageName)"
+                          :alt="person.name"
                           class="border-border-primary size-10 rounded-full border object-cover outline-0 transition-transform hover:scale-110"
                           height="128"
                           width="128"

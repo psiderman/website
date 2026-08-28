@@ -72,7 +72,7 @@
                 <p class="text-text-primary">{{ block.org }}</p>
                 <p v-if="block.role" class="text-text-secondary">{{ block.role }}</p>
                 <p class="text-text-tertiary mt-1">
-                  {{ block.durationText }}<span v-if="!block.endDate">...</span>
+                  {{ block.durationText }}<span v-if="!block.endDate">…</span>
                 </p>
               </div>
             </component>

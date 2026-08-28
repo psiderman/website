@@ -5,7 +5,7 @@
         <!-- Breadcrumbs -->
         <div class="text-ui flex flex-row items-center justify-start gap-2">
           <router-link to="/" class="breadcrumb main">home</router-link>
-          <ChevronRight class="text-text-secondary" :size="16" />
+          <ChevronRight class="text-text-secondary" :size="16" aria-hidden="true" />
           <span class="breadcrumb level">privacy</span>
         </div>
 

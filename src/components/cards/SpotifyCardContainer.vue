@@ -71,7 +71,8 @@
 
           <img
             src="@/assets/svg/spotify.svg"
-            alt="spotify"
+            alt=""
+            aria-hidden="true"
             class="z-10 size-5"
             width="24"
             height="24"
@@ -80,7 +81,7 @@
             <img
               v-if="now_playing.cover"
               :src="now_playing.cover"
-              alt="cover"
+              :alt="`${now_playing.title} album cover`"
               class="z-10 size-8 rounded-sm"
               width="128"
               height="128"
@@ -101,22 +102,16 @@
 
             <div class="z-10 flex h-4 items-end gap-0.5">
               <div
-                v-for="i in 5"
-                :key="i"
-                class="bg-light w-1 rounded-xs transition-all"
+                v-for="bar in waveBars"
+                :key="bar.i"
+                class="bg-light w-1 rounded-xs transition-[height]"
                 :class="[
                   now_playing.is_playing && !prefersReducedMotion ? 'animate-waveform' : '',
                   !now_playing.is_playing || prefersReducedMotion ? 'h-0.75' : '',
                 ]"
                 :style="{
-                  animationDelay:
-                    now_playing.is_playing && !prefersReducedMotion
-                      ? `${i * -Math.random() * 300}ms`
-                      : '0s',
-                  animationDuration:
-                    now_playing.is_playing && !prefersReducedMotion
-                      ? `${Math.max(Math.random() * 1, 0.75)}s`
-                      : '0s',
+                  animationDelay: bar.delay,
+                  animationDuration: bar.duration,
                 }"
               ></div>
             </div>
@@ -135,6 +130,7 @@
 
 <script setup lang="ts">
 import { OctagonAlert } from '@lucide/vue'
+import { computed } from 'vue'
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -142,6 +138,15 @@ import { currentUser } from '@/composables/useAuth.ts'
 import { useSpotify } from '@/composables/useSpotify'
 
 import GenericLoader from '../GenericLoader.vue'
+
+// Stable (non re-randomizing) waveform animation values per bar
+const waveBars = computed(() =>
+  Array.from({ length: 5 }, (_, i) => ({
+    delay: `${i * -Math.random() * 300}ms`,
+    duration: `${Math.max(Math.random() * 1, 0.75)}s`,
+    i,
+  })),
+)
 
 const {
   activeFocusIndex,

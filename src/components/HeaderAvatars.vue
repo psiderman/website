@@ -9,7 +9,14 @@
       }"
       class="avatar outline-background relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-200 outline-4 dark:bg-zinc-200"
     >
-      <img src="@/assets/svg/wilson.svg" class="z-10 size-9" />
+      <img
+        src="@/assets/svg/wilson.svg"
+        alt=""
+        aria-hidden="true"
+        class="z-10 size-9"
+        width="36"
+        height="36"
+      />
     </div>
     <div
       v-for="user in sortedPresenceUsers.slice(0, 5)"
@@ -53,9 +60,10 @@
 
     <span
       v-if="sortedPresenceUsers.length > 5"
+      aria-live="polite"
       class="text-text-secondary ml-2 text-sm whitespace-nowrap"
     >
-      + {{ sortedPresenceUsers.length - 5 }} more...
+      + {{ sortedPresenceUsers.length - 5 }} more…
     </span>
   </div>
 </template>

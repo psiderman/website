@@ -33,12 +33,13 @@
                 <TransitionGroup
                   name="carousel"
                   tag="div"
+                  aria-hidden="true"
                   class="bg-dark text-light relative mx-auto flex h-30 w-full items-center justify-center gap-3 select-none"
                 >
                   <div
                     v-for="offset in [-2, -1, 0, 1, 2]"
                     :key="activeIconIndex + offset"
-                    class="flex items-center justify-center transition-all duration-500 ease-out"
+                    class="flex items-center justify-center transition-[opacity,transform] duration-500 ease-out"
                     :class="[
                       offset === 0
                         ? isResting
@@ -162,7 +163,7 @@ watch(
   () => props.isOpen,
   (open) => {
     stopTimer()
-    if (open) {
+    if (open && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       isResting.value = true
       timer = setInterval(stepCarousel, 1800)
     }
@@ -206,7 +207,9 @@ const signInWithGoogle = async () => {
 .carousel-move,
 .carousel-enter-active,
 .carousel-leave-active {
-  transition: all 0.5s ease-out;
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
 }
 
 .carousel-enter-from {

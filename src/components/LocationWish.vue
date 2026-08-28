@@ -9,8 +9,16 @@
         v-if="!isWishTime"
         to="/"
         class="size-10 shrink-0 overflow-hidden rounded-full hover:opacity-80 active:opacity-90"
+        aria-label="Psiderman home"
       >
-        <img src="/psider.webp" class="size-10" width="80" height="80" />
+        <img
+          src="/psider.webp"
+          alt=""
+          aria-hidden="true"
+          class="size-10"
+          width="80"
+          height="80"
+        />
       </router-link>
     </Transition>
 
@@ -37,13 +45,15 @@
         </span>
       </div>
 
-      <div
+      <button
         v-tooltip="{
           content: isPopping ? null : wishTooltip,
           theme: 'tippy-small',
           hideOnClick: false,
           placement: 'right',
         }"
+        type="button"
+        aria-label="Make a wish"
         data-sync="wish"
         class="relative size-full cursor-cell overflow-hidden rounded-full border-2 border-transparent bg-amber-200 dark:bg-amber-500/20"
         :class="{
@@ -57,6 +67,10 @@
         @mouseleave="onPressEnd"
         @touchstart="onPressStart"
         @touchend="onPressEnd"
+        @keydown.enter.prevent="onPressStart"
+        @keydown.space.prevent="onPressStart"
+        @keyup.enter.prevent="onPressEnd"
+        @keyup.space.prevent="onPressEnd"
       >
         <div
           class="pointer-events-none absolute z-10 size-20 bg-amber-400"
@@ -70,9 +84,9 @@
         ></div>
 
         <div class="absolute inset-0 z-20 flex flex-col items-center justify-center">
-          <span class="text-h2">🤞</span>
+          <span class="text-h2" aria-hidden="true">🤞</span>
         </div>
-      </div>
+      </button>
     </div>
     <div
       v-if="isWishTime"

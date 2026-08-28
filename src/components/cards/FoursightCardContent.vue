@@ -4,7 +4,8 @@
   >
     <img
       src="@/assets/home/bg.webp"
-      alt="bg"
+      alt=""
+      aria-hidden="true"
       class="pointer-events-none absolute inset-0 z-0 h-full w-full bg-cyan-950 object-cover"
       width="713"
       height="436"

@@ -39,7 +39,7 @@
               {{ year }}
             </div>
             <div class="desktop:flex-col desktop:gap-10 desktop:w-full flex gap-2">
-              <button
+              <article
                 v-for="travel in travelsByYear[year]"
                 :key="travel.slug"
                 :ref="(el) => setCardRef(el, travel.slug)"
@@ -47,23 +47,28 @@
                 :class="[currentUser?.id ? 'cursor-pointer hover:shadow-xs' : '']"
                 :data-sync="travel.slug"
                 @click="handleTripClick(travel.slug)"
-                @focus="handleTripClick(travel.slug)"
               >
                 <!-- Card Image Gallery Row -->
                 <div
                   v-if="travel.images && travel.images.length > 0"
                   class="bg-surface-secondary noscrollbar desktop:w-full sticky top-0 flex h-20 shrink-0 snap-x snap-mandatory flex-row overflow-x-auto scroll-smooth rounded-t-xl"
                 >
-                  <img
+                  <button
                     v-for="(img, idx) in travel.images"
                     :key="img.id"
-                    v-lazy="img.thumbnailUrl"
-                    :alt="img.name"
-                    class="size-20 shrink-0 cursor-pointer snap-start object-cover transition-opacity hover:opacity-90"
-                    width="80"
-                    height="80"
+                    type="button"
+                    :aria-label="`Open photo ${img.name}`"
+                    class="size-20 shrink-0 cursor-pointer snap-start overflow-hidden rounded-sm p-0"
                     @click.stop="triggerLightbox(travel, idx)"
-                  />
+                  >
+                    <img
+                      v-lazy="img.thumbnailUrl"
+                      :alt="img.name"
+                      class="size-20 object-cover transition-opacity hover:opacity-90"
+                      width="80"
+                      height="80"
+                    />
+                  </button>
                 </div>
 
                 <!-- Card Body -->
@@ -72,10 +77,15 @@
                     class="bg-surface-primary desktop:p-0 desktop:pb-4 desktop:w-full sticky flex flex-row items-start justify-between p-4"
                     :class="travel.images.length > 0 ? 'top-20' : 'top-0'"
                   >
-                    <div class="flex flex-col gap-0 text-left">
+                    <button
+                      type="button"
+                      :aria-label="`Open ${travel.title} details`"
+                      class="flex flex-col gap-0 text-left"
+                      @click.stop="handleTripClick(travel.slug)"
+                    >
                       <h2 class="text-h2 text-text-primary">{{ travel.title }}</h2>
                       <p class="text-ui text-text-secondary">{{ travel.subtitle }}</p>
-                    </div>
+                    </button>
                     <div class="-mt-2 -mr-2 flex flex-row">
                       <!-- Close Friends -->
                       <div
@@ -89,7 +99,7 @@
                           <Star :size="12" fill="#fff" stroke-width="0" />
                         </div>
                       </div>
-                      <!-- Repeat status button -->
+                      <!-- Repeat status -->
                       <div
                         v-if="travel.repeatVisit"
                         v-tooltip="{
@@ -98,34 +108,46 @@
                         }"
                         class="action-btn cursor-help!"
                       >
-                        <component :is="travel.repeatVisit ? Repeat : RepeatOff" :size="16" />
+                        <component
+                          :is="travel.repeatVisit ? Repeat : RepeatOff"
+                          :size="16"
+                          aria-hidden="true"
+                        />
                       </div>
 
-                      <!-- Instagram Link Button -->
-                      <div
+                      <!-- Instagram Link -->
+                      <a
                         v-if="travel.instagramLink"
                         v-tooltip="{
                           content: 'See this on Instagram',
                           group: travel.slug,
                         }"
+                        :href="travel.instagramLink"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        :aria-label="`${travel.title} on Instagram`"
                         class="action-btn text-text-primary"
-                        @click.stop="openLink(travel.instagramLink)"
+                        @click.stop
                       >
-                        <FA :icon="['fab', 'instagram']" class="text-ui" />
-                      </div>
+                        <FA :icon="['fab', 'instagram']" class="text-ui" aria-hidden="true" />
+                      </a>
 
-                      <!-- Google Maps list link button -->
-                      <div
+                      <!-- Google Maps list link -->
+                      <a
                         v-if="travel.mapsListLink"
                         v-tooltip="{
                           content: 'See my saved places on Google Maps',
                           group: travel.slug,
                         }"
+                        :href="travel.mapsListLink"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        :aria-label="`${travel.title} saved places on Google Maps`"
                         class="action-btn text-text-primary"
-                        @click.stop="openLink(travel.mapsListLink)"
+                        @click.stop
                       >
-                        <Pin :size="16" />
-                      </div>
+                        <Pin :size="16" aria-hidden="true" />
+                      </a>
                     </div>
                   </div>
                   <div
@@ -136,7 +158,7 @@
                     </p>
                   </div>
                 </div>
-              </button>
+              </article>
             </div>
           </div>
           <p
@@ -207,7 +229,6 @@ import {
   useTravelsWithImages,
 } from '@/composables/useTravel'
 import { getStorageUrl } from '@/supabase'
-import { openLink } from '@/utils'
 
 const { error, isLoading, travelsWithImages } = useTravelsWithImages()
 const activeTripSlug = ref<null | string>(null)

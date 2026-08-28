@@ -1,5 +1,5 @@
 <template>
-  <div class="inline-flex items-center justify-center">
+  <div class="inline-flex items-center justify-center" aria-hidden="true">
     <svg
       :width="width"
       :height="height"

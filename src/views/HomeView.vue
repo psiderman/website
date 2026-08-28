@@ -33,7 +33,7 @@
 
     <!-- Filters -->
     <div
-      class="bg-background border-border-primary sticky top-0 z-50 mb-10 flex w-full justify-center border-b px-2"
+      class="bg-background border-border-primary noscrollbar sticky top-0 z-50 mb-10 flex w-full justify-center overflow-x-scroll border-b"
     >
       <div
         ref="tabContainerRef"
@@ -53,7 +53,7 @@
           @click="activeFilter = grp.id"
         >
           <div class="flex h-6 items-center justify-center">
-            <component :is="grp.icon" :size="20" />
+            <component :is="grp.icon" :size="20" aria-hidden="true" />
           </div>
           <div
             class="desktop:grid hidden transition-all duration-500 ease-out"
@@ -147,6 +147,8 @@
             v-lazy="card.imageUrl"
             class="pointer-events-none h-full w-full object-cover"
             :alt="card.title"
+            width="800"
+            height="450"
           />
         </template>
       </CardContainer>
@@ -280,6 +282,8 @@ const activeDescription = computed(() => {
 const getImageUrl = (id: string) => {
   return new URL(`../data/descriptions/${id}.webp`, import.meta.url).href
 }
+
+// Watch global lightbox state is no longer needed to reset isOpen
 
 // Extended interface of Card that includes extra card properties
 interface GridCard extends Card {

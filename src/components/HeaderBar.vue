@@ -22,7 +22,11 @@
             group: 'header-right',
           }"
         >
-          <button class="btn stroke icon-only" @click="toggleMultiplayer()">
+          <button
+            class="btn stroke icon-only"
+            :aria-label="global.allowMultiplayer.value ? 'Hide other visitors' : 'Show other visitors'"
+            @click="toggleMultiplayer()"
+          >
             <MousePointer2 v-if="global.allowMultiplayer.value" :size="16" />
             <MousePointer2Off v-else :size="16" />
           </button>
@@ -39,10 +43,15 @@
           <button v-else class="btn stroke" @click="signOut()">Log out</button>
         </div>
         <div class="desktop:hidden flex">
-          <button v-if="!currentUser" class="btn icon-only primary" @click="isAuthModalOpen = true">
+          <button
+            v-if="!currentUser"
+            class="btn icon-only primary"
+            aria-label="Log in"
+            @click="isAuthModalOpen = true"
+          >
             <LogIn :size="16" />
           </button>
-          <button v-else class="btn icon-only stroke" @click="signOut()">
+          <button v-else class="btn icon-only stroke" aria-label="Log out" @click="signOut()">
             <LogOut :size="16" />
           </button>
         </div>

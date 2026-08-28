@@ -4,17 +4,19 @@
     class="text-light/75 relative flex w-screen flex-col items-center justify-center gap-20 bg-gray-950 pt-20 pb-0 dark:bg-zinc-950"
   >
     <!-- Github Code -->
-    <button
-      class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors duration-200 focus:outline-none"
-      @click="openLink(`https://github.com/psiderman/website/commit/${commit}`)"
+    <a
+      href="https://github.com/psiderman/website/commit/${commit}"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors duration-200 focus:outline-2 focus:outline-offset-2 focus:outline-light"
     >
-      <div class="flex size-4 items-center justify-center">
+      <div class="flex size-4 items-center justify-center" aria-hidden="true">
         <FA class="size-4" :icon="['fab', 'github']" />
       </div>
       <span class="h-3">
         {{ commit }}
       </span>
-    </button>
+    </a>
 
     <!-- Footer Links -->
     <div class="text-ui flex flex-col items-center justify-center gap-4">
@@ -37,14 +39,21 @@
       <div
         class="desktop:flex pointer-events-none hidden h-57.5 w-full items-start justify-center overflow-hidden"
       >
-        <img src="@/assets/svg/wordmark.svg" alt="psiderman wordmark" width="1040" height="300" />
+        <img
+          src="@/assets/svg/wordmark.svg"
+          alt=""
+          aria-hidden="true"
+          width="1040"
+          height="300"
+        />
       </div>
       <div
         class="desktop:hidden pointer-events-none flex w-full items-start justify-center overflow-hidden"
       >
         <img
           src="@/assets/svg/wordmark_mobile.svg"
-          alt="psiderman wordmark"
+          alt=""
+          aria-hidden="true"
           width="1040"
           height="300"
         />
@@ -85,7 +94,6 @@ import { animate } from 'animejs'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import WebStrand from '@/components/WebStrand.vue'
-import { openLink } from '@/utils'
 
 // ==========================================
 // TIMING CONFIGURATION (edit values here)
@@ -241,6 +249,9 @@ const bounceBack = (targetY: number) => {
 
 const handleScroll = () => {
   if (!logoContainer.value || isSnapping) return
+
+  // Honor reduced-motion: skip the thwip/web/bounce animation entirely
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
   const currentScrollY = window.scrollY
   const maxScrollTop = document.documentElement.scrollHeight - window.innerHeight

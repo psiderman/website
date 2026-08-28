@@ -25,16 +25,29 @@
     >
       <span>{{ title }}</span>
       <div
-        v-if="icon"
-        aria-hidden="true"
-        class="focus-within:outline-surface-inverted flex size-6 h-full shrink-0 items-center justify-center rounded-full"
-        :tabindex="arrow === 'help' ? 0 : -1"
-        @focus="isIconHovered = true"
-        @blur="isIconHovered = false"
-        @mouseenter="isIconHovered = true"
-        @mouseleave="isIconHovered = false"
+        class="flex size-6 h-full shrink-0 items-center justify-center rounded-full"
+        :class="{ 'focus-within:outline-surface-inverted': arrow === 'help' }"
       >
-        <component :is="icon" :size="16" />
+        <component
+          :is="icon"
+          v-if="arrow !== 'help'"
+          :size="16"
+          aria-hidden="true"
+          class="pointer-events-none"
+        />
+        <button
+          v-else
+          type="button"
+          aria-label="Toggle card help"
+          class="focus:outline-surface-inverted flex size-6 items-center justify-center rounded-full focus:outline-2 focus:outline-offset-2"
+          @focus="isIconHovered = true"
+          @blur="isIconHovered = false"
+          @mouseenter="isIconHovered = true"
+          @mouseleave="isIconHovered = false"
+          @click.stop.prevent="isIconHovered = !isIconHovered"
+        >
+          <component :is="icon" :size="16" aria-hidden="true" />
+        </button>
       </div>
     </div>
   </component>

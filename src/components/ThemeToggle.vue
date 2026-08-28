@@ -1,6 +1,7 @@
 <template>
   <button
     v-tooltip="{ content: `theme: ${theme}`, group: 'header-right' }"
+    aria-label="Toggle theme"
     class="btn stroke icon-only relative overflow-hidden"
     @click="cycleTheme"
   >
@@ -31,7 +32,9 @@ const cycleTheme = () => {
 
 .slide-up-enter-active,
 .slide-up-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .slide-up-enter-from {
   opacity: 0;

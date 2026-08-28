@@ -38,9 +38,11 @@
               class="desktop:grid desktop:w-full desktop:min-w-full desktop:mx-0 mx-auto flex w-fit gap-4"
               :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
             >
-              <div
+              <button
                 v-for="(img, idx) in images"
                 :key="img.name"
+                type="button"
+                :aria-label="`Open ${img.name}`"
                 class="bg-dark desktop:h-full desktop:w-full desktop:shrink aspect-3/5 h-72 w-auto shrink-0 cursor-pointer rounded-xl object-cover transition-opacity hover:opacity-95"
                 @click="triggerLightbox(idx)"
               >
@@ -51,13 +53,13 @@
                   width="300"
                   height="500"
                 />
-              </div>
+              </button>
             </div>
           </div>
 
           <div class="text-p text-text-secondary mx-auto -mb-12 w-full max-w-prose text-left">
             <h2 class="text-h2">
-              {{ format(new Date(slug + '-01'), 'MMM ’yy').toLocaleLowerCase() }}
+              {{ format(new Date(`${slug}-01`), 'MMM ’yy').toLocaleLowerCase() }}
             </h2>
           </div>
 

@@ -18,20 +18,20 @@
     </div>
 
     <template v-else-if="movies">
-      <div
+      <a
         v-for="(movie, idx) in movies"
         :key="movie.id"
-        class="group border-border-primary dark:border-surface-tertiary outline-surface-inverted relative shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border focus-visible:opacity-80"
+        :href="movie.link || undefined"
+        :target="movie.link ? '_blank' : undefined"
+        :rel="movie.link ? 'noopener noreferrer' : undefined"
+        class="group border-border-primary dark:border-surface-tertiary outline-surface-inverted relative block h-full shrink-0 cursor-pointer snap-start snap-always overflow-hidden rounded-lg border focus-visible:opacity-80 aspect-2/3"
         :tabindex="activeFocusIndex === idx ? 0 : -1"
-        @click="openLink(movie.link)"
-        @keydown.enter="openLink(movie.link)"
-        @keydown.space.prevent="openLink(movie.link)"
         @focus="activeFocusIndex = idx"
       >
         <img
           v-lazy="movie.cover"
           :alt="`poster for ${movie.title}`"
-          class="h-full w-auto group-hover:blur-xs"
+          class="h-full w-full object-cover group-hover:blur-xs"
           width="600"
           height="900"
         />
@@ -50,7 +50,7 @@
               v-for="(star, index) in getStars(movie.rating)"
               :key="index"
               :src="star"
-              alt="star"
+              alt=""
               aria-hidden="true"
               class="h-6 w-6"
               width="24"
@@ -58,7 +58,7 @@
             />
           </div>
         </div>
-      </div>
+      </a>
     </template>
 
     <div
@@ -78,7 +78,6 @@ import { onMounted, onUnmounted, ref } from 'vue'
 
 import starHalf from '@/assets/svg/star-0.5.svg'
 import starFull from '@/assets/svg/star-1.svg'
-import { openLink } from '@/utils'
 
 import GenericLoader from '../GenericLoader.vue'
 
