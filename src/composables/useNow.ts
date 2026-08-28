@@ -25,7 +25,8 @@ export function useNow() {
   })
 
   const slug = computed(() => {
-    return posts.value && posts.value.length > 0 ? posts.value[0].date.substring(0, 7) : null
+    const date = posts.value?.[0]?.date
+    return date ? date.substring(0, 7) : null
   })
 
   // 2. Fetch images (only runs if slug is available)

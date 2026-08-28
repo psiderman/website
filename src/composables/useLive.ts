@@ -31,8 +31,6 @@ interface CursorData {
     bg: string
     fg: string
   }
-  driftX?: number
-  driftY?: number
   id: string
   name: string
   route: string
@@ -307,9 +305,6 @@ export const renderCursors = computed(() => {
       }
     }
 
-    renderX += cursor.driftX || 0
-    renderY += cursor.driftY || 0
-
     return {
       ...cursor,
       renderX,
@@ -355,6 +350,39 @@ let cleanupInterval: null | ReturnType<typeof setInterval> = null
 let driftInterval: null | ReturnType<typeof setInterval> = null
 const activeWatchers: (() => void)[] = []
 
+// ---- Non-reactive cursor drift --------------------------------------
+// The 50ms float animation writes here instead of onto Vue-reactive cursor
+// state, and a single rAF pushes the values straight to the DOM layers. This
+// keeps LiveCursors from re-rendering on every tick (the old render-farm).
+const driftOffsets = new Map<string, { x: number; y: number }>()
+const driftEls = new Map<string, HTMLElement>()
+let driftRaf = 0
+
+const driftLoop = () => {
+  for (const [id, el] of driftEls) {
+    const offset = driftOffsets.get(id)
+    if (offset) el.style.transform = `translate(${offset.x}px, ${offset.y}px)`
+  }
+  if (driftEls.size > 0) {
+    driftRaf = requestAnimationFrame(driftLoop)
+  } else {
+    driftRaf = 0
+  }
+}
+
+export function registerDriftEl(id: string, el: HTMLElement) {
+  driftEls.set(id, el)
+  if (driftRaf === 0) driftRaf = requestAnimationFrame(driftLoop)
+}
+
+export function unregisterDriftEl(id: string) {
+  driftEls.delete(id)
+  if (driftEls.size === 0 && driftRaf !== 0) {
+    cancelAnimationFrame(driftRaf)
+    driftRaf = 0
+  }
+}
+
 const joinRoom = (roomName: string) => {
   if (channel) {
     channel.untrack()
@@ -365,6 +393,7 @@ const joinRoom = (roomName: string) => {
   // Clear stale state from previous room
   cursors.value = {}
   touches.value = {}
+  driftOffsets.clear()
   activePresenceUsers.value = []
   hasOtherUsersOnRoom.value = false
 
@@ -409,11 +438,8 @@ const joinRoom = (roomName: string) => {
     .on('broadcast', { event: 'cursor' }, ({ payload }) => {
       if (payload.id === activeUserId.value) return
 
-      const existing = cursors.value[payload.id]
       cursors.value[payload.id] = {
         ...payload,
-        driftX: existing ? existing.driftX : 0,
-        driftY: existing ? existing.driftY : 0,
         updatedAt: Date.now(),
       }
     })
@@ -644,8 +670,10 @@ const startLiveSession = () => {
       const speedY = 0.0009 + ((hash >> 2) % 10) * 0.00005
 
       // Smooth, continuous organic floating (max +/- 12px)
-      c.driftX = Math.sin(now * speedX + phaseX) * 12
-      c.driftY = Math.cos(now * speedY + phaseY) * 12
+      driftOffsets.set(id, {
+        x: Math.sin(now * speedX + phaseX) * 12,
+        y: Math.cos(now * speedY + phaseY) * 12,
+      })
     }
   }, 50)
 }
@@ -659,6 +687,11 @@ const stopLiveSession = () => {
   if (driftInterval) clearInterval(driftInterval)
   cleanupInterval = null
   driftInterval = null
+  driftOffsets.clear()
+  if (driftRaf !== 0) {
+    cancelAnimationFrame(driftRaf)
+    driftRaf = 0
+  }
   activeWatchers.forEach((unwatch) => unwatch())
   activeWatchers.length = 0
 

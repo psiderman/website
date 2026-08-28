@@ -281,8 +281,6 @@ const getImageUrl = (id: string) => {
   return new URL(`../data/descriptions/${id}.webp`, import.meta.url).href
 }
 
-// Watch global lightbox state is no longer needed to reset isOpen
-
 // Extended interface of Card that includes extra card properties
 interface GridCard extends Card {
   coverVid?: string

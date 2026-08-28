@@ -7,14 +7,12 @@
       class="pointer-events-none absolute top-0 left-0 flex flex-col transition-all duration-1000 ease-linear"
       :class="{ 'opacity-30': cursor.isStale }"
       :style="{
-        transform: `translate(${cursor.renderX - (cursor.driftX || 0)}px, ${cursor.renderY - (cursor.driftY || 0)}px)`,
+        transform: `translate(${cursor.renderX}px, ${cursor.renderY}px)`,
       }"
     >
-      <!-- Inner div handles the rapid 50ms local drift with no CSS transitions fighting it -->
-      <div
-        class="flex flex-col"
-        :style="{ transform: `translate(${cursor.driftX || 0}px, ${cursor.driftY || 0}px)` }"
-      >
+      <!-- Inner div floats via v-drift (non-reactive rAF), so Vue never
+           re-renders the overlay on the 50ms drift tick -->
+      <div v-drift="cursor.id" class="flex flex-col">
         <!-- Cursor Icon -->
         <MousePointer2
           :size="24"
@@ -72,7 +70,21 @@
 import { MousePointer2, Smartphone } from '@lucide/vue'
 
 import { global } from '@/composables/useGlobal'
-import { renderCursors, renderTouches } from '@/composables/useLive'
+import {
+  registerDriftEl,
+  renderCursors,
+  renderTouches,
+  unregisterDriftEl,
+} from '@/composables/useLive'
+
+import type { Directive } from 'vue'
+
+// Local directive: attach a cursor layer element to the shared rAF drift
+// loop, keyed by cursor id.
+const vDrift: Directive<HTMLElement, string> = {
+  mounted: (el, binding) => registerDriftEl(binding.value, el),
+  unmounted: (_el, binding) => unregisterDriftEl(binding.value),
+}
 </script>
 
 <style scoped>
