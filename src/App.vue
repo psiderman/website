@@ -1,38 +1,21 @@
 <template>
-  <GlobalHeader />
-  <main class="flex w-screen flex-col items-center justify-center">
+  <component :is="layout">
     <RouterView />
-  </main>
-  <GlobalFooter />
+  </component>
   <VueQueryDevtools />
-  <AuthModal v-model:is-open="isAuthModalOpen" />
-  <LiveCursors />
-  <WorkModal v-model:is-open="isWorkModalOpen" :work="workData" />
-  <LightBox
-    v-model:is-open="isLightBoxOpen"
-    :title="lightBoxData.title"
-    :description="lightBoxData.description"
-    :images="lightBoxData.images"
-    :videos="lightBoxData.videos"
-    :tags="lightBoxData.tags"
-  />
 </template>
 
 <script setup lang="ts">
 import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
-import { RouterView } from 'vue-router'
+import { computed } from 'vue'
+import { RouterView, useRoute } from 'vue-router'
 
-import AuthModal from './components/AuthModal.vue'
-import GlobalFooter from './components/GlobalFooter.vue'
-import GlobalHeader from './components/HeaderBar.vue'
-import LightBox from './components/LightBox.vue'
-import LiveCursors from './components/LiveCursors.vue'
-import WorkModal from './components/WorkModal.vue'
-import { isAuthModalOpen } from './composables/useAuth'
-import { isLightBoxOpen, isWorkModalOpen, lightBoxData, workData } from './composables/useGlobal'
-import { useLive } from './composables/useLive'
 import { initTheme } from './composables/useTheme'
+import BlankLayout from './layouts/BlankLayout.vue'
+import DefaultLayout from './layouts/DefaultLayout.vue'
 
-useLive()
+const route = useRoute()
+const layout = computed(() => (route.meta.layout === 'blank' ? BlankLayout : DefaultLayout))
+
 initTheme()
 </script>

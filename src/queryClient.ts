@@ -25,3 +25,22 @@ export const queryClient = new QueryClient({
     },
   }),
 })
+
+// Set immediate fetch / no caching for all admin queries
+const adminKeys = [
+  ['admin-user-roles'],
+  ['admin-work-people'],
+  ['admin-trips'],
+  ['admin-images'],
+  ['admin-guestbook'],
+  ['admin'],
+]
+
+adminKeys.forEach((key) => {
+  queryClient.setQueryDefaults(key, {
+    gcTime: 0,
+    persister: undefined,
+    staleTime: 0,
+  })
+})
+

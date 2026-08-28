@@ -83,7 +83,7 @@ const tooltipContent = `
            class="bg-dark overflow-hidden max-h-[calc(50svh-40px)] rounded-lg object-contain" />
     </div>
     <div class="text-p font-handwriting flex w-0 min-w-full flex-col items-center justify-center p-3 text-center align-middle text-gray-700 dark:text-zinc-700">
-      <p class="line-clamp-3 w-full whitespace-normal leading-tight">${props.caption || '&nbsp;'}</p>
+      <p class="line-clamp-3 w-full whitespace-normal leading-tight">${props.caption ? `“${props.caption}”` : '&nbsp;'}</p>
     </div>
   </div>
 `

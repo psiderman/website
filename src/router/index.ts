@@ -21,6 +21,7 @@ const router = createRouter({
     },
     {
       component: SuitladyView,
+      meta: { layout: 'blank', requiresAdmin: true },
       name: 'Suitlady',
       path: '/suitlady',
     },
@@ -51,18 +52,14 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition
-    } else if (to.path === from.path) {
-      return false
-    } else {
-      return { top: 0 }
-    }
+    if (savedPosition) return savedPosition
+    if (to.path === from.path) return false
+    return { top: 0 }
   },
 })
 
 router.beforeEach(async (to) => {
-  if (to.path === '/suitlady') {
+  if (to.meta.requiresAdmin) {
     const role = await ensureUserRole()
     if (role !== 'admin') {
       return { path: '/', replace: true }
@@ -71,10 +68,11 @@ router.beforeEach(async (to) => {
 })
 
 router.afterEach(() => {
-  isLightBoxOpen.value = false
-  isWorkModalOpen.value = false
-  isAuthModalOpen.value = false
+  ;[isLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
+    modal.value = false
+  })
 })
 
 export default router
+
 
