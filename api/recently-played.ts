@@ -30,9 +30,9 @@ export default async function handler(req: any, res: any) {
 
     if (!tokenResponse.ok) {
       const errorDetails = await tokenResponse.text()
+      console.error('Failed to fetch Spotify access token:', tokenResponse.status, errorDetails)
       return res.status(tokenResponse.status).json({
-        details: errorDetails,
-        error: 'Failed to fetch access token',
+        error: 'Failed to authenticate with Spotify',
       })
     }
 

@@ -33,6 +33,7 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({ error: 'No color found' })
     }
 
+    res.setHeader('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable')
     return res.status(200).json({ hex: color.hex() })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'

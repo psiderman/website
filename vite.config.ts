@@ -28,6 +28,7 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('/node_modules/')) {
             if (id.includes('@supabase/supabase-js')) return 'vendor-supabase'
+            if (id.includes('mapbox-gl')) return 'vendor-mapbox'
             if (id.includes('@headlessui/vue')) return 'vendor-ui'
             if (id.match(/date-fns|fuse\.js|validator/)) return 'vendor-utility'
             if (id.match(/vue|vue-router|pinia/)) return 'vendor-vue'

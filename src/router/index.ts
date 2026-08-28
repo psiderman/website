@@ -4,12 +4,6 @@ import { ensureUserRole, isAuthModalOpen } from '@/composables/useAuth'
 import { isLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
 
 import HomeView from '../views/HomeView.vue'
-import NotFoundView from '../views/NotFoundView.vue'
-import NowView from '../views/NowView.vue'
-import PrivacyView from '../views/PrivacyView.vue'
-import SuitladyView from '../views/SuitladyView.vue'
-import TermsView from '../views/TermsView.vue'
-import TravelView from '../views/TravelView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,33 +14,33 @@ const router = createRouter({
       path: '/',
     },
     {
-      component: SuitladyView,
+      component: () => import('../views/SuitladyView.vue'),
       meta: { layout: 'blank', requiresAdmin: true },
       name: 'Suitlady',
       path: '/suitlady',
     },
     {
-      component: NowView,
+      component: () => import('../views/NowView.vue'),
       name: 'Now',
       path: '/now',
     },
     {
-      component: TravelView,
+      component: () => import('../views/TravelView.vue'),
       name: 'Travel',
       path: '/travel',
     },
     {
-      component: TermsView,
+      component: () => import('../views/TermsView.vue'),
       name: 'Terms',
       path: '/terms',
     },
     {
-      component: PrivacyView,
+      component: () => import('../views/PrivacyView.vue'),
       name: 'Privacy',
       path: '/privacy',
     },
     {
-      component: NotFoundView,
+      component: () => import('../views/NotFoundView.vue'),
       name: 'NotFound',
       path: '/:pathMatch(.*)*',
     },

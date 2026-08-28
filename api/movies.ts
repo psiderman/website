@@ -54,8 +54,8 @@ export default async function handler(req: any, res: any) {
       }
     })
 
-    // Cache at edge for 15 minutes (900 seconds) since movies change rarely
-    res.setHeader('Cache-Control', 's-maxage=900, stale-while-revalidate')
+    // Cache at edge for 1 day (86400 seconds) since movies change rarely
+    res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate')
     return res.status(200).json(movies)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
