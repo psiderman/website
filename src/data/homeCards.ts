@@ -133,7 +133,7 @@ export const cards: Card[] = [
     id: 'guestbook',
     size: 'md',
     span: 'desktop:col-span-4 col-span-2',
-    title: 'art by the visitor before you',
+    title: 'artwork by guests',
   },
   {
     arrow: 'external',

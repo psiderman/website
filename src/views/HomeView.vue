@@ -50,7 +50,7 @@
               ? 'text-text-primary font-normal'
               : 'text-text-secondary hover:bg-hover opacity-60 hover:opacity-100',
           ]"
-          @click="activeFilter = grp.id"
+          @click="handleFilterClick(grp.id)"
         >
           <div class="flex h-6 items-center justify-center">
             <component :is="grp.icon" :size="20" aria-hidden="true" />
@@ -257,8 +257,17 @@ const activeFilter = computed<FilterGroupId>({
   },
 })
 
+const handleFilterClick = (id: FilterGroupId) => {
+  if (activeFilter.value === id) {
+    window.scrollTo({ behavior: prefersReducedMotion ? 'auto' : 'smooth', top: 0 })
+  } else {
+    activeFilter.value = id
+  }
+}
+
 watch(activeFilter, async () => {
   if (settleTimeoutId) clearTimeout(settleTimeoutId)
+  window.scrollTo({ behavior: prefersReducedMotion ? 'auto' : 'smooth', top: 0 })
   await nextTick()
   updateIndicator()
   settleTimeoutId = setTimeout(() => {

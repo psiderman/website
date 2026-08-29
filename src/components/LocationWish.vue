@@ -11,14 +11,7 @@
         class="size-10 shrink-0 overflow-hidden rounded-full hover:opacity-80 active:opacity-90"
         aria-label="Psiderman home"
       >
-        <img
-          src="/psider.webp"
-          alt=""
-          aria-hidden="true"
-          class="size-10"
-          width="80"
-          height="80"
-        />
+        <img src="/psider.webp" alt="" aria-hidden="true" class="size-10" width="80" height="80" />
       </router-link>
     </Transition>
 
@@ -73,10 +66,10 @@
         @keyup.space.prevent="onPressEnd"
       >
         <div
-          class="pointer-events-none absolute z-10 size-20 bg-amber-400"
+          class="pointer-events-none absolute inset-0 z-10 bg-amber-400"
           :class="[
-            isPopping ? 'bg-transparent' : 'transition-all ease-linear',
-            isPressing ? 'translate-y-0' : 'translate-y-10',
+            isPopping ? 'bg-transparent' : 'transition-transform ease-linear',
+            isPressing || isPopping ? 'translate-y-0' : 'translate-y-full',
           ]"
           :style="{
             transitionDuration: isPressing ? '5s' : '0s',

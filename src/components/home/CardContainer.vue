@@ -25,8 +25,10 @@
     >
       <span>{{ title }}</span>
       <div
-        class="flex size-6 h-full shrink-0 items-center justify-center rounded-full"
-        :class="{ 'focus-within:outline-surface-inverted': arrow === 'help' }"
+        class="size-6 h-full shrink-0 items-center justify-center rounded-full"
+        :class="[
+          arrow === 'help' ? 'desktop:flex hidden focus-within:outline-surface-inverted' : 'flex',
+        ]"
       >
         <component
           :is="icon"
@@ -39,7 +41,7 @@
           v-else
           type="button"
           aria-label="Toggle card help"
-          class="focus:outline-surface-inverted flex size-6 items-center justify-center rounded-full focus:outline-2 focus:outline-offset-2"
+          class="focus:outline-surface-inverted desktop:flex hidden size-6 items-center justify-center rounded-full focus:outline-2 focus:outline-offset-2"
           @focus="isIconHovered = true"
           @blur="isIconHovered = false"
           @mouseenter="isIconHovered = true"

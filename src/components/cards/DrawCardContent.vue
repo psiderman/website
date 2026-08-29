@@ -5,8 +5,7 @@
   <div
     v-else
     :ref="setupObserver"
-    class="drawing-board desktop:pointer-events-auto outline-surface-inverted pointer-events-none focus-visible:outline-2 focus-visible:outline-offset-2"
-    @keydown="handleKeyDown"
+    class="drawing-board outline-surface-inverted pointer-events-auto focus-visible:outline-2 focus-visible:outline-offset-2"
   >
     <!-- Drawing Surface -->
     <svg
@@ -42,29 +41,42 @@
       <path v-if="currentStrokePath" :d="currentStrokePath" class="fill-surface-inverted" />
     </svg>
 
-    <template v-if="strokes.length > 0">
-      <button
-        v-if="hasUnsavedChanges"
-        v-tooltip="'upload your drawing'"
-        class="text-text-tertiary dark:text-text-secondary hover:text-text-primary absolute top-0 right-0 z-20 cursor-pointer p-3 transition-colors duration-200"
-        :class="{ 'animate-pulse cursor-not-allowed opacity-50': isSaving }"
-        :disabled="isSaving"
-        title="Save Drawing"
-        aria-label="Save Drawing"
-        @click="saveDrawing"
-      >
-        <CloudUpload :size="16" />
-      </button>
-      <div v-else class="absolute top-0 right-0 z-20 p-3 text-green-600 dark:text-green-700">
-        <CloudCheck :size="16" />
-      </div>
-    </template>
-
     <div
       v-if="strokes.length === 0 && currentStroke.length === 0 && backgroundArtist"
       class="bg-surface-secondary text-ui-small text-text-tertiary absolute right-0 bottom-0 rounded-tl-xl px-2 py-1"
     >
       by {{ backgroundArtist }}
+    </div>
+
+    <!-- Button Cluster -->
+    <div
+      v-if="strokes.length > 0"
+      class="pointer-events-auto absolute top-0 right-0 z-20 flex flex-row gap-1 p-1"
+    >
+      <button
+        v-tooltip="'Clear Drawing'"
+        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
+        title="Clear Drawing"
+        aria-label="Clear Drawing"
+        @click.stop.prevent="clearStrokes"
+      >
+        <X :size="16" />
+      </button>
+
+      <button
+        v-tooltip="'Save Drawing'"
+        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
+        :class="{
+          'animate-pulse cursor-not-allowed opacity-50': isSaving,
+          'text-green-600 dark:text-green-500': isSaved && !hasUnsavedChanges,
+        }"
+        :disabled="isSaving"
+        title="Save Drawing"
+        aria-label="Save Drawing"
+        @click.stop.prevent="saveDrawing"
+      >
+        <Check :size="16" />
+      </button>
     </div>
 
     <div
@@ -101,12 +113,11 @@ const visibleBgPointIndex = ref(0)
 </script>
 
 <script setup lang="ts">
-import { CloudCheck, CloudUpload, MousePointer2 } from '@lucide/vue'
-import { useMutation, useQuery } from '@tanstack/vue-query'
+import { Check, MousePointer2, X } from '@lucide/vue'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { format } from 'date-fns'
 import { getStroke } from 'perfect-freehand'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
 
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
 import { supabase } from '@/supabase'
@@ -115,6 +126,7 @@ import GenericLoader from '../GenericLoader.vue'
 
 defineProps<{ showHelp?: boolean }>()
 
+const queryClient = useQueryClient()
 const strokes = ref<number[][][]>([])
 const currentStroke = ref<number[][]>([])
 
@@ -205,10 +217,12 @@ const backgroundArtist = computed(() => {
   return `${data.display_name.toLowerCase().split(' ')[0]}, ${date.toLowerCase()}`
 })
 
-onUnmounted(() => {
-  if (observer) observer.disconnect()
-  stopAnimation()
-})
+function clearStrokes() {
+  if (strokes.value.length === 0) return
+  strokes.value = []
+  resetSaveState()
+  persistDraft()
+}
 
 function getSvgPathFromStroke(points: number[][]) {
   if (!points.length) return ''
@@ -234,16 +248,27 @@ function getSvgPathFromStroke(points: number[][]) {
 }
 
 function handleKeyDown(e: KeyboardEvent) {
+  const target = e.target as HTMLElement | null
+  if (
+    target &&
+    (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+  ) {
+    return
+  }
+
   const key = e.key.toLowerCase()
-  if (key === 'r' && !e.ctrlKey && !e.metaKey) {
-    strokes.value = []
-    resetSaveState()
-    persistDraft()
+  if (key === 'r' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (strokes.value.length > 0) {
+      e.preventDefault()
+      clearStrokes()
+    }
   } else if (key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
-    e.preventDefault()
-    strokes.value.pop()
-    resetSaveState()
-    persistDraft()
+    if (strokes.value.length > 0) {
+      e.preventDefault()
+      strokes.value.pop()
+      resetSaveState()
+      persistDraft()
+    }
   }
 }
 
@@ -305,6 +330,15 @@ const {
     const { error } = await supabase.from('guestbook').upsert(payload)
     if (error) throw error
   },
+  onSuccess: async () => {
+    strokes.value = []
+    persistDraft()
+    resetSaveState()
+    visibleBgStrokeIndex.value = 0
+    visibleBgPointIndex.value = 0
+    await queryClient.invalidateQueries({ queryKey: ['guestbook', 'latest'] })
+    startAnimation()
+  },
 })
 
 function saveDrawing() {
@@ -364,26 +398,14 @@ const hasUnsavedChanges = computed(() => {
   return true
 })
 
-function handleBeforeUnload(e: BeforeUnloadEvent) {
-  if (hasUnsavedChanges.value) {
-    e.preventDefault()
-    e.returnValue = '' // Required for legacy browsers
-  }
-}
-
 onMounted(() => {
-  window.addEventListener('beforeunload', handleBeforeUnload)
+  window.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('beforeunload', handleBeforeUnload)
-})
-
-onBeforeRouteLeave(() => {
-  if (hasUnsavedChanges.value) {
-    const answer = window.confirm('Your art wasn’t saved. Are you sure you want to leave?')
-    if (!answer) return false
-  }
+  window.removeEventListener('keydown', handleKeyDown)
+  if (observer) observer.disconnect()
+  stopAnimation()
 })
 </script>
 
