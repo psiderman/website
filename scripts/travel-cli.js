@@ -4,16 +4,16 @@
 import fs from 'fs'
 import path from 'path'
 
-import { checkbox, confirm, input, select } from '@inquirer/prompts'
+import { checkbox, confirm, input, search, select } from '@inquirer/prompts'
 
 import { copyExifTags, findImagesRecursively, inspectImage, writeExifDate } from './lib/exif.js'
 import {
+  batchConvertToWebp,
+  batchGenerateThumbnails,
+  batchSanitizeAndStripImages,
   checkRequiredTools,
-  convertToWebp,
   generateRandomHexName,
-  generateThumbnail,
   isHexName,
-  sanitizeAndStripImage,
 } from './lib/image-ops.js'
 import { diffStorageFiles, getSupabaseAdminClient, listRemoteBucketFiles } from './lib/storage.js'
 import { analyzeTripStructure, scaffoldTripFolder } from './lib/structure.js'
@@ -24,6 +24,8 @@ console.log(`
 │  Validate • Fix EXIF • Structure • Thumbnails • Sync   │
 └────────────────────────────────────────────────────────┘
 `)
+
+const TRIP_SLUG_REGEX = /^\d{2}_\d{2}_[a-z0-9_-]+$/
 
 // Step 0: Check system dependencies
 const tools = checkRequiredTools()
@@ -47,7 +49,7 @@ if (!targetPath) {
 
 // Strip outer quotes and resolve path (handles drag-and-drop or shell auto-quotes)
 const cleanedPath = targetPath.trim().replace(/^['"]|['"]$/g, '')
-const resolvedPath = path.resolve(cleanedPath)
+let resolvedPath = path.resolve(cleanedPath)
 
 if (!fs.existsSync(resolvedPath)) {
   console.error(`❌ Path does not exist: ${resolvedPath}`)
@@ -55,11 +57,31 @@ if (!fs.existsSync(resolvedPath)) {
 }
 
 const structure = analyzeTripStructure(resolvedPath)
+let activeTripSlug =
+  structure?.tripSlug || path.basename(resolvedPath).toLowerCase().replace(/\s+/g, '_')
 
 if (structure?.isMultiTrip) {
-  console.log(`📁 Target: ${resolvedPath} (Detected multi-trip container with ${structure.trips.length} trip folders)`)
+  console.log(
+    `📁 Target: ${resolvedPath} (Detected multi-trip container with ${structure.trips.length} trip folders)`,
+  )
 } else {
-  console.log(`📁 Target: ${resolvedPath} (Single trip: ${structure?.tripSlug || 'unstructured'})`)
+  const rawBase = path.basename(resolvedPath).toLowerCase().replace(/\s+/g, '_')
+  const defaultSlug = TRIP_SLUG_REGEX.test(rawBase) ? rawBase : '24_02_tokyo'
+
+  const userSlug = await input({
+    default: defaultSlug,
+    message: 'Enter trip slug identifier (format: YY_MM_name, e.g. 24_02_tokyo):',
+    validate: (val) => {
+      const slug = val.trim().toLowerCase().replace(/\s+/g, '_')
+      if (!TRIP_SLUG_REGEX.test(slug)) {
+        return 'Trip slug must match YY_MM_name format (e.g. 24_02_tokyo, 23_11_kyoto)'
+      }
+      return true
+    },
+  })
+  activeTripSlug = userSlug.trim().toLowerCase().replace(/\s+/g, '_')
+  if (structure) structure.tripSlug = activeTripSlug
+  console.log(`📁 Target: ${resolvedPath} (Trip: ${activeTripSlug})`)
 }
 
 // 2. Select pipeline steps (Multi-select with spacebar [X])
@@ -67,11 +89,11 @@ const selectedSteps = await checkbox({
   choices: [
     {
       checked: true,
-      name: '🔍 1. Audit & Interactively Fix EXIF (Dates & GPS)',
+      name: '🔍 1. Audit EXIF (Dates & GPS)',
       value: 'audit_fix',
     },
     {
-      checked: !structure?.isStructuredTrip,
+      checked: true,
       name: '🗂️  2. Structure Trip Folder & Pick [X] Private Photos',
       value: 'structure',
     },
@@ -104,19 +126,19 @@ if (selectedSteps.length === 0) {
 // -----------------------------------------------------------------------------
 if (selectedSteps.includes('audit_fix')) {
   console.log(`\n========================================================`)
-  console.log(`🔍 STEP 1: AUDIT & INTERACTIVELY FIX EXIF`)
+  console.log(`🔍 STEP 1: AUDIT EXIF (Dates & GPS)`)
   console.log(`========================================================`)
 
   const images = findImagesRecursively(resolvedPath)
   console.log(`Inspecting EXIF data across ${images.length} images...`)
 
-  const results = images.map((p) => inspectImage(p))
-  const invalid = results.filter((r) => !r.hasDate || !r.hasGps)
-  const valid = results.filter((r) => r.hasDate && r.hasGps)
+  let results = images.map((p) => inspectImage(p))
+  let invalid = results.filter((r) => !r.hasDate || !r.hasGps)
+  let valid = results.filter((r) => r.hasDate && r.hasGps)
 
   if (invalid.length === 0) {
     console.log(`✅ All ${images.length} images have valid Date Taken and GPS coordinates!`)
-  } else {
+  } else if (valid.length > 0) {
     console.log(`\n⚠️ Found ${invalid.length} image(s) missing required metadata:`)
     invalid.forEach((img, idx) => {
       const issues = []
@@ -127,7 +149,7 @@ if (selectedSteps.includes('audit_fix')) {
 
     const proceedWithFix = await confirm({
       default: true,
-      message: '\nWould you like to step through and fix these images now?',
+      message: `\nFound ${valid.length} valid reference photo(s). Would you like to step through and fix missing EXIF using reference photos?`,
     })
 
     if (proceedWithFix) {
@@ -135,11 +157,15 @@ if (selectedSteps.includes('audit_fix')) {
         console.log(`\n────────────────────────────────────────────────────────`)
         console.log(`📸 Image: ${img.name}`)
         console.log(`   Path: ${img.filePath}`)
-        console.log(`   Status: Date: ${img.hasDate ? '✅' : '❌'}, GPS: ${img.hasGps ? '✅' : '❌'}`)
+        console.log(
+          `   Status: Date: ${img.hasDate ? '✅' : '❌'}, GPS: ${img.hasGps ? '✅' : '❌'}`,
+        )
 
         // 1. Fix Date
         if (!img.hasDate) {
-          const fsIso = img.fsDate ? img.fsDate.toISOString().replace('T', ' ').substring(0, 19) : null
+          const fsIso = img.fsDate
+            ? img.fsDate.toISOString().replace('T', ' ').substring(0, 19)
+            : null
           const dateAction = await select({
             choices: [
               ...(fsIso
@@ -150,12 +176,20 @@ if (selectedSteps.includes('audit_fix')) {
                     },
                   ]
                 : []),
+              ...(valid.length > 0
+                ? [
+                    {
+                      name: 'Copy Date from reference photo in this trip',
+                      value: 'copy_photo',
+                    },
+                  ]
+                : []),
               {
-                name: 'Copy Date from another reference photo',
-                value: 'copy_photo',
+                name: 'Pick any external photo from disk (drag & drop / enter path)',
+                value: 'copy_external',
               },
               {
-                name: 'Skip date for this photo',
+                name: 'Skip date for now',
                 value: 'skip',
               },
             ],
@@ -165,26 +199,52 @@ if (selectedSteps.includes('audit_fix')) {
           if (dateAction === 'fs_date' && img.fsDate) {
             writeExifDate(img.filePath, img.fsDate)
             console.log(`   ✨ Written Date: ${fsIso}`)
-          } else if (dateAction === 'copy_photo' && valid.length > 0) {
-            const refFile = await select({
-              choices: valid.map((v) => ({
-                name: `${v.name} (${v.dateTaken?.toISOString().replace('T', ' ').substring(0, 19)})`,
-                value: v.filePath,
-              })),
-              message: 'Select reference image to copy Date from:',
+          } else if (dateAction === 'copy_photo') {
+            const refFile = await search({
+              message: 'Search/Type reference image to copy Date from:',
+              pageSize: 15,
+              source: (term) => {
+                const choices = valid.map((v) => ({
+                  name: `${v.name} (${v.dateTaken?.toISOString().replace('T', ' ').substring(0, 19)})`,
+                  value: v.filePath,
+                }))
+                if (!term) return choices
+                const lower = term.toLowerCase()
+                return choices.filter((c) => c.name.toLowerCase().includes(lower))
+              },
             })
             copyExifTags(refFile, img.filePath, true, false)
             console.log(`   ✨ Copied Date from ${path.basename(refFile)}`)
+          } else if (dateAction === 'copy_external') {
+            const externalPathInput = await input({
+              message: 'Enter / Drag-and-drop external image path to copy Date from:',
+              validate: (val) => {
+                const p = path.resolve(val.trim().replace(/^['"]|['"]$/g, ''))
+                if (!fs.existsSync(p)) return `File does not exist: ${p}`
+                return true
+              },
+            })
+            const cleanPath = path.resolve(externalPathInput.trim().replace(/^['"]|['"]$/g, ''))
+            copyExifTags(cleanPath, img.filePath, true, false)
+            console.log(`   ✨ Copied Date from external file: ${path.basename(cleanPath)}`)
           }
         }
 
         // 2. Fix GPS
-        if (!img.hasGps && valid.length > 0) {
+        if (!img.hasGps) {
           const gpsAction = await select({
             choices: [
+              ...(valid.length > 0
+                ? [
+                    {
+                      name: 'Copy GPS from reference photo in this trip',
+                      value: 'copy_gps',
+                    },
+                  ]
+                : []),
               {
-                name: 'Copy GPS from a reference photo in this trip',
-                value: 'copy_gps',
+                name: 'Pick any external photo / video from disk (drag & drop / enter path)',
+                value: 'copy_external',
               },
               {
                 name: 'Skip GPS for now',
@@ -195,20 +255,112 @@ if (selectedSteps.includes('audit_fix')) {
           })
 
           if (gpsAction === 'copy_gps') {
-            const refFile = await select({
-              choices: valid.map((v) => ({
-                name: `${v.name} (${v.location?.lat.toFixed(4)}, ${v.location?.lng.toFixed(4)})`,
-                value: v.filePath,
-              })),
-              message: 'Select reference image to copy GPS coordinates from:',
+            const refFile = await search({
+              message: 'Search/Type reference image to copy GPS coordinates from:',
+              pageSize: 15,
+              source: (term) => {
+                const choices = valid.map((v) => ({
+                  name: `${v.name} (${v.location?.lat.toFixed(4)}, ${v.location?.lng.toFixed(4)})`,
+                  value: v.filePath,
+                }))
+                if (!term) return choices
+                const lower = term.toLowerCase()
+                return choices.filter((c) => c.name.toLowerCase().includes(lower))
+              },
             })
             copyExifTags(refFile, img.filePath, false, true)
             console.log(`   ✨ Copied GPS tags from ${path.basename(refFile)}`)
+          } else if (gpsAction === 'copy_external') {
+            const externalPathInput = await input({
+              message: 'Enter / Drag-and-drop external photo or video (.MOV/.MP4) to copy GPS from:',
+              validate: (val) => {
+                const p = path.resolve(val.trim().replace(/^['"]|['"]$/g, ''))
+                if (!fs.existsSync(p)) return `File does not exist: ${p}`
+                return true
+              },
+            })
+            const cleanPath = path.resolve(externalPathInput.trim().replace(/^['"]|['"]$/g, ''))
+            copyExifTags(cleanPath, img.filePath, false, true)
+            console.log(`   ✨ Copied GPS tags from external file: ${path.basename(cleanPath)}`)
           }
         }
       }
-      console.log('\n🎉 EXIF repair run completed!')
     }
+
+    // Re-verify after repair attempt
+    results = images.map((p) => inspectImage(p))
+    invalid = results.filter((r) => !r.hasDate || !r.hasGps)
+
+    if (invalid.length === 0) {
+      console.log(`\n🎉 All ${images.length} images now have valid Date Taken and GPS coordinates!`)
+    } else {
+      console.error(
+        `\n❌ Metadata validation failed: ${invalid.length} image(s) are still missing required EXIF:`,
+      )
+      invalid.forEach((img, idx) => {
+        const issues = []
+        if (!img.hasDate) issues.push('Missing Date')
+        if (!img.hasGps) issues.push('Missing GPS')
+        console.error(`  ${idx + 1}. ${img.filePath} (${issues.join(', ')})`)
+      })
+
+      const sampleGpsTarget = invalid.find((i) => !i.hasGps)?.filePath || '/path/to/target.jpg'
+      const sampleDateTarget = invalid.find((i) => !i.hasDate)?.filePath || '/path/to/target.jpg'
+
+      console.log(`
+🛑 Please fix remaining files with these commands before proceeding:
+
+📍 For GPS from image:
+exiftool -tagsFromFile \\
+  /path/to/reference_with_gps.HEIC \\
+  -gps:all -overwrite_original \\
+  "${sampleGpsTarget}"
+
+🎥 For GPS from video:
+exiftool -ee -tagsFromFile \\
+  /path/to/reference_with_gps.MOV \\
+  "-GPSPosition<GPSCoordinates" -overwrite_original \\
+  "${sampleGpsTarget}"
+
+📅 For Dates (from file modify date):
+exiftool "-AllDates<FileModifyDate" -overwrite_original "${sampleDateTarget}"
+`)
+      process.exit(1)
+    }
+  } else {
+    // valid.length === 0 (no reference images in folder)
+    console.error(
+      `\n❌ Metadata validation failed: ${invalid.length} image(s) missing required EXIF, and no valid reference photos exist in this folder:`,
+    )
+    invalid.forEach((img, idx) => {
+      const issues = []
+      if (!img.hasDate) issues.push('Missing Date')
+      if (!img.hasGps) issues.push('Missing GPS')
+      console.error(`  ${idx + 1}. ${img.filePath} (${issues.join(', ')})`)
+    })
+
+    const sampleGpsTarget = invalid.find((i) => !i.hasGps)?.filePath || '/path/to/target.jpg'
+    const sampleDateTarget = invalid.find((i) => !i.hasDate)?.filePath || '/path/to/target.jpg'
+
+    console.log(`
+🛑 Please fix your files first using these commands, then re-run the pipeline:
+
+📍 For GPS from image:
+exiftool -tagsFromFile \\
+  /path/to/reference_with_gps.HEIC \\
+  -gps:all -overwrite_original \\
+  "${sampleGpsTarget}"
+
+🎥 For GPS from video:
+exiftool -ee -tagsFromFile \\
+  /path/to/reference_with_gps.MOV \\
+  "-GPSPosition<GPSCoordinates" -overwrite_original \\
+  "${sampleGpsTarget}"
+
+📅 For Dates (from file modify date):
+exiftool "-AllDates<FileModifyDate" -overwrite_original "${sampleDateTarget}"
+`)
+    process.exit(1)
   }
 }
 
@@ -222,13 +374,15 @@ if (selectedSteps.includes('structure')) {
 
   const tripsToProcess = structure?.isMultiTrip
     ? structure.trips
-    : [{
-        isStructured: structure?.isStructuredTrip,
-        publicImages: structure?.publicImages || [],
-        pvtImages: structure?.pvtImages || [],
-        tripDir: resolvedPath,
-        tripSlug: structure?.tripSlug || path.basename(resolvedPath),
-      }]
+    : [
+        {
+          isStructured: structure?.isStructuredTrip,
+          publicImages: structure?.publicImages || [],
+          pvtImages: structure?.pvtImages || [],
+          tripDir: resolvedPath,
+          tripSlug: structure?.tripSlug || path.basename(resolvedPath),
+        },
+      ]
 
   let selectedTrips = tripsToProcess
 
@@ -251,15 +405,30 @@ if (selectedSteps.includes('structure')) {
     const tripImages = findImagesRecursively(trip.tripDir)
     if (tripImages.length === 0) continue
 
-    let tripSlug = trip.tripSlug
-    if (!trip.isStructured && !structure?.isMultiTrip) {
-      tripSlug = await input({
-        default: path.basename(trip.tripDir).toLowerCase().replace(/\s+/g, '_'),
-        message: `Enter trip slug identifier for ${trip.tripDir}:`,
+    let tripSlug = structure?.isMultiTrip ? trip.tripSlug : activeTripSlug
+    if (!TRIP_SLUG_REGEX.test(tripSlug)) {
+      const userSlug = await input({
+        default: '24_02_tokyo',
+        message: `Enter trip slug identifier for '${path.basename(trip.tripDir)}' (format: YY_MM_name, e.g. 24_02_tokyo):`,
+        validate: (val) => {
+          const slug = val.trim().toLowerCase().replace(/\s+/g, '_')
+          if (!TRIP_SLUG_REGEX.test(slug)) {
+            return 'Trip slug must match YY_MM_name format (e.g. 24_02_tokyo, 23_11_kyoto)'
+          }
+          return true
+        },
       })
+      tripSlug = userSlug.trim().toLowerCase().replace(/\s+/g, '_')
+      activeTripSlug = tripSlug
     }
 
-    const travelRoot = structure?.isMultiTrip ? resolvedPath : path.dirname(trip.tripDir)
+    const isTargetSameAsSlug = path.basename(trip.tripDir).toLowerCase() === tripSlug
+
+    const travelRoot = structure?.isMultiTrip
+      ? resolvedPath
+      : isTargetSameAsSlug
+        ? path.dirname(trip.tripDir)
+        : trip.tripDir
 
     console.log(`\n── Trip: ${tripSlug} (${tripImages.length} images) ──`)
     console.log('Select PRIVATE images with Spacebar [X]. Unselected items stay PUBLIC:')
@@ -276,26 +445,47 @@ if (selectedSteps.includes('structure')) {
     const pubFiles = tripImages.filter((p) => !pvtSet.has(p))
 
     console.log('\n📋 Staging Plan (Dry-run preview):')
-    console.log(`  Trip folder: ${path.join(travelRoot, tripSlug)}`)
+    console.log(`  Source:      ${trip.tripDir}`)
+    console.log(
+      `  Destination: ${path.join(travelRoot, tripSlug)} (${!isTargetSameAsSlug ? 'COPY from inbox' : 'organize in place'})`,
+    )
     console.log(`  Public (${pubFiles.length} images): ➔ ${tripSlug}/`)
     console.log(`  Private (${selectedPvt.length} images): ➔ ${tripSlug}/pvt/`)
 
     const executeMove = await confirm({
       default: true,
-      message: `Execute scaffolding and moves for '${tripSlug}'?`,
+      message: `Execute scaffolding and ${!isTargetSameAsSlug ? 'copy' : 'moves'} for '${tripSlug}'?`,
     })
 
     if (executeMove) {
       const { pvtDir, tripDir } = scaffoldTripFolder(travelRoot, tripSlug)
       for (const file of pubFiles) {
         const dest = path.join(tripDir, path.basename(file))
-        if (file !== dest) fs.renameSync(file, dest)
+        if (file !== dest) {
+          if (!isTargetSameAsSlug) {
+            fs.copyFileSync(file, dest)
+          } else {
+            fs.renameSync(file, dest)
+          }
+        }
       }
       for (const file of selectedPvt) {
         const dest = path.join(pvtDir, path.basename(file))
-        if (file !== dest) fs.renameSync(file, dest)
+        if (file !== dest) {
+          if (!isTargetSameAsSlug) {
+            fs.copyFileSync(file, dest)
+          } else {
+            fs.renameSync(file, dest)
+          }
+        }
       }
-      console.log(`✅ '${tripSlug}' organized successfully!`)
+      console.log(
+        `✅ '${tripSlug}' ${!isTargetSameAsSlug ? 'copied and organized' : 'organized'} successfully!`,
+      )
+
+      if (!structure?.isMultiTrip && !isTargetSameAsSlug) {
+        resolvedPath = tripDir
+      }
     }
   }
 }
@@ -328,7 +518,7 @@ if (selectedSteps.includes('sanitize')) {
         },
         {
           checked: true,
-          name: 'Convert non-WebP images to .webp format (magick)',
+          name: 'Resize & optimize all images to .webp (3000px longest side, magick)',
           value: 'convert_webp',
         },
         {
@@ -351,13 +541,13 @@ if (selectedSteps.includes('sanitize')) {
     })
     const webpQuality = parseInt(qualityStr, 10) || 85
 
-    const targetList = sanitizeOptions.includes('force_rehex') ? images : newRawImages
+    const targetList = images
 
     console.log(`\n📋 Sanitization Plan (Dry-run preview):`)
     console.log(`  Total images to process: ${targetList.length}`)
     console.log(`  Strip EXIF telemetry: ${sanitizeOptions.includes('strip_exif') ? 'YES' : 'NO'}`)
     console.log(
-      `  Convert to WebP: ${sanitizeOptions.includes('convert_webp') ? `YES (Quality: ${webpQuality})` : 'NO'}`,
+      `  Convert/Resize to WebP: ${sanitizeOptions.includes('convert_webp') ? `YES (Quality: ${webpQuality}, max 3000px)` : 'NO'}`,
     )
     console.log(`  Hex rename: ${sanitizeOptions.includes('hex_rename') ? 'YES' : 'NO'}`)
 
@@ -367,30 +557,40 @@ if (selectedSteps.includes('sanitize')) {
     })
 
     if (doSanitize) {
-      for (const filePath of targetList) {
-        if (sanitizeOptions.includes('strip_exif')) {
-          sanitizeAndStripImage(filePath)
-        }
+      console.log(`\nProcessing ${targetList.length} image(s)...`)
 
-        let currentPath = filePath
-        if (
-          sanitizeOptions.includes('convert_webp') &&
-          path.extname(filePath).toLowerCase() !== '.webp'
-        ) {
-          const destWebp = path.join(path.dirname(filePath), `${path.parse(filePath).name}.webp`)
-          convertToWebp(filePath, destWebp, webpQuality)
-          fs.unlinkSync(filePath)
-          currentPath = destWebp
-        }
-
-        if (sanitizeOptions.includes('hex_rename') && !isHexName(currentPath)) {
-          const ext = path.extname(currentPath)
-          const hexName = generateRandomHexName(ext)
-          const destPath = path.join(path.dirname(currentPath), hexName)
-          fs.renameSync(currentPath, destPath)
-          console.log(`  Renamed: ${path.basename(currentPath)} ➔ ${hexName}`)
-        }
+      // 1. Batch telemetry strip
+      if (sanitizeOptions.includes('strip_exif')) {
+        console.log('  🧹 Batch stripping bloated EXIF tags (exiftool)...')
+        batchSanitizeAndStripImages(targetList)
       }
+
+      // 2. Batch WebP conversion and 3000px resizing with mogrify
+      let currentImages = targetList
+      if (sanitizeOptions.includes('convert_webp')) {
+        console.log('  ⚡ Batch converting & resizing to WebP (magick mogrify)...')
+        currentImages = batchConvertToWebp(targetList, webpQuality)
+      }
+
+      // 3. Fast In-Memory 16-hex renaming
+      if (sanitizeOptions.includes('hex_rename')) {
+        console.log('  🏷️  Renaming images to 16-hex strings...')
+        let renameCount = 0
+        for (const filePath of currentImages) {
+          const shouldRename = !isHexName(filePath) || sanitizeOptions.includes('force_rehex')
+          if (shouldRename) {
+            const ext = path.extname(filePath)
+            const hexName = generateRandomHexName(ext)
+            const destPath = path.join(path.dirname(filePath), hexName)
+            if (filePath !== destPath) {
+              fs.renameSync(filePath, destPath)
+              renameCount++
+            }
+          }
+        }
+        console.log(`  ✅ Renamed ${renameCount} image(s) to 16-hex.`)
+      }
+
       console.log('✅ Sanitization pass completed!')
     }
   }
@@ -454,9 +654,9 @@ if (selectedSteps.includes('thumbnails')) {
       })
 
       if (executeThumbs) {
-        for (const item of thumbPlan) {
-          generateThumbnail(item.imgPath, item.targetThumbPath, thumbQuality)
-        }
+        console.log(`  ⚡ Batch generating ${thumbPlan.length} thumbnails (magick mogrify)...`)
+        const targetImages = thumbPlan.map((item) => item.imgPath)
+        batchGenerateThumbnails(targetImages, travelRoot, thumbQuality)
         console.log(`✅ Generated ${thumbPlan.length} thumbnails!`)
       }
     }
@@ -472,14 +672,16 @@ if (selectedSteps.includes('storage_sync')) {
   console.log(`========================================================`)
 
   const travelRoot = structure?.isMultiTrip ? resolvedPath : path.dirname(resolvedPath)
-  const localImages = findImagesRecursively(travelRoot)
+  const localImages = findImagesRecursively(resolvedPath)
 
-  // Also include thumb/ files
-  const thumbDir = path.join(travelRoot, 'thumb')
-  const localThumbs = fs.existsSync(thumbDir) ? findImagesRecursively(thumbDir) : []
+  // Also include thumb/ files for the target trip(s)
+  const tripThumbDir = structure?.isMultiTrip
+    ? path.join(travelRoot, 'thumb')
+    : path.join(travelRoot, 'thumb', path.basename(resolvedPath))
+  const localThumbs = fs.existsSync(tripThumbDir) ? findImagesRecursively(tripThumbDir) : []
   const allLocal = [...localImages, ...localThumbs]
 
-  console.log(`Connecting to Supabase Storage 'travel' bucket...`)
+  console.log(`Connecting to Supabase Storage & DB...`)
   let supabase
   try {
     supabase = getSupabaseAdminClient()
@@ -488,15 +690,23 @@ if (selectedSteps.includes('storage_sync')) {
     process.exit(1)
   }
 
-  const remoteFiles = await listRemoteBucketFiles(supabase, 'travel')
-  const diff = diffStorageFiles(allLocal, remoteFiles, travelRoot)
+  const [remoteFiles, { data: dbImages }] = await Promise.all([
+    listRemoteBucketFiles(supabase, 'travel'),
+    supabase
+      .from('trip_images')
+      .select('id, trip_slug, storage_path, date_taken, lat, lng, clearance'),
+  ])
 
-  console.log(`\n📋 Storage Diff Preview:`)
-  console.log(`  + To Upload (New/Modified): ${diff.toUpload.length}`)
+  const diff = diffStorageFiles(allLocal, remoteFiles, travelRoot, dbImages || [])
+
+  console.log(`\n📋 Storage & Metadata Diff Preview:`)
+  console.log(`  + To Upload (New/Modified/EXIF changed): ${diff.toUpload.length}`)
   diff.toUpload
-    .slice(0, 10)
-    .forEach((f) => console.log(`     [+] ${f.relPath} (${(f.size / 1024).toFixed(1)} KB)`))
-  if (diff.toUpload.length > 10) console.log(`     ... and ${diff.toUpload.length - 10} more`)
+    .slice(0, 15)
+    .forEach((f) =>
+      console.log(`     [+] ${f.relPath} (${f.reason || `${(f.size / 1024).toFixed(1)} KB`})`),
+    )
+  if (diff.toUpload.length > 15) console.log(`     ... and ${diff.toUpload.length - 15} more`)
 
   console.log(`  - Remote Missing Locally: ${diff.toDelete.length}`)
   diff.toDelete.slice(0, 10).forEach((f) => console.log(`     [-] ${f.path}`))

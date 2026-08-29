@@ -6,28 +6,76 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-export function diffStorageFiles(localFiles, remoteFiles, localBaseDir) {
+import { inspectImage } from './exif.js'
+
+export function diffStorageFiles(localFiles, remoteFiles, localBaseDir, dbImages = []) {
   const toUpload = []
   const toDelete = []
   const matching = []
 
   const remoteMap = new Map(remoteFiles.map((r) => [r.path, r]))
+  const dbMap = new Map(dbImages.map((img) => [img.storage_path, img]))
 
   for (const localPath of localFiles) {
     const relPath = path.relative(localBaseDir, localPath).replace(/\\/g, '/')
     const stat = fs.statSync(localPath)
     const remote = remoteMap.get(relPath)
+    const dbRecord = dbMap.get(relPath)
 
     if (!remote) {
-      toUpload.push({ action: 'create', localPath, relPath, size: stat.size })
+      toUpload.push({
+        action: 'create',
+        localPath,
+        reason: 'New file (not in storage)',
+        relPath,
+        size: stat.size,
+      })
     } else if (remote.size !== stat.size) {
       toUpload.push({
         action: 'update',
         localPath,
+        reason: `Size changed (${(remote.size / 1024).toFixed(1)} KB ➔ ${(stat.size / 1024).toFixed(1)} KB)`,
         relPath,
         remoteSize: remote.size,
         size: stat.size,
       })
+    } else if (dbRecord && !relPath.startsWith('thumb/')) {
+      const meta = inspectImage(localPath)
+      const reasons = []
+
+      if (meta.dateTaken && dbRecord.date_taken) {
+        const localTime = meta.dateTaken.getTime()
+        const dbTime = new Date(dbRecord.date_taken).getTime()
+        if (Math.abs(localTime - dbTime) > 1000) {
+          reasons.push('Date updated')
+        }
+      } else if (meta.dateTaken && !dbRecord.date_taken) {
+        reasons.push('Date added')
+      }
+
+      if (meta.location && (dbRecord.lat !== null || dbRecord.lng !== null)) {
+        const latDiff = Math.abs((meta.location.lat ?? 0) - (dbRecord.lat ?? 0))
+        const lngDiff = Math.abs((meta.location.lng ?? 0) - (dbRecord.lng ?? 0))
+        if (latDiff > 0.0001 || lngDiff > 0.0001) {
+          reasons.push('GPS updated')
+        }
+      } else if (meta.location && dbRecord.lat === null && dbRecord.lng === null) {
+        reasons.push('GPS added')
+      }
+
+      if (reasons.length > 0) {
+        toUpload.push({
+          action: 'meta_update',
+          dbRecord,
+          localPath,
+          meta,
+          reason: `EXIF metadata updated: ${reasons.join(', ')}`,
+          relPath,
+          size: stat.size,
+        })
+      } else {
+        matching.push({ localPath, relPath, size: stat.size })
+      }
     } else {
       matching.push({ localPath, relPath, size: stat.size })
     }

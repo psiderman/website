@@ -51,7 +51,7 @@ function getDateTaken(tags) {
   const isoStr = formattedDate.replace(' ', 'T')
 
   // Capture timezone offset (e.g. "+01:00") if present
-  const offset = tags['OffsetTimeOriginal']?.description || tags['OffsetTime']?.description || ''
+  const offset = tags['OffsetTimeOriginal']?.description || tags['OffsetTime']?.description || 'Z'
 
   const parsedDate = new Date(isoStr + offset)
   if (!isNaN(parsedDate.getTime())) {

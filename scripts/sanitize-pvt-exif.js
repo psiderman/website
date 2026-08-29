@@ -97,7 +97,7 @@ function getDateTaken(tags) {
 
   const formattedDate = dateStr.replace(':', '-').replace(':', '-')
   const isoStr = formattedDate.replace(' ', 'T')
-  const offset = tags['OffsetTimeOriginal']?.description || tags['OffsetTime']?.description || ''
+  const offset = tags['OffsetTimeOriginal']?.description || tags['OffsetTime']?.description || 'Z'
 
   const parsedDate = new Date(isoStr + offset)
   return isNaN(parsedDate.getTime()) ? null : parsedDate

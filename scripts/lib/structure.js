@@ -19,9 +19,11 @@ export function analyzeTripStructure(dirPath) {
   })
 
   // Case 1: Multi-trip container folder (e.g. ~/Downloads/trips/ containing 23_01_pondy, 24_02_tokyo...)
-  // A directory is a multi-trip container if it has multiple subdirectories, or subdirectories that aren't 'pvt'
+  // A directory is a multi-trip container if it has multiple subdirectories, or subdirectories matching YY_MM_...
   const nonPvtSubdirs = subdirs.filter((s) => s !== 'pvt')
-  if (nonPvtSubdirs.length > 0) {
+  const isMulti = nonPvtSubdirs.length > 1 || (nonPvtSubdirs.length === 1 && /^\d{2}_\d{2}_/i.test(nonPvtSubdirs[0]))
+
+  if (isMulti) {
     const trips = []
     for (const sub of nonPvtSubdirs) {
       const tripPath = path.join(resolved, sub)

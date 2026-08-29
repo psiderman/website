@@ -641,6 +641,47 @@
                             </div>
                           </label>
 
+                          <div class="grid grid-cols-1 gap-3">
+                            <div class="flex flex-col gap-1 text-ui-small">
+                              <span class="pl-1.5 text-text-tertiary">Date Taken</span>
+                              <div
+                                class="bg-surface-primary border-border-primary text-text-secondary text-ui flex h-10.5 items-center gap-2 rounded-xl border px-3 py-2"
+                              >
+                                <Calendar :size="14" class="text-text-tertiary shrink-0" />
+                                <span class="truncate">{{ formatImageDate(img.date_taken) }}</span>
+                              </div>
+                            </div>
+
+                            <div class="flex flex-col gap-1 text-ui-small">
+                              <span class="pl-1.5 text-text-tertiary">GPS Coordinates</span>
+                              <div
+                                class="bg-surface-primary border-border-primary text-text-secondary text-ui flex h-10.5 items-center justify-between gap-2 rounded-xl border px-3 py-2"
+                              >
+                                <div class="flex min-w-0 items-center gap-2">
+                                  <MapPin :size="14" class="text-text-tertiary shrink-0" />
+                                  <span class="text-mono truncate text-xs">
+                                    {{ formatImageGps(img.lat, img.lng) }}
+                                  </span>
+                                </div>
+                                <a
+                                  v-if="
+                                    img.lat !== null &&
+                                    img.lat !== undefined &&
+                                    img.lng !== null &&
+                                    img.lng !== undefined
+                                  "
+                                  :href="`https://www.google.com/maps?q=${img.lat},${img.lng}`"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  class="text-text-tertiary hover:text-text-primary shrink-0 transition-colors"
+                                  title="Open in Google Maps"
+                                >
+                                  <ExternalLink :size="14" />
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+
                           <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
                             <div class="flex items-center justify-between pl-1.5">
                               <span>Caption</span>
@@ -932,6 +973,7 @@ import {
 } from '@headlessui/vue'
 import {
   BriefcaseBusiness,
+  Calendar,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -940,6 +982,7 @@ import {
   KeyRound,
   Loader,
   Luggage,
+  MapPin,
   Pencil,
   Pin,
   Plus,
@@ -1721,6 +1764,22 @@ async function deleteImage(img: TripImageRecord) {
     const errorMsg = err instanceof Error ? err.message : 'Unknown error'
     alert(`Failed to delete image: ${errorMsg}`)
   }
+}
+
+function formatImageDate(dateStr: null | string | undefined): string {
+  if (!dateStr) return 'No date recorded'
+  try {
+    return format(new Date(dateStr), 'dd MMM yyyy, HH:mm')
+  } catch {
+    return dateStr
+  }
+}
+
+function formatImageGps(lat: null | number | undefined, lng: null | number | undefined): string {
+  if (lat === null || lat === undefined || lng === null || lng === undefined) {
+    return 'No location recorded'
+  }
+  return `${lat.toFixed(5)}, ${lng.toFixed(5)}`
 }
 
 function getEditImageForm(img: TripImageRecord): ImageEditForm {

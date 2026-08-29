@@ -7,16 +7,33 @@ import ExifReader from 'exifreader'
 export const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.heic', '.webp', '.tiff']
 
 export function copyExifTags(sourceFile, targetFile, copyDate = true, copyGps = true) {
+  const isVideo = ['.avi', '.m4v', '.mov', '.mp4'].includes(path.extname(sourceFile).toLowerCase())
   const args = []
+
+  if (isVideo) {
+    args.push('-ee')
+  }
+
   if (copyDate) {
     args.push('-tagsfromfile', sourceFile, '-AllDates', '-DateTimeOriginal', '-CreateDate')
   }
+
   if (copyGps) {
-    args.push('-tagsfromfile', sourceFile, '-GPS:all')
+    if (isVideo) {
+      args.push('-tagsfromfile', sourceFile, '-GPSPosition<GPSCoordinates', '-GPS:all')
+    } else {
+      args.push('-tagsfromfile', sourceFile, '-GPS:all')
+    }
   }
+
   args.push('-overwrite_original', targetFile)
 
-  execFileSync('exiftool', args, { stdio: 'ignore' })
+  try {
+    execFileSync('exiftool', args, { stdio: 'ignore' })
+    return true
+  } catch {
+    return false
+  }
 }
 
 export function findImagesRecursively(dir) {
@@ -45,7 +62,7 @@ export function getDateTaken(tags) {
 
   const formattedDate = dateStr.replace(':', '-').replace(':', '-')
   const isoStr = formattedDate.replace(' ', 'T')
-  const offset = tags['OffsetTimeOriginal']?.description || tags['OffsetTime']?.description || ''
+  const offset = tags['OffsetTimeOriginal']?.description || tags['OffsetTime']?.description || 'Z'
 
   const parsedDate = new Date(isoStr + offset)
   return isNaN(parsedDate.getTime()) ? null : parsedDate
