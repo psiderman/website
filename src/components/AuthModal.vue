@@ -36,31 +36,38 @@
               <div
                 class="pointer-events-none z-10 flex h-full w-full flex-col justify-center gap-2 text-center"
               >
-                <TransitionGroup
-                  name="carousel"
-                  tag="div"
+                <div
                   aria-hidden="true"
-                  class="bg-dark text-light relative mx-auto flex h-30 w-full items-center justify-center gap-3 select-none"
+                  class="bg-dark text-light relative mx-auto flex h-30 w-full items-center justify-center overflow-hidden select-none"
                 >
+                  <!-- Gradient edge masks -->
                   <div
-                    v-for="offset in [-2, -1, 0, 1, 2]"
-                    :key="activeIconIndex + offset"
-                    class="flex items-center justify-center transition-[opacity,transform] duration-500 ease-out"
-                    :class="[
-                      offset === 0
-                        ? isResting
-                          ? currentItem.id === 'bot' || currentItem.id == 'face-angry'
-                            ? 'animate-bot-shake scale-110 text-red-500 opacity-100'
-                            : 'scale-110 text-green-500 opacity-100'
-                          : 'text-light scale-100 opacity-100'
-                        : Math.abs(offset) === 1
-                          ? 'text-light scale-75 opacity-60'
-                          : 'text-light scale-50 opacity-30',
-                    ]"
+                    class="from-dark pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r to-transparent"
+                  />
+                  <div
+                    class="from-dark pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l to-transparent"
+                  />
+
+                  <!-- Continuous sliding track -->
+                  <div
+                    class="absolute top-1/2 left-1/2 flex -translate-y-1/2 items-center will-change-transform"
+                    :style="trackStyle"
                   >
-                    <component :is="getIconItem(activeIconIndex + offset).icon" :size="32" />
+                    <div
+                      v-for="(item, idx) in trackItems"
+                      :key="idx"
+                      class="flex h-16 w-16 shrink-0 items-center justify-center will-change-transform"
+                      :class="[
+                        isTransitioning
+                          ? 'transition-all duration-500 ease-out'
+                          : 'transition-none',
+                        getItemClass(idx),
+                      ]"
+                    >
+                      <component :is="item.icon" :size="32" />
+                    </div>
                   </div>
-                </TransitionGroup>
+                </div>
               </div>
               <div class="flex flex-col gap-2 px-6 pt-8 pb-4">
                 <DialogTitle as="h2" class="text-h2 text-text-primary leading-7">
@@ -111,7 +118,7 @@
 <script setup lang="ts">
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { Bird, Bot, Dog, FaceAngry, FaceSlightlySmiling, Star } from '@lucide/vue'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { supabase } from '@/supabase'
 
@@ -131,26 +138,61 @@ const ICONS = [
   { icon: Bird, id: 'bird' },
 ] as const
 
-const activeIconIndex = ref(0)
+const ITEM_WIDTH = 64
+const trackItems = [...ICONS, ...ICONS, ...ICONS]
+const midIndex = Math.floor(trackItems.length / 2) // 7
+
+const currentIndex = ref(5)
 const isResting = ref(true)
+const isTransitioning = ref(true)
 const requestedClearance = ref(false)
+
 let timer: null | ReturnType<typeof setInterval> = null
 let restTimeout: null | ReturnType<typeof setTimeout> = null
 
-const getIconItem = (index: number) => {
-  const len = ICONS.length
-  return ICONS[((index % len) + len) % len]
-}
+const currentItem = computed(() => ICONS[currentIndex.value % ICONS.length])
 
-const currentItem = computed(() => getIconItem(activeIconIndex.value))
+const trackStyle = computed(() => {
+  const offset = (currentIndex.value - midIndex) * ITEM_WIDTH
+  return {
+    transform: `translateX(calc(-50% - ${offset}px))`,
+    transition: isTransitioning.value ? 'transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
+  }
+})
+
+const getItemClass = (idx: number) => {
+  const diff = Math.abs(idx - currentIndex.value)
+  if (diff === 0) {
+    if (isResting.value) {
+      if (currentItem.value.id === 'bot' || currentItem.value.id === 'face-angry') {
+        return 'animate-bot-shake scale-110 text-red-500 opacity-100'
+      }
+      return 'scale-110 text-green-500 opacity-100'
+    }
+    return 'text-light scale-100 opacity-100'
+  }
+  if (diff === 1) {
+    return 'text-light scale-75 opacity-60'
+  }
+  if (diff === 2) {
+    return 'text-light scale-50 opacity-30'
+  }
+  return 'text-light scale-25 opacity-0'
+}
 
 const stepCarousel = () => {
   isResting.value = false
-  activeIconIndex.value++
+  isTransitioning.value = true
+  currentIndex.value++
 
   if (restTimeout) clearTimeout(restTimeout)
-  restTimeout = setTimeout(() => {
+  restTimeout = setTimeout(async () => {
     isResting.value = true
+    if (currentIndex.value >= 10) {
+      isTransitioning.value = false
+      currentIndex.value = 5
+      await nextTick()
+    }
   }, 500)
 }
 
@@ -169,9 +211,13 @@ watch(
   () => props.isOpen,
   (open) => {
     stopTimer()
-    if (open && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (open) {
+      currentIndex.value = 5
       isResting.value = true
-      timer = setInterval(stepCarousel, 1800)
+      isTransitioning.value = true
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        timer = setInterval(stepCarousel, 1800)
+      }
     }
   },
   { immediate: true },
@@ -209,28 +255,6 @@ const signInWithGoogle = async () => {
 
 <style scoped>
 @reference "@/style.css";
-
-.carousel-move,
-.carousel-enter-active,
-.carousel-leave-active {
-  transition:
-    opacity 0.5s ease-out,
-    transform 0.5s ease-out;
-}
-
-.carousel-enter-from {
-  opacity: 0;
-  transform: translateX(16px) scale(0.4);
-}
-
-.carousel-leave-to {
-  opacity: 0;
-  transform: translateX(-16px) scale(0.4);
-}
-
-.carousel-leave-active {
-  position: absolute;
-}
 
 @keyframes bot-shake {
   0%,

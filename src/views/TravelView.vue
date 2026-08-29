@@ -58,7 +58,7 @@
                     :key="img.id"
                     type="button"
                     :aria-label="`Open photo ${img.name}`"
-                    class="size-20 shrink-0 cursor-pointer snap-start overflow-hidden rounded-sm p-0"
+                    class="size-20 shrink-0 cursor-pointer snap-start overflow-hidden p-0"
                     @click.stop="triggerLightbox(travel, idx)"
                   >
                     <img
