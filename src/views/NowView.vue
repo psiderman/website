@@ -84,7 +84,7 @@ import { computed } from 'vue'
 
 import GenericLoader from '@/components/GenericLoader.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
-import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
+import { isPhotoLightBoxOpen, photoLightBoxData } from '@/composables/useGlobal'
 import { useNow } from '@/composables/useNow'
 
 const {
@@ -109,19 +109,20 @@ const triggerLightbox = (clickedIdx: number) => {
   if (!images.value || images.value.length === 0) return
 
   const allImages = images.value.map((img) => ({
+    caption: null,
+    thumbnailUrl: img.url,
     url: img.url,
   }))
 
-  const orderedImages = [
-    allImages[clickedIdx],
-    ...allImages.slice(0, clickedIdx),
-    ...allImages.slice(clickedIdx + 1),
-  ]
+  const orderedImages = [...allImages.slice(clickedIdx), ...allImages.slice(0, clickedIdx)]
 
-  lightBoxData.value = {
+  photoLightBoxData.value = {
+    currentTripSlug: '',
     images: orderedImages,
+    initialIndex: 0,
+    tripTitle: slug.value ? format(new Date(`${slug.value}-01`), 'MMM ’yy').toLowerCase() : 'now',
   }
-  isLightBoxOpen.value = true
+  isPhotoLightBoxOpen.value = true
 }
 </script>
 

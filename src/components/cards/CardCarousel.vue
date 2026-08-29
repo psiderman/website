@@ -27,7 +27,8 @@
       <div
         v-for="(img, idx) in images"
         :key="`${img}-${idx}`"
-        class="h-full w-full shrink-0 snap-center"
+        class="h-full w-full shrink-0 cursor-pointer snap-center"
+        @click="emit('click-image', idx)"
       >
         <img
           v-lazy="img"
@@ -81,6 +82,10 @@ const props = defineProps<{
   isError?: boolean
   isLoading?: boolean
   title?: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'click-image', index: number): void
 }>()
 
 const activeIndex = ref(0)

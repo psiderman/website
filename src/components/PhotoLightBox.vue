@@ -27,7 +27,8 @@
             <DialogPanel class="relative flex max-w-full items-center justify-center">
               <!-- End screen card sitting at the bottom of the stack -->
               <div
-                class="bg bg-surface-primary border-border-primary absolute inset-1/2 mx-auto flex size-100 -translate-1/2 flex-col items-center justify-between gap-4 rounded-xl border p-6 text-center shadow-lg select-none"
+                v-if="currentTripSlug && nextTrip"
+                class="bg-surface-primary border-border-primary absolute inset-1/2 mx-auto flex size-100 -translate-1/2 flex-col items-center justify-between gap-4 rounded-xl border p-6 text-center shadow-lg select-none"
                 :class="[isEnded ? 'pointer-events-auto' : 'pointer-events-none']"
                 :style="{
                   zIndex: 0,
@@ -298,6 +299,7 @@ const validTrips = computed(() => {
 })
 
 const nextTrip = computed(() => {
+  if (!props.currentTripSlug) return null
   const list = validTrips.value
   if (list.length === 0) return null
   const currentIdx = list.findIndex((t) => t.slug === props.currentTripSlug)
@@ -642,11 +644,37 @@ watch(currentIndex, () => {
   }
 })
 
+let autoCloseTimer: null | number = null
+
+watch(isEnded, (ended) => {
+  if (autoCloseTimer) {
+    clearTimeout(autoCloseTimer)
+    autoCloseTimer = null
+  }
+
+  if (ended && props.isOpen && (!props.currentTripSlug || !nextTrip.value)) {
+    if (outgoingCards.value.length > 0) {
+      autoCloseTimer = window.setTimeout(() => {
+        if (isEnded.value && props.isOpen && (!props.currentTripSlug || !nextTrip.value)) {
+          closeModal()
+        }
+      }, 350)
+    } else {
+      closeModal()
+    }
+  }
+})
+
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
+  if (autoCloseTimer) clearTimeout(autoCloseTimer)
 })
 
 const closeModal = () => {
+  if (autoCloseTimer) {
+    clearTimeout(autoCloseTimer)
+    autoCloseTimer = null
+  }
   emit('update:isOpen', false)
 }
 </script>

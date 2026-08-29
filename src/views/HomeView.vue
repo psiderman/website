@@ -133,6 +133,7 @@
           :is-error="card.isError"
           :is-loading="card.isLoading"
           :title="card.title"
+          @click-image="(idx: number) => handleCarouselClick(card, idx)"
         />
         <template v-else-if="card.size === 'md'">
           <video
@@ -168,7 +169,12 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 import CardCarousel from '@/components/cards/CardCarousel.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
-import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
+import {
+  isLightBoxOpen,
+  isPhotoLightBoxOpen,
+  lightBoxData,
+  photoLightBoxData,
+} from '@/composables/useGlobal'
 import { useNow } from '@/composables/useNow'
 import { type ExtraCard, extraCards as staticExtraCards } from '@/data/extraCards'
 import { type Card, cards as staticCards } from '@/data/homeCards'
@@ -376,18 +382,51 @@ const filteredCards = computed<GridCard[]>(() => {
   return sorted
 })
 
+function openCarouselPhotoLightbox(extra: ExtraCard, startIndex = 0) {
+  if (!extra.images || extra.images.length === 0) return
+
+  const allImages = extra.images.map((url) => ({
+    caption: null,
+    thumbnailUrl: url,
+    url,
+  }))
+
+  const orderedImages = [...allImages.slice(startIndex), ...allImages.slice(0, startIndex)]
+
+  photoLightBoxData.value = {
+    currentTripSlug: '',
+    images: orderedImages,
+    initialIndex: 0,
+    tripTitle: extra.title || '',
+  }
+  isPhotoLightBoxOpen.value = true
+}
+
+const handleCarouselClick = (card: GridCard, idx: number) => {
+  if (card.isExtra && card.extraKey && card.extraIndex !== undefined) {
+    const extra = extraCards.value[card.extraKey as FilterGroupId]?.[card.extraIndex]
+    if (extra && (extra.carousel || card.carousel)) {
+      openCarouselPhotoLightbox(extra, idx)
+    }
+  }
+}
+
 const handleCardClick = (card: GridCard) => {
   if (card.isExtra && card.size === 'md' && card.extraKey && card.extraIndex !== undefined) {
     const extra = extraCards.value[card.extraKey as FilterGroupId]?.[card.extraIndex]
     if (extra) {
-      lightBoxData.value = {
-        description: extra.description || '',
-        images: extra.images?.map((url) => ({ clearance: 'public' as const, url })) || [],
-        tags: extra.tags,
-        title: extra.title || '',
-        videos: extra.videos || [],
+      if (extra.carousel || card.carousel) {
+        openCarouselPhotoLightbox(extra, 0)
+      } else {
+        lightBoxData.value = {
+          description: extra.description || '',
+          images: extra.images?.map((url) => ({ clearance: 'public' as const, url })) || [],
+          tags: extra.tags,
+          title: extra.title || '',
+          videos: extra.videos || [],
+        }
+        isLightBoxOpen.value = true
       }
-      isLightBoxOpen.value = true
     }
   }
 }
