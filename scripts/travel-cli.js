@@ -272,7 +272,8 @@ if (selectedSteps.includes('audit_fix')) {
             console.log(`   ✨ Copied GPS tags from ${path.basename(refFile)}`)
           } else if (gpsAction === 'copy_external') {
             const externalPathInput = await input({
-              message: 'Enter / Drag-and-drop external photo or video (.MOV/.MP4) to copy GPS from:',
+              message:
+                'Enter / Drag-and-drop external photo or video (.MOV/.MP4) to copy GPS from:',
               validate: (val) => {
                 const p = path.resolve(val.trim().replace(/^['"]|['"]$/g, ''))
                 if (!fs.existsSync(p)) return `File does not exist: ${p}`
@@ -536,10 +537,10 @@ if (selectedSteps.includes('sanitize')) {
     })
 
     const qualityStr = await input({
-      default: '85',
+      default: '80',
       message: 'WebP conversion quality (1-100):',
     })
-    const webpQuality = parseInt(qualityStr, 10) || 85
+    const webpQuality = parseInt(qualityStr, 10) || 80
 
     const targetList = images
 

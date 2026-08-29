@@ -5,7 +5,7 @@ import path from 'path'
 
 const CHUNK_SIZE = 100
 
-export function batchConvertToWebp(filePaths, quality = 85) {
+export function batchConvertToWebp(filePaths, quality = 80) {
   if (filePaths.length === 0) return []
 
   const nonWebpFiles = filePaths.filter((p) => path.extname(p).toLowerCase() !== '.webp')
@@ -187,7 +187,7 @@ export function checkRequiredTools() {
   }
 }
 
-export function convertToWebp(sourcePath, targetWebpPath, quality = 85) {
+export function convertToWebp(sourcePath, targetWebpPath, quality = 80) {
   const targetDir = path.dirname(targetWebpPath)
   if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, { recursive: true })
