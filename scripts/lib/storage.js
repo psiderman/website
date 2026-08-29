@@ -8,7 +8,13 @@ dotenv.config()
 
 import { inspectImage } from './exif.js'
 
-export function diffStorageFiles(localFiles, remoteFiles, localBaseDir, dbImages = []) {
+export function diffStorageFiles(
+  localFiles,
+  remoteFiles,
+  localBaseDir,
+  dbImages = [],
+  scopePrefixes = [],
+) {
   const toUpload = []
   const toDelete = []
   const matching = []
@@ -81,12 +87,19 @@ export function diffStorageFiles(localFiles, remoteFiles, localBaseDir, dbImages
     }
   }
 
+// Deletion is scoped: only remote files under one of `scopePrefixes`
+// (e.g. "23_10_india/" or "thumb/23_10_india/") are ever proposed for
+// deletion. With no scope we refuse to propose ANY deletion — this protects
+// other trips' files.
   const localRelSet = new Set(
     localFiles.map((p) => path.relative(localBaseDir, p).replace(/\\/g, '/')),
   )
 
   for (const remote of remoteFiles) {
-    if (!localRelSet.has(remote.path)) {
+    const inScope =
+      scopePrefixes.length === 0 ||
+      scopePrefixes.some((p) => remote.path.startsWith(p))
+    if (inScope && !localRelSet.has(remote.path)) {
       toDelete.push(remote)
     }
   }

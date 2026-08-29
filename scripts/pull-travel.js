@@ -56,7 +56,6 @@ async function main() {
   let targetPath = null
   let dryRun = false
   let useTrash = false
-  let serviceKey = null
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]
@@ -64,15 +63,13 @@ async function main() {
       dryRun = true
     } else if (arg === '--trash') {
       useTrash = true
-    } else if (arg === '--service-key') {
-      serviceKey = args[++i]
     } else if (arg === '--help' || arg === '-h') {
       console.log('Usage: node scripts/pull-travel.js [path-to-travel-folder] [options]')
       console.log('\nOptions:')
       console.log('  --dry-run             Preview reconciliation actions without disk modifications')
       console.log('  --trash               Move deleted local files to .trash/ folder instead of deleting')
-      console.log('  --service-key <key>   Supabase Service Role Key (default: from .env)')
       console.log('  --help, -h            Show this help message')
+      console.log('\nSupabase credentials are read from .env (SUPABASE_SERVICE_ROLE_KEY).')
       process.exit(0)
     } else if (!targetPath && !arg.startsWith('-')) {
       targetPath = arg
@@ -99,7 +96,7 @@ async function main() {
 
   let supabase
   try {
-    supabase = getSupabaseAdminClient(serviceKey)
+    supabase = getSupabaseAdminClient()
   } catch (err) {
     console.error(`❌ ${err.message}`)
     process.exit(1)
@@ -242,7 +239,7 @@ async function main() {
   if (deletionsToPropose.length > 0) {
     deletionsToPropose.forEach((d) => {
       choices.push({
-        checked: true,
+        checked: false, // deletes opt-in: never destroy local files by default
         name: `🗑️  [${useTrash ? 'Trash' : 'Delete'} Local Orphan] ${d.relPath} (deleted on remote)`,
         value: { type: 'delete', ...d },
       })
@@ -272,7 +269,7 @@ async function main() {
   }
 
   const confirmed = await confirm({
-    default: true,
+    default: false,
     message: `\nApply ${selectedActions.length} changes to local disk${dryRun ? ' (DRY RUN)' : ''}?`,
   })
 
@@ -351,7 +348,18 @@ function safeMoveFile(fromPath, toPath) {
   if (!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir, { recursive: true })
   }
-  fs.renameSync(fromPath, toPath)
+  try {
+    fs.renameSync(fromPath, toPath)
+  } catch (err) {
+    // Cross-device moves throw EXDEV — fall back to copy + unlink so a
+    // partially-applied reconcile can't silently drop files.
+    if (err?.code === 'EXDEV') {
+      fs.copyFileSync(fromPath, toPath)
+      fs.unlinkSync(fromPath)
+      return
+    }
+    throw err
+  }
 }
 
 main().catch((err) => {

@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 
+// Fail loud if anything throws mid-pipeline — a raw unhandled rejection
+// would leave uploads/renames half-applied with no guidance.
+process.on('unhandledRejection', (err) => {
+  console.error('\n❌ Pipeline failed:', err instanceof Error ? err.message : err)
+  console.error('If this happened mid-sync, re-run with --dry-run to verify local & remote state before continuing.')
+  process.exit(1)
+})
+
 import fs from 'fs'
 import path from 'path'
 
@@ -460,9 +468,18 @@ if (selectedSteps.includes('structure')) {
 
     if (executeMove) {
       const { pvtDir, tripDir } = scaffoldTripFolder(travelRoot, tripSlug)
+
+      // Refuse to silently overwrite an existing destination (re-run/collision).
+      const ensureVacant = (dest) => {
+        if (fs.existsSync(dest)) {
+          throw new Error(`Destination already exists, refusing to overwrite: ${dest}`)
+        }
+      }
+
       for (const file of pubFiles) {
         const dest = path.join(tripDir, path.basename(file))
         if (file !== dest) {
+          ensureVacant(dest)
           if (!isTargetSameAsSlug) {
             fs.copyFileSync(file, dest)
           } else {
@@ -473,6 +490,7 @@ if (selectedSteps.includes('structure')) {
       for (const file of selectedPvt) {
         const dest = path.join(pvtDir, path.basename(file))
         if (file !== dest) {
+          ensureVacant(dest)
           if (!isTargetSameAsSlug) {
             fs.copyFileSync(file, dest)
           } else {
@@ -675,6 +693,13 @@ if (selectedSteps.includes('storage_sync')) {
   const travelRoot = structure?.isMultiTrip ? resolvedPath : path.dirname(resolvedPath)
   const localImages = findImagesRecursively(resolvedPath)
 
+// Scope deletions to the trip(s) in the folder being synced so other trips'
+// remote files are never proposed for deletion. Multi-trip root syncs the
+// whole bucket; single-trip syncs only that trip's prefix + its thumb subfolder.
+  const tripScopePrefixes = structure?.isMultiTrip
+    ? []
+    : [`${path.basename(resolvedPath)}/`, `thumb/${path.basename(resolvedPath)}/`]
+
   // Also include thumb/ files for the target trip(s)
   const tripThumbDir = structure?.isMultiTrip
     ? path.join(travelRoot, 'thumb')
@@ -698,7 +723,7 @@ if (selectedSteps.includes('storage_sync')) {
       .select('id, trip_slug, storage_path, date_taken, lat, lng, clearance'),
   ])
 
-  const diff = diffStorageFiles(allLocal, remoteFiles, travelRoot, dbImages || [])
+  const diff = diffStorageFiles(allLocal, remoteFiles, travelRoot, dbImages || [], tripScopePrefixes)
 
   console.log(`\n📋 Storage & Metadata Diff Preview:`)
   console.log(`  + To Upload (New/Modified/EXIF changed): ${diff.toUpload.length}`)

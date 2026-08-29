@@ -63,6 +63,7 @@ export function batchConvertToWebp(filePaths, quality = 80) {
       const destWebp = path.join(dir, `${parsed.name}.webp`)
 
       if (fs.existsSync(destWebp)) {
+        let exifCopied = false
         try {
           execFileSync(
             'exiftool',
@@ -78,12 +79,14 @@ export function batchConvertToWebp(filePaths, quality = 80) {
             ],
             { stdio: 'ignore' },
           )
+          exifCopied = true
         } catch {
           // ignore tag copy errors if format doesn't support
         }
 
-        // Remove original non-webp file
-        if (originalFile !== destWebp && fs.existsSync(originalFile)) {
+        // Only remove the original once the metadata was copied over —
+        // otherwise we'd silently lose GPS/date for good.
+        if (exifCopied && originalFile !== destWebp && fs.existsSync(originalFile)) {
           fs.unlinkSync(originalFile)
         }
         resultingWebpFiles.push(destWebp)
