@@ -682,7 +682,7 @@
                             <button
                               class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
                               type="button"
-                              @click="deleteImage(img.id)"
+                              @click="deleteImage(img)"
                             >
                               Delete
                             </button>
@@ -1701,14 +1701,18 @@ const currentVisibleTrip = computed(() => {
   return list[activeImageTripIndex.value] || null
 })
 
-async function deleteImage(id: string) {
+async function deleteImage(img: TripImageRecord) {
   if (!confirm('Are you sure you want to delete this image?')) return
 
   try {
-    const { error } = await supabase.from('trip_images').delete().eq('id', id)
+    const { error } = await supabase.from('trip_images').delete().eq('id', img.id)
     if (error) throw error
 
-    delete editImageForms[id]
+    if (img.storage_path) {
+      await supabase.storage.from('travel').remove([img.storage_path, `thumb/${img.storage_path}`])
+    }
+
+    delete editImageForms[img.id]
 
     await queryClient.invalidateQueries({ queryKey: ['admin-images'] })
     await queryClient.invalidateQueries({ queryKey: ['trips-with-images'] })
@@ -1746,20 +1750,19 @@ async function saveImage(img: TripImageRecord, close?: () => void) {
 
   try {
     const isMovingFromPublicToPrivate = img.clearance === 'public' && form.clearance !== 'public'
+    const isMovingFromPrivateToPublic = img.clearance !== 'public' && form.clearance === 'public'
+    let newStoragePath: null | string = null
 
-    if (isMovingFromPublicToPrivate) {
+    if (isMovingFromPublicToPrivate && !img.storage_path.includes('/pvt/')) {
       const fileName = img.storage_path.split('/').pop() || img.storage_path
-      const fromPath = img.storage_path.startsWith('pvt/')
-        ? img.storage_path
-        : `${img.trip_slug}/${fileName}`
-      const toPath = `pvt/${img.trip_slug}/${fileName}`
+      const fromPath = img.storage_path
+      const toPath = `${img.trip_slug}/pvt/${fileName}`
 
       const fromThumbPath = `thumb/${fromPath}`
       const toThumbPath = `thumb/${toPath}`
 
       // Move full image
       const { error: moveError } = await supabase.storage.from('travel').move(fromPath, toPath)
-
       if (moveError) throw moveError
 
       // Move thumbnail image
@@ -1770,18 +1773,55 @@ async function saveImage(img: TripImageRecord, close?: () => void) {
       if (moveThumbError) {
         console.warn('Failed to move thumbnail image:', moveThumbError)
       }
+
+      newStoragePath = toPath
+    } else if (isMovingFromPrivateToPublic && img.storage_path.includes('/pvt/')) {
+      const fileName = img.storage_path.split('/').pop() || img.storage_path
+      const fromPath = img.storage_path
+      const toPath = `${img.trip_slug}/${fileName}`
+
+      const fromThumbPath = `thumb/${fromPath}`
+      const toThumbPath = `thumb/${toPath}`
+
+      // Move full image
+      const { error: moveError } = await supabase.storage.from('travel').move(fromPath, toPath)
+      if (moveError) throw moveError
+
+      // Move thumbnail image
+      const { error: moveThumbError } = await supabase.storage
+        .from('travel')
+        .move(fromThumbPath, toThumbPath)
+
+      if (moveThumbError) {
+        console.warn('Failed to move thumbnail image:', moveThumbError)
+      }
+
+      newStoragePath = toPath
+    }
+
+    const updatePayload: {
+      caption: null | string
+      clearance: ClearanceLevel
+      storage_path?: string
+    } = {
+      caption: form.caption.trim() || null,
+      clearance: form.clearance,
+    }
+
+    if (newStoragePath) {
+      updatePayload.storage_path = newStoragePath
     }
 
     const { error } = await supabase
       .from('trip_images')
-      .update({
-        caption: form.caption.trim() || null,
-        clearance: form.clearance,
-      })
+      .update(updatePayload)
       .eq('id', img.id)
 
     if (error) throw error
 
+    if (newStoragePath) {
+      img.storage_path = newStoragePath
+    }
     img.caption = form.caption.trim() || null
     img.clearance = form.clearance
 

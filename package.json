@@ -65,6 +65,7 @@
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "travel": "node scripts/travel-cli.js",
+    "travel:pull": "node scripts/pull-travel.js",
     "type-check": "vue-tsc --build"
   },
   "type": "module",
