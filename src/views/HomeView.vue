@@ -33,6 +33,7 @@
 
     <!-- Filters -->
     <div
+      ref="filterBarRef"
       class="bg-background border-border-primary noscrollbar sticky top-0 z-50 mb-10 flex w-full justify-center overflow-x-scroll overflow-y-visible border-b"
     >
       <div
@@ -83,6 +84,7 @@
 
     <!-- Grid -->
     <div
+      ref="gridRef"
       class="max-w-container desktop:px-20 desktop:grid-cols-12 relative grid w-full grid-flow-row-dense grid-cols-2 gap-8 px-4"
     >
       <!-- Description Card -->
@@ -189,6 +191,8 @@ const filterGroups = FILTER_GROUPS
 const route = useRoute()
 const router = useRouter()
 
+const filterBarRef = ref<HTMLElement | null>(null)
+const gridRef = ref<HTMLElement | null>(null)
 const tabContainerRef = ref<HTMLElement | null>(null)
 const tabRefs = ref<Record<string, HTMLElement>>({})
 
@@ -196,6 +200,14 @@ const setTabRef = (id: string, el: unknown) => {
   if (el) {
     tabRefs.value[id] = el as HTMLElement
   }
+}
+
+const scrollToFilterBar = () => {
+  if (!gridRef.value) return
+  const filterHeight = filterBarRef.value?.offsetHeight || 0
+  const gridTop = window.scrollY + gridRef.value.getBoundingClientRect().top
+  const top = Math.max(0, gridTop - filterHeight - 40)
+  window.scrollTo({ behavior: prefersReducedMotion ? 'auto' : 'smooth', top })
 }
 
 const indicatorStyle = ref({
@@ -259,7 +271,7 @@ const activeFilter = computed<FilterGroupId>({
 
 const handleFilterClick = (id: FilterGroupId) => {
   if (activeFilter.value === id) {
-    window.scrollTo({ behavior: prefersReducedMotion ? 'auto' : 'smooth', top: 0 })
+    scrollToFilterBar()
   } else {
     activeFilter.value = id
   }
@@ -267,7 +279,7 @@ const handleFilterClick = (id: FilterGroupId) => {
 
 watch(activeFilter, async () => {
   if (settleTimeoutId) clearTimeout(settleTimeoutId)
-  window.scrollTo({ behavior: prefersReducedMotion ? 'auto' : 'smooth', top: 0 })
+  scrollToFilterBar()
   await nextTick()
   updateIndicator()
   settleTimeoutId = setTimeout(() => {

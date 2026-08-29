@@ -1,7 +1,7 @@
 <template>
   <a
     href="#main-content"
-    class="bg-surface-inverted text-light focus:bg-surface-inverted focus:text-light sr-only rounded-lg focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-100"
+    class="bg-surface-inverted text-text-inverted-primary focus:bg-surface-inverted focus:text-text-inverted-primary sr-only rounded-lg focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-100"
   >
     <span class="px-2"> Skip to main content </span>
   </a>

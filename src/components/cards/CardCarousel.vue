@@ -18,7 +18,7 @@
       ref="scrollContainer"
       role="region"
       :aria-label="`${title ? title + ' carousel' : 'Image carousel'}`"
-      class="noscrollbar desktop:flex-col desktop:snap-y desktop:overflow-x-hidden desktop:overflow-y-auto relative flex h-full w-full snap-x snap-mandatory flex-row overflow-x-auto overflow-y-hidden scroll-smooth outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-primary"
+      class="noscrollbar desktop:flex-col desktop:snap-y desktop:overflow-x-hidden desktop:overflow-y-auto focus-visible:outline-text-primary relative flex h-full w-full snap-x snap-mandatory flex-row overflow-x-auto overflow-y-hidden scroll-smooth focus-visible:outline-2 focus-visible:-outline-offset-2"
       tabindex="0"
       @touchstart="handleInteraction"
       @wheel="handleInteraction"
