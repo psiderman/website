@@ -1,14 +1,24 @@
 import { getSwatches } from 'colorthief'
 
-import { assertAllowedOrigin } from './_lib/origin'
-import { safeFetch } from './_lib/safety'
+const ALLOWED_HOSTNAMES = new Set(['127.0.0.1', 'localhost', 'psiderman.com', 'www.psiderman.com'])
 
-import type { VercelRequest, VercelResponse } from './_lib/http'
+function isAllowedOrigin(origin: string | undefined): boolean {
+  if (!origin) return false
+  try {
+    return ALLOWED_HOSTNAMES.has(new URL(origin).hostname)
+  } catch {
+    return false
+  }
+}
 
-const ALLOWED_HOSTS = new Set(['i.scdn.co', 'lh3.googleusercontent.com'])
+const ALLOWED_IMAGE_HOSTS = new Set(['i.scdn.co', 'lh3.googleusercontent.com'])
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!assertAllowedOrigin(req)) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function handler(req: any, res: any) {
+  // Soft browser-only gate: missing Origin (same-origin/curl) is allowed,
+  // a present Origin must be trusted. Referer is never trusted.
+  const origin = req.headers.origin ?? ''
+  if (origin && !isAllowedOrigin(origin)) {
     return res.status(403).json({ error: 'Forbidden' })
   }
 
@@ -20,14 +30,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const parsed = new URL(url)
+    // Exact host allowlist + https only + no redirects: blocks SSRF via the
+    // metadata endpoint and internal networks.
     if (
-      !ALLOWED_HOSTS.has(parsed.hostname) ||
-      (parsed.protocol !== 'http:' && parsed.protocol !== 'https:')
+      !ALLOWED_IMAGE_HOSTS.has(parsed.hostname) ||
+      parsed.protocol !== 'https:'
     ) {
       return res.status(400).json({ error: 'URL not allowed' })
     }
 
-    const response = await safeFetch(url)
+    const response = await fetch(parsed.toString(), { redirect: 'manual' })
+    if (response.status >= 300 && response.status < 400) {
+      return res.status(400).json({ error: 'URL not allowed' })
+    }
     if (!response.ok) throw new Error('Image fetch failed')
 
     const arrayBuffer = await response.arrayBuffer()
