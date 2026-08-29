@@ -2,8 +2,10 @@ declare const Deno: any
 
 import { createClient } from '@supabase/supabase-js'
 import ExifReader from 'exifreader'
+import { imageSize } from 'image-size'
 
 interface StorageWebhookPayload {
+  batch?: string[]
   old_record?: null | {
     id?: string
     name?: string
@@ -39,6 +41,33 @@ Deno.serve(async (req: Request) => {
     }
 
     const payload: StorageWebhookPayload = await req.json()
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    if (payload.batch && Array.isArray(payload.batch)) {
+      const results: any[] = []
+      const concurrency = 20
+      for (let i = 0; i < payload.batch.length; i += concurrency) {
+        const slice = payload.batch.slice(i, i + concurrency)
+        const pending = slice.map(async (storagePath) => {
+          try {
+            return await processImage(supabase, storagePath)
+          } catch (e: any) {
+            console.error(`Failed to process ${storagePath}:`, e)
+            return { storagePath, error: e?.message || 'Failed to process' }
+          }
+        })
+        results.push(...(await Promise.all(pending)))
+      }
+      const succeeded = results.filter((r) => !r.error).length
+      return new Response(JSON.stringify({ processed: results.length, succeeded, results }), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 200,
+      })
+    }
+
     const record = payload.record
 
     if (!record || record.bucket_id !== 'travel') {
@@ -66,89 +95,32 @@ Deno.serve(async (req: Request) => {
     // Parse path: format is "<trip_slug>/[pvt/]<filename>"
     const segments = storagePath.split('/')
     if (segments.length < 2) {
-      return new Response(JSON.stringify({ message: 'Path does not match trip folder structure' }), {
-        headers: { 'Content-Type': 'application/json' },
-        status: 200,
-      })
+      return new Response(
+        JSON.stringify({ message: 'Path does not match trip folder structure' }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+          status: 200,
+        },
+      )
     }
 
     const tripSlug = segments[0]
     const isPvt = segments.includes('pvt')
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-    // Check for existing image to preserve custom clearance override if already set
-    const { data: existingImage } = await supabase
-      .from('trip_images')
-      .select('id, clearance')
-      .eq('storage_path', storagePath)
-      .maybeSingle()
-
-    const clearance = existingImage?.clearance || (isPvt ? 'admin' : 'public')
-
-    // Download the image binary to parse EXIF
-    const { data: fileData, error: downloadError } = await supabase.storage
-      .from('travel')
-      .download(storagePath)
-
-    if (downloadError || !fileData) {
-      console.error(`Failed to download ${storagePath}:`, downloadError)
-      return new Response(JSON.stringify({ details: downloadError, error: 'Download failed' }), {
+    const result = await processImage(supabase, storagePath, record.id)
+    if (result.error) {
+      return new Response(JSON.stringify(result), {
         headers: { 'Content-Type': 'application/json' },
-        status: 500,
-      })
-    }
-
-    const arrayBuffer = await fileData.arrayBuffer()
-    let tags: any = {}
-    try {
-      tags = ExifReader.load(arrayBuffer)
-    } catch (e) {
-      console.warn(`Could not parse EXIF for ${storagePath}:`, e)
-    }
-
-    const dateTaken = getDateTaken(tags)
-    const lat = getDecimalCoordinate(tags['GPSLatitude'], tags['GPSLatitudeRef'])
-    const lng = getDecimalCoordinate(tags['GPSLongitude'], tags['GPSLongitudeRef'])
-
-    const width = tags['Image Width']?.value || tags['PixelXDimension']?.value || null
-    const height = tags['Image Height']?.value || tags['PixelYDimension']?.value || null
-
-    // Upsert into trip_images
-    const { error: upsertError } = await supabase.from('trip_images').upsert(
-      {
-        clearance,
-        date_taken: dateTaken ? dateTaken.toISOString() : null,
-        height: height ? Number(height) : null,
-        lat: lat ?? null,
-        lng: lng ?? null,
-        storage_object_id: record.id,
-        storage_path: storagePath,
-        trip_slug: tripSlug,
-        updated_at: new Date().toISOString(),
-        width: width ? Number(width) : null,
-      },
-      {
-        onConflict: 'storage_path',
-      }
-    )
-
-    if (upsertError) {
-      console.error(`Error upserting ${storagePath}:`, upsertError)
-      return new Response(JSON.stringify({ details: upsertError, error: 'DB Upsert failed' }), {
-        headers: { 'Content-Type': 'application/json' },
-        status: 500,
+        status: result.status || 500,
       })
     }
 
     return new Response(
       JSON.stringify({
-        clearance,
-        dateTaken,
-        lat,
-        lng,
+        clearance: result.clearance,
+        dateTaken: result.dateTaken,
+        lat: result.lat,
+        lng: result.lng,
         message: 'Successfully processed image',
         storagePath,
         tripSlug,
@@ -156,7 +128,7 @@ Deno.serve(async (req: Request) => {
       {
         headers: { 'Content-Type': 'application/json' },
         status: 200,
-      }
+      },
     )
   } catch (error: any) {
     console.error('Unhandled error in process-trip-image:', error)
@@ -166,6 +138,95 @@ Deno.serve(async (req: Request) => {
     })
   }
 })
+
+async function processImage(supabase: any, storagePath: string, storageObjectId?: string) {
+  const segments = storagePath.split('/')
+  const tripSlug = segments[0]
+  const isPvt = segments.includes('pvt')
+
+  // Check for existing image to preserve custom clearance override if already set
+  const { data: existingImage } = await supabase
+    .from('trip_images')
+    .select('id, clearance, storage_object_id')
+    .eq('storage_path', storagePath)
+    .maybeSingle()
+
+  const clearance = existingImage?.clearance || (isPvt ? 'admin' : 'public')
+
+  // Download the image binary to parse EXIF
+  const { data: fileData, error: downloadError } = await supabase.storage
+    .from('travel')
+    .download(storagePath)
+
+  if (downloadError || !fileData) {
+    console.error(`Failed to download ${storagePath}:`, downloadError)
+    return { storagePath, details: downloadError, error: 'Download failed', status: 500 }
+  }
+
+  const arrayBuffer = await fileData.arrayBuffer()
+  let tags: any = {}
+  try {
+    tags = ExifReader.load(arrayBuffer)
+  } catch (e) {
+    console.warn(`Could not parse EXIF for ${storagePath}:`, e)
+  }
+
+  const dateTaken = getDateTaken(tags)
+  const lat = getDecimalCoordinate(tags['GPSLatitude'], tags['GPSLatitudeRef'])
+  const lng = getDecimalCoordinate(tags['GPSLongitude'], tags['GPSLongitudeRef'])
+
+  let width: number | null = null
+  let height: number | null = null
+  try {
+    const dims = imageSize(new Uint8Array(arrayBuffer))
+    width = dims.width
+    height = dims.height
+  } catch {
+    width = tags['Image Width']?.value || tags['PixelXDimension']?.value || null
+    height = tags['Image Height']?.value || tags['PixelYDimension']?.value || null
+  }
+
+  if ([5, 6, 7, 8].includes(tags['Orientation']?.value)) {
+    const t = width
+    width = height
+    height = t
+  }
+
+  // Upsert into trip_images
+  const { error: upsertError } = await supabase.from('trip_images').upsert(
+    {
+      clearance,
+      date_taken: dateTaken ? dateTaken.toISOString() : null,
+      height: height ? Number(height) : null,
+      lat: lat ?? null,
+      lng: lng ?? null,
+      storage_object_id: storageObjectId ?? existingImage?.storage_object_id,
+      storage_path: storagePath,
+      trip_slug: tripSlug,
+      updated_at: new Date().toISOString(),
+      width: width ? Number(width) : null,
+    },
+    {
+      onConflict: 'storage_path',
+    },
+  )
+
+  if (upsertError) {
+    console.error(`Error upserting ${storagePath}:`, upsertError)
+    return { storagePath, details: upsertError, error: 'DB Upsert failed', status: 500 }
+  }
+
+  return {
+    storagePath,
+    clearance,
+    dateTaken,
+    lat,
+    lng,
+    width,
+    height,
+    tripSlug,
+  }
+}
 
 function getDateTaken(tags: any): Date | null {
   const dateStr = tags['DateTimeOriginal']?.description || tags['DateTime']?.description
