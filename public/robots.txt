@@ -1,2 +1,7 @@
 User-agent: *
 Allow: /
+
+# Admin-only, auth-gated
+Disallow: /suitlady
+
+Sitemap: https://psiderman.com/sitemap.xml

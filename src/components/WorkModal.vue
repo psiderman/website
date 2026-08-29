@@ -16,6 +16,10 @@
       <div
         ref="scrollContainerRef"
         class="fixed inset-0 overflow-y-auto overscroll-y-contain"
+        :style="{
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }"
         @touchstart.passive="onTouchStart"
         @touchmove="onTouchMove"
         @touchend="onTouchEnd"
@@ -218,7 +222,6 @@
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ArrowUpRight, Undo, X } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query'
-import { animate, createDraggable, type Draggable } from 'animejs'
 import { format } from 'date-fns'
 import DOMPurify from 'dompurify'
 import { computed, nextTick, ref, watch } from 'vue'
@@ -338,17 +341,19 @@ const sortedPeople = computed(() => {
 })
 
 const imageRefs = ref<HTMLElement[]>([])
-let draggables: Draggable[] = []
+let draggables: { stop?: () => void }[] = []
 const isMoved = ref(false)
 
 const resetImages = () => {
   isMoved.value = false
   draggables.forEach((d) => {
-    animate(d, {
-      duration: 600,
-      ease: 'outBack',
-      x: 0,
-      y: 0,
+    void import('animejs').then(({ animate }) => {
+      animate(d, {
+        duration: 600,
+        ease: 'outBack',
+        x: 0,
+        y: 0,
+      })
     })
   })
 }
@@ -360,6 +365,7 @@ watch(
       await nextTick()
 
       draggables.forEach((d) => d.stop?.())
+      const { createDraggable } = await import('animejs')
       draggables = imageRefs.value.map((img) =>
         createDraggable(img, {
           onDrag: () => {

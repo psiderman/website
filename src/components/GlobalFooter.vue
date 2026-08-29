@@ -90,7 +90,6 @@
 </template>
 
 <script setup lang="ts">
-import { animate } from 'animejs'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import WebStrand from '@/components/WebStrand.vue'
@@ -98,6 +97,7 @@ import WebStrand from '@/components/WebStrand.vue'
 // ==========================================
 // TIMING CONFIGURATION (edit values here)
 // ==========================================
+
 const TIMING = {
   // 4. Page Scroll Bounce-back
   bounceDelay: 1000, // Delay from trigger until footer pulls/bounces page back up
@@ -139,11 +139,14 @@ const getRandomQuip = () => {
 }
 
 function dismissThwipAnimation() {
-  if (handEl.value) {
-    animate(handEl.value, {
-      duration: TIMING.handExitDuration,
-      ease: 'inQuad',
-      translateY: '100%',
+  const el = handEl.value
+  if (el) {
+    void import('animejs').then(({ animate }) => {
+      animate(el, {
+        duration: TIMING.handExitDuration,
+        ease: 'inQuad',
+        translateY: '100%',
+      })
     })
   }
 }
@@ -174,30 +177,35 @@ function spawnQuipThrow() {
   const flingXLength = random(40, 60)
   const rotation = random(10, 20) * (flingXLength / 55)
 
-  animate(quipMessage, {
-    duration: random(TIMING.quipFlyDurationMin, TIMING.quipFlyDurationMax),
-    ease: 'out(2)',
-    onComplete: () => {
-      if (quipMessage.parentNode === thwipContainer.value) {
-        thwipContainer.value?.removeChild(quipMessage)
-      }
-    },
-    opacity: [
-      { duration: 200, to: 1 },
-      { delay: TIMING.quipFadeDelay, duration: TIMING.quipFadeDuration, ease: 'inOut(2)', to: 0 },
-    ],
-    rotate: `${plusminus}${rotation}deg`,
-    x: `${plusminus}=${flingXLength}px`,
-    y: `-=${flingYLength}px`,
+  void import('animejs').then(({ animate }) => {
+    animate(quipMessage, {
+      duration: random(TIMING.quipFlyDurationMin, TIMING.quipFlyDurationMax),
+      ease: 'out(2)',
+      onComplete: () => {
+        if (quipMessage.parentNode === thwipContainer.value) {
+          thwipContainer.value?.removeChild(quipMessage)
+        }
+      },
+      opacity: [
+        { duration: 200, to: 1 },
+        { delay: TIMING.quipFadeDelay, duration: TIMING.quipFadeDuration, ease: 'inOut(2)', to: 0 },
+      ],
+      rotate: `${plusminus}${rotation}deg`,
+      x: `${plusminus}=${flingXLength}px`,
+      y: `-=${flingYLength}px`,
+    })
   })
 }
 
 function triggerThwipAnimation() {
-  if (handEl.value) {
-    animate(handEl.value, {
-      duration: TIMING.handEnterDuration,
-      ease: 'outBack(1.5)',
-      translateY: ['100%', '0%'],
+  const el = handEl.value
+  if (el) {
+    void import('animejs').then(({ animate }) => {
+      animate(el, {
+        duration: TIMING.handEnterDuration,
+        ease: 'outBack(1.5)',
+        translateY: ['100%', '0%'],
+      })
     })
   }
 

@@ -82,7 +82,6 @@
 </template>
 
 <script setup lang="ts">
-import { createTimeline } from 'animejs'
 import { ref } from 'vue'
 
 const spiderAnimationFlag = ref(true)
@@ -108,9 +107,10 @@ function spiderAnimation() {
   spiderAnimationFlag.value = false
   emit('animationStart')
 
-  const spiderTimeline = createTimeline({
-    autoplay: true,
-  })
+  void import('animejs').then(({ createTimeline }) => {
+    const spiderTimeline = createTimeline({
+      autoplay: true,
+    })
 
   // 1. Make heart red
   if (heartPathEl.value) {
@@ -445,6 +445,7 @@ function spiderAnimation() {
     spiderAnimationFlag.value = true
     emit('animationEnd')
   }, 9600)
+  })
 }
 </script>
 

@@ -113,6 +113,7 @@
                       ? 'pointer-events-none opacity-0'
                       : 'opacity-0 group-hover:opacity-100'
                   "
+                  :disabled="activeIndex === 0"
                   aria-label="Previous"
                   @click="scrollToPrev"
                 >
@@ -127,6 +128,7 @@
                       : 'opacity-0 group-hover:opacity-100',
                     activeIndex === 0 && mediaItems.length > 1 ? 'opacity-50' : '',
                   ]"
+                  :disabled="activeIndex === mediaItems.length - 1"
                   aria-label="Next"
                   @click="scrollToNext"
                 >

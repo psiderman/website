@@ -76,8 +76,6 @@ const buttons = [
   },
 ]
 
-import { animate } from 'animejs'
-
 const random = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
 
 async function copyEmail(event: MouseEvent) {
@@ -121,36 +119,35 @@ async function copyEmail(event: MouseEvent) {
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    if (prefersReducedMotion) {
-      animate(copiedMessage, {
-        duration: 1500,
-        onComplete: () => {
-          document.body.removeChild(copiedMessage)
-        },
-        opacity: [
-          { duration: 200, to: 1 },
-          { duration: 1300, to: 0 },
-        ],
-      })
-    } else {
-      const direction = random(0, 1)
-      const plusminus = direction ? '+' : '-'
-      const flingYLength = random(20, 50)
-      const flingXLength = random(0, 50)
-      const rotation = random(10, 15) * (flingXLength / 50)
+    void import('animejs').then(({ animate }) => {
+      if (prefersReducedMotion) {
+        animate(copiedMessage, {
+          duration: 1500,
+          onComplete: () => {
+            document.body.removeChild(copiedMessage)
+          },
+          opacity: [{ duration: 200, to: 1 }, { duration: 1300, to: 0 }],
+        })
+      } else {
+        const direction = random(0, 1)
+        const plusminus = direction ? '+' : '-'
+        const flingYLength = random(20, 50)
+        const flingXLength = random(0, 50)
+        const rotation = random(10, 15) * (flingXLength / 50)
 
-      animate(copiedMessage, {
-        duration: random(500, 1000),
-        ease: 'out(2)',
-        onComplete: () => {
-          document.body.removeChild(copiedMessage)
-        },
-        opacity: [{ duration: 2000, ease: 'inOut(2)', to: 0 }],
-        rotate: `${plusminus}${rotation}deg`,
-        x: `${plusminus}=${flingXLength}px`,
-        y: `-=${flingYLength}px`,
-      })
-    }
+        animate(copiedMessage, {
+          duration: random(500, 1000),
+          ease: 'out(2)',
+          onComplete: () => {
+            document.body.removeChild(copiedMessage)
+          },
+          opacity: [{ duration: 2000, ease: 'inOut(2)', to: 0 }],
+          rotate: `${plusminus}${rotation}deg`,
+          x: `${plusminus}=${flingXLength}px`,
+          y: `-=${flingYLength}px`,
+        })
+      }
+    })
   } catch {
     return
   }

@@ -374,6 +374,15 @@
     user-select: none;
     -webkit-user-drag: none;
   }
+
+  button,
+  a {
+    touch-action: manipulation;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @layer components {

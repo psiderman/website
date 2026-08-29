@@ -1,6 +1,12 @@
 <template>
+  <a
+    href="#main-content"
+    class="bg-surface-inverted text-light focus:bg-surface-inverted focus:text-light sr-only rounded-xl px-4 py-2 focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-100"
+  >
+    Skip to main content
+  </a>
   <GlobalHeader />
-  <main class="flex w-screen flex-col items-center justify-center">
+  <main id="main-content" class="flex w-screen flex-col items-center justify-center" tabindex="-1">
     <slot />
   </main>
   <GlobalFooter />

@@ -13,7 +13,13 @@
         <div class="bg-overlay fixed inset-0 backdrop-blur-xs" />
       </TransitionChild>
 
-      <div class="fixed inset-0 overflow-y-auto">
+      <div
+        class="fixed inset-0 overflow-y-auto"
+        :style="{
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }"
+      >
         <div class="flex min-h-full items-center justify-center p-4 text-center">
           <TransitionChild
             as="template"

@@ -139,6 +139,9 @@ const userAvatar = computed(() => {
 const colorCache = ref<Record<string, { bg: string; fg: string }>>({})
 const userColor = ref(fallbackColor.value)
 
+// Set of avatar URLs currently being fetched for color — dedupes the API.
+const pendingColorFetch = ref(new Set<string>())
+
 let channel: null | ReturnType<typeof supabase.channel> = null
 
 export const activeRoomName = computed(() => {
@@ -180,6 +183,11 @@ watch(
       return
     }
 
+    // Dedupe in-flight color fetches per avatar so the first frame of a busy
+    // room doesn't fire N identical /api/color requests.
+    if (pendingColorFetch.value.has(avatar)) return
+
+    pendingColorFetch.value.add(avatar)
     fetch(`/api/color?url=${encodeURIComponent(avatar)}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch color')
@@ -205,6 +213,9 @@ watch(
       })
       .catch((err) => {
         console.error('Failed to extract color via API', err)
+      })
+      .finally(() => {
+        pendingColorFetch.value.delete(avatar)
       })
   },
   { immediate: true },

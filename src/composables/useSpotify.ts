@@ -41,8 +41,8 @@ export function useSpotify() {
 
   const { data: now_playing_data, isLoading: isNowPlayingLoading } = useQuery({
     enabled: computed(() => isVisible.value && !!currentUser.value),
-    queryFn: async () => {
-      const res = await fetch('/api/now-playing')
+    queryFn: async ({ signal }) => {
+      const res = await fetch('/api/now-playing', { signal })
       if (!res.ok) throw new Error('Failed to fetch now playing')
       return await res.json()
     },
@@ -85,8 +85,8 @@ export function useSpotify() {
 
   const { data: recently_played_data, isLoading: isRecentLoading } = useQuery({
     enabled: isVisible,
-    queryFn: async () => {
-      const res = await fetch('/api/recently-played')
+    queryFn: async ({ signal }) => {
+      const res = await fetch('/api/recently-played', { signal })
       if (!res.ok) throw new Error('Failed to fetch recently played tracks')
       return (await res.json()) as Track[]
     },

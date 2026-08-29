@@ -69,8 +69,9 @@
 </template>
 
 <script setup lang="ts">
-import { createTimeline } from 'animejs'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+
+import type { createTimeline as createTimelineType } from 'animejs'
 
 const props = withDefaults(
   defineProps<{
@@ -255,7 +256,7 @@ const P8 = [
 
 // Progress ranges from 0 (Frame 1) to 4 (Frame 5)
 const progress = ref(0)
-let tl: null | ReturnType<typeof createTimeline> = null
+let tl: null | ReturnType<typeof createTimelineType> = null
 
 function formatC1(pts: number[]): string {
   const p = pts.map((n) => n.toFixed(2))
@@ -285,19 +286,10 @@ const currentPath6 = computed(() => formatC1(interpolateArray(P6, progress.value
 const currentPath7 = computed(() => formatC1(interpolateArray(P7, progress.value)))
 const currentPath8 = computed(() => formatC1(interpolateArray(P8, progress.value)))
 
-function pause() {
-  if (tl) tl.pause()
-}
-
-function play() {
-  if (tl) tl.play()
-}
-
-function start() {
-  if (tl) tl.pause()
-  progress.value = 0
-  const track = { val: 0 }
-
+function buildTimeline(
+  createTimeline: typeof createTimelineType,
+  track: { val: number },
+) {
   const upDur = props.upDuration ?? props.duration * 0.75
   const downDur = props.downDuration ?? props.duration * 0.25
 
@@ -330,6 +322,24 @@ function start() {
     },
     `+=${props.frame4Delay}`,
   )
+}
+
+function pause() {
+  if (tl) tl.pause()
+}
+
+function play() {
+  if (tl) tl.play()
+}
+
+function start() {
+  if (tl) tl.pause()
+  progress.value = 0
+  const track = { val: 0 }
+
+  void import('animejs').then(({ createTimeline }) => {
+    buildTimeline(createTimeline, track)
+  })
 }
 
 watch(
