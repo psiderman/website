@@ -33,7 +33,7 @@
 
     <!-- Filters -->
     <div
-      class="bg-background border-border-primary noscrollbar sticky top-0 z-50 mb-10 flex w-full justify-center overflow-x-scroll border-b"
+      class="bg-background border-border-primary noscrollbar sticky top-0 z-50 mb-10 flex w-full justify-center overflow-x-scroll overflow-y-visible border-b"
     >
       <div
         ref="tabContainerRef"
@@ -44,7 +44,7 @@
           :key="grp.id"
           :ref="(el) => setTabRef(grp.id, el)"
           :aria-label="grp.label"
-          class="text-ui font-sans-alt desktop:shrink-0 desktop:px-5 relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl p-4 transition-colors duration-200"
+          class="text-ui font-sans-alt focus-visible:bg-hover desktop:shrink-0 desktop:px-5 focus-visible:border-surface-tertiary relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl border border-b-0 border-transparent p-4 transition-colors duration-200 focus-visible:outline-0!"
           :class="[
             activeFilter === grp.id
               ? 'text-text-primary font-normal'

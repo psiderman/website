@@ -575,8 +575,11 @@
                       as="template"
                     >
                       <div
-                        :class="open ? 'col-span-3' : 'col-span-1'"
-                        class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
+                        :class="[
+                          open ? 'col-span-3' : 'col-span-1',
+                          savingImageId === img.id ? 'pointer-events-none opacity-50' : '',
+                        ]"
+                        class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border transition-opacity"
                       >
                         <DisclosureButton
                           class="relative aspect-square w-full cursor-pointer overflow-hidden text-left"
@@ -609,10 +612,7 @@
                         <DisclosurePanel
                           class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
                         >
-                          <label
-                            v-if="!group.isPublic"
-                            class="text-ui-small text-text-tertiary flex flex-col gap-1"
-                          >
+                          <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
                             <span class="pl-1.5">Clearance</span>
                             <div
                               class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
@@ -1745,6 +1745,33 @@ async function saveImage(img: TripImageRecord, close?: () => void) {
   savingImageId.value = img.id
 
   try {
+    const isMovingFromPublicToPrivate = img.clearance === 'public' && form.clearance !== 'public'
+
+    if (isMovingFromPublicToPrivate) {
+      const fileName = img.storage_path.split('/').pop() || img.storage_path
+      const fromPath = img.storage_path.startsWith('pvt/')
+        ? img.storage_path
+        : `${img.trip_slug}/${fileName}`
+      const toPath = `pvt/${img.trip_slug}/${fileName}`
+
+      const fromThumbPath = `thumb/${fromPath}`
+      const toThumbPath = `thumb/${toPath}`
+
+      // Move full image
+      const { error: moveError } = await supabase.storage.from('travel').move(fromPath, toPath)
+
+      if (moveError) throw moveError
+
+      // Move thumbnail image
+      const { error: moveThumbError } = await supabase.storage
+        .from('travel')
+        .move(fromThumbPath, toThumbPath)
+
+      if (moveThumbError) {
+        console.warn('Failed to move thumbnail image:', moveThumbError)
+      }
+    }
+
     const { error } = await supabase
       .from('trip_images')
       .update({

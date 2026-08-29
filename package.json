@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@inquirer/prompts": "^8.7.0",
     "@sentry/vite-plugin": "^5.4.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/vue-query-devtools": "^6.1.38",
@@ -63,6 +64,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
+    "travel": "node scripts/travel-cli.js",
     "type-check": "vue-tsc --build"
   },
   "type": "module",
