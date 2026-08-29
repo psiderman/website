@@ -42,10 +42,10 @@
                 >
                   <!-- Gradient edge masks -->
                   <div
-                    class="from-dark pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r to-transparent"
+                    class="from-dark pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-linear-to-r to-transparent"
                   />
                   <div
-                    class="from-dark pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l to-transparent"
+                    class="from-dark pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-linear-to-l to-transparent"
                   />
 
                   <!-- Continuous sliding track -->

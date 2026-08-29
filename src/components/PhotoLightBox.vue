@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot appear :show="isOpen" as="template">
-    <Dialog as="div" class="relative z-50" @close="closeModal">
+    <Dialog as="div" class="relative z-50 select-none" @close="closeModal">
       <TransitionChild
         as="template"
         enter="duration-300 ease-out"
@@ -13,11 +13,8 @@
         <div class="bg-overlay fixed inset-0 backdrop-blur-xs" />
       </TransitionChild>
 
-      <div class="fixed inset-0 overflow-y-auto">
-        <div
-          class="flex min-h-full justify-center p-10 text-center"
-          :class="title && description ? 'items-start' : 'items-center'"
-        >
+      <div class="fixed inset-0 overflow-hidden">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
           <TransitionChild
             as="template"
             enter="duration-300 ease-out"
@@ -27,134 +24,177 @@
             leave-from="opacity-100 scale-100"
             leave-to="opacity-0 scale-95"
           >
-            <DialogPanel
-              class="bg-surface-primary relative flex h-full w-180 flex-col items-center justify-center gap-2 overflow-hidden border"
-              :class="
-                title && description
-                  ? 'border-border-primary rounded-xl p-2'
-                  : 'border-dark rounded-special p-0'
-              "
-            >
-              <div class="bg-dark group desktop:min-h-80 relative h-full w-full rounded-lg">
+            <DialogPanel class="relative flex max-w-full items-center justify-center">
+              <!-- End screen card sitting at the bottom of the stack -->
+              <div
+                class="bg bg-surface-primary border-border-primary absolute inset-1/2 mx-auto flex size-100 -translate-1/2 flex-col items-center justify-between gap-4 rounded-xl border p-6 text-center shadow-lg select-none"
+                :class="[isEnded ? 'pointer-events-auto' : 'pointer-events-none']"
+                :style="{
+                  zIndex: 0,
+                  transform: 'translate(0, 0) rotate(1.2deg)',
+                  transformOrigin: 'center center',
+                  transition: 'transform 0.4s ease-out, opacity 0.3s ease-out',
+                }"
+              >
+                <p class="text-h2 text-text-primary">Up next: {{ nextTripTitle }}</p>
+
                 <div
-                  ref="scrollContainer"
-                  class="noscrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth"
-                  @scroll="handleScroll"
+                  class="bg-surface-tertiary relative min-h-0 w-full flex-1 overflow-hidden rounded-lg p-2"
                 >
                   <div
-                    v-for="(item, idx) in mediaItems"
-                    :key="idx"
-                    class="my-auto flex h-full w-full shrink-0 snap-center items-center justify-center overflow-hidden rounded-lg"
+                    v-if="nextTripThumbnails.length === 1"
+                    class="relative h-full w-full overflow-hidden p-1"
+                  >
+                    <img
+                      :src="nextTripThumbnails[0]"
+                      alt=""
+                      draggable="false"
+                      loading="eager"
+                      decoding="async"
+                      class="pointer-events-none h-full w-full rounded-xs object-cover select-none"
+                    />
+                  </div>
+                  <div
+                    v-else-if="nextTripThumbnails.length > 0"
+                    class="grid h-full w-full grid-cols-3 grid-rows-2 gap-3 overflow-hidden p-1"
                   >
                     <div
-                      v-if="item.type === 'image'"
-                      class="relative flex max-h-full max-w-full items-center justify-center"
+                      v-for="(url, idx) in nextTripThumbnails"
+                      :key="idx"
+                      class="bg-surface-tertiary outline-dark-5p relative overflow-hidden rounded-xs shadow-sm"
+                      :style="{
+                        transform: `rotate(${THUMB_ROTATIONS[idx % THUMB_ROTATIONS.length]}deg)`,
+                      }"
                     >
                       <img
-                        v-lazy="{ src: item.src, placeholder: item.placeholder }"
-                        :alt="item.caption || ''"
-                        :style="
-                          item.width && item.height
-                            ? {
-                                height: `${item.height}px`,
-                                maxHeight: '75svh',
-                                maxWidth: '100%',
-                                width: `${item.width}px`,
-                              }
-                            : { maxHeight: '75svh', maxWidth: '100%' }
-                        "
-                        class="rounded-lg object-contain"
+                        :src="url"
+                        alt=""
+                        draggable="false"
+                        loading="eager"
+                        decoding="async"
+                        class="border-light pointer-events-none h-full w-full border-6 border-b-12 object-cover select-none"
                       />
-                      <div class="absolute top-2 right-2 flex flex-row gap-2">
-                        <div
-                          v-if="item.caption"
-                          v-tooltip="{ content: item.caption }"
-                          class="border-light bg-dark/50 text-light flex size-8 items-center justify-center rounded-full border-3 font-mono shadow-md"
-                        >
-                          i
-                        </div>
-                        <div
-                          v-if="isHighClearance(item.clearance)"
-                          v-tooltip="{ content: 'you’re on “the list”' }"
-                          class="border-light flex size-8 items-center justify-center rounded-full border-3 bg-green-500 shadow-md"
-                        >
-                          <Star :size="20" fill="#fff" stroke-width="0" />
-                        </div>
-                      </div>
                     </div>
-                    <video
-                      v-else-if="item.type === 'video'"
-                      :alt="`${title}-${idx}`"
-                      :src="item.src"
-                      class="desktop:max-h-[calc(75svh)] w-auto object-contain"
-                      playsinline
-                      :autoplay="!prefersReducedMotion"
-                      :loop="!prefersReducedMotion"
-                      muted
-                      controls
-                    />
+                  </div>
+                  <div
+                    v-else
+                    class="text-text-tertiary flex h-full w-full items-center justify-center text-xs"
+                  >
+                    No preview
                   </div>
                 </div>
 
-                <!-- Custom Side Indicator -->
-                <CarouselIndicator
-                  v-if="mediaItems.length > 1"
-                  class="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100"
-                  :class="{ 'opacity-50': activeIndex === 0 }"
-                  :active-index="activeIndex"
-                  :count="mediaItems.length"
-                  orientation="horizontal"
-                />
-
-                <button
-                  class="btn icon-only inverted bg-dark/50 absolute top-1/2 left-4 -translate-y-1/2 transition-opacity"
-                  :class="
-                    activeIndex === 0
-                      ? 'pointer-events-none opacity-0'
-                      : 'opacity-0 group-hover:opacity-100'
-                  "
-                  :disabled="activeIndex === 0"
-                  aria-label="Previous"
-                  @click="scrollToPrev"
-                >
-                  <ArrowLeft :size="16" />
-                </button>
-
-                <button
-                  class="btn icon-only inverted bg-dark/50 absolute top-1/2 right-4 -translate-y-1/2 transition-opacity"
-                  :class="[
-                    activeIndex === mediaItems.length - 1
-                      ? 'pointer-events-none opacity-0'
-                      : 'opacity-0 group-hover:opacity-100',
-                    activeIndex === 0 && mediaItems.length > 1 ? 'opacity-50' : '',
-                  ]"
-                  :disabled="activeIndex === mediaItems.length - 1"
-                  aria-label="Next"
-                  @click="scrollToNext"
-                >
-                  <ArrowRight :size="16" />
-                </button>
+                <div class="flex w-full flex-col justify-center gap-2">
+                  <button type="button" class="btn primary grow" @click="goToNextTrip">
+                    <span>Next</span>
+                    <ArrowRight :size="16" />
+                  </button>
+                  <button type="button" class="btn stroke grow" @click="startOver">
+                    <Undo2 :size="16" />
+                    <span>Replay</span>
+                  </button>
+                </div>
               </div>
-              <div v-if="title && description" class="flex w-full flex-col items-start gap-6 p-4">
-                <div class="flex w-full flex-col gap-2 text-left">
-                  <h2 class="text-h2 text-text-primary">{{ title }}</h2>
-                  <p class="text-ui text-text-secondary">
-                    {{ description }}
+
+              <!-- Active stack cards -->
+              <div
+                v-for="card in visibleCards"
+                :key="card.id"
+                class="bg-light border-border-primary absolute inset-1/2 mx-auto flex h-fit w-fit -translate-1/2 touch-none flex-col rounded-lg border p-6 pb-4 shadow-lg select-none"
+                :class="[
+                  card.isBehind ? 'pointer-events-none' : 'pointer-events-auto',
+                  card.depth === 0 && isDragging ? 'cursor-grabbing' : 'cursor-grab',
+                ]"
+                :style="{
+                  zIndex: card.zIndex,
+                  transform: `translate(${card.x}px, ${card.y}px) rotate(${card.rotate}deg) scale(${card.scale})`,
+                  transformOrigin: 'center center',
+                  transition:
+                    card.isBehind || (card.depth === 0 && isDragging)
+                      ? 'none'
+                      : 'transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.15), opacity 0.3s ease-out',
+                  opacity: card.isBehind ? 0 : 1,
+                }"
+                @pointerdown="onPointerDown(card.depth, $event)"
+                @pointermove="onPointerMove($event)"
+                @pointerup="onPointerUp"
+                @pointercancel="onPointerUp"
+              >
+                <div class="relative">
+                  <img
+                    v-lazy="{ src: card.img.url, placeholder: card.img.thumbnailUrl }"
+                    :alt="card.img.caption ?? ''"
+                    draggable="false"
+                    :style="
+                      card.img.width && card.img.height
+                        ? { aspectRatio: `${card.img.width}/${card.img.height}` }
+                        : undefined
+                    "
+                    class="desktop:max-w-[40svw] pointer-events-none block h-auto max-h-[calc(100svh-10rem)] w-auto max-w-[80svw] rounded-xs object-contain select-none"
+                  />
+                  <!-- Green star badge for 'the list' -->
+                  <div
+                    v-if="isHighClearance(card.img.clearance)"
+                    v-tooltip="{ content: 'you’re on “the list”' }"
+                    class="border-light desktop:size-8 desktop:border-3 absolute top-2 right-2 flex size-7 items-center justify-center rounded-full border-2 bg-green-500 shadow-md select-none"
+                  >
+                    <Star :size="16" fill="#fff" stroke-width="0" />
+                  </div>
+                </div>
+                <div
+                  class="flex min-h-12 w-0 min-w-full items-center justify-center pt-3 text-center"
+                >
+                  <p
+                    v-if="card.img.caption"
+                    class="text-dark font-handwriting text-p pointer-events-none leading-6 select-none"
+                  >
+                    {{ card.img.caption }}
                   </p>
                 </div>
-                <div v-if="tags && tags.length > 0" class="desktop:flex-row flex flex-col gap-2">
-                  <component
-                    :is="tag.link ? 'a' : 'div'"
-                    v-for="(tag, idx) in tags"
-                    :key="idx"
-                    :href="tag.link"
-                    :target="tag.link ? '_blank' : undefined"
-                    class="bg-surface-secondary border-border-primary text-text-secondary text-ui hover:text-text-primary flex w-fit flex-row items-center justify-center gap-0.5 rounded-full border px-3 py-0.5 transition-colors"
-                    :class="{ 'hover:border-border-hover cursor-pointer': tag.link }"
+              </div>
+
+              <!-- Exiting cards flying away smoothly -->
+              <div
+                v-for="card in outgoingCards"
+                :key="card.id"
+                class="bg-light border-border-primary pointer-events-none absolute inset-1/2 mx-auto flex h-fit w-fit -translate-1/2 touch-none flex-col rounded-lg border p-6 pb-4 shadow-lg select-none"
+                :style="{
+                  zIndex: 999,
+                  transform: `translate(${card.x}px, ${card.y}px) rotate(${card.rotate}deg) scale(1)`,
+                  transformOrigin: 'center center',
+                  transition:
+                    'transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  opacity: card.isExiting ? 0 : 1,
+                }"
+              >
+                <div class="relative">
+                  <img
+                    v-lazy="{ src: card.img.url, placeholder: card.img.thumbnailUrl }"
+                    :alt="card.img.caption ?? ''"
+                    draggable="false"
+                    :style="
+                      card.img.width && card.img.height
+                        ? { aspectRatio: `${card.img.width}/${card.img.height}` }
+                        : undefined
+                    "
+                    class="desktop:max-w-[40svw] pointer-events-none block h-auto max-h-[calc(100svh-10rem)] w-auto max-w-[85svw] rounded-xs object-contain select-none"
+                  />
+                  <div
+                    v-if="isHighClearance(card.img.clearance)"
+                    class="border-light desktop:size-8 desktop:border-3 absolute top-2 right-2 flex size-7 items-center justify-center rounded-full border-2 bg-green-500 shadow-md select-none"
                   >
-                    {{ tag.value }}
-                    <ArrowUpRight v-if="tag.link" :size="16" />
-                  </component>
+                    <Star :size="16" fill="#fff" stroke-width="0" />
+                  </div>
+                </div>
+                <div
+                  class="flex min-h-12 w-0 min-w-full items-center justify-center pt-3 text-center"
+                >
+                  <p
+                    v-if="card.img.caption"
+                    class="font-handwriting text-p pointer-events-none line-clamp-3 leading-6 select-none"
+                  >
+                    {{ card.img.caption }}
+                  </p>
                 </div>
               </div>
             </DialogPanel>
@@ -167,93 +207,401 @@
 
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ArrowLeft, ArrowRight, ArrowUpRight, Star } from '@lucide/vue'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { ArrowRight, Star, Undo2 } from '@lucide/vue'
+import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 
-import CarouselIndicator from '@/components/CarouselIndicator.vue'
-import { isHighClearance } from '@/composables/useTravel'
+import { photoLightBoxData } from '@/composables/useGlobal'
+import { type ClearanceLevel, isHighClearance, useTravelsWithImages } from '@/composables/useTravel'
 
-import type { LightBoxTag } from '@/components/LightBox.vue'
-import type { ClearanceLevel } from '@/composables/useTravel'
+export interface PhotoLightBoxImage {
+  caption?: null | string
+  clearance?: ClearanceLevel | null | string
+  height?: null | number
+  thumbnailUrl?: string
+  url: string
+  width?: null | number
+}
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-const props = defineProps<{
-  description?: string
-  images: {
-    caption?: null | string
-    clearance?: ClearanceLevel
-    height?: null | number
-    thumbnailUrl?: string
-    url: string
-    width?: null | number
-  }[]
-  isOpen: boolean
-  tags?: LightBoxTag[]
-  title?: string
-  videos?: string[]
-}>()
-
-const mediaItems = computed(() => {
-  const items = []
-  if (props.images) {
-    items.push(
-      ...props.images.map((img) => ({
-        caption: img.caption,
-        clearance: img.clearance,
-        height: img.height,
-        placeholder: img.thumbnailUrl,
-        src: img.url,
-        type: 'image' as const,
-        width: img.width,
-      })),
-    )
-  }
-  if (props.videos) {
-    items.push(...props.videos.map((vid) => ({ src: vid, type: 'video' as const })))
-  }
-  return items
-})
+const props = withDefaults(
+  defineProps<{
+    currentTripSlug?: string
+    images?: PhotoLightBoxImage[]
+    initialIndex?: number
+    isOpen: boolean
+    tripTitle?: string
+  }>(),
+  {
+    currentTripSlug: '',
+    images: () => [],
+    initialIndex: 0,
+    tripTitle: '',
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
 }>()
 
-const closeModal = () => {
-  emit('update:isOpen', false)
+const photoRotations = ref<number[]>([])
+
+function getPhotoRotation(imgIndex: number): number {
+  if (photoRotations.value[imgIndex] !== undefined) {
+    return photoRotations.value[imgIndex]
+  }
+  const sign = Math.random() < 0.5 ? -1 : 1
+  const magnitude = 1 + Math.random() * 2.5
+  const rot = Number((sign * magnitude).toFixed(1))
+  photoRotations.value[imgIndex] = rot
+  return rot
 }
 
-const activeIndex = ref(0)
-const scrollContainer = ref<HTMLElement | null>(null)
+const currentIndex = ref(0)
+const dragX = ref(0)
+const dragY = ref(0)
+const isDragging = ref(false)
 
-const scrollToNext = () => {
-  if (scrollContainer.value) {
-    scrollContainer.value.scrollBy({ behavior: 'smooth', left: scrollContainer.value.clientWidth })
+interface OutgoingCard {
+  id: string
+  img: PhotoLightBoxImage
+  isExiting: boolean
+  rotate: number
+  x: number
+  y: number
+}
+
+const outgoingCards = ref<OutgoingCard[]>([])
+
+const BUFFER_BEHIND = 2
+const BUFFER_AHEAD = 3
+
+interface StackCard {
+  depth: number
+  id: string
+  img: PhotoLightBoxImage
+  imgIndex: number
+  isBehind: boolean
+  rotate: number
+  scale: number
+  x: number
+  y: number
+  zIndex: number
+}
+
+const isEnded = computed(() => {
+  return props.images.length > 0 && currentIndex.value >= props.images.length
+})
+
+const { travelsWithImages } = useTravelsWithImages()
+
+const validTrips = computed(() => {
+  return (travelsWithImages.value ?? []).filter((t) => t.images && t.images.length > 0)
+})
+
+const nextTrip = computed(() => {
+  const list = validTrips.value
+  if (list.length === 0) return null
+  const currentIdx = list.findIndex((t) => t.slug === props.currentTripSlug)
+  const nextIdx = currentIdx !== -1 && currentIdx < list.length - 1 ? currentIdx + 1 : 0
+  return list[nextIdx] ?? null
+})
+
+const nextTripTitle = computed(() => {
+  return nextTrip.value?.title ?? null
+})
+
+const THUMB_ROTATIONS = [-2.5, 3, -1.8, 2.2, -3, 2]
+
+const nextTripThumbnails = computed(() => {
+  const trip = nextTrip.value
+  if (!trip || !trip.images || trip.images.length === 0) return []
+
+  return trip.images
+    .map((img) => img.thumbnailUrl || img.url)
+    .filter(Boolean)
+    .slice(0, 6) as string[]
+})
+
+function goToNextTrip() {
+  const target = nextTrip.value
+  if (!target) return
+
+  const targetImages = target.images.map((img) => ({
+    caption: img.caption,
+    clearance: img.clearance,
+    height: img.height,
+    thumbnailUrl: img.thumbnailUrl,
+    url: img.url,
+    width: img.width,
+  }))
+
+  photoLightBoxData.value = {
+    currentTripSlug: target.slug,
+    images: targetImages,
+    initialIndex: 0,
+    tripTitle: target.title,
+  }
+
+  startOver()
+}
+
+function startOver() {
+  outgoingCards.value = []
+  dragX.value = 0
+  dragY.value = 0
+  isDragging.value = false
+  currentIndex.value = 0
+  preloadAdjacentImages()
+}
+
+const visibleCards = computed<StackCard[]>(() => {
+  const total = props.images.length
+  if (total === 0) return []
+
+  const result: StackCard[] = []
+  const seenIndices = new Set<number>()
+
+  let dragProgress = 0
+  if (isDragging.value) {
+    const dist = Math.hypot(dragX.value, dragY.value)
+    dragProgress = Math.min(1, dist / 120)
+  }
+
+  // Active stack cards ahead and current (from currentIndex to end of deck)
+  const remaining = Math.max(0, total - currentIndex.value)
+  const aheadCount = Math.min(remaining, BUFFER_AHEAD + 1)
+
+  for (let depth = 0; depth < aheadCount; depth++) {
+    const imgIndex = currentIndex.value + depth
+    if (imgIndex >= total) break
+    if (seenIndices.has(imgIndex)) continue
+    seenIndices.add(imgIndex)
+
+    const img = props.images[imgIndex]
+    const baseRot = getPhotoRotation(imgIndex)
+    const dragTilt =
+      depth === 0 && isDragging.value ? Math.max(-6, Math.min(6, dragX.value * 0.04)) : 0
+    const visualDepth = Math.max(0, depth - dragProgress)
+    const scale = depth === 0 ? 1 : Math.max(0.84, 1 - visualDepth * 0.04)
+
+    result.push({
+      depth,
+      id: `${img.url}-${imgIndex}`,
+      img,
+      imgIndex,
+      isBehind: false,
+      rotate: baseRot + dragTilt,
+      scale,
+      x: depth === 0 ? dragX.value : 0,
+      y: depth === 0 ? dragY.value : 0,
+      zIndex: aheadCount - depth,
+    })
+  }
+
+  // Pre-warmed buffer cards behind (seen cards that can be brought back)
+  for (let b = 1; b <= BUFFER_BEHIND; b++) {
+    const imgIndex = currentIndex.value - b
+    if (imgIndex < 0) break
+    if (seenIndices.has(imgIndex)) continue
+    seenIndices.add(imgIndex)
+
+    const img = props.images[imgIndex]
+    const baseRot = getPhotoRotation(imgIndex)
+
+    result.push({
+      depth: -b,
+      id: `${img.url}-${imgIndex}`,
+      img,
+      imgIndex,
+      isBehind: true,
+      rotate: baseRot,
+      scale: 1,
+      x: 0,
+      y: 0,
+      zIndex: -1,
+    })
+  }
+
+  return result
+})
+
+function nextCard() {
+  const total = props.images.length
+  if (isEnded.value || currentIndex.value >= total) return
+
+  outgoingCards.value = []
+  dragX.value = 0
+  dragY.value = 0
+  isDragging.value = false
+  activePointerId = null
+  currentIndex.value++
+}
+
+function prevCard() {
+  if (isEnded.value || currentIndex.value <= 0) return
+
+  outgoingCards.value = []
+  dragX.value = 0
+  dragY.value = 0
+  isDragging.value = false
+  activePointerId = null
+  currentIndex.value--
+}
+
+let activePointerId: null | number = null
+let startX = 0
+let startY = 0
+let lastMoveTime = 0
+let lastMoveX = 0
+let lastMoveY = 0
+let velocityX = 0
+let velocityY = 0
+
+function onPointerDown(depth: number, e: PointerEvent) {
+  if (depth !== 0) {
+    currentIndex.value = currentIndex.value + depth
+    dragX.value = 0
+    dragY.value = 0
+    outgoingCards.value = []
+  }
+
+  activePointerId = e.pointerId
+  ;(e.currentTarget as HTMLElement)?.setPointerCapture(e.pointerId)
+  startX = e.clientX
+  startY = e.clientY
+  lastMoveX = e.clientX
+  lastMoveY = e.clientY
+  lastMoveTime = performance.now()
+  velocityX = 0
+  velocityY = 0
+}
+
+function onPointerMove(e: PointerEvent) {
+  if (activePointerId !== e.pointerId) return
+
+  const now = performance.now()
+  const dt = Math.max(1, now - lastMoveTime)
+  const dx = e.clientX - startX
+  const dy = e.clientY - startY
+
+  const currentVx = (e.clientX - lastMoveX) / dt
+  const currentVy = (e.clientY - lastMoveY) / dt
+  velocityX = velocityX * 0.4 + currentVx * 0.6
+  velocityY = velocityY * 0.4 + currentVy * 0.6
+
+  lastMoveX = e.clientX
+  lastMoveY = e.clientY
+  lastMoveTime = now
+
+  if (!isDragging.value && Math.hypot(dx, dy) > 3) {
+    isDragging.value = true
+  }
+
+  if (isDragging.value) {
+    dragX.value = dx
+    dragY.value = dy
   }
 }
 
-const scrollToPrev = () => {
-  if (scrollContainer.value) {
-    scrollContainer.value.scrollBy({ behavior: 'smooth', left: -scrollContainer.value.clientWidth })
-  }
-}
+function onPointerUp() {
+  if (activePointerId === null) return
+  activePointerId = null
 
-const handleScroll = () => {
-  if (scrollContainer.value) {
-    const index = Math.round(scrollContainer.value.scrollLeft / scrollContainer.value.clientWidth)
-    activeIndex.value = index
+  if (!isDragging.value) return
+  isDragging.value = false
+
+  const total = props.images.length
+  if (currentIndex.value >= total) {
+    dragX.value = 0
+    dragY.value = 0
+    return
+  }
+
+  const distance = Math.hypot(dragX.value, dragY.value)
+  const speed = Math.hypot(velocityX, velocityY)
+
+  const isFling = (distance > 100 || (speed > 0.45 && distance > 25)) && total > 1
+
+  if (isFling) {
+    const currentImg = props.images[currentIndex.value]
+    const baseRot = getPhotoRotation(currentIndex.value)
+
+    let dirX = speed > 0.45 ? velocityX / (speed || 1) : dragX.value / (distance || 1)
+    let dirY = speed > 0.45 ? velocityY / (speed || 1) : dragY.value / (distance || 1)
+
+    if (Math.abs(dirX) < 0.1 && Math.abs(dirY) < 0.1) {
+      dirX = 1
+      dirY = 0
+    }
+
+    const throwDist = Math.max(260, Math.min(420, distance * 1.5 + speed * 150))
+    const spin = Math.max(-8, Math.min(8, dirX * 6))
+
+    const outgoing = reactive<OutgoingCard>({
+      id: `out-${Date.now()}-${Math.random()}`,
+      img: currentImg,
+      isExiting: false,
+      rotate: baseRot + (isDragging.value ? Math.max(-6, Math.min(6, dragX.value * 0.04)) : 0),
+      x: dragX.value,
+      y: dragY.value,
+    })
+    outgoingCards.value.push(outgoing)
+
+    currentIndex.value++
+    dragX.value = 0
+    dragY.value = 0
+
+    requestAnimationFrame(() => {
+      outgoing.isExiting = true
+      outgoing.x = outgoing.x + dirX * throwDist
+      outgoing.y = outgoing.y + dirY * (throwDist * 0.4)
+      outgoing.rotate = baseRot + spin
+    })
+
+    setTimeout(() => {
+      const idx = outgoingCards.value.findIndex((c) => c.id === outgoing.id)
+      if (idx !== -1) outgoingCards.value.splice(idx, 1)
+    }, 420)
+  } else {
+    dragX.value = 0
+    dragY.value = 0
   }
 }
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (!props.isOpen) return
+  if (!props.isOpen || isEnded.value) return
   if (e.key === 'ArrowRight') {
     e.preventDefault()
-    scrollToNext()
+    nextCard()
   } else if (e.key === 'ArrowLeft') {
     e.preventDefault()
-    scrollToPrev()
+    prevCard()
   }
+}
+
+const preloadedUrls = new Set<string>()
+
+function preloadAdjacentImages() {
+  const total = props.images.length
+  if (total === 0) return
+
+  const offsets = [-2, -1, 1, 2, 3, 4]
+  for (const offset of offsets) {
+    const idx = currentIndex.value + offset
+    if (idx >= 0 && idx < total) {
+      const img = props.images[idx]
+      if (img) {
+        preloadUrl(img.thumbnailUrl)
+        preloadUrl(img.url)
+      }
+    }
+  }
+}
+
+function preloadUrl(url?: null | string) {
+  if (!url || preloadedUrls.has(url)) return
+  preloadedUrls.add(url)
+  const img = new Image()
+  img.src = url
 }
 
 watch(
@@ -268,9 +616,39 @@ watch(
   { immediate: true },
 )
 
+watch(
+  [() => props.isOpen, () => props.images],
+  ([isOpen]) => {
+    if (isOpen) {
+      photoRotations.value = props.images.map(() => {
+        const sign = Math.random() < 0.5 ? -1 : 1
+        const magnitude = 1 + Math.random() * 2.5
+        return Number((sign * magnitude).toFixed(1))
+      })
+      currentIndex.value = props.initialIndex || 0
+      dragX.value = 0
+      dragY.value = 0
+      isDragging.value = false
+      outgoingCards.value = []
+      preloadAdjacentImages()
+    }
+  },
+  { immediate: true },
+)
+
+watch(currentIndex, () => {
+  if (props.isOpen) {
+    preloadAdjacentImages()
+  }
+})
+
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
 })
+
+const closeModal = () => {
+  emit('update:isOpen', false)
+}
 </script>
 
 <style scoped>

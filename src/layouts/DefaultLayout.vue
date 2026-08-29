@@ -23,11 +23,10 @@
   />
   <PhotoLightBox
     v-model:is-open="isPhotoLightBoxOpen"
-    :title="photoLightBoxData.title"
-    :description="photoLightBoxData.description"
+    :current-trip-slug="photoLightBoxData.currentTripSlug"
     :images="photoLightBoxData.images"
-    :videos="photoLightBoxData.videos"
-    :tags="photoLightBoxData.tags"
+    :initial-index="photoLightBoxData.initialIndex"
+    :trip-title="photoLightBoxData.tripTitle"
   />
 </template>
 

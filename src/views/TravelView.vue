@@ -256,6 +256,19 @@ function handleTripClick(slug: string) {
   }
 }
 
+watch(
+  () => photoLightBoxData.value.currentTripSlug,
+  (newSlug) => {
+    if (newSlug && isPhotoLightBoxOpen.value) {
+      activeTripSlug.value = newSlug
+      const el = cardRefs.value[newSlug]
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      }
+    }
+  },
+)
+
 function setCardRef(el: unknown, slug: string) {
   if (el) {
     const htmlEl = (el as { $el?: HTMLElement }).$el || (el as HTMLElement)
@@ -302,17 +315,13 @@ const triggerLightbox = (travel: TripWithImages, clickedIdx: number) => {
     url: img.url,
     width: img.width,
   }))
-  // Reorder so that the clicked image starts at index 0 in the lightbox
-  const orderedImages = [
-    allImages[clickedIdx],
-    ...allImages.slice(0, clickedIdx),
-    ...allImages.slice(clickedIdx + 1),
-  ]
+  const orderedImages = [...allImages.slice(clickedIdx), ...allImages.slice(0, clickedIdx)]
 
   photoLightBoxData.value = {
-    description: travel.subtitle,
+    currentTripSlug: travel.slug,
     images: orderedImages,
-    title: travel.title,
+    initialIndex: 0,
+    tripTitle: travel.title,
   }
   isPhotoLightBoxOpen.value = true
 }

@@ -31,22 +31,22 @@ export const lightBoxData = ref<{
 
 export const isPhotoLightBoxOpen = ref(false)
 export const photoLightBoxData = ref<{
-  description?: string
+  currentTripSlug?: string
   images: {
     caption?: null | string
-    clearance?: ClearanceLevel
+    clearance?: ClearanceLevel | null | string
     height?: null | number
     thumbnailUrl?: string
     url: string
     width?: null | number
   }[]
-  tags?: LightBoxTag[]
-  title?: string
-  videos?: string[]
+  initialIndex?: number
+  tripTitle?: string
 }>({
-  description: '',
+  currentTripSlug: '',
   images: [],
-  title: '',
+  initialIndex: 0,
+  tripTitle: '',
 })
 
 export const isWorkModalOpen = ref(false)
