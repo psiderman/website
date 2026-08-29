@@ -21,6 +21,14 @@
     :videos="lightBoxData.videos"
     :tags="lightBoxData.tags"
   />
+  <PhotoLightBox
+    v-model:is-open="isPhotoLightBoxOpen"
+    :title="photoLightBoxData.title"
+    :description="photoLightBoxData.description"
+    :images="photoLightBoxData.images"
+    :videos="photoLightBoxData.videos"
+    :tags="photoLightBoxData.tags"
+  />
 </template>
 
 <script setup lang="ts">
@@ -29,9 +37,17 @@ import GlobalFooter from '@/components/GlobalFooter.vue'
 import GlobalHeader from '@/components/HeaderBar.vue'
 import LightBox from '@/components/LightBox.vue'
 import LiveCursors from '@/components/LiveCursors.vue'
+import PhotoLightBox from '@/components/PhotoLightBox.vue'
 import WorkModal from '@/components/WorkModal.vue'
 import { isAuthModalOpen } from '@/composables/useAuth'
-import { isLightBoxOpen, isWorkModalOpen, lightBoxData, workData } from '@/composables/useGlobal'
+import {
+  isLightBoxOpen,
+  isPhotoLightBoxOpen,
+  isWorkModalOpen,
+  lightBoxData,
+  photoLightBoxData,
+  workData,
+} from '@/composables/useGlobal'
 import { useLive } from '@/composables/useLive'
 
 useLive()

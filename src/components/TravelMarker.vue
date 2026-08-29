@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import { Star } from '@lucide/vue'
 
-import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
+import { isPhotoLightBoxOpen, photoLightBoxData } from '@/composables/useGlobal'
 import { isHighClearance } from '@/composables/useTravel'
 
 import type { ClearanceLevel, TravelImage, Trip } from '@/composables/useTravel'
@@ -106,12 +106,12 @@ function openLightbox() {
   const startIdx = Math.max(0, idx)
   const orderedImages = [...images.slice(startIdx), ...images.slice(0, startIdx)]
 
-  lightBoxData.value = {
+  photoLightBoxData.value = {
     description: props.travel?.subtitle || '',
     images: orderedImages,
     title: props.travel?.title || props.caption || '',
   }
-  isLightBoxOpen.value = true
+  isPhotoLightBoxOpen.value = true
 }
 </script>
 

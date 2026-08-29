@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import { ensureUserRole, isAuthModalOpen } from '@/composables/useAuth'
-import { isLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
+import { isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
 
 import HomeView from '../views/HomeView.vue'
 
@@ -146,7 +146,7 @@ router.afterEach((to) => {
   applyRouteMeta(to)
 
   // Reset any open modals on navigation
-  ;[isLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
+  ;[isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
     modal.value = false
   })
 })

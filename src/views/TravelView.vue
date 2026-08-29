@@ -221,7 +221,7 @@ import GenericLoader from '@/components/GenericLoader.vue'
 import TravelMap from '@/components/TravelMap.vue'
 import { currentUser } from '@/composables/useAuth'
 import { isAuthModalOpen } from '@/composables/useAuth'
-import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
+import { isPhotoLightBoxOpen, photoLightBoxData } from '@/composables/useGlobal'
 import {
   isHighClearance,
   type TravelImage,
@@ -309,12 +309,12 @@ const triggerLightbox = (travel: TripWithImages, clickedIdx: number) => {
     ...allImages.slice(clickedIdx + 1),
   ]
 
-  lightBoxData.value = {
+  photoLightBoxData.value = {
     description: travel.subtitle,
     images: orderedImages,
     title: travel.title,
   }
-  isLightBoxOpen.value = true
+  isPhotoLightBoxOpen.value = true
 }
 
 function setupIntersectionObserver() {
