@@ -8,6 +8,7 @@ import { type App, computed, createApp, h, onMounted, onUnmounted, ref, watch } 
 
 import TravelMarker from '@/components/TravelMarker.vue'
 import { theme } from '@/composables/useTheme'
+import { getUserLocation } from '@/composables/useUserLocation'
 import tooltip from '@/directives/tooltip'
 
 import type { TravelImage, Trip } from '@/composables/useTravel'
@@ -151,12 +152,14 @@ function getMapPadding() {
   return isDesktop ? 50 : { bottom: 350, left: 50, right: 50, top: 50 }
 }
 
-function initMap() {
+async function initMap() {
+  if (!mapContainer.value) return
+  const center = await getUserLocation()
   if (!mapContainer.value) return
   mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
   map = new mapboxgl.Map({
     attributionControl: false,
-    center: [77.589, 12.9763],
+    center,
     container: mapContainer.value,
     style: 'mapbox://styles/mapbox/standard',
     zoom: 10,

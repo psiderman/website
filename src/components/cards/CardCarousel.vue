@@ -28,6 +28,8 @@
         v-for="(img, idx) in images"
         :key="`${img}-${idx}`"
         class="h-full w-full shrink-0 snap-center"
+        :class="{ 'cursor-pointer': props.interactive, 'pointer-events-none': !props.interactive }"
+        @click.stop="props.interactive && emit('click-image', idx)"
       >
         <img
           v-lazy="img"
@@ -78,9 +80,14 @@ import GenericLoader from '../GenericLoader.vue'
 
 const props = defineProps<{
   images?: string[]
+  interactive?: boolean
   isError?: boolean
   isLoading?: boolean
   title?: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'click-image', index: number): void
 }>()
 
 const activeIndex = ref(0)

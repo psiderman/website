@@ -10,13 +10,16 @@
         </div>
 
         <!-- Header -->
-        <div class="text-p mx-auto w-full max-w-prose text-left">
+        <div v-reveal class="text-p mx-auto w-full max-w-prose text-left">
           <h1 class="text-display -mb-14">Privacy Policy</h1>
           <p class="text-text-secondary text-ui-small mt-16">Last updated: August 25, 2026</p>
         </div>
 
         <!-- Content -->
-        <div class="text-p text-text-primary mx-auto max-w-prose space-y-6 pb-20 text-left">
+        <div
+          v-reveal="100"
+          class="text-p text-text-primary mx-auto max-w-prose space-y-6 pb-20 text-left"
+        >
           <p>
             I respect your privacy and am committed to protecting your personal data. This privacy
             policy explains how I handle your information when you use this website.

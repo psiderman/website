@@ -118,4 +118,9 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
   // Invalidate travel & images cache globally on auth state changes
   queryClient.invalidateQueries({ queryKey: ['trips-with-images'] })
   queryClient.invalidateQueries({ queryKey: ['trip-images'] })
+  // Also refresh blog listing + post content (including gated posts whose
+  // access changed once a user logs in or out).
+  queryClient.invalidateQueries({ queryKey: ['blog-posts'] })
+  queryClient.invalidateQueries({ queryKey: ['blog-post'] })
+  queryClient.invalidateQueries({ queryKey: ['blog-post-content'] })
 })

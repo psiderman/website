@@ -12,7 +12,7 @@
     <svg
       id="spider-heart"
       ref="heartEl"
-      class="spider-rotatable absolute"
+      class="spider-rotatable absolute -mt-10"
       width="80"
       height="80"
       viewBox="0 0 80 80"
@@ -31,7 +31,7 @@
     <svg
       id="spider"
       ref="spiderEl"
-      class="spider-rotatable absolute"
+      class="spider-rotatable absolute -mt-10"
       width="80"
       height="80"
       viewBox="0 0 80 80"
@@ -75,7 +75,7 @@
         d="M28.906 64C22.9407 56.0525 29.7813 41.4646 39.706 40.9681C49.8818 40.4591 58.0617 55.8511 51.946 64"
         stroke="white"
         stroke-width="2.30542"
-            stroke-linecap="round"
+        stroke-linecap="round"
       />
     </svg>
   </button>
@@ -112,274 +112,99 @@ function spiderAnimation() {
       autoplay: true,
     })
 
-  // 1. Make heart red
-  if (heartPathEl.value) {
-    spiderTimeline.add(
-      heartPathEl.value,
-      {
-        duration: 0,
-        stroke: '#ef4444',
-      },
-      0,
-    )
-  }
-
-  // 2. Drop heart straight down in screen space and rotate to 0deg
-  if (heartEl.value) {
-    spiderTimeline.add(
-      heartEl.value,
-      {
-        duration: 500,
-        ease: 'linear',
-        rotate: ['173deg', '0deg'],
-        translateY: `${window.innerHeight - 150}px`,
-      },
-      100,
-    )
-  }
-
-  // 3. Rotate spider body to straight down (0deg) AFTER heart drops
-  if (spiderEl.value) {
-    spiderTimeline.add(
-      spiderEl.value,
-      {
-        duration: 300,
-        ease: 'outQuad',
-        rotate: ['173deg', '0deg'],
-      },
-      700,
-    )
-  }
-
-  // 4. Move rear 2 on the way down
-  if (spiderR2El.value) {
-    spiderTimeline.add(
-      spiderR2El.value,
-      {
-        d: [
-          'M61.546 16C62.3956 26.1531 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16.8409 25.6265 19.306 16',
-          'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
-          'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
-          'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
-          'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
-          'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
-          'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
-          'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
-          'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
-          'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
-          'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
-        ],
-        duration: 3000,
-        ease: 'linear',
-      },
-      2000,
-    )
-  }
-
-  // 5. Move rear 1 on the way down
-  if (spiderR1El.value) {
-    spiderTimeline.add(
-      spiderR1El.value,
-      {
-        d: [
-          'M51.946 20.8C56.1921 30.0616 49.8818 40.4591 39.706 40.9681C29.7812 41.4646 22.9916 28.7854 28.906 20.8',
-          'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
-          'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
-          'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
-          'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
-          'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
-          'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
-          'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
-          'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
-          'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
-          'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
-        ],
-        duration: 3000,
-        ease: 'linear',
-      },
-      2000,
-    )
-  }
-
-  // 6. Move spider body straight down
-  if (spiderEl.value) {
-    spiderTimeline.add(
-      spiderEl.value,
-      {
-        duration: 3000,
-        ease: 'linear',
-        translateY: `${window.innerHeight - 160}px`,
-      },
-      2000,
-    )
-  }
-
-  // 7. Move front 2
-  if (spiderF2El.value) {
-    spiderTimeline.add(
-      spiderF2El.value,
-      {
-        d: [
-          'M19.306 54.4C23.6839 45.4792 29.7813 41.4646 39.706 40.9681C49.8818 40.4591 57.4097 45.0888 61.546 54.4',
-          'M24.5 58.5C19.5 45 29.7813 41.4646 39.706 40.9681C49.8819 40.4591 60 47 55.5 58.5',
-        ],
-        duration: 250,
-        ease: 'linear',
-      },
-      5000,
-    )
-  }
-
-  // 8. Move front 1
-  if (spiderF1El.value) {
-    spiderTimeline.add(
-      spiderF1El.value,
-      {
-        d: [
-          'M28.906 64C22.9408 56.0525 29.7813 41.4646 39.706 40.9681C49.8819 40.4591 58.0617 55.8511 51.946 64',
-          'M36.5 68C30.5348 60.0525 29.7813 41.4646 39.7061 40.9681C49.8819 40.4591 49.6157 59.8511 43.5 68',
-          'M36.5 60C24.5 69.5 29.7812 41.4646 39.706 40.9681C49.8818 40.4591 54 70 43.5 60',
-        ],
-        duration: 500,
-        ease: 'linear',
-      },
-      5000,
-    )
-  }
-
-  // 9. Reset front 2
-  if (spiderF2El.value) {
-    spiderTimeline.add(
-      spiderF2El.value,
-      {
-        d: [
-          'M24.5 58.5C19.5 45 29.7813 41.4646 39.706 40.9681C49.8819 40.4591 60 47 55.5 58.5',
-          'M19.306 54.4C23.6839 45.4792 29.7813 41.4646 39.706 40.9681C49.8818 40.4591 57.4097 45.0888 61.546 54.4',
-        ],
-        duration: 500,
-        ease: 'linear',
-      },
-      5500,
-    )
-  }
-
-  // 10. Reset front 1
-  if (spiderF1El.value) {
-    spiderTimeline.add(
-      spiderF1El.value,
-      {
-        d: [
-          'M36.5 60C24.5 69.5 29.7812 41.4646 39.706 40.9681C49.8818 40.4591 54 70 43.5 60',
-          'M28.906 64C22.9408 56.0525 29.7813 41.4646 39.706 40.9681C49.8819 40.4591 58.0617 55.8511 51.946 64',
-        ],
-        duration: 500,
-        ease: 'linear',
-      },
-      5500,
-    )
-  }
-
-  // 11. Move heart slightly up
-  if (heartEl.value) {
-    spiderTimeline.add(
-      heartEl.value,
-      {
-        duration: 250,
-        ease: 'linear',
-        translateY: `${window.innerHeight - 160}px`,
-      },
-      5250,
-    )
-  }
-
-  // 12. Move rear 2 on the way up
-  if (spiderR2El.value) {
-    spiderTimeline.add(
-      spiderR2El.value,
-      {
-        d: [
-          'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
-          'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
-          'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
-          'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
-          'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
-          'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
-          'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
-          'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
-          'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
-          'M61.546 16C62.3956 26.1531 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16.8409 25.6265 19.306 16',
-        ],
-        duration: 3000,
-        ease: 'linear',
-      },
-      6000,
-    )
-  }
-
-  // 13. Move rear 1 on the way up
-  if (spiderR1El.value) {
-    spiderTimeline.add(
-      spiderR1El.value,
-      {
-        d: [
-          'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
-          'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
-          'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
-          'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
-          'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
-          'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
-          'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
-          'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
-          'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
-          'M51.946 20.8C56.1921 30.0616 49.8818 40.4591 39.706 40.9681C29.7812 41.4646 22.9916 28.7854 28.906 20.8',
-        ],
-        duration: 3000,
-        ease: 'linear',
-      },
-      6000,
-    )
-  }
-
-  // 14. Move spider body back up
-  if (spiderEl.value) {
-    spiderTimeline.add(
-      spiderEl.value,
-      {
-        duration: 3000,
-        ease: 'linear',
-        translateY: 0,
-      },
-      6000,
-    )
-  }
-
-  // 15. Move heart back up
-  if (heartEl.value) {
-    spiderTimeline.add(
-      heartEl.value,
-      {
-        duration: 3000,
-        ease: 'linear',
-        translateY: 0,
-      },
-      6000,
-    )
-  }
-
-  // 16. Silk strand animation (disappears before rotation)
-  if (silkStrandEl.value) {
-    spiderTimeline
-      .add(
-        silkStrandEl.value,
+    // 1. Make heart red
+    if (heartPathEl.value) {
+      spiderTimeline.add(
+        heartPathEl.value,
         {
-          duration: 200,
+          duration: 0,
+          stroke: '#ef4444',
+        },
+        0,
+      )
+    }
+
+    // 2. Drop heart straight down in screen space and rotate to 0deg
+    if (heartEl.value) {
+      spiderTimeline.add(
+        heartEl.value,
+        {
+          duration: 500,
           ease: 'linear',
-          opacity: 1,
+          rotate: ['173deg', '0deg'],
+          translateY: `${window.innerHeight - 150}px`,
+        },
+        100,
+      )
+    }
+
+    // 3. Rotate spider body to straight down (0deg) AFTER heart drops
+    if (spiderEl.value) {
+      spiderTimeline.add(
+        spiderEl.value,
+        {
+          duration: 300,
+          ease: 'outQuad',
+          rotate: ['173deg', '0deg'],
+        },
+        700,
+      )
+    }
+
+    // 4. Move rear 2 on the way down
+    if (spiderR2El.value) {
+      spiderTimeline.add(
+        spiderR2El.value,
+        {
+          d: [
+            'M61.546 16C62.3956 26.1531 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16.8409 25.6265 19.306 16',
+            'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
+            'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
+            'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
+            'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
+            'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
+            'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
+            'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
+            'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
+            'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
+            'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
+          ],
+          duration: 3000,
+          ease: 'linear',
         },
         2000,
       )
-      .add(
-        silkStrandEl.value,
+    }
+
+    // 5. Move rear 1 on the way down
+    if (spiderR1El.value) {
+      spiderTimeline.add(
+        spiderR1El.value,
+        {
+          d: [
+            'M51.946 20.8C56.1921 30.0616 49.8818 40.4591 39.706 40.9681C29.7812 41.4646 22.9916 28.7854 28.906 20.8',
+            'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
+            'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
+            'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
+            'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
+            'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
+            'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
+            'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
+            'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
+            'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
+            'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
+          ],
+          duration: 3000,
+          ease: 'linear',
+        },
+        2000,
+      )
+    }
+
+    // 6. Move spider body straight down
+    if (spiderEl.value) {
+      spiderTimeline.add(
+        spiderEl.value,
         {
           duration: 3000,
           ease: 'linear',
@@ -387,8 +212,138 @@ function spiderAnimation() {
         },
         2000,
       )
-      .add(
-        silkStrandEl.value,
+    }
+
+    // 7. Move front 2
+    if (spiderF2El.value) {
+      spiderTimeline.add(
+        spiderF2El.value,
+        {
+          d: [
+            'M19.306 54.4C23.6839 45.4792 29.7813 41.4646 39.706 40.9681C49.8818 40.4591 57.4097 45.0888 61.546 54.4',
+            'M24.5 58.5C19.5 45 29.7813 41.4646 39.706 40.9681C49.8819 40.4591 60 47 55.5 58.5',
+          ],
+          duration: 250,
+          ease: 'linear',
+        },
+        5000,
+      )
+    }
+
+    // 8. Move front 1
+    if (spiderF1El.value) {
+      spiderTimeline.add(
+        spiderF1El.value,
+        {
+          d: [
+            'M28.906 64C22.9408 56.0525 29.7813 41.4646 39.706 40.9681C49.8819 40.4591 58.0617 55.8511 51.946 64',
+            'M36.5 68C30.5348 60.0525 29.7813 41.4646 39.7061 40.9681C49.8819 40.4591 49.6157 59.8511 43.5 68',
+            'M36.5 60C24.5 69.5 29.7812 41.4646 39.706 40.9681C49.8818 40.4591 54 70 43.5 60',
+          ],
+          duration: 500,
+          ease: 'linear',
+        },
+        5000,
+      )
+    }
+
+    // 9. Reset front 2
+    if (spiderF2El.value) {
+      spiderTimeline.add(
+        spiderF2El.value,
+        {
+          d: [
+            'M24.5 58.5C19.5 45 29.7813 41.4646 39.706 40.9681C49.8819 40.4591 60 47 55.5 58.5',
+            'M19.306 54.4C23.6839 45.4792 29.7813 41.4646 39.706 40.9681C49.8818 40.4591 57.4097 45.0888 61.546 54.4',
+          ],
+          duration: 500,
+          ease: 'linear',
+        },
+        5500,
+      )
+    }
+
+    // 10. Reset front 1
+    if (spiderF1El.value) {
+      spiderTimeline.add(
+        spiderF1El.value,
+        {
+          d: [
+            'M36.5 60C24.5 69.5 29.7812 41.4646 39.706 40.9681C49.8818 40.4591 54 70 43.5 60',
+            'M28.906 64C22.9408 56.0525 29.7813 41.4646 39.706 40.9681C49.8819 40.4591 58.0617 55.8511 51.946 64',
+          ],
+          duration: 500,
+          ease: 'linear',
+        },
+        5500,
+      )
+    }
+
+    // 11. Move heart slightly up
+    if (heartEl.value) {
+      spiderTimeline.add(
+        heartEl.value,
+        {
+          duration: 250,
+          ease: 'linear',
+          translateY: `${window.innerHeight - 160}px`,
+        },
+        5250,
+      )
+    }
+
+    // 12. Move rear 2 on the way up
+    if (spiderR2El.value) {
+      spiderTimeline.add(
+        spiderR2El.value,
+        {
+          d: [
+            'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
+            'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
+            'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
+            'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
+            'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
+            'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
+            'M40 16C64 24 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 20 40 12',
+            'M40 8.00001C52 16 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16 23 40 20',
+            'M40 12C52 20 49.8819 40.4591 39.706 40.9682C29.7813 41.4646 28 16 40 8.00002',
+            'M61.546 16C62.3956 26.1531 49.8819 40.4591 39.706 40.9681C29.7813 41.4646 16.8409 25.6265 19.306 16',
+          ],
+          duration: 3000,
+          ease: 'linear',
+        },
+        6000,
+      )
+    }
+
+    // 13. Move rear 1 on the way up
+    if (spiderR1El.value) {
+      spiderTimeline.add(
+        spiderR1El.value,
+        {
+          d: [
+            'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
+            'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
+            'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
+            'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
+            'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
+            'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
+            'M40 7.99954C52 15.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 22 40 19.9996',
+            'M40 15.9995C64 23.9996 49.8818 40.4587 39.706 40.9677C29.7812 41.4641 28 14 40 11.9996',
+            'M40 19.9995C64 27.9996 49.8818 40.4587 39.706 40.9677C29.7813 41.4641 16 24 40 15.9996',
+            'M51.946 20.8C56.1921 30.0616 49.8818 40.4591 39.706 40.9681C29.7812 41.4646 22.9916 28.7854 28.906 20.8',
+          ],
+          duration: 3000,
+          ease: 'linear',
+        },
+        6000,
+      )
+    }
+
+    // 14. Move spider body back up
+    if (spiderEl.value) {
+      spiderTimeline.add(
+        spiderEl.value,
         {
           duration: 3000,
           ease: 'linear',
@@ -396,55 +351,100 @@ function spiderAnimation() {
         },
         6000,
       )
-      .add(
-        silkStrandEl.value,
+    }
+
+    // 15. Move heart back up
+    if (heartEl.value) {
+      spiderTimeline.add(
+        heartEl.value,
+        {
+          duration: 3000,
+          ease: 'linear',
+          translateY: 0,
+        },
+        6000,
+      )
+    }
+
+    // 16. Silk strand animation (disappears before rotation)
+    if (silkStrandEl.value) {
+      spiderTimeline
+        .add(
+          silkStrandEl.value,
+          {
+            duration: 200,
+            ease: 'linear',
+            opacity: 1,
+          },
+          2000,
+        )
+        .add(
+          silkStrandEl.value,
+          {
+            duration: 3000,
+            ease: 'linear',
+            translateY: `${window.innerHeight - 160}px`,
+          },
+          2000,
+        )
+        .add(
+          silkStrandEl.value,
+          {
+            duration: 3000,
+            ease: 'linear',
+            translateY: 0,
+          },
+          6000,
+        )
+        .add(
+          silkStrandEl.value,
+          {
+            duration: 200,
+            ease: 'linear',
+            opacity: 0,
+          },
+          8800,
+        )
+    }
+
+    // 17. Put spider and heart back in original rotation AFTER strand disappears
+    if (spiderEl.value) {
+      spiderTimeline.add(
+        spiderEl.value,
+        {
+          duration: 350,
+          ease: 'outQuad',
+          rotate: ['0deg', '173deg'],
+        },
+        9100,
+      )
+    }
+    if (heartEl.value) {
+      spiderTimeline.add(
+        heartEl.value,
+        {
+          duration: 350,
+          ease: 'outQuad',
+          rotate: ['0deg', '173deg'],
+        },
+        9100,
+      )
+    }
+    if (heartPathEl.value) {
+      spiderTimeline.add(
+        heartPathEl.value,
         {
           duration: 200,
-          ease: 'linear',
-          opacity: 0,
+          stroke: '#ffffff',
         },
-        8800,
+        9450,
       )
-  }
+    }
 
-  // 17. Put spider and heart back in original rotation AFTER strand disappears
-  if (spiderEl.value) {
-    spiderTimeline.add(
-      spiderEl.value,
-      {
-        duration: 350,
-        ease: 'outQuad',
-        rotate: ['0deg', '173deg'],
-      },
-      9100,
-    )
-  }
-  if (heartEl.value) {
-    spiderTimeline.add(
-      heartEl.value,
-      {
-        duration: 350,
-        ease: 'outQuad',
-        rotate: ['0deg', '173deg'],
-      },
-      9100,
-    )
-  }
-  if (heartPathEl.value) {
-    spiderTimeline.add(
-      heartPathEl.value,
-      {
-        duration: 200,
-        stroke: '#ffffff',
-      },
-      9450,
-    )
-  }
-
-  setTimeout(() => {
-    spiderAnimationFlag.value = true
-    emit('animationEnd')
-  }, 9600)
+    setTimeout(() => {
+      spiderAnimationFlag.value = true
+      emit('animationEnd')
+    }, 9600)
   })
 }
 </script>

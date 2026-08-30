@@ -21,11 +21,12 @@
       <div
         v-for="(movie, idx) in movies"
         :key="movie.id"
+        v-reveal
         v-tooltip="{
           content: `${movie.title}, ${formatDistanceToNowStrict(movie.watched_date)} ago`,
           group: 'movies',
         }"
-  class="group border-border-primary dark:border-surface-tertiary has-focus-visible:outline-surface-inverted relative block aspect-2/3 h-full shrink-0 snap-start snap-always overflow-hidden rounded-lg border has-focus-visible:outline-2 has-focus-visible:-outline-offset-2   "
+        class="group border-border-primary dark:border-surface-tertiary has-focus-visible:outline-surface-inverted relative block aspect-2/3 h-full shrink-0 snap-start snap-always overflow-hidden rounded-lg border has-focus-visible:outline-2 has-focus-visible:-outline-offset-2"
       >
         <a
           v-if="movie.link"

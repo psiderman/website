@@ -144,8 +144,9 @@
                     </p>
                     <component
                       :is="project.link ? 'a' : 'div'"
-                      v-for="project in work.data?.projects"
+                      v-for="(project, idx) in work.data?.projects"
                       :key="project.name"
+                      v-reveal="idx * 50"
                       :href="project.link"
                       :target="project.link ? '_blank' : undefined"
                       class="-mx-2 -my-1 flex w-fit flex-row items-center gap-2 rounded-lg px-2 py-1"
@@ -170,8 +171,9 @@
                     <div class="flex flex-row flex-wrap gap-1">
                       <component
                         :is="person.linkedin ? 'a' : 'div'"
-                        v-for="person in sortedPeople"
+                        v-for="(person, idx) in sortedPeople"
                         :key="person.name"
+                        v-reveal="idx * 50"
                         v-tooltip="{
                           content: personTooltip(person),
                           trigger: 'mouseenter',
@@ -189,6 +191,12 @@
                         />
                       </component>
                     </div>
+                    <footnote
+                      v-reveal="sortedPeople.length * 50"
+                      class="text-ui-small text-text-tertiary mt-auto text-left"
+                      >DM me if you'd like me to remove your icon, or if you want your tooltip to
+                      say anything at all!
+                    </footnote>
                   </div>
                 </div>
 

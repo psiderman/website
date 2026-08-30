@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import { ensureUserRole, isAuthModalOpen } from '@/composables/useAuth'
-import { isLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
-
-import HomeView from '../views/HomeView.vue'
+import { isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
 
 const SITE_URL = 'https://psiderman.com'
 const DEFAULT_TITLE = 'Karan Sanas | Personal Website'
@@ -60,7 +58,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      component: HomeView,
+      component: () => import('../views/HomeView.vue'),
       meta: {
         description: DEFAULT_DESCRIPTION,
         title: DEFAULT_TITLE,
@@ -98,6 +96,24 @@ const router = createRouter({
       path: '/travel',
     },
     {
+      component: () => import('../views/WritingView.vue'),
+      meta: {
+        description: 'Essays, poems, recaps, and everything else I write.',
+        title: 'Words | Karan Sanas',
+      },
+      name: 'Words',
+      path: '/words',
+    },
+    {
+      component: () => import('../views/PostView.vue'),
+      meta: {
+        description: 'A piece of writing.',
+        title: 'Writing | Karan Sanas',
+      },
+      name: 'Post',
+      path: '/words/:slug',
+    },
+    {
       component: () => import('../views/TermsView.vue'),
       meta: {
         description: 'Terms of use for psiderman.com.',
@@ -119,6 +135,7 @@ const router = createRouter({
       component: () => import('../views/NotFoundView.vue'),
       meta: {
         description: 'That page doesn’t exist.',
+        layout: 'blank',
         noindex: true,
         title: 'Page Not Found | Karan Sanas',
       },
@@ -146,7 +163,7 @@ router.afterEach((to) => {
   applyRouteMeta(to)
 
   // Reset any open modals on navigation
-  ;[isLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
+  ;[isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
     modal.value = false
   })
 })

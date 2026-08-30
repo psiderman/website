@@ -1,6 +1,7 @@
 {
   "imports": {
     "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.112.3",
-    "exifreader": "npm:exifreader@^4.44.0"
+    "exifreader": "npm:exifreader@^4.44.0",
+    "image-size": "npm:image-size@^2"
   }
 }
