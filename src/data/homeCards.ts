@@ -147,3 +147,65 @@ export const cards: Card[] = [
     title: 'blr maps',
   },
 ]
+
+export interface CardIntro {
+  body: string[]
+  cover: string
+  title: string
+}
+
+export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
+  building: {
+    body: [
+      '“i’m a builder at heart and have no qualms investing 5 hours making something that brings someone joy, even if for only 5 seconds.',
+      'what the internet people call delight, i call whimsy. we’re very short on whimsy as a species.',
+      'those 5 seconds separate us from the machines, and i want you to have those 5 seconds today at least once.”',
+    ],
+    cover: new URL('../assets/home/intro/building.webp', import.meta.url).href,
+    title: 'the joy of building something, anything',
+  },
+  life: {
+    body: [
+      '“i’ve always wanted to have a website that’s more than just my design portfolio. a website that’s an extension of me, and not just my work self.',
+      'i think i’ve landed on an iteration that’s here to stay. i hope you find all the little easter eggs i’ve left in here.',
+      'if there is something that you’d like to see on here, let me know.”',
+    ],
+    cover: new URL('../assets/home/intro/life.webp', import.meta.url).href,
+    title: 'welcome to the psider-verse',
+  },
+  music: {
+    body: [
+      '“picking up a guitar at 14 to impress a girl was my canon event that made me realize how much music is part of my identity.',
+      'since then, i’ve taught myself enough guitar and keys, that i make covers for fun on my daw.',
+      'i grew up in the mp3 era so i’ve never made a mixtape but my playlists are close enough.”',
+    ],
+    cover: new URL('../assets/home/intro/music.webp', import.meta.url).href,
+    title: 'to the beat',
+  },
+  personal_finance: {
+    body: [
+      '“somewhere along the way, i became the person who friends would come to for spreadsheets, budgeting, and investment questions. i found myself further down the rabbit hole, and i enjoyed it.',
+      'the kind of person i am, inevitably, i tried to translate my obsession for managing your money into a product.',
+      'foursight is that attempt.”',
+    ],
+    cover: new URL('../assets/home/intro/personal_finance.webp', import.meta.url).href,
+    title: 'on personal finance',
+  },
+  travel: {
+    body: [
+      '“in 2023, i took my first international trip to hong kong. the same year, i took an open-ended break from work to travel.',
+      'it took me two months of solo one-bagging in south-east asia to realize i like slow travel in short bursts.',
+      'travel is now part of my identity, and i try to have one flight booked in the next 6 months.”',
+    ],
+    cover: new URL('../assets/home/intro/travel.webp', import.meta.url).href,
+    title: 'psiderman: far from home',
+  },
+  work: {
+    body: [
+      '“my career has taken me through ed-tech, b2b saas, and fin-tech. i started out designing features, then systems, and eventually found myself designing products end-to-end.',
+      'code always seemed aspirational. i don’t know about you, but today, llms make it easier to be all about the design engineering life. so i guess now i can professionally make rectangles <strong>and divs</strong>.”',
+    ],
+    cover: new URL('../assets/home/intro/work.webp', import.meta.url).href,
+    title: 'professional rectangle maker',
+  },
+}

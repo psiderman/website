@@ -36,7 +36,7 @@
     <!-- Filters -->
     <div
       ref="filterBarRef"
-      class="bg-background border-border-primary noscrollbar sticky top-0 z-50 mb-10 flex w-full justify-center overflow-x-scroll overflow-y-visible border-b"
+      class="bg-background border-border-primary noscrollbar sticky top-0 z-20 mb-10 flex w-full justify-center overflow-x-scroll overflow-y-visible border-b"
     >
       <TabGroup :selected-index="selectedTabIndex" as="template" @change="handleTabChange">
         <TabList
@@ -94,16 +94,16 @@
     >
       <!-- Description Card -->
       <div
-        v-if="activeFilter !== 'home' && activeDescription.id"
-        :key="activeDescription.id"
+        v-if="activeFilter !== 'home' && activeDescription"
+        :key="activeFilter"
         v-reveal
         class="border-border-primary bg-surface-primary desktop:col-span-4 pointer-events-auto col-span-2 row-span-3 flex h-124 flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
       >
         <div class="aspect-video">
           <img
-            v-lazy="getImageUrl(activeDescription.id)"
+            v-lazy="activeDescription.cover"
             class="border-border-primary h-full w-full rounded-lg border object-cover"
-            :alt="activeDescription.id"
+            :alt="activeFilter"
             width="800"
             height="450"
           />
@@ -112,7 +112,7 @@
           class="text-p text-text-secondary noscrollbar flex h-full w-full flex-col gap-5 overflow-scroll italic"
         >
           <p class="text-text-primary -mb-1 font-semibold" v-html="activeDescription.title"></p>
-          <p v-for="(p, i) in activeDescription.content" :key="i" v-html="p"></p>
+          <p v-for="(p, i) in activeDescription.body" :key="i" v-html="p"></p>
         </div>
       </div>
       <!-- All Cards -->
@@ -186,7 +186,7 @@ import {
 } from '@/composables/useGlobal'
 import { useNow } from '@/composables/useNow'
 import { type ExtraCard, extraCards as staticExtraCards } from '@/data/extraCards'
-import { type Card, cards as staticCards } from '@/data/homeCards'
+import { type Card, intros, cards as staticCards } from '@/data/homeCards'
 import { FILTER_GROUPS } from '@/types'
 
 import type { FilterGroupId } from '@/types'
@@ -327,21 +327,7 @@ watch(activeFilter, async () => {
   }, 320)
 })
 
-import { descriptionContent } from '@/data/homeDescriptions'
-
-const activeDescription = computed(() => {
-  if (activeFilter.value && activeFilter.value !== 'home')
-    return descriptionContent.filter((a) => a.id === activeFilter.value)[0]
-  else
-    return {
-      content: null,
-      id: null,
-    }
-})
-
-const getImageUrl = (id: string) => {
-  return new URL(`../data/descriptions/${id}.webp`, import.meta.url).href
-}
+const activeDescription = computed(() => intros[activeFilter.value] ?? null)
 
 // Watch global lightbox state is no longer needed to reset isOpen
 

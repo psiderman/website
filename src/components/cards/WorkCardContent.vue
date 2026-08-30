@@ -61,6 +61,10 @@
               :class="{ 'col-start-2': block.track == 'right', clickable: block.clickable }"
               @click="openWorkModal(block.org_id)"
             >
+              <ArrowUpRight
+                :size="16"
+                class="text-border-high-contrast pointer-events-none absolute top-2 right-2"
+              />
               <div class="flex size-4 shrink-0 items-center justify-center">
                 <img
                   v-if="block.logoUrl"
@@ -107,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { OctagonAlert } from '@lucide/vue'
+import { ArrowUpRight, OctagonAlert } from '@lucide/vue'
 import { differenceInCalendarMonths, getYear, min } from 'date-fns'
 import { computed } from 'vue'
 

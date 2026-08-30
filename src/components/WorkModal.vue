@@ -191,6 +191,12 @@
                         />
                       </component>
                     </div>
+                    <footnote
+                      v-reveal="sortedPeople.length * 50"
+                      class="text-ui-small text-text-tertiary mt-auto text-left"
+                      >DM me if you'd like me to remove your icon, or if you want your tooltip to
+                      say anything at all!
+                    </footnote>
                   </div>
                 </div>
 
