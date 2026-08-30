@@ -19,7 +19,7 @@
       alt="foursight wordmark"
     />
     <img
-      v-reveal="80"
+      v-reveal="50"
       src="@/assets/home/app.webp"
       class="desktop:h-auto desktop:mb-0 pointer-events-none z-10 -mb-4 h-full w-auto rounded-lg object-contain object-bottom shadow-xl"
       width="633"

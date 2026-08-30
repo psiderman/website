@@ -5,8 +5,8 @@
   >
     <span class="px-2"> Skip to main content </span>
   </a>
-  <GlobalHeader />
   <main id="main-content" class="flex w-screen flex-col items-center justify-center" tabindex="-1">
+    <GlobalHeader />
     <slot />
   </main>
   <GlobalFooter />

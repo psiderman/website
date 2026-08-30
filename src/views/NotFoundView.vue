@@ -27,12 +27,12 @@
         {{ text }}
       </p>
 
-      <router-link v-reveal="320" to="/" class="btn primary bg-light text-dark text-ui mt-8 w-full">
+      <router-link v-reveal="200" to="/" class="btn primary bg-light text-dark text-ui mt-8 w-full">
         Home
       </router-link>
 
       <a
-        v-reveal="400"
+        v-reveal="250"
         href="https://www.youtube.com/watch?v=YPlR8gyVtWs"
         target="_blank"
         rel="noopener noreferrer"
@@ -46,8 +46,8 @@
 
 <script setup lang="ts">
 const credits = [
-  ['–Angie McMahon', 80, 'text-light/30 scale-75'],
-  ['–Fred Gibson', 160, 'text-light/50'],
-  ['–This page', 240, 'text-light scale-120'],
+  ['–Angie McMahon', 70, 'text-light/30 scale-75'],
+  ['–Fred Gibson', 140, 'text-light/50'],
+  ['–This page', 210, 'text-light scale-120'],
 ]
 </script>

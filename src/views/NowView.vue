@@ -42,7 +42,7 @@
               <button
                 v-for="(img, idx) in images"
                 :key="img.name"
-                v-reveal="idx * 80 + 80"
+                v-reveal="idx * 70 + 70"
                 type="button"
                 :aria-label="`Open ${img.name}`"
                 class="bg-dark desktop:h-full desktop:w-full desktop:shrink aspect-3/5 h-72 w-auto shrink-0 cursor-pointer rounded-xl object-cover transition-opacity hover:opacity-95"
@@ -60,7 +60,7 @@
           </div>
 
           <div
-            v-reveal="160"
+            v-reveal="100"
             class="text-p text-text-secondary mx-auto -mb-12 w-full max-w-prose text-left"
           >
             <h2 class="text-h2">
@@ -71,7 +71,7 @@
           <!-- Render parsed markdown -->
           <div
             v-if="parsedMarkdown"
-            v-reveal="240"
+            v-reveal="150"
             class="text-p markdown-content text-text-primary mx-auto max-w-prose overflow-hidden"
             v-html="parsedMarkdown"
           ></div>

@@ -17,7 +17,7 @@
 
         <!-- Content -->
         <div
-          v-reveal="120"
+          v-reveal="100"
           class="text-p text-text-primary mx-auto max-w-prose space-y-6 pb-20 text-left"
         >
           <p>

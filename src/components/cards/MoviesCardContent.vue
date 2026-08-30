@@ -21,7 +21,7 @@
       <div
         v-for="(movie, idx) in movies"
         :key="movie.id"
-        v-reveal="Math.min(idx * 70, 490)"
+        v-reveal
         v-tooltip="{
           content: `${movie.title}, ${formatDistanceToNowStrict(movie.watched_date)} ago`,
           group: 'movies',

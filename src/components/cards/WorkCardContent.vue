@@ -49,7 +49,7 @@
         <div
           v-for="(block, idx) in timelineData.blocks"
           :key="`${block.org}-${block.startDate}`"
-          v-reveal="Math.min(idx * 70, 490)"
+          v-reveal="idx * 50"
         >
           <div
             class="grid w-full grid-cols-2 pt-0.75 pb-0.5"

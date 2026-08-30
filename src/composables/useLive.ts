@@ -146,9 +146,6 @@ let channel: null | ReturnType<typeof supabase.channel> = null
 
 export const activeRoomName = computed(() => {
   let name = `live:${router.currentRoute.value.path}`
-  if (router.currentRoute.value.query.filter) {
-    name += `?filter=${router.currentRoute.value.query.filter}`
-  }
   if (global.activeModal.value) {
     name += `&modal=${global.activeModal.value}`
   }

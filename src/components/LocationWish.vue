@@ -7,6 +7,7 @@
     >
       <router-link
         v-if="!isWishTime"
+        v-reveal
         to="/"
         class="size-10 shrink-0 overflow-hidden rounded-full hover:opacity-80 active:opacity-90"
         aria-label="Psiderman home"
@@ -15,7 +16,7 @@
       </router-link>
     </Transition>
 
-    <div v-if="isWishTime" class="relative size-10 shrink-0">
+    <div v-if="isWishTime" v-reveal class="relative size-10 shrink-0">
       <!-- Confetti Particles -->
       <div v-if="particles.length > 0" class="z-00 pointer-events-none absolute inset-0">
         <span
@@ -87,11 +88,11 @@
     ></div>
 
     <div class="text-text-tertiary text-ui-small flex flex-col gap-1">
-      <div class="flex flex-row gap-1 tabular-nums">
+      <div v-reveal="50" class="flex flex-row gap-1 tabular-nums">
         <component :is="currentTimeClockIcon" :size="16" />
         {{ isWishTime ? currentTime.split(':').slice(0, -1).join(':') : currentTime }}
       </div>
-      <div class="flex flex-row gap-1">
+      <div v-reveal="100" class="flex flex-row gap-1">
         <Globe2 :size="16" />
         {{ current_location.city }}
       </div>

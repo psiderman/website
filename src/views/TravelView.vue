@@ -57,7 +57,7 @@
                   <button
                     v-for="(img, idx) in travel.images"
                     :key="img.id"
-                    v-reveal="Math.min(idx * 70, 490)"
+                    v-reveal="Math.min(idx * 50, 350)"
                     type="button"
                     :aria-label="`Open photo ${img.name}`"
                     class="size-20 shrink-0 cursor-pointer snap-start overflow-hidden p-0"

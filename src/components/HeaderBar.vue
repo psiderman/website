@@ -1,7 +1,8 @@
 <template>
   <header
     data-sync="header"
-    class="bg-background z-50 flex w-screen flex-row items-center justify-center backdrop-blur-xs"
+    class="z-60 flex w-screen flex-row items-center justify-center"
+    :class="{ 'desktop:sticky desktop:top-0': isHome }"
   >
     <div
       class="max-w-container desktop:px-10 flex w-full flex-row items-center justify-between px-4 py-5"
@@ -12,10 +13,11 @@
       <!-- Right side -->
       <div class="desktop:gap-4 flex flex-row items-center gap-2">
         <!-- Avatar stack -->
-        <HeaderAvatars class="desktop:flex hidden" />
+        <HeaderAvatars v-reveal="50" class="desktop:flex hidden" />
 
         <!-- Multiplayer tools -->
         <div
+          v-reveal="100"
           v-tooltip="{
             content: global.allowMultiplayer.value ? 'hide other visitors' : 'show other visitors',
             hideOnClick: false,
@@ -24,7 +26,9 @@
         >
           <button
             class="btn stroke icon-only"
-            :aria-label="global.allowMultiplayer.value ? 'Hide other visitors' : 'Show other visitors'"
+            :aria-label="
+              global.allowMultiplayer.value ? 'Hide other visitors' : 'Show other visitors'
+            "
             @click="toggleMultiplayer()"
           >
             <MousePointer2 v-if="global.allowMultiplayer.value" :size="16" />
@@ -33,10 +37,10 @@
         </div>
 
         <!-- Theme -->
-        <ThemeToggle />
+        <ThemeToggle v-reveal="150" />
 
         <!-- Login -->
-        <div class="desktop:flex hidden">
+        <div v-reveal="200" class="desktop:flex hidden">
           <button v-if="!currentUser" class="btn primary" @click="isAuthModalOpen = true">
             Log in
           </button>
@@ -62,6 +66,8 @@
 
 <script setup lang="ts">
 import { LogIn, LogOut, MousePointer2, MousePointer2Off } from '@lucide/vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { currentUser, isAuthModalOpen, signOut } from '../composables/useAuth'
 import { global } from '../composables/useGlobal'
@@ -69,4 +75,7 @@ import { toggleMultiplayer } from '../composables/useLive'
 import HeaderAvatars from './HeaderAvatars.vue'
 import LocationWish from './LocationWish.vue'
 import ThemeToggle from './ThemeToggle.vue'
+
+const route = useRoute()
+const isHome = computed(() => route.name === 'Home' || route.path === '/')
 </script>
