@@ -16,15 +16,16 @@
         @keydown.up.prevent="focusSibling(-1)"
       >
         <a
-          v-for="(t, i) in display_tracks"
+          v-for="(t, idx) in display_tracks"
           :key="t.track_id"
+          v-reveal="Math.min(idx * 50, 350)"
           class="text-ui-small focus-visible:outline-light/50! text-light hover:bg-hover-inverted active:bg-press-inverted relative flex w-full cursor-pointer flex-row gap-3 rounded-lg px-2 py-1"
           :href="t.song_url"
           target="_blank"
-          :tabindex="activeFocusIndex === i ? 0 : -1"
-          @focus="activeFocusIndex = i"
+          :tabindex="activeFocusIndex === idx ? 0 : -1"
+          @focus="activeFocusIndex = idx"
         >
-          <p class="h-4 w-4 shrink-0 text-right tabular-nums opacity-60">{{ i + 1 }}</p>
+          <p class="h-4 w-4 shrink-0 text-right tabular-nums opacity-60">{{ idx + 1 }}</p>
           <div class="flex grow flex-row items-center gap-1 truncate">
             <p class="truncate">{{ t.title }}</p>
             <span

@@ -652,6 +652,23 @@
       background-size: 75%;
     }
   }
+
+  /* Scroll-reveal entrance (driven by v-reveal directive) */
+  .reveal {
+    opacity: 0;
+  }
+
+  .reveal-visible {
+    opacity: 1;
+    animation: reveal-in 0.5s ease var(--reveal-delay, 0s) backwards;
+  }
+
+  @keyframes reveal-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem) scale(0.99);
+    }
+  }
 }
 
 :root {
@@ -715,7 +732,7 @@ a,
     @apply text-text-inverted-primary text-ui-small;
 
     & blockquote {
-      @apply border-surface-primary/50 text-text-inverted-secondary my-1 max-w-40 border-l-2 pl-2 italic;
+      @apply border-surface-primary/50 text-text-inverted-secondary my-1 max-w-40 border-l-2 pl-2 font-serif italic;
     }
   }
 }

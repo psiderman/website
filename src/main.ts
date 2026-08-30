@@ -54,12 +54,15 @@ if (import.meta.env.PROD && ['psiderman.com'].includes(window.location.hostname)
 }
 
 import lazy from './directives/lazy'
+import reveal from './directives/reveal'
 import tooltip from './directives/tooltip'
 import { queryClient } from './queryClient'
 
 app.use(router)
 app.directive('tooltip', tooltip)
 app.directive('lazy', lazy)
+app.directive('reveal', reveal)
 app.use(VueQueryPlugin, { queryClient })
 
+await router.isReady()
 app.mount('#app')

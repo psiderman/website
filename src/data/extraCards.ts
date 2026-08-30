@@ -10,6 +10,7 @@ export interface ExtraCard {
   coverVid?: string
   description?: string
   images?: string[]
+  lightbox?: boolean
   link?: string
   size: 'md' | 'sm'
   subtitle?: string
@@ -49,6 +50,7 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       images: Array.from({ length: 15 }, (_, i) =>
         getStorageUrl('webp', 'japan_film', `${i + 1}.webp`),
       ),
+      lightbox: true,
       size: 'md',
       title: 'japan on film',
     },
@@ -57,6 +59,7 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       images: Array.from({ length: 8 }, (_, i) =>
         getStorageUrl('webp', 'dad_paris', `${i + 1}.webp`),
       ),
+      lightbox: true,
       size: 'md',
       title: 'dad in paris (25 yrs later)',
     },

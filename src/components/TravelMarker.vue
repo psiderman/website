@@ -15,6 +15,7 @@
         ? 'bg-green-500 outline-4 outline-green-500/35'
         : 'bg-red-500 outline-4 outline-red-500/25 dark:bg-red-700 dark:outline-red-500/35'
     "
+    @click="openLightbox"
   >
     <Star v-if="isHighClearance(clearance)" :size="10" fill="#fff" stroke-width="0" />
   </div>
@@ -23,7 +24,7 @@
 <script setup lang="ts">
 import { Star } from '@lucide/vue'
 
-import { isLightBoxOpen, lightBoxData } from '@/composables/useGlobal'
+import { isPhotoLightBoxOpen, photoLightBoxData } from '@/composables/useGlobal'
 import { isHighClearance } from '@/composables/useTravel'
 
 import type { ClearanceLevel, TravelImage, Trip } from '@/composables/useTravel'
@@ -45,41 +46,32 @@ const props = defineProps<Props>()
 // no inline `onload` handler, no HTML-string interpolation.
 function buildTooltipContent(): Element {
   const wrap = document.createElement('div')
-  wrap.className =
-    'bg-light border-light outline-dark/10 rounded-special flex w-fit flex-col items-center border-4 shadow-xl outline'
-
-  const media = document.createElement('div')
-  media.className =
-    'bg-dark max-h-[calc(50svh-40px)] overflow-hidden rounded-lg flex items-center justify-center'
+  wrap.className = 'p-0.5 bg-light rounded-lg shadow-lg overflow-hidden flex'
 
   const img = document.createElement('img')
-  img.className = 'bg-dark max-h-[calc(50svh-40px)] overflow-hidden rounded-lg object-contain'
-  if (props.width) img.width = props.width
-  if (props.height) img.height = props.height
-  if (props.width && props.height) img.style.aspectRatio = `${props.width}/${props.height}`
-  img.src = props.thumbnailUrl || props.imageUrl
-
-  // Lazy-load the full-resolution image only when a distinct thumbnail exists
-  if (props.thumbnailUrl && props.thumbnailUrl !== props.imageUrl) {
-    const preload = new Image()
-    preload.onload = () => {
-      img.src = preload.src
-    }
-    preload.src = props.imageUrl
+  if (props.width && props.height) {
+    img.style.aspectRatio = `${props.width}/${props.height}`
+    img.className =
+      props.width > props.height
+        ? 'w-40 h-auto object-contain rounded-md block'
+        : 'h-32 w-auto object-contain rounded-md block'
+  } else {
+    img.className = 'max-w-40 max-h-32 w-auto h-auto object-contain rounded-md block'
   }
 
-  media.appendChild(img)
+  img.src = props.thumbnailUrl || props.imageUrl
 
-  const captionWrap = document.createElement('div')
-  captionWrap.className =
-    'text-p font-handwriting flex w-0 min-w-full flex-col items-center justify-center p-3 text-center align-middle text-gray-700 dark:text-zinc-700'
-  const cap = document.createElement('p')
-  cap.className = 'line-clamp-3 w-full whitespace-normal leading-tight'
-  cap.textContent = props.caption ? `“${props.caption}”` : ''
-  captionWrap.appendChild(cap)
+  // Preload high-res in background and swap without layout shift
+  if (props.thumbnailUrl && props.thumbnailUrl !== props.imageUrl) {
+    const highRes = new Image()
+    highRes.onload = () => {
+      img.src = highRes.src
+    }
+    highRes.src = props.imageUrl
+  }
 
-  wrap.appendChild(media)
-  wrap.appendChild(captionWrap)
+  wrap.appendChild(img)
+
   return wrap
 }
 
@@ -106,12 +98,13 @@ function openLightbox() {
   const startIdx = Math.max(0, idx)
   const orderedImages = [...images.slice(startIdx), ...images.slice(0, startIdx)]
 
-  lightBoxData.value = {
-    description: props.travel?.subtitle || '',
+  photoLightBoxData.value = {
+    currentTripSlug: props.travel?.slug || '',
     images: orderedImages,
-    title: props.travel?.title || props.caption || '',
+    initialIndex: 0,
+    tripTitle: props.travel?.title || '',
   }
-  isLightBoxOpen.value = true
+  isPhotoLightBoxOpen.value = true
 }
 </script>
 

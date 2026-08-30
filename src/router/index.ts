@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import { ensureUserRole, isAuthModalOpen } from '@/composables/useAuth'
-import { isLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
+import { isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
 
 import HomeView from '../views/HomeView.vue'
 
@@ -119,6 +119,7 @@ const router = createRouter({
       component: () => import('../views/NotFoundView.vue'),
       meta: {
         description: 'That page doesn’t exist.',
+        layout: 'blank',
         noindex: true,
         title: 'Page Not Found | Karan Sanas',
       },
@@ -146,7 +147,7 @@ router.afterEach((to) => {
   applyRouteMeta(to)
 
   // Reset any open modals on navigation
-  ;[isLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
+  ;[isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
     modal.value = false
   })
 })

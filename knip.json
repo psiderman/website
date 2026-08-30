@@ -1,12 +1,28 @@
 {
-  "entry": ["index.html", "api/**/*.ts", "src/fonts.css", "src/main.ts", "scripts/**/*.js"],
-  "ignore": ["src/components/PsiderLogo.vue"],
-  "ignoreBinaries": ["vercel"],
+  "compilers": {
+    "svg": ""
+  },
+  "entry": [
+    "index.html",
+    "api/**/*.ts",
+    "src/fonts.css",
+    "src/main.ts",
+    "scripts/**/*.js"
+  ],
+  "ignore": [
+    "src/components/PsiderLogo.vue"
+  ],
+  "ignoreBinaries": [
+    "vercel"
+  ],
   "ignoreDependencies": [
     "@fontsource-variable/bricolage-grotesque",
     "@fontsource/source-serif-pro",
     "vue-tippy"
   ],
-  "project": ["src/**/*.{ts,vue}", "api/**/*.ts", "scripts/**/*.js"]
+  "project": [
+    "src/**/*.{css,gif,jpeg,jpg,mp4,png,svg,ts,vue,webp,woff,woff2}",
+    "api/**/*.ts",
+    "scripts/**/*.js"
+  ]
 }
-

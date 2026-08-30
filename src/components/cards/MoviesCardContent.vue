@@ -21,11 +21,12 @@
       <div
         v-for="(movie, idx) in movies"
         :key="movie.id"
+        v-reveal
         v-tooltip="{
           content: `${movie.title}, ${formatDistanceToNowStrict(movie.watched_date)} ago`,
           group: 'movies',
         }"
-        class="group border-border-primary dark:border-surface-tertiary outline-surface-inverted relative block aspect-2/3 h-full shrink-0 snap-start snap-always overflow-hidden rounded-lg border"
+        class="group border-border-primary dark:border-surface-tertiary has-focus-visible:outline-surface-inverted relative block aspect-2/3 h-full shrink-0 snap-start snap-always overflow-hidden rounded-lg border has-focus-visible:outline-2 has-focus-visible:-outline-offset-2"
       >
         <a
           v-if="movie.link"
@@ -33,7 +34,7 @@
           target="_blank"
           rel="noopener noreferrer"
           data-focusable
-          class="absolute inset-0 z-0 cursor-pointer focus-visible:opacity-80 focus-visible:outline-none"
+          class="absolute inset-0 z-10 cursor-pointer rounded-lg focus:outline-none"
           :tabindex="activeFocusIndex === idx ? 0 : -1"
           :aria-label="`Open ${movie.title} on Letterboxd`"
           @focus="activeFocusIndex = idx"
@@ -176,7 +177,13 @@ const focusSibling = (direction: number) => {
     const baseIndex = currentIndex !== -1 ? currentIndex : activeFocusIndex.value
     const nextIndex = baseIndex + direction
     if (nextIndex >= 0 && nextIndex < focusable.length) {
+      activeFocusIndex.value = nextIndex
       focusable[nextIndex].focus()
+      focusable[nextIndex].scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      })
     }
   }
 }

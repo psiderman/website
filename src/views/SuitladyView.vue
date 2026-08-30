@@ -299,13 +299,12 @@
 
                   <div class="flex shrink-0 flex-row items-center gap-2">
                     <!-- Close Friends -->
-                    <div
+                    <TheListIndicator
                       v-if="isHighClearance(trip.clearance)"
-                      v-tooltip="{ content: 'you’re on “the list”' }"
-                      class="flex size-5 items-center justify-center rounded-full bg-green-500"
-                    >
-                      <Star :size="12" fill="#fff" stroke-width="0" />
-                    </div>
+                      size="md"
+                      :border="false"
+                      tooltip
+                    />
 
                     <!-- Repeat status -->
                     <div
@@ -987,7 +986,6 @@ import {
   Pin,
   Plus,
   Repeat,
-  Star,
   Upload,
   X,
 } from '@lucide/vue'
@@ -996,6 +994,7 @@ import { format } from 'date-fns'
 import { getStroke } from 'perfect-freehand'
 import { computed, reactive, ref, watch } from 'vue'
 
+import TheListIndicator from '@/components/TheListIndicator.vue'
 import { isAdmin } from '@/composables/useAuth'
 import { type ClearanceLevel, isHighClearance } from '@/composables/useTravel'
 import { workHistory } from '@/data/work'

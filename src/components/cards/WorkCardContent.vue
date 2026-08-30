@@ -46,7 +46,11 @@
 
       <!-- Blocks -->
       <div class="absolute z-10 -mt-px flex w-full flex-col px-10 py-10.5 pl-20">
-        <div v-for="block in timelineData.blocks" :key="`${block.org}-${block.startDate}`">
+        <div
+          v-for="(block, idx) in timelineData.blocks"
+          :key="`${block.org}-${block.startDate}`"
+          v-reveal="idx * 50"
+        >
           <div
             class="grid w-full grid-cols-2 pt-0.75 pb-0.5"
             :style="{ height: `${block.heightPx}px` }"
@@ -57,6 +61,10 @@
               :class="{ 'col-start-2': block.track == 'right', clickable: block.clickable }"
               @click="openWorkModal(block.org_id)"
             >
+              <ArrowUpRight
+                :size="16"
+                class="text-border-high-contrast pointer-events-none absolute top-2 right-2"
+              />
               <div class="flex size-4 shrink-0 items-center justify-center">
                 <img
                   v-if="block.logoUrl"
@@ -103,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { OctagonAlert } from '@lucide/vue'
+import { ArrowUpRight, OctagonAlert } from '@lucide/vue'
 import { differenceInCalendarMonths, getYear, min } from 'date-fns'
 import { computed } from 'vue'
 

@@ -29,12 +29,33 @@ export const lightBoxData = ref<{
   title: '',
 })
 
+export const isPhotoLightBoxOpen = ref(false)
+export const photoLightBoxData = ref<{
+  currentTripSlug?: string
+  images: {
+    caption?: null | string
+    clearance?: ClearanceLevel | null | string
+    height?: null | number
+    thumbnailUrl?: string
+    url: string
+    width?: null | number
+  }[]
+  initialIndex?: number
+  tripTitle?: string
+}>({
+  currentTripSlug: '',
+  images: [],
+  initialIndex: 0,
+  tripTitle: '',
+})
+
 export const isWorkModalOpen = ref(false)
 export const workData = ref<null | WorkDetail>(null)
 
 const activeModal = computed(() => {
   if (isWorkModalOpen.value) return 'work'
   if (isLightBoxOpen.value) return 'lightbox'
+  if (isPhotoLightBoxOpen.value) return 'photoLightbox'
   if (isAuthModalOpen.value) return 'auth'
   return null
 })
@@ -43,7 +64,9 @@ export const global = {
   activeModal,
   allowMultiplayer,
   isLightBoxOpen,
+  isPhotoLightBoxOpen,
   isWorkModalOpen,
   lightBoxData,
+  photoLightBoxData,
   workData,
 }
