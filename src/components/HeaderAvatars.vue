@@ -1,24 +1,29 @@
 <template>
   <div class="avatar-stack flex flex-row items-center gap-0">
-    <div
-      v-if="!global.allowMultiplayer.value"
-      v-reveal
+    <a
       v-tooltip="{
         content: 'Wilson',
         group: 'header-avatars',
         placement: 'bottom',
       }"
-      class="avatar outline-background relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-200 outline-4 dark:bg-zinc-200"
+      href="https://share.google/eakcO826TmMal2uqb"
+      class="rounded-full"
     >
-      <img
-        src="@/assets/svg/wilson.svg"
-        alt=""
-        aria-hidden="true"
-        class="z-10 size-9"
-        width="36"
-        height="36"
-      />
-    </div>
+      <div
+        v-if="!global.allowMultiplayer.value"
+        v-reveal
+        class="avatar outline-background relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-200 outline-4 dark:bg-zinc-200"
+      >
+        <img
+          src="@/assets/svg/wilson.svg"
+          alt=""
+          aria-hidden="true"
+          class="z-10 size-9"
+          width="36"
+          height="36"
+        />
+      </div>
+    </a>
     <div
       v-for="user in sortedPresenceUsers.slice(0, 5)"
       :key="user.id"

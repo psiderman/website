@@ -1,5 +1,5 @@
 <template>
-  <div class="group relative flex flex-row items-center justify-center gap-2">
+  <div class="group pointer-events-auto relative flex flex-row items-center justify-center gap-2">
     <Transition
       enter-active-class="transition duration-1000 ease-out"
       enter-from-class="opacity-0"

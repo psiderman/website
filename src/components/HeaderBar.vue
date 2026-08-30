@@ -1,7 +1,7 @@
 <template>
   <header
     data-sync="header"
-    class="z-60 flex w-screen flex-row items-center justify-center"
+    class="pointer-events-none z-60 flex w-screen flex-row items-center justify-center"
     :class="{ 'desktop:sticky desktop:top-0': isHome }"
   >
     <div
@@ -11,7 +11,7 @@
       <LocationWish />
 
       <!-- Right side -->
-      <div class="desktop:gap-4 flex flex-row items-center gap-2">
+      <div class="desktop:gap-4 pointer-events-auto flex flex-row items-center gap-2">
         <!-- Avatar stack -->
         <HeaderAvatars v-reveal="50" class="desktop:flex hidden" />
 

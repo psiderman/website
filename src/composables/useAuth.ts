@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { clearPersistedCache, queryClient } from '@/queryClient'
 import { supabase } from '@/supabase'
 
-import type { User } from '@supabase/supabase-js'
+import type { RealtimeChannel, User } from '@supabase/supabase-js'
 
 // Global state for the auth modal
 export const isAuthModalOpen = ref(false)
@@ -14,13 +14,47 @@ export const currentUserRole = ref<null | string>(null)
 export const isRoleLoading = ref(false)
 export const isAdmin = computed(() => currentUserRole.value === 'admin')
 
+let roleChannel: null | RealtimeChannel = null
+
 // Sign out and wipe all cached query data (incl. localStorage persistence)
 // so the next user never sees this user's trips, travel images, etc.
 export async function signOut() {
+  stopWatchingRoleChanges()
   await supabase.auth.signOut()
   currentUser.value = null
   currentUserRole.value = null
   clearPersistedCache()
+}
+
+function stopWatchingRoleChanges() {
+  if (roleChannel) {
+    supabase.removeChannel(roleChannel)
+    roleChannel = null
+  }
+}
+
+function watchRoleChanges(userId: string) {
+  stopWatchingRoleChanges()
+
+  roleChannel = supabase
+    .channel(`user-role:${userId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        filter: `user_id=eq.${userId}`,
+        schema: 'public',
+        table: 'user_roles',
+      },
+      (payload) => {
+        const newRole = (payload.new as { role?: string })?.role
+        if (newRole && newRole !== currentUserRole.value) {
+          currentUserRole.value = newRole
+          queryClient.invalidateQueries()
+        }
+      },
+    )
+    .subscribe()
 }
 
 export const fetchUserRole = async (userId?: string) => {
@@ -106,8 +140,10 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
     }
 
     await fetchUserRole(currentUser.value.id)
+    watchRoleChanges(currentUser.value.id)
   } else {
     currentUserRole.value = null
+    stopWatchingRoleChanges()
   }
 
   if (!initialized) {
