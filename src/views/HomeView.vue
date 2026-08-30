@@ -90,7 +90,7 @@
     <!-- Grid -->
     <div
       ref="gridRef"
-      class="max-w-container desktop:px-20 desktop:grid-cols-12 relative z-0 grid min-h-[calc(100dvh-5rem)] w-full grid-flow-row-dense grid-cols-2 gap-8 px-4"
+      class="max-w-container desktop:px-20 desktop:grid-cols-12 relative z-0 grid min-h-[calc(100dvh-5rem)] w-full grid-flow-row-dense auto-rows-36 grid-cols-2 gap-8 px-4"
     >
       <!-- Description Card -->
       <div
