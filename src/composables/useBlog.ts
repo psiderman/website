@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/vue-query'
-import { format } from 'date-fns'
+import { format, parse } from 'date-fns'
 import { computed, type Ref } from 'vue'
 
-import { ensureUserRole } from '@/composables/useAuth'
+import { currentUser, ensureUserRole } from '@/composables/useAuth'
 import { supabase } from '@/supabase'
 
 import type { ClearanceLevel } from '@/composables/useTravel'
@@ -83,7 +83,7 @@ export function useBlogPost(slug: Ref<string> | string) {
       const p = post.value
       const role = await ensureUserRole()
 
-      if (!hasBlogAccess(p.clearance, role)) {
+      if (!hasBlogAccess(p.clearance, effectiveRole(role))) {
         return {
           access: 'denied',
           markdown: '',
@@ -135,7 +135,7 @@ export function useBlogPosts() {
       const rows = (data ?? []).map((row) => rowToBlogPost(row as Record<string, unknown>))
       const role = await ensureUserRole()
 
-      return rows.filter((post) => hasBlogAccess(post.clearance, role))
+      return rows.filter((post) => hasBlogAccess(post.clearance, effectiveRole(role)))
     },
     queryKey: ['blog-posts'],
   })
@@ -143,10 +143,20 @@ export function useBlogPosts() {
   return { error, isLoading, posts }
 }
 
+// Mirrors the DB's has_clearance(): a signed-in user with no user_roles row is
+// treated as rank 1 ('auth'). Kept separate from hasBlogAccess so logged-out
+// users (role null) are still denied non-public posts.
+function effectiveRole(role: null | string): null | string {
+  if (role) return role
+  return currentUser.value ? 'auth' : null
+}
+
 function rowToBlogPost(row: Record<string, unknown>): BlogPost {
   return {
     clearance: (row.clearance as ClearanceLevel) || 'admin',
-    date: new Date(row.date as string),
+    // Postgres `date` returns "YYYY-MM-DD"; parsing it as local midnight avoids
+    // the UTC-midnight off-by-one that shifts dates a day early west of UTC.
+    date: parse(row.date as string, 'yyyy-MM-dd', new Date()),
     excerpt: (row.excerpt as string) ?? '',
     isActive: (row.is_active as boolean) ?? true,
     minutes: (row.minutes as number) ?? 2,

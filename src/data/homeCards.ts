@@ -157,6 +157,17 @@ export const cards: Card[] = [
     span: 'desktop:col-span-2 col-span-1',
     title: 'blr maps',
   },
+  {
+    arrow: 'external',
+    bgClass: 'bg-sky-200 dark:bg-sky-950',
+    group: [],
+    id: 'resume',
+    imageUrl: new URL('../assets/home/resume.webp', import.meta.url).href,
+    link: 'https://links.psiderman.com/resume',
+    size: 'sm',
+    span: 'desktop:col-span-2 col-span-1',
+    title: 'résumé',
+  },
 ]
 
 export interface CardIntro {

@@ -27,7 +27,7 @@
       <div
         class="size-6 h-full shrink-0 items-center justify-center rounded-full"
         :class="[
-          arrow === 'help' ? 'desktop:flex hidden focus-within:outline-surface-inverted' : 'flex',
+          arrow === 'help' ? 'desktop:flex focus-within:outline-surface-inverted hidden' : 'flex',
         ]"
       >
         <component
