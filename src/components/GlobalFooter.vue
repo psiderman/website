@@ -5,7 +5,7 @@
   >
     <!-- Github Code -->
     <a
-      href="https://github.com/psiderman/website/commit/${commit}"
+      :href="`https://github.com/psiderman/website/commit/${commit}`"
       target="_blank"
       rel="noopener noreferrer"
       class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors duration-200 focus:outline-2 focus:outline-offset-2 focus:outline-light"
