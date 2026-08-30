@@ -6,6 +6,31 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 
 let syncChannel: null | RealtimeChannel = null
 
+// Coalesce bursts of realtime events into a single refetch per key, so e.g. an
+// admin renaming 15 trips doesn't fire 15 cache invalidations. `null` marks a
+// role-affecting change that should invalidate the whole cache.
+let pending: Array<null | string> = []
+let flushTimer: null | ReturnType<typeof setTimeout> = null
+
+const scheduleInvalidate = (keys: Array<null | string>) => {
+  for (const key of keys) {
+    if (!pending.includes(key)) pending.push(key)
+  }
+  if (flushTimer) return
+  flushTimer = setTimeout(() => {
+    flushTimer = null
+    const batch = pending
+    pending = []
+    if (batch.includes(null)) {
+      queryClient.invalidateQueries()
+      return
+    }
+    for (const key of batch as string[]) {
+      queryClient.invalidateQueries({ queryKey: [key] })
+    }
+  }, 100)
+}
+
 export function initRealtimeSync(): RealtimeChannel {
   if (syncChannel) return syncChannel
 
@@ -19,9 +44,7 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'trips',
       },
       () => {
-        queryClient.invalidateQueries({ queryKey: ['trips'] })
-        queryClient.invalidateQueries({ queryKey: ['trips-with-images'] })
-        queryClient.invalidateQueries({ queryKey: ['admin-trips'] })
+        scheduleInvalidate(['trips', 'trips-with-images', 'admin-trips'])
       },
     )
     .on(
@@ -32,9 +55,7 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'now',
       },
       () => {
-        queryClient.invalidateQueries({ queryKey: ['now-posts'] })
-        queryClient.invalidateQueries({ queryKey: ['now-markdown'] })
-        queryClient.invalidateQueries({ queryKey: ['now-images'] })
+        scheduleInvalidate(['now-posts', 'now-markdown', 'now-images'])
       },
     )
     .on(
@@ -45,8 +66,7 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'guestbook',
       },
       () => {
-        queryClient.invalidateQueries({ queryKey: ['guestbook'] })
-        queryClient.invalidateQueries({ queryKey: ['admin-guestbook'] })
+        scheduleInvalidate(['guestbook', 'admin-guestbook'])
       },
     )
     .on(
@@ -57,29 +77,30 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'work_people',
       },
       () => {
-        queryClient.invalidateQueries({ queryKey: ['work-people'] })
-        queryClient.invalidateQueries({ queryKey: ['admin-work-people'] })
+        scheduleInvalidate(['work-people', 'admin-work-people'])
       },
     )
     .on(
       'postgres_changes',
       {
-        event: '*',
+        event: 'UPDATE',
         schema: 'public',
         table: 'user_roles',
       },
       (payload) => {
         const record = payload.new as null | { role?: string; user_id?: string }
-        if (currentUser.value?.id && record?.user_id === currentUser.value.id) {
-          if (record.role && record.role !== currentUserRole.value) {
-            currentUserRole.value = record.role
-            queryClient.invalidateQueries()
-          }
+        const isCurrentUser = currentUser.value?.id && record?.user_id === currentUser.value.id
+        if (isCurrentUser && record?.role && record.role !== currentUserRole.value) {
+          currentUserRole.value = record.role
+          scheduleInvalidate([null])
         }
-        queryClient.invalidateQueries({ queryKey: ['admin-user-roles'] })
+        scheduleInvalidate(['admin-user-roles'])
       },
     )
-    .subscribe()
+    .subscribe((status, err) => {
+      if (status === 'SUBSCRIBED') return
+      console.warn('[realtime] channel not subscribed:', status, err?.message ?? '')
+    })
 
   return syncChannel
 }
