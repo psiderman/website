@@ -28,7 +28,7 @@
         </div>
 
         <div
-          v-else-if="error || contentError"
+          v-else-if="error"
           class="bg-surface-secondary flex w-full grow flex-col items-center justify-center gap-4 rounded-xl"
         >
           <FileExclamationPoint :size="32" class="text-text-tertiary" />
@@ -53,7 +53,7 @@
           >
             log in
           </button>
-          <router-link v-else to="/words" class="btn primary" type="button">
+          <router-link v-else to="/words" class="btn primary">
             <ArrowLeft :size="16" /> Back to words
           </router-link>
         </div>
@@ -89,7 +89,7 @@ const route = useRoute()
 
 const slug = computed(() => (typeof route.params.slug === 'string' ? route.params.slug : ''))
 
-const { content, contentError, error, isLoading, isNotFound, post } = useBlogPost(slug)
+const { content, error, isLoading, isNotFound, post } = useBlogPost(slug)
 
 // Auto-prompt for login when a logged-out user lands on a gated post
 watch(

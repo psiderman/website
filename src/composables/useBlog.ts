@@ -7,14 +7,8 @@ import { supabase } from '@/supabase'
 
 import type { ClearanceLevel } from '@/composables/useTravel'
 
-export interface BlogImage {
-  name: string
-  url: string
-}
-
 export interface BlogPost {
   clearance: ClearanceLevel
-  coverUrl: null | string
   date: Date
   excerpt: string
   isActive: boolean
@@ -27,8 +21,6 @@ export type BlogPostAccess = 'denied' | 'granted' | 'public'
 
 export interface BlogPostContent {
   access: BlogPostAccess
-  coverUrl: null | string
-  images: BlogImage[]
   markdown: string
 }
 
@@ -94,41 +86,20 @@ export function useBlogPost(slug: Ref<string> | string) {
       if (!hasBlogAccess(p.clearance, role)) {
         return {
           access: 'denied',
-          coverUrl: null,
-          images: [],
           markdown: '',
         }
       }
 
-      const mdPath = `${p.slug}/${p.slug}.md?v=${format(new Date(), 'yyyyMMdd')}`
-      const imgPrefix = `${p.slug}/`
-
-      const mdQuery = supabase.storage.from('blog').download(mdPath)
-      const listQuery = supabase.storage.from('blog').list(imgPrefix)
-
-      const [mdRes, listRes] = await Promise.all([mdQuery, listQuery])
-      if (mdRes.error) throw mdRes.error
-
-      const files = (listRes.data ?? []).filter(
-        (file) => !file.name.endsWith('.md') && file.name !== 'cover.webp',
-      )
-
-      const signedImages = await Promise.all(
-        files.map(async (file) => {
-          const url = await signStoragePath(`${imgPrefix}${file.name}`)
-          if (!url) return null
-          return { name: file.name, url }
-        }),
-      )
-
-      const images = signedImages.filter((i): i is BlogImage => i !== null)
-      const coverUrl = await signStoragePath(`${p.slug}/cover.webp`)
+      const { data, error } = await supabase.storage
+        .from('blog')
+        .download(`${p.slug}/${p.slug}.md`, {
+          cacheNonce: format(new Date(), 'yyMM'),
+        })
+      if (error) throw error
 
       return {
         access: p.clearance === 'public' ? 'public' : 'granted',
-        coverUrl,
-        images,
-        markdown: await mdRes.data.text(),
+        markdown: await data.text(),
       }
     },
     queryKey: ['blog-post-content', slugRef],
@@ -164,16 +135,9 @@ export function useBlogPosts() {
       const rows = (data ?? []).map((row) => rowToBlogPost(row as Record<string, unknown>))
       const role = await ensureUserRole()
 
-      const accessible = rows.filter((post) => hasBlogAccess(post.clearance, role))
-
-      return Promise.all(
-        accessible.map(async (post) => {
-          return { ...post, coverUrl: await signStoragePath(`${post.slug}/cover.webp`) }
-        }),
-      )
+      return rows.filter((post) => hasBlogAccess(post.clearance, role))
     },
     queryKey: ['blog-posts'],
-    staleTime: 0,
   })
 
   return { error, isLoading, posts }
@@ -182,7 +146,6 @@ export function useBlogPosts() {
 function rowToBlogPost(row: Record<string, unknown>): BlogPost {
   return {
     clearance: (row.clearance as ClearanceLevel) || 'admin',
-    coverUrl: null,
     date: new Date(row.date as string),
     excerpt: (row.excerpt as string) ?? '',
     isActive: (row.is_active as boolean) ?? true,
@@ -190,10 +153,4 @@ function rowToBlogPost(row: Record<string, unknown>): BlogPost {
     slug: row.slug as string,
     title: (row.title as string) ?? (row.slug as string),
   }
-}
-
-async function signStoragePath(storagePath: string): Promise<null | string> {
-  const { data, error } = await supabase.storage.from('blog').createSignedUrl(storagePath, 60 * 60)
-  if (error || !data) return null
-  return data.signedUrl
 }

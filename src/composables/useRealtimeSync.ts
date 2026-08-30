@@ -55,9 +55,7 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'now',
       },
       () => {
-        queryClient.invalidateQueries({ queryKey: ['now-posts'] })
-        queryClient.invalidateQueries({ queryKey: ['now-markdown'] })
-        queryClient.invalidateQueries({ queryKey: ['now-images'] })
+        scheduleInvalidate(['now-posts', 'now-markdown', 'now-images'])
       },
     )
     .on(
@@ -68,8 +66,7 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'blog',
       },
       () => {
-        queryClient.invalidateQueries({ queryKey: ['blog-posts'] })
-        queryClient.invalidateQueries({ queryKey: ['blog-post'] })
+        scheduleInvalidate(['blog-posts', 'blog-post', 'blog-post-content'])
       },
     )
     .on(

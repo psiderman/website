@@ -13,15 +13,15 @@
       <OctagonAlert :size="24" class="text-text-tertiary" />
       <div class="text-text-tertiary text-ui">Error fetching data</div>
     </div>
-    <img
-      src="@/assets/home/writing.webp"
-      alt="a picture of me writing on a desk"
-      class="h-full w-full object-cover"
-    />
-    <template v-if="visiblePosts && visiblePosts.length > 0">
-      <p class="text-light/30 text-mono absolute top-0 left-0 p-4">
+    <template v-else>
+      <img
+        src="@/assets/home/writing.webp"
+        alt="a picture of me writing on a desk"
+        class="h-full w-full object-cover"
+      />
+      <p v-if="latestPost" class="text-light/30 text-mono absolute top-0 left-0 p-4">
         Last published <br />
-        {{ formatDistanceToNowStrict(visiblePosts[0].date) }} ago
+        {{ formatDistanceToNowStrict(latestPost.date) }} ago
       </p>
     </template>
   </div>
@@ -32,14 +32,11 @@ import { OctagonAlert } from '@lucide/vue'
 import { formatDistanceToNowStrict } from 'date-fns'
 import { computed } from 'vue'
 
-import { currentUserRole } from '@/composables/useAuth.ts'
-import { hasBlogAccess, useBlogPosts } from '@/composables/useBlog'
+import { useBlogPosts } from '@/composables/useBlog'
 
 import GenericLoader from '../GenericLoader.vue'
 
 const { error, isLoading, posts } = useBlogPosts()
 
-const visiblePosts = computed(() => {
-  return posts.value?.filter((a) => hasBlogAccess(a.clearance, currentUserRole.value))
-})
+const latestPost = computed(() => posts.value?.[0] ?? null)
 </script>
