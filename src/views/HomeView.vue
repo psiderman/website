@@ -36,7 +36,7 @@
     <!-- Filters -->
     <div
       ref="filterBarRef"
-      class="bg-background border-border-primary noscrollbar sticky top-0 z-20 mb-10 flex w-full justify-center overflow-x-scroll overflow-y-visible border-b"
+      class="bg-background border-border-primary noscrollbar desktop:h-20 sticky top-0 z-20 mb-10 flex w-full items-end justify-center overflow-x-scroll overflow-y-visible border-b"
     >
       <TabGroup :selected-index="selectedTabIndex" as="template" @change="handleTabChange">
         <TabList
@@ -48,7 +48,7 @@
               :ref="(el) => setTabRef(grp.id, el)"
               v-reveal="Math.min(idx * 50, 350)"
               :aria-label="grp.label"
-              class="text-ui font-sans-alt focus-visible:bg-hover desktop:shrink-0 desktop:px-5 focus-visible:border-surface-tertiary desktop:h-20 relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl border border-b-0 border-transparent p-4 transition-colors duration-200 focus-visible:outline-0!"
+              class="text-ui font-sans-alt focus-visible:bg-hover desktop:shrink-0 desktop:px-5 focus-visible:border-surface-tertiary relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl border border-b-0 border-transparent p-4 transition-colors duration-200 focus-visible:outline-0!"
               :class="[
                 selected
                   ? 'text-text-primary font-normal'
@@ -90,7 +90,7 @@
     <!-- Grid -->
     <div
       ref="gridRef"
-      class="max-w-container desktop:px-20 desktop:grid-cols-12 relative grid min-h-[calc(100dvh-5rem)] w-full grid-flow-row-dense grid-cols-2 gap-8 px-4"
+      class="max-w-container desktop:px-20 desktop:grid-cols-12 relative z-0 grid min-h-[calc(100dvh-5rem)] w-full grid-flow-row-dense grid-cols-2 gap-8 px-4"
     >
       <!-- Description Card -->
       <div

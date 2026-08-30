@@ -47,7 +47,7 @@ export function initRealtimeSync(): RealtimeChannel {
         scheduleInvalidate(['trips', 'trips-with-images', 'admin-trips'])
       },
     )
-    .on(
+.on(
       'postgres_changes',
       {
         event: '*',
@@ -55,7 +55,21 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'now',
       },
       () => {
-        scheduleInvalidate(['now-posts', 'now-markdown', 'now-images'])
+        queryClient.invalidateQueries({ queryKey: ['now-posts'] })
+        queryClient.invalidateQueries({ queryKey: ['now-markdown'] })
+        queryClient.invalidateQueries({ queryKey: ['now-images'] })
+      },
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'blog',
+      },
+      () => {
+        queryClient.invalidateQueries({ queryKey: ['blog-posts'] })
+        queryClient.invalidateQueries({ queryKey: ['blog-post'] })
       },
     )
     .on(

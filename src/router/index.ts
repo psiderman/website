@@ -3,8 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { ensureUserRole, isAuthModalOpen } from '@/composables/useAuth'
 import { isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
 
-import HomeView from '../views/HomeView.vue'
-
 const SITE_URL = 'https://psiderman.com'
 const DEFAULT_TITLE = 'Karan Sanas | Personal Website'
 const DEFAULT_DESCRIPTION =
@@ -60,7 +58,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      component: HomeView,
+      component: () => import('../views/HomeView.vue'),
       meta: {
         description: DEFAULT_DESCRIPTION,
         title: DEFAULT_TITLE,
@@ -96,6 +94,24 @@ const router = createRouter({
       },
       name: 'Travel',
       path: '/travel',
+    },
+    {
+      component: () => import('../views/WritingView.vue'),
+      meta: {
+        description: 'Essays, poems, recaps, and everything else I write.',
+        title: 'Words | Karan Sanas',
+      },
+      name: 'Words',
+      path: '/words',
+    },
+    {
+      component: () => import('../views/PostView.vue'),
+      meta: {
+        description: 'A piece of writing.',
+        title: 'Writing | Karan Sanas',
+      },
+      name: 'Post',
+      path: '/words/:slug',
     },
     {
       component: () => import('../views/TermsView.vue'),

@@ -1,20 +1,20 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
     <div class="desktop:px-20 flex flex-col px-4">
-      <div class="flex flex-col gap-20 pt-10">
+      <div class="flex min-h-[calc(100svh-5rem)] flex-col gap-20 pt-10">
         <!-- <div class="text-ui flex flex-row items-center justify-start gap-2">
           <router-link to="/" class="breadcrumb main">home</router-link>
           <ChevronRight class="text-text-secondary" :size="16" />
           <router-link to="/now" class="breadcrumb level">now</router-link>
         </div> -->
 
-        <div v-if="isLoadingSlug || isLoadingMarkdown || isLoadingImages" class="aspect-4/1 w-full">
+        <div v-if="isLoadingSlug || isLoadingMarkdown || isLoadingImages" class="w-full grow">
           <GenericLoader />
         </div>
 
         <div
           v-else-if="slugError || markdownError"
-          class="bg-surface-secondary flex aspect-4/1 h-full w-full items-center justify-center rounded-xl"
+          class="bg-surface-secondary flex h-full w-full grow items-center justify-center rounded-xl"
         >
           <p class="text-mono text-text-tertiary">Error loading post.</p>
         </div>
@@ -107,7 +107,7 @@ const {
 // Parse markdown to HTML
 const parsedMarkdown = computed(() => {
   if (!markdownContent.value) return ''
-  const raw = marked.parse(markdownContent.value)
+  const raw = marked.parse(markdownContent.value, { breaks: true })
   return DOMPurify.sanitize(raw as string)
 })
 

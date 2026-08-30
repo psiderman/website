@@ -6,6 +6,7 @@ import MoviesCardContent from '@/components/cards/MoviesCardContent.vue'
 import SpotifyCardContainer from '@/components/cards/SpotifyCardContainer.vue'
 import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
+import WritingCardContent from '@/components/cards/WritingCardContent.vue'
 
 import type { FilterGroupId } from '@/types'
 
@@ -73,14 +74,33 @@ export const cards: Card[] = [
     title: 'what have i been watching?',
   },
   {
-    arrow: 'none',
+    arrow: 'right',
     content: TravelCardContent,
     group: ['travel'],
     id: 'travel',
     link: '/travel',
-    size: 'lg',
-    span: 'desktop:col-span-6 col-span-2',
+    size: 'md',
+    span: 'desktop:col-span-4 col-span-2',
     title: 'travel & photography',
+  },
+  {
+    arrow: 'help',
+    content: DrawCardContent,
+    group: ['building'],
+    id: 'guestbook',
+    size: 'md',
+    span: 'desktop:col-span-4 col-span-2',
+    title: 'artwork by guests',
+  },
+  {
+    arrow: 'right',
+    content: WritingCardContent,
+    group: ['life'],
+    id: 'words',
+    link: '/words',
+    size: 'md',
+    span: 'desktop:col-span-4 col-span-2',
+    title: 'what have i been writing?',
   },
   {
     arrow: 'external',
@@ -125,15 +145,6 @@ export const cards: Card[] = [
     size: 'sm',
     span: 'desktop:col-span-2 col-span-1',
     title: 'personal finance',
-  },
-  {
-    arrow: 'help',
-    content: DrawCardContent,
-    group: ['building'],
-    id: 'guestbook',
-    size: 'md',
-    span: 'desktop:col-span-4 col-span-2',
-    title: 'artwork by guests',
   },
   {
     arrow: 'external',

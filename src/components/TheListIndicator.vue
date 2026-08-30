@@ -2,7 +2,7 @@
   <component
     :is="as"
     v-tooltip="tooltipConfig"
-    class="border-light flex shrink-0 items-center justify-center rounded-full bg-green-500 select-none"
+    class="border-light flex shrink-0 cursor-help items-center justify-center rounded-full bg-green-500 select-none"
     :class="[
       sizeClasses,
       border && size === 'sm' ? 'border shadow-sm' : '',
