@@ -11,6 +11,7 @@ import { computed } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 
 import { initTheme } from './composables/useTheme'
+import { preloadUserLocation } from './composables/useUserLocation'
 import BlankLayout from './layouts/BlankLayout.vue'
 import DefaultLayout from './layouts/DefaultLayout.vue'
 
@@ -18,4 +19,5 @@ const route = useRoute()
 const layout = computed(() => (route.meta.layout === 'blank' ? BlankLayout : DefaultLayout))
 
 initTheme()
+preloadUserLocation()
 </script>
