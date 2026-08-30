@@ -324,6 +324,7 @@ const updateTime = () => {
 
 onMounted(() => {
   lastWish.value = localStorage.getItem('lastWishTime')
+  updateTime()
   timer = setInterval(updateTime, 1000)
 })
 

@@ -18,6 +18,7 @@
         <a
           v-for="(t, i) in display_tracks"
           :key="t.track_id"
+          v-reveal="Math.min(i * 70, 490)"
           class="text-ui-small focus-visible:outline-light/50! text-light hover:bg-hover-inverted active:bg-press-inverted relative flex w-full cursor-pointer flex-row gap-3 rounded-lg px-2 py-1"
           :href="t.song_url"
           target="_blank"

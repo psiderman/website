@@ -2,6 +2,7 @@
   <div class="avatar-stack flex flex-row items-center gap-0">
     <div
       v-if="!global.allowMultiplayer.value"
+      v-reveal
       v-tooltip="{
         content: 'Wilson',
         group: 'header-avatars',
@@ -47,13 +48,10 @@
         </span>
         <div
           v-if="isHighClearance(user.role) && user.id === activeUserId"
+          v-reveal
           class="bg-background absolute -right-2 -bottom-2 z-10 flex size-5.25 items-center justify-center rounded-full"
         >
-          <div
-            class="border-light flex size-4 items-center justify-center rounded-full border bg-green-500 shadow-sm"
-          >
-            <Star :size="10" fill="#fff" stroke-width="0" />
-          </div>
+          <TheListIndicator size="sm" />
         </div>
       </div>
     </div>
@@ -69,9 +67,9 @@
 </template>
 
 <script setup lang="ts">
-import { Star } from '@lucide/vue'
 import DOMPurify from 'dompurify'
 
+import TheListIndicator from '@/components/TheListIndicator.vue'
 import { global } from '@/composables/useGlobal'
 import { isHighClearance } from '@/composables/useTravel'
 

@@ -43,6 +43,7 @@
                 v-for="travel in travelsByYear[year]"
                 :key="travel.slug"
                 :ref="(el) => setCardRef(el, travel.slug)"
+                v-reveal
                 class="border-border-primary bg-surface-primary desktop:h-fit noscrollbar desktop:w-full desktop:snap-start desktop:scroll-mt-14 pointer-events-auto flex h-80 w-[90svw] snap-center snap-always flex-col overflow-y-scroll rounded-xl border p-0 transition-colors duration-200"
                 :class="[currentUser?.id ? 'cursor-pointer hover:shadow-xs' : '']"
                 :data-sync="travel.slug"
@@ -56,6 +57,7 @@
                   <button
                     v-for="(img, idx) in travel.images"
                     :key="img.id"
+                    v-reveal="Math.min(idx * 70, 490)"
                     type="button"
                     :aria-label="`Open photo ${img.name}`"
                     class="size-20 shrink-0 cursor-pointer snap-start overflow-hidden p-0"
@@ -90,14 +92,9 @@
                       <!-- Close Friends -->
                       <div
                         v-if="isHighClearance(travel.clearance)"
-                        v-tooltip="{ content: 'you’re on “the list”' }"
                         class="flex size-10 shrink-0 items-center justify-center"
                       >
-                        <div
-                          class="flex size-5 items-center justify-center rounded-full bg-green-500"
-                        >
-                          <Star :size="12" fill="#fff" stroke-width="0" />
-                        </div>
+                        <TheListIndicator size="md" :border="false" tooltip />
                       </div>
                       <!-- Repeat status -->
                       <div
@@ -214,10 +211,11 @@
 </template>
 
 <script setup lang="ts">
-import { Pin, Repeat, RepeatOff, Star } from '@lucide/vue'
+import { Pin, Repeat, RepeatOff } from '@lucide/vue'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import GenericLoader from '@/components/GenericLoader.vue'
+import TheListIndicator from '@/components/TheListIndicator.vue'
 import TravelMap from '@/components/TravelMap.vue'
 import { currentUser } from '@/composables/useAuth'
 import { isAuthModalOpen } from '@/composables/useAuth'

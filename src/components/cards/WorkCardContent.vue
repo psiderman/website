@@ -46,7 +46,11 @@
 
       <!-- Blocks -->
       <div class="absolute z-10 -mt-px flex w-full flex-col px-10 py-10.5 pl-20">
-        <div v-for="block in timelineData.blocks" :key="`${block.org}-${block.startDate}`">
+        <div
+          v-for="(block, idx) in timelineData.blocks"
+          :key="`${block.org}-${block.startDate}`"
+          v-reveal="Math.min(idx * 70, 490)"
+        >
           <div
             class="grid w-full grid-cols-2 pt-0.75 pb-0.5"
             :style="{ height: `${block.heightPx}px` }"

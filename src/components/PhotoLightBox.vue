@@ -134,13 +134,12 @@
                     class="desktop:max-w-[40svw] pointer-events-none block h-auto max-h-[calc(100svh-10rem)] w-auto max-w-[80svw] rounded-xs object-contain select-none"
                   />
                   <!-- Green star badge for 'the list' -->
-                  <div
+                  <TheListIndicator
                     v-if="isHighClearance(card.img.clearance)"
-                    v-tooltip="{ content: 'you’re on “the list”' }"
-                    class="border-light desktop:size-8 desktop:border-3 absolute top-2 right-2 flex size-7 items-center justify-center rounded-full border-2 bg-green-500 shadow-md select-none"
-                  >
-                    <Star :size="16" fill="#fff" stroke-width="0" />
-                  </div>
+                    size="lg"
+                    tooltip
+                    class="absolute top-2 right-2"
+                  />
                 </div>
                 <div
                   class="flex min-h-12 w-0 min-w-full items-center justify-center pt-3 text-center"
@@ -180,12 +179,11 @@
                     "
                     class="desktop:max-w-[40svw] pointer-events-none block h-auto max-h-[calc(100svh-10rem)] w-auto max-w-[85svw] rounded-xs object-contain select-none"
                   />
-                  <div
+                  <TheListIndicator
                     v-if="isHighClearance(card.img.clearance)"
-                    class="border-light desktop:size-8 desktop:border-3 absolute top-2 right-2 flex size-7 items-center justify-center rounded-full border-2 bg-green-500 shadow-md select-none"
-                  >
-                    <Star :size="16" fill="#fff" stroke-width="0" />
-                  </div>
+                    size="lg"
+                    class="absolute top-2 right-2"
+                  />
                 </div>
                 <div
                   class="flex min-h-12 w-0 min-w-full items-center justify-center pt-3 text-center"
@@ -208,9 +206,10 @@
 
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ArrowRight, Star, Undo2 } from '@lucide/vue'
+import { ArrowRight, Undo2 } from '@lucide/vue'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 
+import TheListIndicator from '@/components/TheListIndicator.vue'
 import { photoLightBoxData } from '@/composables/useGlobal'
 import { type ClearanceLevel, isHighClearance, useTravelsWithImages } from '@/composables/useTravel'
 

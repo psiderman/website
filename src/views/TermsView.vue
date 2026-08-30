@@ -10,13 +10,16 @@
         </div>
 
         <!-- Header -->
-        <div class="text-p mx-auto w-full max-w-prose text-left">
+        <div v-reveal class="text-p mx-auto w-full max-w-prose text-left">
           <h1 class="text-display -mb-14">Terms of Service</h1>
           <p class="text-text-secondary text-ui-small mt-16">Last updated: August 25, 2026</p>
         </div>
 
         <!-- Content -->
-        <div class="text-p text-text-primary mx-auto max-w-prose space-y-6 pb-20 text-left">
+        <div
+          v-reveal="120"
+          class="text-p text-text-primary mx-auto max-w-prose space-y-6 pb-20 text-left"
+        >
           <p>
             Welcome to my personal website! By accessing or using this site, you agree to comply
             with and be bound by these Terms of Service.

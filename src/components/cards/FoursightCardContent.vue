@@ -11,6 +11,7 @@
       height="436"
     />
     <img
+      v-reveal="0"
       src="@/assets/home/foursight-wordmark.svg"
       class="pointer-events-none z-10 h-8"
       width="200"
@@ -18,6 +19,7 @@
       alt="foursight wordmark"
     />
     <img
+      v-reveal="80"
       src="@/assets/home/app.webp"
       class="desktop:h-auto desktop:mb-0 pointer-events-none z-10 -mb-4 h-full w-auto rounded-lg object-contain object-bottom shadow-xl"
       width="633"

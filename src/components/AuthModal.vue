@@ -98,13 +98,12 @@
                     aria-label="request access to “the list”"
                   />
                   <span>request access to “the list”</span>
-                  <span
-                    v-tooltip="{ content: 'yes, <i>the</i> list', allowHTML: true }"
-                    class="border-light flex size-4 items-center justify-center rounded-full border bg-green-500 shadow-sm"
+                  <TheListIndicator
+                    as="span"
+                    size="sm"
+                    tooltip="yes, <i>the</i> list"
                     @click.stop
-                  >
-                    <Star :size="10" fill="#fff" stroke-width="0" />
-                  </span>
+                  />
                 </label>
               </div>
             </DialogPanel>
@@ -117,9 +116,10 @@
 
 <script setup lang="ts">
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { Bird, Bot, Dog, FaceAngry, FaceSlightlySmiling, Star } from '@lucide/vue'
+import { Bird, Bot, Dog, FaceAngry, FaceSlightlySmiling } from '@lucide/vue'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
+import TheListIndicator from '@/components/TheListIndicator.vue'
 import { supabase } from '@/supabase'
 
 const props = defineProps<{

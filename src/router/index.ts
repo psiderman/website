@@ -119,6 +119,7 @@ const router = createRouter({
       component: () => import('../views/NotFoundView.vue'),
       meta: {
         description: 'That page doesn’t exist.',
+        layout: 'blank',
         noindex: true,
         title: 'Page Not Found | Karan Sanas',
       },

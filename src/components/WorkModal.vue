@@ -144,8 +144,9 @@
                     </p>
                     <component
                       :is="project.link ? 'a' : 'div'"
-                      v-for="project in work.data?.projects"
+                      v-for="(project, idx) in work.data?.projects"
                       :key="project.name"
+                      v-reveal="Math.min(idx * 70, 490)"
                       :href="project.link"
                       :target="project.link ? '_blank' : undefined"
                       class="-mx-2 -my-1 flex w-fit flex-row items-center gap-2 rounded-lg px-2 py-1"

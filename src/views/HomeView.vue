@@ -6,6 +6,7 @@
       class="max-w-container desktop:p-20 desktop:flex-row flex w-full flex-col items-center justify-center gap-8 p-6"
     >
       <img
+        v-reveal
         src="@/assets/public.webp"
         alt="karan sanas"
         class="border-border-primary dark:border-light/20 aspect-auto h-50 rounded-[4.16rem] border"
@@ -18,9 +19,9 @@
         <div
           class="text-ui text-text-secondary desktop:items-start desktop:text-left flex flex-col items-center gap-2 text-center"
         >
-          <p>@psiderman</p>
-          <h1 class="text-display text-text-primary -mt-2">hi, i’m karan</h1>
-          <p class="text-ui">
+          <p v-reveal="70">@psiderman</p>
+          <h1 v-reveal="140" class="text-display text-text-primary -mt-2">hi, i’m karan</h1>
+          <p v-reveal="210" class="text-ui">
             i’m still searching for a one-liner to sum me up.
             <br class="desktop:block hidden" />
             until then my life is a bento box of endless interests,
@@ -41,9 +42,10 @@
         class="max-w-container desktop:justify-center desktop:px-20 relative flex w-full flex-row items-start justify-between gap-1"
       >
         <button
-          v-for="grp in filterGroups"
+          v-for="(grp, idx) in filterGroups"
           :key="grp.id"
           :ref="(el) => setTabRef(grp.id, el)"
+          v-reveal="Math.min(idx * 70, 490)"
           :aria-label="grp.label"
           class="text-ui font-sans-alt focus-visible:bg-hover desktop:shrink-0 desktop:px-5 focus-visible:border-surface-tertiary relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl border border-b-0 border-transparent p-4 transition-colors duration-200 focus-visible:outline-0!"
           :class="[
@@ -53,7 +55,7 @@
           ]"
           @click="handleFilterClick(grp.id)"
         >
-          <div class="flex h-6 items-center justify-center">
+          <div v-reveal class="flex h-6 items-center justify-center">
             <component :is="grp.icon" :size="20" aria-hidden="true" />
           </div>
           <div
@@ -90,6 +92,7 @@
       <!-- Description Card -->
       <div
         v-if="activeFilter !== 'home' && activeDescription.id"
+        v-reveal
         class="border-border-primary bg-surface-primary desktop:col-span-4 pointer-events-auto col-span-2 row-span-3 flex h-124 flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
       >
         <div class="aspect-video">
@@ -110,9 +113,10 @@
       </div>
       <!-- All Cards -->
       <CardContainer
-        v-for="card in filteredCards"
+        v-for="(card, idx) in filteredCards"
         :key="card.id"
         v-slot="{ isIconHovered }"
+        v-reveal="Math.min(idx * 70, 490)"
         :class="card.span"
         :title="card.title"
         :arrow="card.arrow"
@@ -284,9 +288,11 @@ const handleFilterClick = (id: FilterGroupId) => {
   }
 }
 
-watch(activeFilter, async () => {
+watch(activeFilter, async (newVal, oldVal) => {
   if (settleTimeoutId) clearTimeout(settleTimeoutId)
-  scrollToFilterBar()
+  if (oldVal && oldVal !== newVal) {
+    scrollToFilterBar()
+  }
   await nextTick()
   updateIndicator()
   settleTimeoutId = setTimeout(() => {
