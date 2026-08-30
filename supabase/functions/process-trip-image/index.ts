@@ -2,6 +2,7 @@ declare const Deno: any
 
 import { createClient } from '@supabase/supabase-js'
 import ExifReader from 'exifreader'
+// @ts-expect-error image-size is available in Deno.
 import { imageSize } from 'image-size'
 
 interface StorageWebhookPayload {

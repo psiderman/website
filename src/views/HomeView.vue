@@ -130,6 +130,7 @@
         <CardCarousel
           v-else-if="card.carousel"
           :images="card.images"
+          :interactive="card.lightbox"
           :is-error="card.isError"
           :is-loading="card.isLoading"
           :title="card.title"
@@ -320,6 +321,7 @@ interface GridCard extends Card {
   isError?: boolean
   isExtra?: boolean
   isLoading?: boolean
+  lightbox?: boolean
 }
 
 const filteredCards = computed<GridCard[]>(() => {
@@ -366,6 +368,7 @@ const filteredCards = computed<GridCard[]>(() => {
         imageUrl:
           extra.cover || (extra.images && extra.images.length > 0 ? extra.images[0] : undefined),
         isExtra: true,
+        lightbox: extra.lightbox,
         link: extra.link,
         size: extra.size || 'sm',
         span:
@@ -405,7 +408,7 @@ function openCarouselPhotoLightbox(extra: ExtraCard, startIndex = 0) {
 const handleCarouselClick = (card: GridCard, idx: number) => {
   if (card.isExtra && card.extraKey && card.extraIndex !== undefined) {
     const extra = extraCards.value[card.extraKey as FilterGroupId]?.[card.extraIndex]
-    if (extra && (extra.carousel || card.carousel)) {
+    if (extra && extra.lightbox) {
       openCarouselPhotoLightbox(extra, idx)
     }
   }
@@ -415,7 +418,7 @@ const handleCardClick = (card: GridCard) => {
   if (card.isExtra && card.size === 'md' && card.extraKey && card.extraIndex !== undefined) {
     const extra = extraCards.value[card.extraKey as FilterGroupId]?.[card.extraIndex]
     if (extra) {
-      if (extra.carousel || card.carousel) {
+      if (extra.lightbox) {
         openCarouselPhotoLightbox(extra, 0)
       } else {
         lightBoxData.value = {
