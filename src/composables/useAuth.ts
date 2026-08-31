@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 
-import { clearPersistedCache, queryClient } from '@/queryClient'
+import { forceSignOut, queryClient } from '@/queryClient'
 import { supabase } from '@/supabase'
 
 import type { User } from '@supabase/supabase-js'
@@ -17,10 +17,9 @@ export const isAdmin = computed(() => currentUserRole.value === 'admin')
 // Sign out and wipe all cached query data (incl. localStorage persistence)
 // so the next user never sees this user's trips, travel images, etc.
 export async function signOut() {
-  await supabase.auth.signOut()
+  await forceSignOut()
   currentUser.value = null
   currentUserRole.value = null
-  clearPersistedCache()
 }
 
 export const fetchUserRole = async (userId?: string) => {

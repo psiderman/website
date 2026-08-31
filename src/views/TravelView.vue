@@ -1,6 +1,6 @@
 <template>
   <div class="flex w-full flex-col gap-0">
-    <div class="flex h-[calc(100svh-80px)] flex-col">
+    <div class="desktop:h-[calc(100svh-80px)] flex h-svh flex-col">
       <!-- Loading State -->
       <div
         v-if="isLoading"

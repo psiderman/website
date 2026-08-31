@@ -1,14 +1,14 @@
 <template>
   <footer
     data-sync="footer"
-    class="text-light/75 relative flex w-screen flex-col items-center justify-center gap-20 bg-gray-950 pt-20 pb-0 dark:bg-zinc-950"
+    class="text-light/75 relative flex w-screen flex-col items-center justify-center gap-20 overflow-hidden bg-gray-950 pt-20 pb-0 dark:bg-zinc-950"
   >
     <!-- Github Code -->
     <a
       :href="`https://github.com/psiderman/website/commit/${commit}`"
       target="_blank"
       rel="noopener noreferrer"
-      class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors duration-200 focus:outline-2 focus:outline-offset-2 focus:outline-light"
+      class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 focus:outline-light absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors duration-200 focus:outline-2 focus:outline-offset-2"
     >
       <div class="flex size-4 items-center justify-center" aria-hidden="true">
         <FA class="size-4" :icon="['fab', 'github']" />
@@ -20,18 +20,29 @@
 
     <!-- Footer Links -->
     <div class="text-ui flex flex-col items-center justify-center gap-4">
-      <div class="flex w-full flex-row gap-3">
-        <router-link to="/terms" class="rounded-full px-2 outline-gray-400! dark:outline-zinc-400!"
+      <div class="flex w-full flex-row items-center justify-center gap-3">
+        <router-link
+          to="/terms"
+          class="hover:bg-light-5p active:bg-light-10p hover:text-light -mx-2 -my-1 rounded-full px-4 py-1 outline-gray-400! dark:outline-zinc-400!"
           >terms</router-link
         >
         <span class="text-light/50">✦</span>
         <router-link
           to="/privacy"
-          class="rounded-full px-2 outline-gray-400! dark:outline-zinc-400!"
+          class="hover:bg-light-5p active:bg-light-10p hover:text-light -mx-2 -my-1 rounded-full px-4 py-1 outline-gray-400! dark:outline-zinc-400!"
           >privacy</router-link
         >
+        <span class="text-light/50">✦</span>
+        <a
+          href="https://links.psiderman.com/resume"
+          target="_blank"
+          class="hover:bg-light-5p active:bg-light-10p hover:text-light -mx-2 -my-1 rounded-full px-4 py-1 outline-gray-400! dark:outline-zinc-400!"
+          >résumé</a
+        >
       </div>
-      <p>© {{ currentYear }} Karan Sanas</p>
+      <div class="flex w-full flex-row items-center justify-center gap-3">
+        <p>© {{ currentYear }} Karan Sanas</p>
+      </div>
     </div>
 
     <!-- Logo -->
@@ -39,13 +50,7 @@
       <div
         class="desktop:flex pointer-events-none hidden h-57.5 w-full items-start justify-center overflow-hidden"
       >
-        <img
-          src="@/assets/svg/wordmark.svg"
-          alt=""
-          aria-hidden="true"
-          width="1040"
-          height="300"
-        />
+        <img src="@/assets/svg/wordmark.svg" alt="" aria-hidden="true" width="1040" height="300" />
       </div>
       <div
         class="desktop:hidden pointer-events-none flex w-full items-start justify-center overflow-hidden"
