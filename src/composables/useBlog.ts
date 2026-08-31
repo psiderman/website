@@ -90,11 +90,11 @@ export function useBlogPost(slug: Ref<string> | string) {
         }
       }
 
+      const storagePath =
+        p.clearance === 'public' ? `${p.slug}/${p.slug}.md` : `pvt/${p.slug}/${p.slug}.md`
       const { data, error } = await supabase.storage
         .from('blog')
-        .download(`${p.slug}/${p.slug}.md`, {
-          cacheNonce: format(new Date(), 'yyMM'),
-        })
+        .download(storagePath, { cacheNonce: format(new Date(), 'yyMM') })
       if (error) throw error
 
       return {

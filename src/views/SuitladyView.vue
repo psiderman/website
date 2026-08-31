@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen w-screen items-center justify-center bg-zinc-950">
+  <div class="flex h-screen w-full items-center justify-center bg-zinc-950">
     <div class="bg-background mx-auto flex h-dvh w-full max-w-120 flex-col overflow-hidden">
       <TabGroup
         :selected-index="selectedTab"

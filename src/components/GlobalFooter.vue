@@ -1,7 +1,7 @@
 <template>
   <footer
     data-sync="footer"
-    class="text-light/75 relative flex w-screen flex-col items-center justify-center gap-20 overflow-hidden bg-gray-950 pt-20 pb-0 dark:bg-zinc-950"
+    class="text-light/75 relative flex w-full flex-col items-center justify-center gap-20 overflow-hidden bg-gray-950 pt-20 pb-0 dark:bg-zinc-950"
   >
     <!-- Github Code -->
     <a

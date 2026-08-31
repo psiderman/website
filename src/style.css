@@ -693,12 +693,18 @@
  * Canvas = footer color → bottom overscroll seamless.
  * #app paints the actual page background over it.
  */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   @apply bg-gray-950 dark:bg-zinc-950;
 }
 
 #app {
   @apply bg-background;
+  overflow-x: clip;
 }
 
 input,

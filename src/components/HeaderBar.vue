@@ -1,7 +1,7 @@
 <template>
   <header
     data-sync="header"
-    class="pointer-events-none z-30 flex w-screen flex-row items-center justify-center"
+    class="pointer-events-none z-30 flex w-full flex-row items-center justify-center"
     :class="{ 'desktop:sticky desktop:top-0': isHome }"
   >
     <div
