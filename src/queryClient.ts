@@ -19,7 +19,19 @@ const AUTH_SCOPED_PREFIXES = [
   'now-markdown',
 ]
 
+// Queries whose results depend on the signed-in user (clearance-gated trips,
+// blog listing + gated markdown, now page). These must never be written to
+// localStorage: a persisted cache would let the next visitor see the previous
+// user's gated data without re-checking auth.
+const SENSITIVE_PREFIXES = [...AUTH_SCOPED_PREFIXES, 'blog-posts', 'blog-post', 'blog-post-content']
+
 const persister = experimental_createQueryPersister({
+  filters: {
+    predicate: (query) => {
+      const key = query.queryKey[0]
+      return typeof key !== 'string' || !SENSITIVE_PREFIXES.includes(key)
+    },
+  },
   maxAge: 1000 * 60 * 60 * 12, // 12 hours
   storage: window.localStorage,
 })
@@ -40,7 +52,7 @@ export const queryClient = new QueryClient({
         const isAuthError =
           err.code === 'PGRST303' || err.message === 'JWT expired' || err.status === 401
         if (isAuthError && isAuthScoped(query.queryKey)) {
-          supabase.auth.signOut()
+          void forceSignOut()
         }
       }
     },
@@ -56,6 +68,17 @@ export function clearPersistedCache() {
   keys.forEach((k) => window.localStorage.removeItem(k))
   queryClient.clear()
   void persister.removeQueries()
+}
+
+/**
+ * Hard sign-out used when an auth-scoped query proves the session is dead.
+ * Unlike a bare auth.signOut(), this also wipes the in-memory query cache and
+ * the localStorage persistence layer so the previous user's gated data can't
+ * resurface after the session ends.
+ */
+export async function forceSignOut() {
+  await supabase.auth.signOut()
+  clearPersistedCache()
 }
 
 function isAuthScoped(key: readonly unknown[]): boolean {
