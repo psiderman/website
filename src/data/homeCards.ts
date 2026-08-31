@@ -149,7 +149,7 @@ export const cards: Card[] = [
   {
     arrow: 'external',
     bgClass: 'bg-rose-200 dark:bg-rose-950',
-    group: ['travel', 'life'],
+    group: ['building'],
     id: 'blr',
     imageUrl: new URL('../assets/home/blr.webp', import.meta.url).href,
     link: 'https://links.psiderman.com/blr',
