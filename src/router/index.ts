@@ -15,6 +15,8 @@ interface RouteMeta extends Record<number | string | symbol, unknown> {
 }
 
 function applyRouteMeta(to: { meta: unknown; path: string }) {
+  if (typeof document === 'undefined') return
+
   const meta = (to.meta || {}) as RouteMeta
   const title = meta.title || DEFAULT_TITLE
   const description = meta.description || DEFAULT_DESCRIPTION
@@ -22,13 +24,13 @@ function applyRouteMeta(to: { meta: unknown; path: string }) {
 
   document.title = title
 
-  upsertMeta('name=description', 'content', description)
-  upsertMeta('property=og:title', 'content', title)
-  upsertMeta('property=og:description', 'content', description)
-  upsertMeta('property=og:url', 'content', url)
-  upsertMeta('name=twitter:title', 'content', title)
-  upsertMeta('name=twitter:description', 'content', description)
-  upsertMeta('name=robots', 'content', meta.noindex ? 'noindex, nofollow' : 'index, follow')
+  upsertMeta('name', 'description', description)
+  upsertMeta('property', 'og:title', title)
+  upsertMeta('property', 'og:description', description)
+  upsertMeta('property', 'og:url', url)
+  upsertMeta('name', 'twitter:title', title)
+  upsertMeta('name', 'twitter:description', description)
+  upsertMeta('name', 'robots', meta.noindex ? 'noindex, nofollow' : 'index, follow')
 
   setCanonical(to.path)
 }
@@ -43,15 +45,18 @@ function setCanonical(path: string) {
   link.href = `${SITE_URL}${path}`
 }
 
-function upsertMeta(selector: string, attr: string, value: string) {
+function upsertMeta(attrName: 'name' | 'property', attrValue: string, content: string) {
+  const selector =
+    attrName === 'property'
+      ? `meta[property="${attrValue}"], meta[name="${attrValue}"]`
+      : `meta[name="${attrValue}"]`
   let el = document.head.querySelector<HTMLMetaElement>(selector)
   if (!el) {
     el = document.createElement('meta')
-    const [attrName, attrValue] = selector.slice(1).split('=')
     el.setAttribute(attrName, attrValue)
     document.head.appendChild(el)
   }
-  el.setAttribute(attr, value)
+  el.setAttribute('content', content)
 }
 
 const router = createRouter({
@@ -168,4 +173,9 @@ router.afterEach((to) => {
   })
 })
 
+router.onError((error) => {
+  console.error('[router] Navigation error:', error)
+})
+
 export default router
+

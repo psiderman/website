@@ -2,7 +2,11 @@
   <div class="max-w-container flex w-full flex-col gap-0">
     <div class="desktop:px-20 flex flex-col px-4">
       <div class="flex min-h-[calc(100svh-5rem)] flex-col gap-20 pt-20">
-        <div v-reveal class="text-ui flex flex-row items-center justify-start gap-2">
+        <div
+          v-reveal
+          data-sync="post-breadcrumbs"
+          class="text-ui flex flex-row items-center justify-start gap-2"
+        >
           <router-link to="/" class="breadcrumb main">home</router-link>
           <ChevronRight class="text-text-secondary" :size="16" />
           <router-link to="/words" class="breadcrumb main">words</router-link>
@@ -38,6 +42,7 @@
         <!-- Login / clearance required to read this post -->
         <div
           v-else-if="content?.access === 'denied'"
+          data-sync="post-denied"
           class="bg-surface-secondary flex w-full grow flex-col items-center justify-center gap-4 rounded-xl"
         >
           <Lock :size="32" aria-hidden="true" class="text-text-tertiary" />
@@ -63,7 +68,8 @@
           <div
             v-if="parsedMarkdown"
             v-reveal="150"
-            class="text-p markdown-content text-text-primary mx-auto w-full max-w-prose overflow-hidden"
+            :data-sync="post.slug"
+            class="text-p markdown-content text-text-primary mx-auto w-full max-w-prose"
             v-html="parsedMarkdown"
           ></div>
         </template>
