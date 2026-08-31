@@ -22,7 +22,6 @@ export interface PresenceUser {
   isStale?: boolean
   name: string
   role?: null | string
-  room: string
 }
 
 interface CursorData {
@@ -144,13 +143,12 @@ const pendingColorFetch = ref(new Set<string>())
 
 let channel: null | ReturnType<typeof supabase.channel> = null
 
-export const activeRoomName = computed(() => {
-  let name = `live:${router.currentRoute.value.path}`
-  if (global.activeModal.value) {
-    name += `&modal=${global.activeModal.value}`
-  }
-  return name
-})
+// One site-wide presence room — everyone online is visible everywhere. Cursor
+// broadcast is gated to the home page only (see handleMouseMove), so presence
+// on other pages is enough to show "these people are here".
+const LIVE_ROOM = 'live:site'
+
+export const isHomeView = computed(() => router.currentRoute.value.path === '/')
 
 watch(
   [activeUserId, userName, userAvatar, currentUserRole],
@@ -163,7 +161,6 @@ watch(
           id,
           name,
           role,
-          room: activeRoomName.value,
         })
       }
     }
@@ -253,7 +250,6 @@ export const sortedPresenceUsers = computed(() => {
     id: activeUserId.value,
     name: userName.value,
     role: currentUserRole.value,
-    room: activeRoomName.value,
   }
 
   if (!global.allowMultiplayer.value) {
@@ -297,6 +293,7 @@ export const sortedPresenceUsers = computed(() => {
 
 export const renderCursors = computed(() => {
   if (!global.allowMultiplayer.value) return []
+  if (!isHomeView.value) return []
   return activeCursors.value.map((cursor) => {
     let renderX = cursor.x * windowWidth.value
     let renderY = cursor.y
@@ -323,6 +320,7 @@ export const renderCursors = computed(() => {
 
 export const renderTouches = computed(() => {
   if (!global.allowMultiplayer.value) return []
+  if (!isHomeView.value) return []
   return activeTouches.value.map((touch) => {
     let renderX = touch.x * windowWidth.value
     let renderY = touch.y
@@ -391,7 +389,7 @@ export function unregisterDriftEl(id: string) {
   }
 }
 
-const joinRoom = (roomName: string) => {
+const joinRoom = () => {
   if (channel) {
     channel.untrack()
     channel.unsubscribe()
@@ -407,7 +405,7 @@ const joinRoom = (roomName: string) => {
 
   if (!global.allowMultiplayer.value) return
 
-  channel = supabase.channel(roomName)
+  channel = supabase.channel(LIVE_ROOM)
 
   channel
     .on('presence', { event: 'sync' }, () => {
@@ -463,7 +461,6 @@ const joinRoom = (roomName: string) => {
           id: activeUserId.value,
           name: userName.value,
           role: currentUserRole.value,
-          room: activeRoomName.value,
         })
       }
     })
@@ -499,6 +496,7 @@ const handleScroll = () => {
 const handleMouseMove = (e: MouseEvent) => {
   if (isMobile.value) return // Mobile uses touchstart
   if (!global.allowMultiplayer.value) return
+  if (!isHomeView.value) return
   if (!hasOtherUsersOnRoom.value) return
   if (!channel) return
 
@@ -528,7 +526,6 @@ const handleMouseMove = (e: MouseEvent) => {
       color: userColor.value,
       id: activeUserId.value,
       name: userName.value,
-      room: activeRoomName.value,
       x,
       y,
     },
@@ -539,6 +536,7 @@ const handleMouseMove = (e: MouseEvent) => {
 const handleTouchStart = (e: TouchEvent) => {
   if (!isMobile.value) return
   if (!global.allowMultiplayer.value) return
+  if (!isHomeView.value) return
   if (!hasOtherUsersOnRoom.value) return
   if (!channel) return
   if (e.changedTouches.length === 0) return
@@ -570,7 +568,6 @@ const handleTouchStart = (e: TouchEvent) => {
       color: userColor.value,
       id: activeUserId.value,
       name: userName.value,
-      room: activeRoomName.value,
       timestamp: now,
       x,
       y,
@@ -592,25 +589,14 @@ const startLiveSession = () => {
   window.addEventListener('mousemove', handleMouseMove)
   window.addEventListener('touchstart', handleTouchStart, { passive: true })
 
-  joinRoom(activeRoomName.value)
-
-  // Watch for room changes to rejoin
-  activeWatchers.push(
-    watch(
-      () => activeRoomName.value,
-      (newRoom) => {
-        joinRoom(newRoom)
-      },
-      { immediate: false },
-    ),
-  )
+  joinRoom()
 
   // Watch for toggle to rejoin/leave
   activeWatchers.push(
     watch(
       () => global.allowMultiplayer.value,
       (allow) => {
-        if (allow) joinRoom(activeRoomName.value)
+        if (allow) joinRoom()
         else {
           if (channel) {
             channel.untrack()

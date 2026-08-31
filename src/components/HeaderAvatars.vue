@@ -37,7 +37,7 @@
     >
       <div
         class="flex size-9 items-center justify-center rounded-full"
-        :class="{ 'opacity-50': user.room !== activeRoomName || user.isStale }"
+        :class="{ 'opacity-50': user.isStale }"
         :style="{ backgroundColor: user.color?.bg, color: user.color?.fg }"
       >
         <img
@@ -79,7 +79,6 @@ import { global } from '@/composables/useGlobal'
 import { isHighClearance } from '@/composables/useTravel'
 
 import {
-  activeRoomName,
   activeUserId,
   type PresenceUser,
   sortedPresenceUsers,
