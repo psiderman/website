@@ -18,14 +18,14 @@
 
         <div
           v-if="isLoading"
-          class="bg-surface-secondary flex w-full grow flex-col items-center justify-center"
+          class="bg-surface-secondary flex min-h-120 w-full grow flex-col items-center justify-center"
         >
           <GenericLoader />
         </div>
 
         <div
           v-else-if="isNotFound"
-          class="bg-surface-secondary flex w-full grow flex-col items-center justify-center gap-4 rounded-xl"
+          class="bg-surface-secondary flex min-h-120 w-full grow flex-col items-center justify-center gap-4 rounded-xl"
         >
           <FileX :size="32" class="text-text-tertiary" />
           <p class="text-mono text-text-tertiary">The post you're trying to find doesn't exist.</p>
@@ -33,7 +33,7 @@
 
         <div
           v-else-if="error"
-          class="bg-surface-secondary flex w-full grow flex-col items-center justify-center gap-4 rounded-xl"
+          class="bg-surface-secondary flex min-h-120 w-full grow flex-col items-center justify-center gap-4 rounded-xl"
         >
           <FileExclamationPoint :size="32" class="text-text-tertiary" />
           <p class="text-mono text-text-tertiary">Error loading post.</p>
@@ -43,11 +43,21 @@
         <div
           v-else-if="content?.access === 'denied'"
           data-sync="post-denied"
-          class="bg-surface-secondary flex w-full grow flex-col items-center justify-center gap-4 rounded-xl"
+          class="bg-surface-secondary flex min-h-120 w-full grow flex-col items-center justify-center gap-4 rounded-xl"
         >
-          <Lock :size="32" aria-hidden="true" class="text-text-tertiary" />
+          <Lock
+            :size="32"
+            aria-hidden="true"
+            class="text-text-tertiary dark:text-light dark:opacity-50"
+          />
           <h2 class="text-h2">{{ post?.title }}</h2>
-          <p class="text-p text-text-tertiary max-w-sm text-center">
+          <p
+            v-if="!currentUser"
+            class="text-p text-text-tertiary max-w-sm text-center text-balance"
+          >
+            log in to see if you have access.
+          </p>
+          <p v-else class="text-p text-text-tertiary max-w-sm text-center text-balance">
             this post isn’t public yet. if you think you should have access, DM me.
           </p>
           <button
@@ -96,17 +106,6 @@ const route = useRoute()
 const slug = computed(() => (typeof route.params.slug === 'string' ? route.params.slug : ''))
 
 const { content, error, isLoading, isNotFound, post } = useBlogPost(slug)
-
-// Auto-prompt for login when a logged-out user lands on a gated post
-watch(
-  content,
-  (c) => {
-    if (c?.access === 'denied' && !currentUser.value) {
-      isAuthModalOpen.value = true
-    }
-  },
-  { immediate: true },
-)
 
 // Override the router title once the post resolves (post titles aren't known at route meta time)
 watch(

@@ -55,11 +55,24 @@
                   <p class="text-h2 text-text-primary group-hover:underline">
                     {{ post.title }}
                   </p>
-                  <p v-if="post.excerpt" class="text-p text-text-secondary line-clamp-1">
+                  <p
+                    v-if="post.hasAccess && post.excerpt"
+                    class="text-p text-text-secondary line-clamp-1"
+                  >
                     {{ post.excerpt }}…
                   </p>
                   <p class="text-ui-small text-text-tertiary flex flex-row items-center gap-2">
-                    <TheListIndicator v-if="isHighClearance(post.clearance)" size="sm" tooltip />
+                    <Lock
+                      v-if="!post.hasAccess"
+                      :size="12"
+                      class="dark:text-light shrink-0 dark:opacity-50"
+                      aria-label="locked post"
+                    />
+                    <TheListIndicator
+                      v-if="post.hasAccess && isHighClearance(post.clearance)"
+                      size="sm"
+                      tooltip
+                    />
                     <span> {{ format(new Date(post.date), 'dd MMMM, yyyy') }} </span>
                     <span> • </span>
                     <span> {{ post.minutes }} min read </span>
@@ -75,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { CloudAlert, Ghost } from '@lucide/vue'
+import { CloudAlert, Ghost, Lock } from '@lucide/vue'
 import { format } from 'date-fns'
 import { computed } from 'vue'
 

@@ -11,6 +11,9 @@ export interface BlogPost {
   clearance: ClearanceLevel
   date: Date
   excerpt: string
+  // Whether the current viewer may read this post's content. Always false when
+  // not signed in (except public posts). Used by the list to show locks.
+  hasAccess: boolean
   isActive: boolean
   minutes: number
   slug: string
@@ -135,7 +138,13 @@ export function useBlogPosts() {
       const rows = (data ?? []).map((row) => rowToBlogPost(row as Record<string, unknown>))
       const role = await ensureUserRole()
 
-      return rows.filter((post) => hasBlogAccess(post.clearance, effectiveRole(role)))
+      // Return the full catalog — every post, locked or not — each tagged with
+      // whether the current viewer can actually read it. The list UI decides
+      // how to present locked rows (title/date/minutes + lock icon, no excerpt).
+      return rows.map((post) => ({
+        ...post,
+        hasAccess: hasBlogAccess(post.clearance, effectiveRole(role)),
+      }))
     },
     queryKey: ['blog-posts'],
   })
@@ -158,6 +167,7 @@ function rowToBlogPost(row: Record<string, unknown>): BlogPost {
     // the UTC-midnight off-by-one that shifts dates a day early west of UTC.
     date: parse(row.date as string, 'yyyy-MM-dd', new Date()),
     excerpt: (row.excerpt as string) ?? '',
+    hasAccess: false,
     isActive: (row.is_active as boolean) ?? true,
     minutes: (row.minutes as number) ?? 2,
     slug: row.slug as string,
