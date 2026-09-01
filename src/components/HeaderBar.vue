@@ -2,7 +2,7 @@
   <header
     data-sync="header"
     class="pointer-events-none z-30 flex w-full flex-row items-center justify-center"
-    :class="{ 'desktop:sticky desktop:top-0': isHome }"
+    :class="{ 'desktop:sticky desktop:top-0': isHomeView }"
   >
     <div
       class="max-w-container desktop:px-10 flex w-full flex-row items-center justify-between px-4 py-5"
@@ -14,7 +14,7 @@
       <div class="desktop:gap-4 pointer-events-none flex flex-row items-center gap-2">
         <!-- Avatar stack -->
         <div
-          :class="{ 'avatar-scroll-out': isHome }"
+          :class="{ 'avatar-scroll-out': isHomeView }"
           class="desktop:flex pointer-events-auto hidden"
         >
           <HeaderAvatars v-reveal="50" />
@@ -72,18 +72,13 @@
 
 <script setup lang="ts">
 import { LogIn, LogOut, MousePointer2, MousePointer2Off } from '@lucide/vue'
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
 
 import { currentUser, isAuthModalOpen, signOut } from '../composables/useAuth'
 import { global } from '../composables/useGlobal'
-import { toggleMultiplayer } from '../composables/useLive'
+import { isHomeView, toggleMultiplayer } from '../composables/useLive'
 import HeaderAvatars from './HeaderAvatars.vue'
 import LocationWish from './LocationWish.vue'
 import ThemeToggle from './ThemeToggle.vue'
-
-const route = useRoute()
-const isHome = computed(() => route.name === 'Home' || route.path === '/')
 </script>
 
 <style scoped>

@@ -11,7 +11,7 @@ export const isAuthModalOpen = ref(false)
 // Global state for the current authenticated user
 export const currentUser = ref<null | User>(null)
 export const currentUserRole = ref<null | string>(null)
-export const isRoleLoading = ref(false)
+const isRoleLoading = ref(false)
 export const isAdmin = computed(() => currentUserRole.value === 'admin')
 
 // Sign out and wipe all cached query data (incl. localStorage persistence)
@@ -22,7 +22,7 @@ export async function signOut() {
   currentUserRole.value = null
 }
 
-export const fetchUserRole = async (userId?: string) => {
+const fetchUserRole = async (userId?: string) => {
   const uid = userId ?? currentUser.value?.id
   if (!uid) return (currentUserRole.value = null)
 

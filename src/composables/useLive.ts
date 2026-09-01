@@ -5,13 +5,6 @@ import { global } from '@/composables/useGlobal'
 import router from '@/router'
 import { supabase } from '@/supabase'
 
-export interface BoxRect {
-  height: number
-  left: number
-  top: number
-  width: number
-}
-
 export interface PresenceUser {
   avatar: null | string
   color: {
@@ -23,6 +16,13 @@ export interface PresenceUser {
   name: string
   role?: null | string
   route?: string
+}
+
+interface BoxRect {
+  height: number
+  left: number
+  top: number
+  width: number
 }
 
 interface CursorData {
@@ -223,7 +223,7 @@ watch(
 )
 
 // Global reactive state
-export const hasOtherUsersOnRoom = ref(false)
+const hasOtherUsersOnRoom = ref(false)
 const activePresenceUsers = ref<PresenceUser[]>([])
 const cursors = ref<Record<string, CursorData>>({})
 const touches = ref<Record<string, TouchData>>({})

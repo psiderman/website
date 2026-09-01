@@ -213,7 +213,7 @@ import TheListIndicator from '@/components/TheListIndicator.vue'
 import { photoLightBoxData } from '@/composables/useGlobal'
 import { type ClearanceLevel, isHighClearance, useTravelsWithImages } from '@/composables/useTravel'
 
-export interface PhotoLightBoxImage {
+interface PhotoLightBoxImage {
   caption?: null | string
   clearance?: ClearanceLevel | null | string
   height?: null | number

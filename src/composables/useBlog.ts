@@ -20,12 +20,12 @@ export interface BlogPost {
   title: string
 }
 
-export type BlogPostAccess = 'denied' | 'granted' | 'public'
-
 export interface BlogPostContent {
   access: BlogPostAccess
   markdown: string
 }
+
+type BlogPostAccess = 'denied' | 'granted' | 'public'
 
 const CLEARANCE_RANK: Record<ClearanceLevel, number> = {
   admin: 5,
@@ -34,17 +34,6 @@ const CLEARANCE_RANK: Record<ClearanceLevel, number> = {
   friends: 3,
   known: 2,
   public: 0,
-}
-
-export function hasBlogAccess(required: ClearanceLevel, role: null | string): boolean {
-  // 'public' is the only level readable without signing in. Everything else —
-  // even 'auth' — needs a signed-in user whose role clears it. The blog table
-  // listing is public (titles/excerpts), but the actual files never are.
-  if (required === 'public') return true
-  if (!role) return false
-  const roleRank = CLEARANCE_RANK[role as ClearanceLevel]
-  if (roleRank === undefined) return false
-  return roleRank >= CLEARANCE_RANK[required]
 }
 
 export function useBlogPost(slug: Ref<string> | string) {
@@ -158,6 +147,17 @@ export function useBlogPosts() {
 function effectiveRole(role: null | string): null | string {
   if (role) return role
   return currentUser.value ? 'auth' : null
+}
+
+function hasBlogAccess(required: ClearanceLevel, role: null | string): boolean {
+  // 'public' is the only level readable without signing in. Everything else —
+  // even 'auth' — needs a signed-in user whose role clears it. The blog table
+  // listing is public (titles/excerpts), but the actual files never are.
+  if (required === 'public') return true
+  if (!role) return false
+  const roleRank = CLEARANCE_RANK[role as ClearanceLevel]
+  if (roleRank === undefined) return false
+  return roleRank >= CLEARANCE_RANK[required]
 }
 
 function rowToBlogPost(row: Record<string, unknown>): BlogPost {

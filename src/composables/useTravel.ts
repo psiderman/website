@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/vue-query'
 import { format } from 'date-fns'
-import { computed, type Ref } from 'vue'
 
 import { getStorageUrl, supabase } from '@/supabase'
 
@@ -23,7 +22,6 @@ export interface TravelImage {
   width: null | number
 }
 
-
 // Matches the public.trips table (snake_case from Supabase → camelCase here)
 export interface Trip {
   clearance: ClearanceLevel
@@ -43,71 +41,6 @@ export interface TripWithImages extends Trip {
 
 export function isHighClearance(level?: ClearanceLevel | null | string): boolean {
   return !!level && ['admin', 'close', 'friends'].includes(level)
-}
-
-export function useTravel(slug: Ref<null | string> | Ref<string> | string) {
-  const slugRef = computed(() => {
-    if (typeof slug === 'string') return slug
-    return slug.value
-  })
-
-  const {
-    data: images,
-    error,
-    isLoading,
-    refetch,
-  } = useQuery<TravelImage[]>({
-    enabled: computed(() => !!slugRef.value),
-    gcTime: 1000 * 60 * 60, // 1 hour
-    queryFn: async () => {
-      if (!slugRef.value) return []
-
-      // Ensure session is fresh (refreshes token if expired, or clears it for anon request)
-      await supabase.auth.getSession()
-
-      // 1. Fetch images from public.trip_images (RLS handles clearance visibility)
-      const { data: dbImages, error: dbError } = await supabase
-        .from('trip_images')
-        .select('*')
-        .eq('trip_slug', slugRef.value)
-        .order('sort_order', { ascending: true, nullsFirst: false })
-        .order('date_taken', { ascending: true, nullsFirst: false })
-
-      if (dbError) throw dbError
-      if (!dbImages || dbImages.length === 0) return []
-
-      return dbImages.map((img) => {
-        const name = (img.storage_path as string).split('/').pop() || img.storage_path
-        const url = getStorageUrl('travel', img.storage_path as string)
-        const thumbnailUrl = getStorageUrl('travel', `thumb/${img.storage_path}`)
-        return {
-          caption: (img.caption as null | string) ?? null,
-          clearance: (img.clearance as ClearanceLevel) || 'public',
-          dateTaken: img.date_taken ? new Date(img.date_taken as string) : null,
-          height: (img.height as null | number) ?? null,
-          id: img.id as string,
-          location: {
-            lat: (img.lat as null | number) ?? null,
-            lng: (img.lng as null | number) ?? null,
-          },
-          name,
-          storagePath: img.storage_path as string,
-          thumbnailUrl,
-          url,
-          width: (img.width as null | number) ?? null,
-        }
-      })
-    },
-    queryKey: ['trip-images', slugRef],
-    staleTime: 1000 * 60 * 15, // Cache for 15 minutes
-  })
-
-  return {
-    error,
-    images,
-    isLoading,
-    refetch,
-  }
 }
 
 export function useTravelsWithImages() {
@@ -185,33 +118,6 @@ export function useTravelsWithImages() {
     refetch,
     travelsWithImages,
   }
-}
-
-export function useTrips() {
-  const {
-    data: trips,
-    error,
-    isLoading,
-    refetch,
-  } = useQuery<Trip[]>({
-    gcTime: 1000 * 60 * 60,
-    queryFn: async () => {
-      // Ensure session is fresh (refreshes token if expired, or clears it for anon request)
-      await supabase.auth.getSession()
-
-      const { data, error } = await supabase
-        .from('trips')
-        .select('*')
-        .order('date', { ascending: false })
-
-      if (error) throw error
-      return (data ?? []).map(rowToTrip)
-    },
-    queryKey: ['trips'],
-    staleTime: 1000 * 60 * 10, // 10 minutes
-  })
-
-  return { error, isLoading, refetch, trips }
 }
 
 function rowToTrip(row: Record<string, unknown>): Trip {

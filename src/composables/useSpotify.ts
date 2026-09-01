@@ -8,7 +8,7 @@ export interface DisplayTrack extends Omit<Track, 'duration'> {
   duration: string
 }
 
-export interface Track {
+interface Track {
   artist: string
   duration: number
   explicit: boolean

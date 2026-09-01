@@ -18,6 +18,7 @@
   "ignoreDependencies": [
     "@fontsource-variable/bricolage-grotesque",
     "@fontsource/source-serif-pro",
+    "@fontsource/kalam",
     "vue-tippy"
   ],
   "project": [

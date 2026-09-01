@@ -52,17 +52,6 @@ export const queryClient = new QueryClient({
 })
 
 /**
- * Drop all cached query data, including the localStorage persistence layer.
- * Used on sign-out so a different user never sees the previous user's data.
- */
-export function clearPersistedCache() {
-  const keys = Object.keys(window.localStorage).filter((k) => k.startsWith(PERSIST_PREFIX))
-  keys.forEach((k) => window.localStorage.removeItem(k))
-  queryClient.clear()
-  void persister.removeQueries()
-}
-
-/**
  * Hard sign-out used when an auth-scoped query proves the session is dead.
  * Unlike a bare auth.signOut(), this also wipes the in-memory query cache and
  * the localStorage persistence layer so the previous user's gated data can't
@@ -71,6 +60,17 @@ export function clearPersistedCache() {
 export async function forceSignOut() {
   await supabase.auth.signOut()
   clearPersistedCache()
+}
+
+/**
+ * Drop all cached query data, including the localStorage persistence layer.
+ * Used on sign-out so a different user never sees the previous user's data.
+ */
+function clearPersistedCache() {
+  const keys = Object.keys(window.localStorage).filter((k) => k.startsWith(PERSIST_PREFIX))
+  keys.forEach((k) => window.localStorage.removeItem(k))
+  queryClient.clear()
+  void persister.removeQueries()
 }
 
 function isAuthScoped(key: readonly unknown[]): boolean {
