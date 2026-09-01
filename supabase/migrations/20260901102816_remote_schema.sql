@@ -152,6 +152,7 @@ CREATE FUNCTION public.clearance_rank (
   RETURNS integer
   LANGUAGE sql
   IMMUTABLE
+  SET search_path TO ''
   AS $function$
   SELECT CASE lvl
     WHEN 'public'  THEN 0
@@ -174,7 +175,7 @@ CREATE FUNCTION public.get_my_role()
   LANGUAGE sql
   STABLE
   SECURITY DEFINER
-  SET search_path TO 'public'
+  SET search_path TO ''
   AS $function$
   SELECT role FROM public.user_roles WHERE user_id = auth.uid() LIMIT 1;
 $function$;
@@ -184,6 +185,74 @@ GRANT ALL ON FUNCTION public.get_my_role() TO anon;
 GRANT ALL ON FUNCTION public.get_my_role() TO authenticated;
 
 GRANT ALL ON FUNCTION public.get_my_role() TO service_role;
+
+CREATE FUNCTION public.handle_new_user_discord()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path TO ''
+  AS $function$
+DECLARE
+  webhook_url text;
+  avatar      text;
+  full_name   text;
+  provider    text;
+  embed       jsonb;
+  payload     jsonb;
+BEGIN
+  SELECT value INTO webhook_url FROM public.app_config WHERE key = 'discord_webhook_url';
+  IF webhook_url IS NULL OR webhook_url = '' THEN
+    RETURN NEW;
+  END IF;
+
+  full_name := COALESCE(NEW.raw_user_meta_data->>'full_name',
+                        NEW.raw_user_meta_data->>'name', 'Unknown');
+  provider  := COALESCE(NEW.raw_app_meta_data->>'provider', 'email');
+  avatar    := COALESCE(NEW.raw_user_meta_data->>'avatar_url',
+                        NEW.raw_user_meta_data->>'picture');
+
+  embed := jsonb_build_object(
+    'title',     'New signup — ' || full_name,
+    'url',       'https://psiderman.com/suitlady',
+    'color',     5793266,
+    'timestamp', NEW.created_at,
+    'fields', jsonb_build_array(
+      jsonb_build_object('name', 'Name',     'value', full_name,              'inline', true),
+      jsonb_build_object('name', 'Email',    'value', COALESCE(NEW.email, '—'),'inline', true),
+      jsonb_build_object('name', 'Provider', 'value', provider,               'inline', true)
+    )
+  );
+
+  IF avatar IS NOT NULL AND avatar ~ '^https?://' THEN
+    embed := jsonb_set(embed, '{thumbnail}', jsonb_build_object('url', avatar));
+  END IF;
+
+  payload := jsonb_build_object('embeds', jsonb_build_array(embed));
+
+  BEGIN
+    PERFORM net.http_post(
+      url     := webhook_url,
+      headers := jsonb_build_object('Content-Type', 'application/json'),
+      body    := payload
+    );
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+
+  RETURN NEW;
+END;
+$function$;
+
+CREATE TRIGGER on_auth_user_created_discord
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_new_user_discord();
+
+GRANT ALL ON FUNCTION public.handle_new_user_discord() TO anon;
+
+GRANT ALL ON FUNCTION public.handle_new_user_discord() TO authenticated;
+
+GRANT ALL ON FUNCTION public.handle_new_user_discord() TO service_role;
 
 CREATE FUNCTION public.handle_new_user_role()
   RETURNS TRIGGER
@@ -298,6 +367,7 @@ GRANT ALL ON FUNCTION public.handle_storage_image_upsert() TO service_role;
 CREATE FUNCTION public.handle_updated_at()
   RETURNS TRIGGER
   LANGUAGE plpgsql
+  SET search_path TO ''
   AS $function$
 BEGIN
   NEW.updated_at = now();
@@ -373,6 +443,30 @@ GRANT ALL ON FUNCTION public.is_friend(uuid) TO authenticated;
 
 GRANT ALL ON FUNCTION public.is_friend(uuid) TO service_role;
 
+CREATE FUNCTION public.record_page_view (
+  p_path text
+)
+  RETURNS void
+  LANGUAGE sql
+  SECURITY DEFINER
+  SET search_path TO ''
+  AS $function$
+  INSERT INTO public.user_page_views (user_id, path)
+  SELECT auth.uid(), p_path
+  WHERE auth.uid() IS NOT NULL
+    AND public.get_my_role() <> 'admin'
+  ON CONFLICT (user_id, path)
+  DO UPDATE SET
+    views = public.user_page_views.views + 1,
+    last_visited_at = now();
+  $function$;
+
+GRANT ALL ON FUNCTION public.record_page_view(text) TO anon;
+
+GRANT ALL ON FUNCTION public.record_page_view(text) TO authenticated;
+
+GRANT ALL ON FUNCTION public.record_page_view(text) TO service_role;
+
 CREATE TABLE public.app_config (
   key   text NOT NULL,
   value text NOT NULL
@@ -385,6 +479,52 @@ ALTER TABLE public.app_config
   ADD CONSTRAINT app_config_pkey PRIMARY KEY (key);
 
 GRANT ALL ON public.app_config TO service_role;
+
+CREATE TABLE public.blog (
+  slug       text                     NOT NULL,
+  title      text                     NOT NULL,
+  excerpt    text,
+  date       date                     DEFAULT CURRENT_DATE NOT NULL,
+  clearance  public.clearance_level   DEFAULT 'admin'::public.clearance_level NOT NULL,
+  is_active  boolean                  DEFAULT true NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  minutes    numeric
+);
+
+ALTER TABLE public.blog
+  ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.blog
+  ADD CONSTRAINT blog_minutes_check CHECK (minutes > 0::numeric);
+
+ALTER TABLE public.blog
+  ADD CONSTRAINT blog_pkey PRIMARY KEY (slug);
+
+GRANT ALL ON public.blog TO anon;
+
+GRANT ALL ON public.blog TO authenticated;
+
+GRANT ALL ON public.blog TO service_role;
+
+CREATE TRIGGER set_blog_updated_at
+  BEFORE UPDATE ON public.blog
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE POLICY "Admins can manage blog" ON public.blog
+  TO authenticated
+  USING ((( SELECT public.get_my_role() AS get_my_role) = 'admin'::text))
+  WITH CHECK ((( SELECT public.get_my_role() AS get_my_role) = 'admin'::text));
+
+CREATE POLICY "Anyone can view active blog posts" ON public.blog
+  FOR SELECT
+  USING (is_active);
+
+CREATE POLICY "Service role full access on blog" ON public.blog
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
 CREATE TABLE public.guestbook (
   id           uuid                     DEFAULT gen_random_uuid() NOT NULL,
@@ -430,29 +570,6 @@ CREATE POLICY "Users can update their own guestbook entries" ON public.guestbook
   USING ((( SELECT auth.uid() AS uid) = user_id))
   WITH CHECK ((( SELECT auth.uid() AS uid) = user_id));
 
-CREATE TABLE public.now (
-  date       date                     NOT NULL,
-  role       text                     DEFAULT 'public'::text NOT NULL,
-  is_active  boolean                  DEFAULT true NOT NULL,
-  created_at timestamp with time zone DEFAULT now() NOT NULL
-);
-
-ALTER TABLE public.now
-  ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE public.now
-  ADD CONSTRAINT now_pkey PRIMARY KEY (date);
-
-GRANT ALL ON public.now TO anon;
-
-GRANT ALL ON public.now TO authenticated;
-
-GRANT ALL ON public.now TO service_role;
-
-CREATE POLICY "Enable read access for all users" ON public.now
-  FOR SELECT
-  USING (true);
-
 CREATE TABLE public.trip_images (
   id                uuid                     DEFAULT gen_random_uuid() NOT NULL,
   storage_object_id uuid,
@@ -488,13 +605,13 @@ GRANT ALL ON public.trip_images TO authenticated;
 
 GRANT ALL ON public.trip_images TO service_role;
 
+CREATE INDEX trip_images_storage_object_id_idx ON public.trip_images (storage_object_id);
+
 CREATE INDEX idx_trip_images_trip_slug ON public.trip_images (trip_slug);
 
 CREATE INDEX idx_trip_images_date_taken ON public.trip_images (date_taken);
 
 CREATE INDEX trip_images_trip_slug_idx ON public.trip_images (trip_slug, sort_order);
-
-CREATE INDEX trip_images_storage_object_id_idx ON public.trip_images (storage_object_id);
 
 CREATE TRIGGER set_trip_images_updated_at
   BEFORE UPDATE ON public.trip_images
@@ -552,6 +669,33 @@ CREATE POLICY "Allow select trips based on clearance" ON public.trips
   FOR SELECT
   USING ((public.has_clearance(( SELECT auth.uid() AS uid), clearance) OR (( SELECT public.get_my_role() AS get_my_role) = 'admin'::text)));
 
+CREATE TABLE public.user_page_views (
+  user_id         uuid                     NOT NULL,
+  path            text                     NOT NULL,
+  views           integer                  DEFAULT 1 NOT NULL,
+  last_visited_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+ALTER TABLE public.user_page_views
+  ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.user_page_views
+  ADD CONSTRAINT user_page_views_pkey PRIMARY KEY (user_id, path);
+
+ALTER TABLE public.user_page_views
+  ADD CONSTRAINT user_page_views_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+
+GRANT ALL ON public.user_page_views TO anon;
+
+GRANT ALL ON public.user_page_views TO authenticated;
+
+GRANT ALL ON public.user_page_views TO service_role;
+
+CREATE POLICY "Admins can read page views" ON public.user_page_views
+  FOR SELECT
+  TO authenticated
+  USING ((public.get_my_role() = 'admin'::text));
+
 CREATE TABLE public.user_roles (
   user_id             uuid                     NOT NULL,
   role                text                     DEFAULT 'auth'::text NOT NULL,
@@ -604,6 +748,8 @@ CREATE TABLE public.work_people (
   linkedin    text,
   quote       text
 );
+
+ALTER PUBLICATION supabase_realtime ADD TABLE public.blog, TABLE public.guestbook, TABLE public.trips, TABLE public.user_roles, TABLE public.work_people;
 
 ALTER TABLE public.work_people
   ENABLE ROW LEVEL SECURITY;
