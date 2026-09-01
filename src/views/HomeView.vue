@@ -165,7 +165,9 @@
         </template>
       </CardContainer>
     </div>
-    <ContactForm />
+    <div class="max-w-container w-full">
+      <ContactForm />
+    </div>
   </div>
 </template>
 

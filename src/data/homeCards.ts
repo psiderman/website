@@ -149,7 +149,7 @@ export const cards: Card[] = [
   {
     arrow: 'external',
     bgClass: 'bg-rose-200 dark:bg-rose-950',
-    group: ['building'],
+    group: ['life'],
     id: 'blr',
     imageUrl: new URL('../assets/home/blr.webp', import.meta.url).href,
     link: 'https://links.psiderman.com/blr',
@@ -159,8 +159,8 @@ export const cards: Card[] = [
   },
   {
     arrow: 'external',
-    bgClass: 'bg-blue-200 dark:bg-blue-950',
-    group: [],
+    bgClass: 'bg-blue-900 dark:bg-blue-950',
+    group: ['life'],
     id: 'resume',
     imageUrl: new URL('../assets/home/tattoo.webp', import.meta.url).href,
     link: '/gaming',

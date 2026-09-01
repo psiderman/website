@@ -52,18 +52,16 @@
         />
         <div
           v-if="movie.review"
-          class="bg-dark/70 text-p pointer-events-none absolute inset-0 flex flex-col justify-between p-3 transition-opacity duration-200 group-hover:opacity-100"
+          class="bg-dark/70 text-p pointer-events-none absolute inset-0 flex flex-col justify-between p-3 pt-10 italic transition-opacity duration-200 group-hover:opacity-100"
           :class="activeReviewId === movie.id ? 'opacity-100' : 'opacity-0'"
         >
-          <p class="text-light/80 font-handwriting line-clamp-8 text-ellipsis">
-            “{{ movie.review }}”
-          </p>
+          <p class="text-light/80 line-clamp-8 text-ellipsis">“{{ movie.review }}”</p>
         </div>
         <div
-          class="bg-surface-primary border-border-primary dark:border-surface-tertiary pointer-events-none absolute bottom-1 left-1 mx-auto flex w-fit flex-row items-center justify-center gap-1 rounded-sm border px-1.5 py-1"
+          class="bg-dark/50 pointer-events-none absolute top-0 left-0 mx-auto flex w-fit flex-row items-center justify-center gap-1 rounded-br-lg px-1.5 py-1 backdrop-blur-md"
         >
           <Star :size="12" class="-ml-0.5 fill-amber-500" stroke-width="0" />
-          <span class="text-mono text-text-primary">
+          <span class="text-mono text-light">
             {{ movie.rating?.toFixed(1) }}
           </span>
         </div>
@@ -72,7 +70,7 @@
           type="button"
           :aria-expanded="activeReviewId === movie.id"
           :aria-label="activeReviewId === movie.id ? 'Hide review' : 'Show review'"
-          class="bg-surface-primary border-border-primary dark:border-surface-tertiary text-text-primary desktop:hidden absolute right-1 bottom-1 z-10 mx-auto flex w-fit cursor-pointer flex-row items-center justify-center gap-1 rounded-sm border px-1 py-1 after:absolute after:top-1/2 after:left-1/2 after:h-12 after:w-12 after:-translate-x-1/2 after:-translate-y-1/2 after:content-['']"
+          class="bg-dark/50 text-light desktop:hidden absolute top-0 right-0 z-10 flex w-fit cursor-pointer flex-row items-center justify-center gap-1 rounded-bl-lg px-1.5 py-1.5 backdrop-blur-md after:absolute after:top-1/2 after:left-1/2 after:h-12 after:w-12 after:-translate-x-1/2 after:-translate-y-1/2 after:content-['']"
           @click.stop="toggleReview(movie.id)"
         >
           <TextAlignStart :size="12" />

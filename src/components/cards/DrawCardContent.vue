@@ -5,7 +5,7 @@
   <div
     v-else
     :ref="setupObserver"
-    class="drawing-board outline-surface-inverted pointer-events-auto focus-visible:outline-2 focus-visible:outline-offset-2"
+    class="drawing-board group outline-surface-inverted pointer-events-auto focus-visible:outline-2 focus-visible:outline-offset-2"
   >
     <!-- Drawing Surface -->
     <svg
@@ -43,7 +43,7 @@
 
     <div
       v-if="strokes.length === 0 && currentStroke.length === 0 && backgroundArtist"
-      class="bg-surface-secondary text-ui-small text-text-tertiary absolute right-0 bottom-0 rounded-tl-xl px-2 py-1"
+      class="bg-surface-secondary text-ui-small text-text-tertiary absolute right-0 bottom-0 rounded-tl-xl px-2 py-1 transition-opacity duration-200 group-hover:opacity-0"
     >
       by {{ backgroundArtist }}
     </div>
