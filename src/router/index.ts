@@ -116,6 +116,14 @@ const router = createRouter({
       path: '/words/:slug',
     },
     {
+      component: () => import('../views/GamingView.vue'),
+      meta: {
+        title: 'Gaming | Karan Sanas',
+      },
+      name: 'Gaming',
+      path: '/gaming',
+    },
+    {
       component: () => import('../views/TermsView.vue'),
       meta: {
         title: 'Terms | Karan Sanas',

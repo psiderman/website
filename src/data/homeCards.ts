@@ -159,14 +159,14 @@ export const cards: Card[] = [
   },
   {
     arrow: 'external',
-    bgClass: 'bg-sky-200 dark:bg-sky-950',
+    bgClass: 'bg-blue-200 dark:bg-blue-950',
     group: [],
     id: 'resume',
-    imageUrl: new URL('../assets/home/resume.webp', import.meta.url).href,
-    link: 'https://links.psiderman.com/resume',
+    imageUrl: new URL('../assets/home/tattoo.webp', import.meta.url).href,
+    link: '/gaming',
     size: 'sm',
     span: 'desktop:col-span-2 col-span-1',
-    title: 'résumé',
+    title: 'gaming',
   },
 ]
 
