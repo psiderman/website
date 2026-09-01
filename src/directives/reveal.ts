@@ -25,7 +25,10 @@ const reveal: Directive<RevealHTMLImageElement, number | string | undefined> = {
 
     const delay = binding.value
     if (delay !== undefined && delay !== null && delay !== '') {
-      el.style.setProperty('--reveal-delay', `${typeof delay === 'number' ? delay : parseInt(delay, 10)}ms`)
+      el.style.setProperty(
+        '--reveal-delay',
+        `${typeof delay === 'number' ? delay : parseInt(delay, 10)}ms`,
+      )
     }
 
     el.classList.add('reveal')

@@ -286,10 +286,7 @@ const currentPath6 = computed(() => formatC1(interpolateArray(P6, progress.value
 const currentPath7 = computed(() => formatC1(interpolateArray(P7, progress.value)))
 const currentPath8 = computed(() => formatC1(interpolateArray(P8, progress.value)))
 
-function buildTimeline(
-  createTimeline: typeof createTimelineType,
-  track: { val: number },
-) {
+function buildTimeline(createTimeline: typeof createTimelineType, track: { val: number }) {
   const upDur = props.upDuration ?? props.duration * 0.75
   const downDur = props.downDuration ?? props.duration * 0.25
 

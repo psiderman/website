@@ -66,8 +66,12 @@ async function main() {
     } else if (arg === '--help' || arg === '-h') {
       console.log('Usage: node scripts/pull-travel.js [path-to-travel-folder] [options]')
       console.log('\nOptions:')
-      console.log('  --dry-run             Preview reconciliation actions without disk modifications')
-      console.log('  --trash               Move deleted local files to .trash/ folder instead of deleting')
+      console.log(
+        '  --dry-run             Preview reconciliation actions without disk modifications',
+      )
+      console.log(
+        '  --trash               Move deleted local files to .trash/ folder instead of deleting',
+      )
       console.log('  --help, -h            Show this help message')
       console.log('\nSupabase credentials are read from .env (SUPABASE_SERVICE_ROLE_KEY).')
       process.exit(0)
@@ -116,7 +120,9 @@ async function main() {
 
   const remoteDbImages = dbImages || []
   const remoteStorageMap = new Map(remoteStorageFiles.map((f) => [f.path, f]))
-  console.log(`  Found ${remoteDbImages.length} DB image records and ${remoteStorageFiles.length} storage objects.`)
+  console.log(
+    `  Found ${remoteDbImages.length} DB image records and ${remoteStorageFiles.length} storage objects.`,
+  )
 
   // 2. Scan Local Files
   console.log('\n🔍 Scanning local directory...')

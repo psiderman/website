@@ -14,12 +14,7 @@
         @click.self="emit('close')"
       >
         <div class="flex flex-col items-center justify-center gap-6 p-6">
-          <WishCircle
-            v-model:popping="popping"
-            hint
-            size="lg"
-            @wished="emit('wished')"
-          />
+          <WishCircle v-model:popping="popping" hint size="lg" @wished="emit('wished')" />
         </div>
       </div>
     </Transition>

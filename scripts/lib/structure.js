@@ -14,14 +14,17 @@ export function analyzeTripStructure(dirPath) {
     SUPPORTED_EXTENSIONS.includes(path.extname(e).toLowerCase()),
   )
   const subdirs = entries.filter((e) => {
-    if (e.startsWith('.') || e === 'thumb' || e === 'processed' || e === 'node_modules') return false
+    if (e.startsWith('.') || e === 'thumb' || e === 'processed' || e === 'node_modules')
+      return false
     return fs.statSync(path.join(resolved, e)).isDirectory()
   })
 
   // Case 1: Multi-trip container folder (e.g. ~/Downloads/trips/ containing 23_01_pondy, 24_02_tokyo...)
   // A directory is a multi-trip container if it has multiple subdirectories, or subdirectories matching YY_MM_...
   const nonPvtSubdirs = subdirs.filter((s) => s !== 'pvt')
-  const isMulti = nonPvtSubdirs.length > 1 || (nonPvtSubdirs.length === 1 && /^\d{2}_\d{2}_/i.test(nonPvtSubdirs[0]))
+  const isMulti =
+    nonPvtSubdirs.length > 1 ||
+    (nonPvtSubdirs.length === 1 && /^\d{2}_\d{2}_/i.test(nonPvtSubdirs[0]))
 
   if (isMulti) {
     const trips = []

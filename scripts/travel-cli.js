@@ -5,7 +5,9 @@
 // would leave uploads/renames half-applied with no guidance.
 process.on('unhandledRejection', (err) => {
   console.error('\n❌ Pipeline failed:', err instanceof Error ? err.message : err)
-  console.error('If this happened mid-sync, re-run with --dry-run to verify local & remote state before continuing.')
+  console.error(
+    'If this happened mid-sync, re-run with --dry-run to verify local & remote state before continuing.',
+  )
   process.exit(1)
 })
 
@@ -693,9 +695,9 @@ if (selectedSteps.includes('storage_sync')) {
   const travelRoot = structure?.isMultiTrip ? resolvedPath : path.dirname(resolvedPath)
   const localImages = findImagesRecursively(resolvedPath)
 
-// Scope deletions to the trip(s) in the folder being synced so other trips'
-// remote files are never proposed for deletion. Multi-trip root syncs the
-// whole bucket; single-trip syncs only that trip's prefix + its thumb subfolder.
+  // Scope deletions to the trip(s) in the folder being synced so other trips'
+  // remote files are never proposed for deletion. Multi-trip root syncs the
+  // whole bucket; single-trip syncs only that trip's prefix + its thumb subfolder.
   const tripScopePrefixes = structure?.isMultiTrip
     ? []
     : [`${path.basename(resolvedPath)}/`, `thumb/${path.basename(resolvedPath)}/`]
@@ -723,7 +725,13 @@ if (selectedSteps.includes('storage_sync')) {
       .select('id, trip_slug, storage_path, date_taken, lat, lng, clearance'),
   ])
 
-  const diff = diffStorageFiles(allLocal, remoteFiles, travelRoot, dbImages || [], tripScopePrefixes)
+  const diff = diffStorageFiles(
+    allLocal,
+    remoteFiles,
+    travelRoot,
+    dbImages || [],
+    tripScopePrefixes,
+  )
 
   console.log(`\n📋 Storage & Metadata Diff Preview:`)
   console.log(`  + To Upload (New/Modified/EXIF changed): ${diff.toUpload.length}`)

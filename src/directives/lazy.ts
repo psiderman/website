@@ -38,7 +38,7 @@ const observer = new IntersectionObserver(
   },
   {
     rootMargin: '200px', // Pre-load images 200px before they enter the viewport
-  }
+  },
 )
 
 type LazyBindingValue = LazyValue | string
@@ -48,7 +48,7 @@ interface LazyValue {
   src: string
 }
 
-function resolveBinding(value: LazyBindingValue): { placeholder?: string; src: string; } {
+function resolveBinding(value: LazyBindingValue): { placeholder?: string; src: string } {
   if (typeof value === 'string') {
     return { src: value }
   }
@@ -98,4 +98,3 @@ const lazyDirective: Directive<LazyHTMLImageElement, LazyBindingValue> = {
 }
 
 export default lazyDirective
-

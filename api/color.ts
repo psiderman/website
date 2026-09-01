@@ -32,10 +32,7 @@ export default async function handler(req: any, res: any) {
     const parsed = new URL(url)
     // Exact host allowlist + https only + no redirects: blocks SSRF via the
     // metadata endpoint and internal networks.
-    if (
-      !ALLOWED_IMAGE_HOSTS.has(parsed.hostname) ||
-      parsed.protocol !== 'https:'
-    ) {
+    if (!ALLOWED_IMAGE_HOSTS.has(parsed.hostname) || parsed.protocol !== 'https:') {
       return res.status(400).json({ error: 'URL not allowed' })
     }
 

@@ -87,18 +87,17 @@ export function diffStorageFiles(
     }
   }
 
-// Deletion is scoped: only remote files under one of `scopePrefixes`
-// (e.g. "23_10_india/" or "thumb/23_10_india/") are ever proposed for
-// deletion. With no scope we refuse to propose ANY deletion — this protects
-// other trips' files.
+  // Deletion is scoped: only remote files under one of `scopePrefixes`
+  // (e.g. "23_10_india/" or "thumb/23_10_india/") are ever proposed for
+  // deletion. With no scope we refuse to propose ANY deletion — this protects
+  // other trips' files.
   const localRelSet = new Set(
     localFiles.map((p) => path.relative(localBaseDir, p).replace(/\\/g, '/')),
   )
 
   for (const remote of remoteFiles) {
     const inScope =
-      scopePrefixes.length === 0 ||
-      scopePrefixes.some((p) => remote.path.startsWith(p))
+      scopePrefixes.length === 0 || scopePrefixes.some((p) => remote.path.startsWith(p))
     if (inScope && !localRelSet.has(remote.path)) {
       toDelete.push(remote)
     }
