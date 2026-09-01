@@ -64,5 +64,11 @@ app.directive('lazy', lazy)
 app.directive('reveal', reveal)
 app.use(VueQueryPlugin, { queryClient })
 
+// Let vue-router own scroll restoration so the browser never races the router's
+// scroll reset during client-side navigations.
+if ('scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual'
+}
+
 await router.isReady()
 app.mount('#app')

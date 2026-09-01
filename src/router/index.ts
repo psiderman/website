@@ -1,8 +1,24 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteComponent } from 'vue-router'
 
 import { ensureUserRole, isAuthModalOpen } from '@/composables/useAuth'
 import { trackPageView } from '@/composables/useEvents'
 import { isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
+
+// Wrap lazy route components so a flaky chunk load retries the dynamic import
+// once instead of silently aborting the navigation (which would leave the
+// previously mounted page on screen until a manual refresh).
+function makeLazy(loader: () => Promise<RouteComponent>): () => Promise<RouteComponent> {
+  let promise: null | Promise<RouteComponent> = null
+  return () => {
+    if (!promise) {
+      promise = loader().catch((error) => {
+        promise = null
+        throw error
+      })
+    }
+    return promise
+  }
+}
 
 const SITE_URL = 'https://psiderman.com'
 const DEFAULT_TITLE = 'Karan Sanas | Personal Website'
@@ -64,7 +80,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      component: () => import('../views/HomeView.vue'),
+      component: makeLazy(() => import('../views/HomeView.vue')),
       meta: {
         description: DEFAULT_DESCRIPTION,
         title: DEFAULT_TITLE,
@@ -73,7 +89,7 @@ const router = createRouter({
       path: '/',
     },
     {
-      component: () => import('../views/SuitladyView.vue'),
+      component: makeLazy(() => import('../views/SuitladyView.vue')),
       meta: {
         layout: 'blank',
         noindex: true,
@@ -84,7 +100,7 @@ const router = createRouter({
       path: '/suitlady',
     },
     {
-      component: () => import('../views/NowView.vue'),
+      component: makeLazy(() => import('../views/NowView.vue')),
       meta: {
         title: 'Now | Karan Sanas',
       },
@@ -92,7 +108,7 @@ const router = createRouter({
       path: '/now',
     },
     {
-      component: () => import('../views/TravelView.vue'),
+      component: makeLazy(() => import('../views/TravelView.vue')),
       meta: {
         title: 'Travel | Karan Sanas',
       },
@@ -100,7 +116,7 @@ const router = createRouter({
       path: '/travel',
     },
     {
-      component: () => import('../views/WritingView.vue'),
+      component: makeLazy(() => import('../views/WritingView.vue')),
       meta: {
         title: 'Words | Karan Sanas',
       },
@@ -108,7 +124,7 @@ const router = createRouter({
       path: '/words',
     },
     {
-      component: () => import('../views/PostView.vue'),
+      component: makeLazy(() => import('../views/PostView.vue')),
       meta: {
         title: 'Words | Karan Sanas',
       },
@@ -116,7 +132,7 @@ const router = createRouter({
       path: '/words/:slug',
     },
     {
-      component: () => import('../views/GamingView.vue'),
+      component: makeLazy(() => import('../views/GamingView.vue')),
       meta: {
         title: 'Gaming | Karan Sanas',
       },
@@ -124,7 +140,7 @@ const router = createRouter({
       path: '/gaming',
     },
     {
-      component: () => import('../views/TermsView.vue'),
+      component: makeLazy(() => import('../views/TermsView.vue')),
       meta: {
         title: 'Terms | Karan Sanas',
       },
@@ -132,7 +148,7 @@ const router = createRouter({
       path: '/terms',
     },
     {
-      component: () => import('../views/PrivacyView.vue'),
+      component: makeLazy(() => import('../views/PrivacyView.vue')),
       meta: {
         title: 'Privacy | Karan Sanas',
       },
@@ -140,7 +156,7 @@ const router = createRouter({
       path: '/privacy',
     },
     {
-      component: () => import('../views/NotFoundView.vue'),
+      component: makeLazy(() => import('../views/NotFoundView.vue')),
       meta: {
         layout: 'blank',
         noindex: true,

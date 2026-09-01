@@ -1,6 +1,8 @@
 <template>
   <component :is="layout">
-    <RouterView />
+    <RouterView v-slot="{ Component, route: routeRecord }">
+      <component :is="Component" :key="routeRecord.path" />
+    </RouterView>
   </component>
   <VueQueryDevtools />
 </template>
