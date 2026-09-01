@@ -70,12 +70,51 @@
 
           <!-- Roles Tab Panel -->
           <TabPanel class="outline-none">
-            <div v-for="user in sortedUserRolesList" :key="user.user_id" class="px-4">
-              <!-- User / Image + Name -->
+            <!-- Online now -->
+            <div class="border-border-primary bg-surface-secondary border-b px-4 py-3">
+              <p class="text-ui-small text-text-tertiary tracking-wider uppercase">
+                online now · {{ liveVisitors.length }}
+              </p>
+              <div v-if="liveVisitors.length" class="mt-2 flex flex-col gap-1.5">
+                <div
+                  v-for="v in liveVisitors"
+                  :key="v.id"
+                  class="flex min-w-0 flex-row items-center gap-2"
+                >
+                  <img
+                    v-if="v.avatar"
+                    :src="v.avatar"
+                    referrerpolicy="no-referrer"
+                    class="size-6 shrink-0 rounded-full object-cover"
+                    alt=""
+                  />
+                  <div
+                    v-else
+                    class="bg-surface-tertiary text-text-tertiary flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold uppercase"
+                  >
+                    {{ getPresenceInitial(v.name) }}
+                  </div>
+                  <span class="text-ui text-text-primary truncate">{{ v.name }}</span>
+                  <span class="text-ui-small text-text-tertiary ml-auto shrink-0 truncate">
+                    {{ v.route }}
+                  </span>
+                </div>
+              </div>
+              <p v-else class="text-ui-small text-text-tertiary mt-2">
+                no one is online right now.
+              </p>
+            </div>
+
+            <div v-for="user in sortedUserRolesList" :key="user.user_id">
               <div
-                class="border-border-primary relative flex w-full flex-row items-center justify-between gap-4 border-b py-4"
+                class="border-border-primary relative flex w-full flex-row items-center justify-between gap-4 border-b px-4 py-4"
               >
-                <div class="relative flex min-w-0 flex-1 flex-row items-center gap-2">
+                <button
+                  type="button"
+                  class="flex min-w-0 flex-1 flex-row items-center gap-2 text-left"
+                  :aria-expanded="expandedUserId === user.user_id"
+                  @click="toggleUserExpand(user.user_id)"
+                >
                   <div
                     class="border-border-primary bg-surface-secondary size-8 shrink-0 overflow-hidden rounded-full border"
                   >
@@ -119,7 +158,7 @@
                       {{ user.email }}
                     </p>
                   </div>
-                </div>
+                </button>
                 <div
                   class="text-ui border-border-primary bg-surface-primary relative inline-flex h-8 min-w-28 cursor-pointer items-center justify-between gap-3 rounded-lg border px-2.5 py-0"
                 >
@@ -136,6 +175,7 @@
                   <select
                     v-model="pendingRoles[user.user_id]"
                     class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    @click.stop
                     @change="saveRole(user)"
                   >
                     <option v-for="role in clearanceLevels" :key="role" :value="role">
@@ -143,6 +183,44 @@
                     </option>
                   </select>
                 </div>
+              </div>
+
+              <!-- Page views panel -->
+              <div
+                v-if="expandedUserId === user.user_id"
+                class="border-border-primary bg-surface-secondary border-b px-4 py-3"
+              >
+                <div class="flex flex-row items-center justify-between gap-2">
+                  <p class="text-ui-small text-text-tertiary tracking-wider uppercase">
+                    pages visited
+                  </p>
+                  <Loader
+                    v-if="pageViewsLoading"
+                    :size="12"
+                    class="text-text-tertiary animate-spin"
+                  />
+                </div>
+                <p v-if="pageViewsError" class="text-ui-small text-text-tertiary mt-2">
+                  failed to load page views.
+                </p>
+                <ul
+                  v-else-if="pageViews?.length"
+                  class="mt-2 flex max-h-64 flex-col gap-1 overflow-y-auto"
+                >
+                  <li
+                    v-for="pv in pageViews"
+                    :key="pv.path"
+                    class="flex min-w-0 flex-row items-center gap-2"
+                  >
+                    <span class="text-ui text-text-primary truncate">{{ pv.path }}</span>
+                    <span
+                      class="text-ui-small text-text-tertiary ml-auto shrink-0 whitespace-nowrap"
+                    >
+                      {{ pv.views }}× · {{ formatVisited(pv.last_visited_at) }}
+                    </span>
+                  </li>
+                </ul>
+                <p v-else class="text-ui-small text-text-tertiary mt-2">no page views yet.</p>
               </div>
             </div>
           </TabPanel>
@@ -641,8 +719,8 @@
                           </label>
 
                           <div class="grid grid-cols-1 gap-3">
-                            <div class="flex flex-col gap-1 text-ui-small">
-                              <span class="pl-1.5 text-text-tertiary">Date Taken</span>
+                            <div class="text-ui-small flex flex-col gap-1">
+                              <span class="text-text-tertiary pl-1.5">Date Taken</span>
                               <div
                                 class="bg-surface-primary border-border-primary text-text-secondary text-ui flex h-10.5 items-center gap-2 rounded-xl border px-3 py-2"
                               >
@@ -651,8 +729,8 @@
                               </div>
                             </div>
 
-                            <div class="flex flex-col gap-1 text-ui-small">
-                              <span class="pl-1.5 text-text-tertiary">GPS Coordinates</span>
+                            <div class="text-ui-small flex flex-col gap-1">
+                              <span class="text-text-tertiary pl-1.5">GPS Coordinates</span>
                               <div
                                 class="bg-surface-primary border-border-primary text-text-secondary text-ui flex h-10.5 items-center justify-between gap-2 rounded-xl border px-3 py-2"
                               >
@@ -992,10 +1070,11 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { format } from 'date-fns'
 import { getStroke } from 'perfect-freehand'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import { isAdmin } from '@/composables/useAuth'
+import { type PresenceUser } from '@/composables/useLive'
 import { type ClearanceLevel, isHighClearance } from '@/composables/useTravel'
 import { workHistory } from '@/data/work'
 import { getStorageUrl, supabase } from '@/supabase'
@@ -1034,6 +1113,75 @@ const clearanceLevels: ClearanceLevel[] = ['auth', 'known', 'friends', 'close']
 const queryClient = useQueryClient()
 const pendingRoles = reactive<Record<string, ClearanceLevel>>({})
 
+// ----------------------------------------------------
+// LIVE VISITORS — read the public presence room without tracking ourselves.
+// ----------------------------------------------------
+const liveVisitors = ref<PresenceUser[]>([])
+let liveChannel: null | ReturnType<typeof supabase.channel> = null
+
+function subscribeLiveVisitors() {
+  if (liveChannel) return
+  liveChannel = supabase.channel('live:site')
+  liveChannel
+    .on('presence', { event: 'sync' }, () => {
+      if (!liveChannel) return
+      const state = liveChannel.presenceState()
+      const users: PresenceUser[] = []
+      for (const id in state) {
+        const presences = state[id] as unknown as PresenceUser[]
+        if (presences.length > 0) users.push(presences[0])
+      }
+      liveVisitors.value = users.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    })
+    .subscribe()
+}
+
+onMounted(subscribeLiveVisitors)
+onUnmounted(() => {
+  liveChannel?.unsubscribe()
+  liveChannel = null
+})
+
+const getPresenceInitial = (name?: string) => (name || '?').charAt(0).toUpperCase()
+
+// ----------------------------------------------------
+// PAGE VIEWS — click a user to see their browsing history.
+// ----------------------------------------------------
+const expandedUserId = ref<null | string>(null)
+
+const toggleUserExpand = (id: string) => {
+  expandedUserId.value = expandedUserId.value === id ? null : id
+}
+
+interface PageViewRecord {
+  last_visited_at?: string
+  path: string
+  views: number
+}
+
+const {
+  data: pageViews,
+  error: pageViewsError,
+  isLoading: pageViewsLoading,
+} = useQuery({
+  enabled: computed(() => isAdmin.value && !!expandedUserId.value),
+  queryFn: async () => {
+    const uid = expandedUserId.value
+    if (!uid) return []
+    const { data, error } = await supabase
+      .from('user_page_views')
+      .select('path, views, last_visited_at')
+      .eq('user_id', uid)
+      .order('views', { ascending: false })
+      .limit(50)
+    if (error) throw error
+    return (data || []) as PageViewRecord[]
+  },
+  queryKey: computed(() => ['admin-user-page-views', expandedUserId.value]),
+})
+
+const formatVisited = (iso?: string) => (iso ? format(new Date(iso), 'MMM d · HH:mm') : '—')
+
 // Pull to refresh state & handlers
 const pullDistance = ref(0)
 const pullThreshold = 60
@@ -1046,6 +1194,9 @@ async function handleRefresh() {
   const queryKey = tabQueryKeys[selectedTab.value]
   if (queryKey) {
     await queryClient.invalidateQueries({ queryKey })
+  }
+  if (expandedUserId.value) {
+    await queryClient.invalidateQueries({ queryKey: ['admin-user-page-views'] })
   }
 }
 
@@ -1104,6 +1255,14 @@ const sortedUserRolesList = computed(() => {
       const bRequested = b.role === 'auth' && Boolean(b.requested_clearance ?? b.requestedClearance)
 
       if (aRequested !== bRequested) return aRequested ? -1 : 1
+
+      const nameA = (a.full_name || a.email || '').trim()
+      const nameB = (b.full_name || b.email || '').trim()
+      const nameComparison = nameA.localeCompare(nameB, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      })
+      if (nameComparison !== 0) return nameComparison
 
       const timeA = a.created_at ? Date.parse(a.created_at) : 0
       const timeB = b.created_at ? Date.parse(b.created_at) : 0
@@ -1870,10 +2029,7 @@ async function saveImage(img: TripImageRecord, close?: () => void) {
       updatePayload.storage_path = newStoragePath
     }
 
-    const { error } = await supabase
-      .from('trip_images')
-      .update(updatePayload)
-      .eq('id', img.id)
+    const { error } = await supabase.from('trip_images').update(updatePayload).eq('id', img.id)
 
     if (error) throw error
 

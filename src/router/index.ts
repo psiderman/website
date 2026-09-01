@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import { ensureUserRole, isAuthModalOpen } from '@/composables/useAuth'
+import { trackPageView } from '@/composables/useEvents'
 import { isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
 
 const SITE_URL = 'https://psiderman.com'
@@ -166,6 +167,7 @@ router.beforeEach(async (to) => {
 
 router.afterEach((to) => {
   applyRouteMeta(to)
+  trackPageView(to.path)
 
   // Reset any open modals on navigation
   ;[isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
@@ -178,4 +180,3 @@ router.onError((error) => {
 })
 
 export default router
-

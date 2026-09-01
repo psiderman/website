@@ -22,6 +22,7 @@ export interface PresenceUser {
   isStale?: boolean
   name: string
   role?: null | string
+  route?: string
 }
 
 interface CursorData {
@@ -150,30 +151,36 @@ const LIVE_ROOM = 'live:site'
 
 export const isHomeView = computed(() => router.currentRoute.value.path === '/')
 
+// Presence payload recomposed live so it always reflects the current route.
+// Admins never broadcast — their own browsing stays out of the visitor list.
+const buildPresence = (color: { bg: string; fg: string }) => ({
+  avatar: userAvatar.value,
+  color,
+  id: activeUserId.value,
+  name: userName.value,
+  role: currentUserRole.value,
+  route: router.currentRoute.value.fullPath,
+})
+
+const sendPresence = (color: { bg: string; fg: string }) => {
+  if (!channel) return
+  if (!global.allowMultiplayer.value) return
+  if (currentUserRole.value === 'admin') return
+  void channel.track(buildPresence(color))
+}
+
 watch(
   [activeUserId, userName, userAvatar, currentUserRole],
-  ([id, name, avatar, role]) => {
-    const trackPresence = (color: { bg: string; fg: string }) => {
-      if (channel && global.allowMultiplayer.value) {
-        channel.track({
-          avatar,
-          color,
-          id,
-          name,
-          role,
-        })
-      }
-    }
-
+  ([_id, _name, avatar, _role]) => {
     if (!avatar) {
       userColor.value = fallbackColor.value
-      trackPresence(userColor.value)
+      sendPresence(userColor.value)
       return
     }
 
     if (colorCache.value[avatar]) {
       userColor.value = colorCache.value[avatar]
-      trackPresence(userColor.value)
+      sendPresence(userColor.value)
       return
     }
 
@@ -203,7 +210,7 @@ watch(
         colorCache.value[avatar] = extractedColor
         userColor.value = extractedColor
 
-        trackPresence(extractedColor)
+        sendPresence(extractedColor)
       })
       .catch((err) => {
         console.error('Failed to extract color via API', err)
@@ -250,6 +257,7 @@ export const sortedPresenceUsers = computed(() => {
     id: activeUserId.value,
     name: userName.value,
     role: currentUserRole.value,
+    route: router.currentRoute.value.fullPath,
   }
 
   if (!global.allowMultiplayer.value) {
@@ -455,13 +463,7 @@ const joinRoom = () => {
     })
     .subscribe(async (status) => {
       if (status === 'SUBSCRIBED' && global.allowMultiplayer.value) {
-        await channel!.track({
-          avatar: userAvatar.value,
-          color: userColor.value,
-          id: activeUserId.value,
-          name: userName.value,
-          role: currentUserRole.value,
-        })
+        sendPresence(userColor.value)
       }
     })
 }
@@ -590,6 +592,16 @@ const startLiveSession = () => {
   window.addEventListener('touchstart', handleTouchStart, { passive: true })
 
   joinRoom()
+
+  // Keep the presence route fresh without rejoining the single site room.
+  activeWatchers.push(
+    watch(
+      () => router.currentRoute.value.fullPath,
+      () => {
+        sendPresence(userColor.value)
+      },
+    ),
+  )
 
   // Watch for toggle to rejoin/leave
   activeWatchers.push(
