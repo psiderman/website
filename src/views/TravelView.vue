@@ -220,8 +220,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import GenericLoader from '@/components/GenericLoader.vue'
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import TravelMap from '@/components/TravelMap.vue'
-import { currentUser } from '@/composables/useAuth'
-import { isAuthModalOpen } from '@/composables/useAuth'
+import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
 import { isPhotoLightBoxOpen, openPhotoLightbox, photoLightBoxData } from '@/composables/useGlobal'
 import {
   isHighClearance,

@@ -1,12 +1,13 @@
 import { computed, ref } from 'vue'
 
+import { isAuthModalOpen, openAuthModal } from '@/composables/useGlobal'
 import { forceSignOut, queryClient } from '@/queryClient'
 import { supabase } from '@/supabase'
 
 import type { User } from '@supabase/supabase-js'
 
-// Global state for the auth modal
-export const isAuthModalOpen = ref(false)
+// Re-export auth modal state from useGlobal
+export { isAuthModalOpen, openAuthModal }
 
 // Global state for the current authenticated user
 export const currentUser = ref<null | User>(null)

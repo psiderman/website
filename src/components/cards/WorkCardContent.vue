@@ -115,16 +115,14 @@ import { ArrowUpRight, OctagonAlert } from '@lucide/vue'
 import { differenceInCalendarMonths, getYear, min } from 'date-fns'
 import { computed } from 'vue'
 
-import { isWorkModalOpen, workData } from '@/composables/useGlobal'
+import { openWorkModal as openGlobalWorkModal } from '@/composables/useGlobal'
 import { workHistory } from '@/data/work'
 
 const openWorkModal = (orgId: string) => {
   const data = workHistory.find((w) => w.orgId === orgId)
-  if (data?.data)
-    if (data) {
-      workData.value = data
-      isWorkModalOpen.value = true
-    }
+  if (data?.data) {
+    openGlobalWorkModal(data)
+  }
 }
 
 const careerData = computed(() => {

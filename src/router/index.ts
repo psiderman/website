@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory, type RouteComponent } from 'vue-router'
 
-import { ensureUserRole, isAuthModalOpen } from '@/composables/useAuth'
+import { ensureUserRole } from '@/composables/useAuth'
 import { trackPageView } from '@/composables/useEvents'
-import { isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen } from '@/composables/useGlobal'
+import { resetModals } from '@/composables/useGlobal'
 
 // Wrap lazy route components so a flaky chunk load retries the dynamic import
 // once instead of silently aborting the navigation (which would leave the
@@ -191,9 +191,7 @@ router.afterEach((to) => {
   }
 
   // Reset any open modals on navigation
-  ;[isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
-    modal.value = false
-  })
+  resetModals()
 })
 
 router.onError((error, to) => {

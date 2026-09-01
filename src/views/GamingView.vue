@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import ContactForm from '@/components/home/ContactForm.vue'
-import { isPhotoLightBoxOpen, photoLightBoxData } from '@/composables/useGlobal'
+import { openPhotoLightbox } from '@/composables/useGlobal'
 
 const GAME_CAPTIONS: Record<string, string> = {
   arkham:
@@ -173,23 +173,14 @@ const pcSetup = {
 }
 
 const triggerLightbox = (clickedIdx: number) => {
-  if (gameImages.length === 0) return
-
-  const allImages = gameImages.map((img) => ({
-    caption: img.caption,
-    thumbnailUrl: img.url,
-    url: img.url,
-  }))
-
-  const orderedImages = [...allImages.slice(clickedIdx), ...allImages.slice(0, clickedIdx)]
-
-  photoLightBoxData.value = {
-    currentTripSlug: '',
-    images: orderedImages,
-    initialIndex: 0,
-    tripTitle: 'gaming',
-  }
-  isPhotoLightBoxOpen.value = true
+  openPhotoLightbox(
+    gameImages.map((img) => ({
+      caption: img.caption,
+      thumbnailUrl: img.url,
+      url: img.url,
+    })),
+    { initialIndex: clickedIdx, title: 'gaming' },
+  )
 }
 </script>
 

@@ -71,10 +71,11 @@ export async function forceSignOut() {
  * Used on sign-out so a different user never sees the previous user's data.
  */
 function clearPersistedCache() {
-  const keys = Object.keys(window.localStorage).filter((k) => k.startsWith(PERSIST_PREFIX))
-  keys.forEach((k) => window.localStorage.removeItem(k))
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const keys = Object.keys(window.localStorage).filter((k) => k.startsWith(PERSIST_PREFIX))
+    keys.forEach((k) => window.localStorage.removeItem(k))
+  }
   queryClient.clear()
-  void persister.removeQueries()
 }
 
 function isAuthScoped(key: readonly unknown[]): boolean {
