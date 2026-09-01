@@ -17,72 +17,61 @@
         </div>
 
         <div
-          v-if="isLoading"
-          class="bg-surface-secondary text-p mx-auto mt-10 flex min-h-120 w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
+          v-if="isLoading || isNotFound || error || content?.access === 'denied'"
+          :data-sync="content?.access === 'denied' ? 'post-denied' : undefined"
+          class="bg-surface-secondary text-p mx-auto mt-10 flex min-h-120 w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl p-10 text-center"
         >
-          <GenericLoader />
+          <GenericLoader v-if="isLoading" />
+
+          <template v-else-if="isNotFound">
+            <FileX :size="32" class="text-text-tertiary" />
+            <p class="text-mono text-text-tertiary">
+              The post you're trying to find doesn't exist.
+            </p>
+          </template>
+
+          <template v-else-if="error">
+            <FileExclamationPoint :size="32" class="text-text-tertiary" />
+            <p class="text-mono text-text-tertiary">Error loading post.</p>
+          </template>
+
+          <!-- Login / clearance required to read this post -->
+          <template v-else-if="content?.access === 'denied'">
+            <Lock
+              :size="32"
+              aria-hidden="true"
+              class="text-text-tertiary dark:text-light dark:opacity-50"
+            />
+            <h2 class="text-h2">{{ post?.title }}</h2>
+            <p class="text-p text-text-tertiary max-w-sm text-center text-balance">
+              {{
+                currentUser
+                  ? 'this post isn’t public yet. if you think you should have access, DM me.'
+                  : 'log in to see if you have access.'
+              }}
+            </p>
+            <button
+              v-if="!currentUser"
+              class="btn primary mt-8"
+              type="button"
+              @click="isAuthModalOpen = true"
+            >
+              log in
+            </button>
+            <router-link v-else to="/words" class="btn primary mt-8">
+              <ArrowLeft :size="16" /> Back to words
+            </router-link>
+          </template>
         </div>
 
+        <!-- Render parsed markdown -->
         <div
-          v-else-if="isNotFound"
-          class="bg-surface-secondary text-p mx-auto mt-10 flex min-h-120 w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
-        >
-          <FileX :size="32" class="text-text-tertiary" />
-          <p class="text-mono text-text-tertiary">The post you're trying to find doesn't exist.</p>
-        </div>
-
-        <div
-          v-else-if="error"
-          class="bg-surface-secondary text-p mx-auto mt-10 flex min-h-120 w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
-        >
-          <FileExclamationPoint :size="32" class="text-text-tertiary" />
-          <p class="text-mono text-text-tertiary">Error loading post.</p>
-        </div>
-
-        <!-- Login / clearance required to read this post -->
-        <div
-          v-else-if="content?.access === 'denied'"
-          data-sync="post-denied"
-          class="bg-surface-secondary flex min-h-120 w-full grow flex-col items-center justify-center gap-4 rounded-xl"
-        >
-          <Lock
-            :size="32"
-            aria-hidden="true"
-            class="text-text-tertiary dark:text-light dark:opacity-50"
-          />
-          <h2 class="text-h2">{{ post?.title }}</h2>
-          <p
-            v-if="!currentUser"
-            class="text-p text-text-tertiary max-w-sm text-center text-balance"
-          >
-            log in to see if you have access.
-          </p>
-          <p v-else class="text-p text-text-tertiary max-w-sm text-center text-balance">
-            this post isn’t public yet. if you think you should have access, DM me.
-          </p>
-          <button
-            v-if="!currentUser"
-            class="btn primary"
-            type="button"
-            @click="isAuthModalOpen = true"
-          >
-            log in
-          </button>
-          <router-link v-else to="/words" class="btn primary">
-            <ArrowLeft :size="16" /> Back to words
-          </router-link>
-        </div>
-
-        <template v-else-if="post">
-          <!-- Render parsed markdown -->
-          <div
-            v-if="parsedMarkdown"
-            v-reveal="150"
-            :data-sync="post.slug"
-            class="text-p markdown-content text-text-primary mx-auto w-full max-w-prose"
-            v-html="parsedMarkdown"
-          ></div>
-        </template>
+          v-else-if="parsedMarkdown"
+          v-reveal="150"
+          :data-sync="post?.slug"
+          class="text-p markdown-content text-text-primary mx-auto w-full max-w-prose"
+          v-html="parsedMarkdown"
+        ></div>
       </div>
     </div>
   </div>
@@ -125,7 +114,7 @@ const parsedMarkdown = computed(() => {
 @reference "@/style.css";
 
 .breadcrumb {
-  @apply hover:bg-hover active:bg-press -mx-2 rounded-lg px-2 py-1;
+  @apply hover:bg-hover active:bg-press -mx-2 line-clamp-1 w-full max-w-fit rounded-lg px-2 py-1;
 
   &.main {
     @apply text-text-tertiary;
