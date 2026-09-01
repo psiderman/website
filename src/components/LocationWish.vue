@@ -9,7 +9,8 @@
         v-if="!isWishTime"
         v-reveal
         to="/"
-        class="size-10 shrink-0 overflow-hidden rounded-full hover:opacity-80 active:opacity-90"
+        class="size-10 shrink-0 overflow-hidden rounded-full"
+        :class="isHomeView ? 'cursor-default!' : 'hover:opacity-80 active:opacity-90'"
         aria-label="Psiderman home"
       >
         <img src="/psider.webp" alt="" aria-hidden="true" class="size-10" width="80" height="80" />
@@ -51,7 +52,11 @@
         <Globe2 :size="16" />
         i'm in {{ current_location.city }}
       </div>
-      <div v-reveal="50" class="flex flex-row items-center gap-1 tabular-nums">
+      <div
+        v-tooltip="{ content: isWishTime ? null : 'can’t make a wish yet', placement: 'right' }"
+        v-reveal="50"
+        class="flex w-fit flex-row items-center gap-1 tabular-nums"
+      >
         <MiniClock :time="currentTime" :size="16" />
         and it is
         {{
@@ -74,6 +79,7 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import MiniClock from './MiniClock.vue'
 import WishCircle from './WishCircle.vue'
 import WishDialog from './WishDialog.vue'
+import { isHomeView } from '@/composables/useLive.ts'
 
 interface Location {
   city: string
