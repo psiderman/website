@@ -121,7 +121,9 @@ const getAnonName = (id: string) => {
 
 const userName = computed(() => {
   if (!currentUser.value) return getAnonName(activeUserId.value)
-  return currentUser.value.user_metadata?.full_name?.split(' ')[0] || getAnonName(activeUserId.value)
+  return (
+    currentUser.value.user_metadata?.full_name?.split(' ')[0] || getAnonName(activeUserId.value)
+  )
 })
 
 const userAvatar = computed(() => {
@@ -295,58 +297,47 @@ export const sortedPresenceUsers = computed(() => {
     })
 })
 
+/** Convert a normalized {box, x, y} back to absolute page coordinates for rendering. */
+function toRenderCoords(
+  item: { box: string; x: number; y: number },
+  winW: number,
+  sy: number,
+  rects: Map<string, BoxRect>,
+): { renderX: number; renderY: number } {
+  let renderX = item.x * winW
+  let renderY = item.y
+
+  if (item.box !== 'viewport' && rects.has(item.box)) {
+    const rect = rects.get(item.box)!
+    renderX = rect.left + item.x * rect.width
+
+    if (item.box === 'header') {
+      const viewportTop = Math.max(0, rect.top - sy)
+      renderY = sy + viewportTop + item.y * rect.height
+    } else {
+      renderY = rect.top + item.y * rect.height
+    }
+  }
+
+  return { renderX, renderY }
+}
+
 export const renderCursors = computed(() => {
   if (!global.allowMultiplayer.value) return []
   if (!isHomeView.value) return []
-  return activeCursors.value.map((cursor) => {
-    let renderX = cursor.x * windowWidth.value
-    let renderY = cursor.y
-
-    if (cursor.box !== 'viewport' && boxRects.value.has(cursor.box)) {
-      const rect = boxRects.value.get(cursor.box)!
-      renderX = rect.left + cursor.x * rect.width
-
-      if (cursor.box === 'header') {
-        const viewportTop = Math.max(0, rect.top - scrollY.value)
-        renderY = scrollY.value + viewportTop + cursor.y * rect.height
-      } else {
-        renderY = rect.top + cursor.y * rect.height
-      }
-    }
-
-    return {
-      ...cursor,
-      renderX,
-      renderY,
-    }
-  })
+  return activeCursors.value.map((cursor) => ({
+    ...cursor,
+    ...toRenderCoords(cursor, windowWidth.value, scrollY.value, boxRects.value),
+  }))
 })
 
 export const renderTouches = computed(() => {
   if (!global.allowMultiplayer.value) return []
   if (!isHomeView.value) return []
-  return activeTouches.value.map((touch) => {
-    let renderX = touch.x * windowWidth.value
-    let renderY = touch.y
-
-    if (touch.box !== 'viewport' && boxRects.value.has(touch.box)) {
-      const rect = boxRects.value.get(touch.box)!
-      renderX = rect.left + touch.x * rect.width
-
-      if (touch.box === 'header') {
-        const viewportTop = Math.max(0, rect.top - scrollY.value)
-        renderY = scrollY.value + viewportTop + touch.y * rect.height
-      } else {
-        renderY = rect.top + touch.y * rect.height
-      }
-    }
-
-    return {
-      ...touch,
-      renderX,
-      renderY,
-    }
-  })
+  return activeTouches.value.map((touch) => ({
+    ...touch,
+    ...toRenderCoords(touch, windowWidth.value, scrollY.value, boxRects.value),
+  }))
 })
 
 export const toggleMultiplayer = () => {
@@ -491,6 +482,30 @@ const handleScroll = () => {
   scrollY.value = window.scrollY
 }
 
+/** Resolve data-sync box coordinates from a pointer position. */
+function resolveInputCoords(
+  target: Element | null,
+  pageX: number,
+  pageY: number,
+  clientX: number,
+  clientY: number,
+  winW: number,
+): { box: string; x: number; y: number } {
+  const syncEl = target?.closest('[data-sync]')
+  if (syncEl) {
+    const boxId = syncEl.getAttribute('data-sync')
+    if (boxId) {
+      const rect = syncEl.getBoundingClientRect()
+      return {
+        box: boxId,
+        x: (clientX - rect.left) / rect.width,
+        y: (clientY - rect.top) / rect.height,
+      }
+    }
+  }
+  return { box: 'viewport', x: pageX / winW, y: pageY }
+}
+
 const handleMouseMove = (e: MouseEvent) => {
   if (isMobile.value) return // Mobile uses touchstart
   if (!global.allowMultiplayer.value) return
@@ -502,20 +517,14 @@ const handleMouseMove = (e: MouseEvent) => {
   if (now - lastSent < THROTTLE_MS) return
   lastSent = now
 
-  const target = (e.target as Element).closest('[data-sync]')
-  let box = 'viewport'
-  let x = e.pageX / windowWidth.value
-  let y = e.pageY
-
-  if (target) {
-    const boxId = target.getAttribute('data-sync')
-    if (boxId) {
-      const rect = target.getBoundingClientRect()
-      box = boxId
-      x = (e.clientX - rect.left) / rect.width
-      y = (e.clientY - rect.top) / rect.height
-    }
-  }
+  const { box, x, y } = resolveInputCoords(
+    e.target as Element,
+    e.pageX,
+    e.pageY,
+    e.clientX,
+    e.clientY,
+    windowWidth.value,
+  )
 
   channel.send({
     event: 'cursor',
@@ -544,20 +553,14 @@ const handleTouchStart = (e: TouchEvent) => {
   lastSent = now
 
   const touch = e.changedTouches[0]
-  const target = (e.target as Element).closest('[data-sync]')
-  let box = 'viewport'
-  let x = touch.pageX / windowWidth.value
-  let y = touch.pageY
-
-  if (target) {
-    const boxId = target.getAttribute('data-sync')
-    if (boxId) {
-      const rect = target.getBoundingClientRect()
-      box = boxId
-      x = (touch.clientX - rect.left) / rect.width
-      y = (touch.clientY - rect.top) / rect.height
-    }
-  }
+  const { box, x, y } = resolveInputCoords(
+    e.target as Element,
+    touch.pageX,
+    touch.pageY,
+    touch.clientX,
+    touch.clientY,
+    windowWidth.value,
+  )
 
   channel.send({
     event: 'touch',
