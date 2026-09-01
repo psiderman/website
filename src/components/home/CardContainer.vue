@@ -7,7 +7,7 @@
     @click="handleClick"
   >
     <div
-      class="relative flex h-full w-full grow items-center justify-center overflow-hidden rounded-lg"
+      class="relative flex size-full grow items-center justify-center overflow-hidden rounded-lg"
       :class="bgClass || 'bg-background'"
     >
       <img

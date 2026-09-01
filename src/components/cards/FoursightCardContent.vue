@@ -1,12 +1,12 @@
 <template>
   <div
-    class="border-border-high-contrast relative flex h-full w-full flex-col items-center justify-start gap-10 overflow-hidden rounded-lg border p-10 pb-0"
+    class="border-border-high-contrast relative flex size-full flex-col items-center justify-start gap-10 overflow-hidden rounded-lg border p-10 pb-0"
   >
     <img
       src="@/assets/home/bg.webp"
       alt=""
       aria-hidden="true"
-      class="pointer-events-none absolute inset-0 z-0 h-full w-full bg-cyan-950 object-cover"
+      class="pointer-events-none absolute inset-0 z-0 size-full bg-cyan-950 object-cover"
       width="713"
       height="436"
     />

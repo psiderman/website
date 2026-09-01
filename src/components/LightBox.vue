@@ -35,16 +35,16 @@
                   : 'border-dark rounded-special p-0'
               "
             >
-              <div class="bg-dark group desktop:min-h-80 relative h-full w-full rounded-lg">
+              <div class="bg-dark group desktop:min-h-80 relative size-full rounded-lg">
                 <div
                   ref="scrollContainer"
-                  class="noscrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden scroll-smooth overscroll-x-contain"
+                  class="noscrollbar flex size-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth"
                   @scroll="handleScroll"
                 >
                   <div
                     v-for="(item, idx) in mediaItems"
                     :key="idx"
-                    class="my-auto flex h-full w-full shrink-0 snap-center items-center justify-center overflow-hidden rounded-lg"
+                    class="my-auto flex size-full shrink-0 snap-center items-center justify-center overflow-hidden rounded-lg"
                   >
                     <div
                       v-if="item.type === 'image'"
@@ -55,15 +55,15 @@
                         :alt="item.caption || ''"
                         :style="
                           item.width && item.height
-                            ? { 
-                                width: `${item.width}px`, 
+                            ? {
+                                width: `${item.width}px`,
                                 height: `${item.height}px`,
                                 maxWidth: '100%',
-                                maxHeight: '75svh'
+                                maxHeight: '75svh',
                               }
                             : { maxWidth: '100%', maxHeight: '75svh' }
                         "
-                        class="object-contain rounded-lg"
+                        class="rounded-lg object-contain"
                       />
                       <div class="absolute top-2 right-2 flex flex-row gap-2">
                         <div

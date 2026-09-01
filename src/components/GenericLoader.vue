@@ -1,5 +1,5 @@
 <template>
-  <div role="status" aria-label="Loading" class="flex h-full w-full items-center justify-center">
+  <div role="status" aria-label="Loading" class="flex size-full items-center justify-center">
     <div
       class="size-5 animate-spin rounded-full border-2"
       :class="classes[theme || 'default']"

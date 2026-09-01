@@ -1,13 +1,13 @@
 <template>
   <div
-    class="bg-surface-secondary relative h-full w-full rounded-lg"
+    class="bg-surface-secondary relative size-full rounded-lg"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
     <!-- Loading State -->
     <div
       v-if="isLoading"
-      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+      class="bg-surface-secondary flex size-full flex-col items-center justify-center gap-2"
     >
       <GenericLoader />
     </div>
@@ -18,7 +18,7 @@
       ref="scrollContainer"
       role="region"
       :aria-label="`${title ? title + ' carousel' : 'Image carousel'}`"
-      class="noscrollbar desktop:flex-col desktop:snap-y desktop:overflow-x-hidden desktop:overflow-y-auto focus-visible:outline-text-primary relative flex h-full w-full snap-x snap-mandatory flex-row overflow-x-auto overflow-y-hidden scroll-smooth focus-visible:outline-2 focus-visible:-outline-offset-2"
+      class="noscrollbar desktop:flex-col desktop:snap-y desktop:overflow-x-hidden desktop:overflow-y-auto focus-visible:outline-text-primary relative flex size-full snap-x snap-mandatory flex-row overflow-x-auto overflow-y-hidden scroll-smooth focus-visible:outline-2 focus-visible:-outline-offset-2"
       tabindex="0"
       @touchstart="handleInteraction"
       @wheel="handleInteraction"
@@ -27,13 +27,13 @@
       <div
         v-for="(img, idx) in images"
         :key="`${img}-${idx}`"
-        class="h-full w-full shrink-0 snap-center"
+        class="size-full shrink-0 snap-center"
         :class="{ 'cursor-pointer': props.interactive, 'pointer-events-none': !props.interactive }"
         @click.stop="props.interactive && emit('click-image', idx)"
       >
         <img
           v-lazy="img"
-          class="h-full w-full object-cover"
+          class="size-full object-cover"
           :alt="title ? `${title} ${idx + 1}` : `Image ${idx + 1}`"
           width="300"
           height="500"
@@ -46,7 +46,7 @@
     <!-- Empty / Error State -->
     <div
       v-else
-      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+      class="bg-surface-secondary flex size-full flex-col items-center justify-center gap-2"
     >
       <OctagonAlert :size="24" class="text-text-tertiary" />
       <div class="text-text-tertiary text-ui">Error fetching data</div>

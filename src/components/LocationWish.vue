@@ -26,7 +26,7 @@
         @click="isWishDialogOpen = true"
       >
         <span
-          class="text-h2 flex h-full w-full flex-col items-center justify-center"
+          class="text-h2 flex size-full flex-col items-center justify-center"
           aria-hidden="true"
         >
           🤞
@@ -76,10 +76,11 @@ import { Globe2 } from '@lucide/vue'
 import { addDays } from 'date-fns'
 import { onMounted, onUnmounted, ref } from 'vue'
 
+import { isHomeView } from '@/composables/useLive.ts'
+
 import MiniClock from './MiniClock.vue'
 import WishCircle from './WishCircle.vue'
 import WishDialog from './WishDialog.vue'
-import { isHomeView } from '@/composables/useLive.ts'
 
 interface Location {
   city: string

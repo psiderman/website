@@ -44,7 +44,7 @@
                 >
                   <div
                     v-if="nextTripThumbnails.length === 1"
-                    class="relative h-full w-full overflow-hidden p-1"
+                    class="relative size-full overflow-hidden p-1"
                   >
                     <img
                       :src="nextTripThumbnails[0]"
@@ -52,12 +52,12 @@
                       draggable="false"
                       loading="eager"
                       decoding="async"
-                      class="pointer-events-none h-full w-full rounded-xs object-cover select-none"
+                      class="pointer-events-none size-full rounded-xs object-cover select-none"
                     />
                   </div>
                   <div
                     v-else-if="nextTripThumbnails.length > 0"
-                    class="grid h-full w-full grid-cols-3 grid-rows-2 gap-3 overflow-hidden p-1"
+                    class="grid size-full grid-cols-3 grid-rows-2 gap-3 overflow-hidden p-1"
                   >
                     <div
                       v-for="(url, idx) in nextTripThumbnails"
@@ -73,13 +73,13 @@
                         draggable="false"
                         loading="eager"
                         decoding="async"
-                        class="border-light pointer-events-none h-full w-full border-6 border-b-12 object-cover select-none"
+                        class="border-light pointer-events-none size-full border-6 border-b-12 object-cover select-none"
                       />
                     </div>
                   </div>
                   <div
                     v-else
-                    class="text-text-tertiary flex h-full w-full items-center justify-center text-xs"
+                    class="text-text-tertiary flex size-full items-center justify-center text-xs"
                   >
                     No preview
                   </div>

@@ -64,7 +64,7 @@
               allowfullscreen
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
-              class="bg-dark block aspect-video h-full w-full border-0"
+              class="bg-dark block aspect-video size-full border-0"
             ></iframe>
             <p class="text-p text-text-tertiary">
               video editing is difficult but it's easier than ranking higher in valorant :')
@@ -87,7 +87,7 @@
                 <img
                   v-lazy="game.url"
                   :alt="game.caption"
-                  class="h-full w-full object-cover"
+                  class="size-full object-cover"
                   loading="lazy"
                 />
               </button>

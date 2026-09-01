@@ -1,12 +1,12 @@
 <template>
-  <div class="pointer-events-none relative h-full w-full grow">
+  <div class="pointer-events-none relative size-full grow">
     <img
       v-if="previewUrl"
       v-lazy="previewUrl"
       alt="map view"
       width="600"
       height="400"
-      class="absolute inset-0 h-full w-full object-cover dark:opacity-80"
+      class="absolute inset-0 size-full object-cover dark:opacity-80"
     />
   </div>
   <div class="pointer-events-auto absolute inset-0 bg-transparent"></div>

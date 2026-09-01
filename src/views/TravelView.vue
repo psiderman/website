@@ -4,7 +4,7 @@
       <!-- Loading State -->
       <div
         v-if="isLoading"
-        class="max-w-container mx-auto flex h-full w-full items-center justify-center"
+        class="max-w-container mx-auto flex size-full items-center justify-center"
       >
         <GenericLoader />
       </div>
@@ -12,7 +12,7 @@
       <!-- Error State -->
       <div
         v-else-if="error"
-        class="max-w-container bg-surface-secondary mx-auto flex h-full w-full items-center justify-center"
+        class="max-w-container bg-surface-secondary mx-auto flex size-full items-center justify-center"
       >
         <p class="text-mono text-text-tertiary">Error loading travels.</p>
       </div>
@@ -21,7 +21,7 @@
       <div
         v-else
         id="mapbox-bounds"
-        class="desktop:grid desktop:px-0 desktop:grid-cols-[1fr_min(40%,400px)_min(60%,1020px)_1fr] noscrollbar border-border-primary relative z-0 h-full w-full gap-8 overflow-hidden border-t"
+        class="desktop:grid desktop:px-0 desktop:grid-cols-[1fr_min(40%,400px)_min(60%,1020px)_1fr] noscrollbar border-border-primary relative z-0 size-full gap-8 overflow-hidden border-t"
       >
         <div></div>
         <div
@@ -167,13 +167,13 @@
 
         <div
           v-if="!currentUser?.id"
-          class="desktop:relative desktop:flex text-ui desktop:col-span-2 absolute inset-0 z-10 h-full w-full bg-blue-900"
+          class="desktop:relative desktop:flex text-ui desktop:col-span-2 absolute inset-0 z-10 size-full bg-blue-900"
         >
           <img
             v-if="previewUrl"
             v-lazy="previewUrl"
             alt="map view"
-            class="absolute inset-0 h-full w-full object-cover opacity-60"
+            class="absolute inset-0 size-full object-cover opacity-60"
           />
           <div
             class="bg-dark/70 desktop:pb-0 absolute inset-0 flex flex-col items-center justify-center pb-80 backdrop-blur-xs"
@@ -196,7 +196,7 @@
 
         <div
           v-else
-          class="desktop:relative desktop:flex desktop:col-span-2 absolute inset-0 z-10 h-full w-full bg-blue-900"
+          class="desktop:relative desktop:flex desktop:col-span-2 absolute inset-0 z-10 size-full bg-blue-900"
         >
           <TravelMap
             :active-trip-slug="activeTripSlug"

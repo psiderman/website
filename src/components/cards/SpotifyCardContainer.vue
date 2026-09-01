@@ -1,7 +1,7 @@
 <template>
   <div
     ref="containerRef"
-    class="noscrollbar dark:bg-dark dark:border-border-primary relative h-full w-full overflow-scroll rounded-lg border border-transparent bg-[#121212]"
+    class="noscrollbar dark:bg-dark dark:border-border-primary relative size-full overflow-scroll rounded-lg border border-transparent bg-[#121212]"
   >
     <GenericLoader v-if="isRecentLoading" theme="dark" />
     <template v-else-if="display_tracks.length > 0">
@@ -41,7 +41,7 @@
     </template>
     <div
       v-else
-      class="dark:bg-dark flex h-full w-full flex-col items-center justify-center gap-2 bg-[#121212]"
+      class="dark:bg-dark flex size-full flex-col items-center justify-center gap-2 bg-[#121212]"
     >
       <OctagonAlert :size="24" class="text-light/50" />
       <div class="text-light/50 text-ui">Error fetching data</div>

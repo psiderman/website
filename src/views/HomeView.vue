@@ -102,14 +102,14 @@
         <div class="aspect-video">
           <img
             v-lazy="activeDescription.cover"
-            class="border-border-primary h-full w-full rounded-lg border object-cover"
+            class="border-border-primary size-full rounded-lg border object-cover"
             :alt="activeFilter"
             width="800"
             height="450"
           />
         </div>
         <div
-          class="text-p text-text-secondary noscrollbar flex h-full w-full flex-col gap-5 overflow-scroll italic"
+          class="text-p text-text-secondary noscrollbar flex size-full flex-col gap-5 overflow-scroll italic"
         >
           <p class="text-text-primary -mb-1 font-semibold" v-html="activeDescription.title"></p>
           <p v-for="(p, i) in activeDescription.body" :key="i" v-html="p"></p>
@@ -148,7 +148,7 @@
           <video
             v-if="card.coverVid"
             :src="card.coverVid"
-            class="pointer-events-none h-full w-full object-cover"
+            class="pointer-events-none size-full object-cover"
             :autoplay="!prefersReducedMotion"
             :loop="!prefersReducedMotion"
             muted
@@ -157,7 +157,7 @@
           <img
             v-else-if="card.imageUrl"
             v-lazy="card.imageUrl"
-            class="pointer-events-none h-full w-full object-cover"
+            class="pointer-events-none size-full object-cover"
             :alt="card.title"
             width="800"
             height="450"

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoading" class="bg-surface-secondary h-full w-full">
+  <div v-if="isLoading" class="bg-surface-secondary size-full">
     <GenericLoader />
   </div>
   <div
@@ -413,7 +413,7 @@ onUnmounted(() => {
 @reference "@/style.css";
 
 .drawing-board {
-  @apply border-border-primary relative h-full w-full overflow-hidden rounded-lg border;
+  @apply border-border-primary relative size-full overflow-hidden rounded-lg border;
   background: url('@/assets/patterns/dot_grid.webp');
   background-size: 2.5%;
   @apply bg-repeat;
@@ -425,7 +425,7 @@ onUnmounted(() => {
 }
 
 .canvas {
-  @apply absolute inset-0 h-full w-full cursor-crosshair touch-none;
+  @apply absolute inset-0 size-full cursor-crosshair touch-none;
 }
 
 .keyboard-key {

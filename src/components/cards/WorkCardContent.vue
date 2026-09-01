@@ -1,7 +1,7 @@
 <template>
   <!-- Disabled on mobile because Work Modal is not responsive -->
   <div
-    class="border-border-primary desktop:pointer-events-auto bg-surface-secondary dark:bg-dark noscrollbar relative flex h-full w-full overflow-scroll rounded-lg border focus:outline-none"
+    class="border-border-primary desktop:pointer-events-auto bg-surface-secondary dark:bg-dark noscrollbar relative flex size-full overflow-scroll rounded-lg border focus:outline-none"
     tabindex="-1"
   >
     <template v-if="careerData.length > 0">
@@ -103,7 +103,7 @@
       </div>
     </template>
 
-    <div v-else class="flex h-full w-full flex-col items-center justify-center gap-2">
+    <div v-else class="flex size-full flex-col items-center justify-center gap-2">
       <OctagonAlert :size="24" class="text-text-tertiary" />
       <div class="text-text-tertiary text-ui">Error fetching data</div>
     </div>

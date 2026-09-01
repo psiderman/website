@@ -4,7 +4,7 @@
       <TabGroup
         :selected-index="selectedTab"
         as="div"
-        class="flex h-full w-full flex-col overflow-hidden"
+        class="flex size-full flex-col overflow-hidden"
         @change="(index: number) => (selectedTab = index)"
       >
         <div
@@ -32,7 +32,7 @@
 
         <TabPanels
           ref="scrollContainer"
-          class="relative h-full w-full overflow-auto"
+          class="relative size-full overflow-auto"
           @touchstart.passive="onTouchStart"
           @touchmove="onTouchMove"
           @touchend="onTouchEnd"
@@ -151,7 +151,7 @@
 
                   <select
                     v-model="pendingRoles[user.user_id]"
-                    class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    class="absolute inset-0 size-full cursor-pointer opacity-0"
                     @click.stop
                     @change="saveRole(user)"
                   >
@@ -415,7 +415,7 @@
                         <ChevronDown :size="14" class="shrink-0 opacity-70" />
                         <select
                           v-model="getEditTripForm(trip).clearance"
-                          class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                          class="absolute inset-0 size-full cursor-pointer opacity-0"
                         >
                           <option v-for="level in clearanceLevels" :key="level" :value="level">
                             {{ level }}
@@ -597,7 +597,7 @@
               <div
                 v-for="trip in tripsWithImagesGrouped"
                 :key="trip.slug"
-                class="flex h-full w-full shrink-0 snap-start scroll-m-4 flex-col gap-4 overflow-y-auto p-4 pb-28"
+                class="flex size-full shrink-0 snap-start scroll-m-4 flex-col gap-4 overflow-y-auto p-4 pb-28"
               >
                 <!-- Public & Private Image Groups -->
                 <div
@@ -680,7 +680,7 @@
                               <ChevronDown :size="14" class="shrink-0 opacity-70" />
                               <select
                                 v-model="getEditImageForm(img).clearance"
-                                class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                                class="absolute inset-0 size-full cursor-pointer opacity-0"
                               >
                                 <option
                                   v-for="level in clearanceLevels"
@@ -809,7 +809,7 @@
                   </button>
                 </div>
                 <div class="drawing-board relative h-80! w-full">
-                  <svg class="h-full w-full">
+                  <svg class="size-full">
                     <path
                       v-for="(pathD, idx) in entry.svgPaths"
                       :key="idx"
@@ -857,9 +857,7 @@
                     </p>
                   </div>
                   <div class="flex shrink-0 flex-row items-center gap-2">
-                    <span
-                      class="text-ui-small text-text-tertiary px-2 uppercase"
-                    >
+                    <span class="text-ui-small text-text-tertiary px-2 uppercase">
                       {{ post.clearance }}
                     </span>
                     <span
@@ -891,7 +889,7 @@
                         <ChevronDown :size="14" class="shrink-0 opacity-70" />
                         <select
                           v-model="getEditBlogForm(post).clearance"
-                          class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                          class="absolute inset-0 size-full cursor-pointer opacity-0"
                         >
                           <option v-for="level in clearanceLevels" :key="level" :value="level">
                             {{ level }}
@@ -952,9 +950,7 @@
 
                   <div
                     class="bg-surface-primary border-border-primary -mt-2 flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2 select-none"
-                    @click="
-                      getEditBlogForm(post).is_active = !getEditBlogForm(post).is_active
-                    "
+                    @click="getEditBlogForm(post).is_active = !getEditBlogForm(post).is_active"
                   >
                     <span class="text-ui text-text-primary">Is Active</span>
                     <div
@@ -1059,7 +1055,7 @@
                         <ChevronDown :size="14" class="shrink-0 opacity-70" />
                         <select
                           v-model="newPersonForm.orgId"
-                          class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                          class="absolute inset-0 size-full cursor-pointer opacity-0"
                           required
                         >
                           <option v-for="org in availableOrgs" :key="org.id" :value="org.id">
@@ -2425,9 +2421,7 @@ async function saveBlog(post: BlogPostRecord, close?: () => void) {
       if (await hasBlogFile(newPath)) {
         throw new Error(`Destination file already exists at “${newPath}”.`)
       }
-      const { error: moveError } = await supabase.storage
-        .from('blog')
-        .move(oldPath, newPath)
+      const { error: moveError } = await supabase.storage.from('blog').move(oldPath, newPath)
       if (moveError) throw moveError
     }
 
@@ -2488,7 +2482,7 @@ async function saveBlog(post: BlogPostRecord, close?: () => void) {
 @reference "@/style.css";
 
 .drawing-board {
-  @apply border-border-primary relative h-full w-full overflow-hidden rounded-lg border;
+  @apply border-border-primary relative size-full overflow-hidden rounded-lg border;
   background: url('@/assets/patterns/dot_grid.webp');
   background-size: 2.5%;
   @apply bg-repeat;
@@ -2500,7 +2494,7 @@ async function saveBlog(post: BlogPostRecord, close?: () => void) {
 }
 
 .canvas {
-  @apply absolute inset-0 h-full w-full cursor-crosshair touch-none;
+  @apply absolute inset-0 size-full cursor-crosshair touch-none;
 }
 
 .keyboard-key {

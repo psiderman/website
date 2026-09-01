@@ -31,7 +31,7 @@
             >
               <img
                 v-lazy="img.url"
-                class="aspect-3/5 h-full w-full rounded-xl object-cover"
+                class="aspect-3/5 size-full rounded-xl object-cover"
                 :alt="img.name"
                 width="300"
                 height="500"

@@ -34,7 +34,7 @@
               class="bg-surface-primary border-border-primary relative flex min-h-40 w-100 flex-col items-center justify-center overflow-hidden rounded-xl border shadow-none!"
             >
               <div
-                class="pointer-events-none z-10 flex h-full w-full flex-col justify-center gap-2 text-center"
+                class="pointer-events-none z-10 flex size-full flex-col justify-center gap-2 text-center"
               >
                 <div
                   aria-hidden="true"

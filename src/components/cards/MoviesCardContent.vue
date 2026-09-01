@@ -1,7 +1,7 @@
 <template>
   <div
     ref="scrollContainer"
-    class="bg-surface-primary noscrollbar relative flex h-full w-full snap-x snap-mandatory flex-row gap-2 overflow-x-auto scroll-smooth"
+    class="bg-surface-primary noscrollbar relative flex size-full snap-x snap-mandatory flex-row gap-2 overflow-x-auto scroll-smooth"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
     @touchstart="handleInteraction"
@@ -12,7 +12,7 @@
   >
     <div
       v-if="loading"
-      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+      class="bg-surface-secondary flex size-full flex-col items-center justify-center gap-2"
     >
       <GenericLoader />
     </div>
@@ -42,7 +42,7 @@
         <img
           v-lazy="movie.cover"
           :alt="`poster for ${movie.title}`"
-          class="h-full w-full object-cover"
+          class="size-full object-cover"
           :class="{
             'group-hover:blur-xs': movie.review,
             'blur-xs': activeReviewId === movie.id,
@@ -80,7 +80,7 @@
 
     <div
       v-else
-      class="bg-surface-secondary flex h-full w-full flex-col items-center justify-center gap-2"
+      class="bg-surface-secondary flex size-full flex-col items-center justify-center gap-2"
     >
       <OctagonAlert :size="24" class="text-text-tertiary" />
       <div class="text-text-tertiary text-ui">Error fetching data</div>
