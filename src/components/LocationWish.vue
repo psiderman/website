@@ -17,18 +17,17 @@
     </Transition>
 
     <!-- Mobile: tap to open the big wish dialog -->
-    <div
-      v-if="isWishTime && isCoarsePointer"
-      v-reveal
-      class="relative size-10 shrink-0"
-    >
+    <div v-if="isWishTime && isCoarsePointer" v-reveal class="relative size-10 shrink-0">
       <button
         type="button"
         aria-label="Make a wish"
         class="relative size-full overflow-hidden rounded-full border-2 border-transparent bg-amber-200 dark:bg-amber-500/20"
         @click="isWishDialogOpen = true"
       >
-        <span class="text-h2 flex h-full w-full flex-col items-center justify-center" aria-hidden="true">
+        <span
+          class="text-h2 flex h-full w-full flex-col items-center justify-center"
+          aria-hidden="true"
+        >
           🤞
         </span>
       </button>
@@ -48,44 +47,31 @@
     ></div>
 
     <div class="text-text-tertiary text-ui-small flex flex-col gap-1">
-      <div v-reveal="50" class="flex flex-row gap-1 tabular-nums">
-        <component :is="currentTimeClockIcon" :size="16" />
-        {{ isWishTime ? currentTime.split(':').slice(0, -1).join(':') : currentTime }}
-      </div>
       <div v-reveal="100" class="flex flex-row gap-1">
         <Globe2 :size="16" />
-        {{ current_location.city }}
+        i'm in {{ current_location.city }}
+      </div>
+      <div v-reveal="50" class="flex flex-row items-center gap-1 tabular-nums">
+        <MiniClock :time="currentTime" :size="16" />
+        and it is
+        {{
+          isWishTime
+            ? `${currentTime.split(':').slice(0, -1).join(':')}, time to make a wish`
+            : currentTime
+        }}
       </div>
     </div>
 
-    <WishDialog
-      :is-open="isWishDialogOpen"
-      @close="isWishDialogOpen = false"
-      @wished="onWished"
-    />
+    <WishDialog :is-open="isWishDialogOpen" @close="isWishDialogOpen = false" @wished="onWished" />
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  Clock,
-  Clock1,
-  Clock2,
-  Clock3,
-  Clock4,
-  Clock5,
-  Clock6,
-  Clock7,
-  Clock8,
-  Clock9,
-  Clock10,
-  Clock11,
-  Clock12,
-  Globe2,
-} from '@lucide/vue'
+import { Globe2 } from '@lucide/vue'
 import { addDays } from 'date-fns'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
+import MiniClock from './MiniClock.vue'
 import WishCircle from './WishCircle.vue'
 import WishDialog from './WishDialog.vue'
 
@@ -108,26 +94,6 @@ const isPopping = ref(false)
 const isWishDialogOpen = ref(false)
 const nextWishTimeStr = ref('')
 const lastWish = ref<null | string>(null)
-
-const clockIcons = [
-  Clock12,
-  Clock1,
-  Clock2,
-  Clock3,
-  Clock4,
-  Clock5,
-  Clock6,
-  Clock7,
-  Clock8,
-  Clock9,
-  Clock10,
-  Clock11,
-]
-
-const currentTimeClockIcon = computed(() => {
-  const hour = parseInt(currentTime.value.split(':')[0], 10)
-  return clockIcons[hour % 12] || Clock
-})
 
 const onWished = () => {
   isPopping.value = true
