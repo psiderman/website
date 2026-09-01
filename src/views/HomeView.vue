@@ -179,21 +179,22 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
 import CardCarousel from '@/components/cards/CardCarousel.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
 import { openLightbox, openPhotoLightbox } from '@/composables/useGlobal'
+import { useNow } from '@/composables/useNow'
 import { type ExtraCard, extraCards as staticExtraCards } from '@/data/extraCards'
 import { type Card, intros, cards as staticCards } from '@/data/homeCards'
-import { nowImages } from '@/data/now'
 import { FILTER_GROUPS } from '@/types'
 
 import type { FilterGroupId } from '@/types'
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 const extraCards = ref<Partial<Record<FilterGroupId, ExtraCard[]>>>(staticExtraCards)
 
+const { error: nowError, images: nowImages, isLoading: isNowLoading } = useNow()
 const filterGroups = FILTER_GROUPS
 
 const getHtmlElement = (el: unknown): HTMLElement | null => {
@@ -365,9 +366,9 @@ const filteredCards = computed<GridCard[]>(() => {
     if (card.id === 'now') {
       return {
         ...card,
-        images: nowImages.map((img) => img.url),
-        isError: false,
-        isLoading: false,
+        images: nowImages.value.map((img) => img.url),
+        isError: !!nowError.value && nowImages.value.length === 0,
+        isLoading: isNowLoading.value && nowImages.value.length === 0,
       }
     }
     return card

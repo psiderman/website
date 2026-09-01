@@ -17,11 +17,15 @@ const AUTH_SCOPED_PREFIXES = ['trips', 'trip-images', 'trips-with-images', 'admi
 // user's gated data without re-checking auth.
 const SENSITIVE_PREFIXES = [...AUTH_SCOPED_PREFIXES, 'blog-posts', 'blog-post', 'blog-post-content']
 
+function isAdminKey(key: string): boolean {
+  return key.startsWith('admin')
+}
+
 const persister = experimental_createQueryPersister({
   filters: {
     predicate: (query) => {
       const key = query.queryKey[0]
-      return typeof key !== 'string' || !SENSITIVE_PREFIXES.includes(key)
+      return typeof key !== 'string' || (!SENSITIVE_PREFIXES.includes(key) && !isAdminKey(key))
     },
   },
   maxAge: 1000 * 60 * 60 * 12, // 12 hours
@@ -74,7 +78,10 @@ function clearPersistedCache() {
 }
 
 function isAuthScoped(key: readonly unknown[]): boolean {
-  return typeof key[0] === 'string' && AUTH_SCOPED_PREFIXES.indexOf(key[0]) !== -1
+  return (
+    typeof key[0] === 'string' &&
+    (AUTH_SCOPED_PREFIXES.indexOf(key[0]) !== -1 || isAdminKey(key[0]))
+  )
 }
 
 // Set immediate fetch / no caching for all admin queries
@@ -85,6 +92,7 @@ const adminKeys = [
   ['admin-images'],
   ['admin-guestbook'],
   ['admin-blog'],
+  ['admin-user-page-views'],
 ]
 
 adminKeys.forEach((key) => {
