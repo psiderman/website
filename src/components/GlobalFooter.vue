@@ -1,5 +1,6 @@
 <template>
   <footer
+    ref="footerEl"
     data-sync="footer"
     class="text-light/75 relative flex w-full flex-col items-center justify-center gap-20 overflow-hidden bg-gray-950 pt-20 pb-0 dark:bg-zinc-950"
   >
@@ -10,10 +11,10 @@
       rel="noopener noreferrer"
       class="text-mono bg-light/10 text-light hover:bg-light/20 focus:bg-light/20 focus:outline-light absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-2 rounded-b-xl px-4 py-1.5 transition-colors duration-200 focus:outline-2 focus:outline-offset-2"
     >
-      <div class="flex size-4 items-center justify-center" aria-hidden="true">
+      <div v-reveal class="flex size-4 items-center justify-center" aria-hidden="true">
         <FA class="size-4" :icon="['fab', 'github']" />
       </div>
-      <span class="h-3">
+      <span v-reveal="50" class="h-3">
         {{ commit }}
       </span>
     </a>
@@ -22,31 +23,43 @@
     <div class="text-ui flex flex-col items-center justify-center gap-4">
       <div class="flex w-full flex-row items-center justify-center gap-3">
         <router-link
+          v-reveal="150"
           to="/terms"
           class="hover:bg-light-5p active:bg-light-10p hover:text-light -mx-2 -my-1 rounded-full px-4 py-1 outline-gray-400! dark:outline-zinc-400!"
           >terms</router-link
         >
-        <span class="text-light/50">✦</span>
+        <span v-reveal="200" class="text-light/50">✦</span>
         <router-link
+          v-reveal="250"
           to="/privacy"
           class="hover:bg-light-5p active:bg-light-10p hover:text-light -mx-2 -my-1 rounded-full px-4 py-1 outline-gray-400! dark:outline-zinc-400!"
           >privacy</router-link
         >
-        <span class="text-light/50">✦</span>
+        <span v-reveal="300" class="text-light/50">✦</span>
         <a
+          v-reveal="350"
           href="https://links.psiderman.com/resume"
           target="_blank"
           class="hover:bg-light-5p active:bg-light-10p hover:text-light -mx-2 -my-1 rounded-full px-4 py-1 outline-gray-400! dark:outline-zinc-400!"
           >résumé</a
         >
+        <span v-reveal="400" class="text-light/50">✦</span>
+        <a
+          v-reveal="450"
+          v-tooltip="'scroll down'"
+          href="https://www.youtube.com/watch?v=6P65Y-q-ht4"
+          target="_blank"
+          class="tabular-nums"
+          >thwips: {{ thwips !== null ? thwips : '...' }}</a
+        >
       </div>
-      <div class="flex w-full flex-row items-center justify-center gap-3">
+      <div v-reveal="500" class="flex w-full flex-row items-center justify-center gap-3">
         <p>© {{ currentYear }} Karan Sanas</p>
       </div>
     </div>
 
     <!-- Logo -->
-    <div ref="logoContainer" class="w-full">
+    <div ref="logoContainer" v-reveal="550" class="w-full">
       <div
         class="desktop:flex pointer-events-none hidden h-57.5 w-full items-start justify-center overflow-hidden"
       >
@@ -91,13 +104,21 @@
         🤟
       </div>
     </div>
+
+    <ThwipAchievementModal
+      :is-open="isAchievementModalOpen"
+      @close="isAchievementModalOpen = false"
+    />
   </footer>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
+import ThwipAchievementModal from '@/components/ThwipAchievementModal.vue'
 import WebStrand from '@/components/WebStrand.vue'
+import { getEasterEggEmail, getEasterEggQuips } from '@/data/thwipEasterEgg'
 
 // ==========================================
 // TIMING CONFIGURATION (edit values here)
@@ -105,7 +126,7 @@ import WebStrand from '@/components/WebStrand.vue'
 
 const TIMING = {
   // 4. Page Scroll Bounce-back
-  bounceDelay: 1000, // Delay from trigger until footer pulls/bounces page back up
+  bounceDelay: 1500, // Delay from trigger until footer pulls/bounces page back up
   bounceDuration: 700, // Duration of the page scroll snap-back
 
   // 2. Hand (🤟) emoji
@@ -119,28 +140,111 @@ const TIMING = {
   quipFlyDurationMin: 1000, // Fastest throw duration
 
   webDownDuration: 300, // Pull down morph duration (Frame 4 -> 5)
-  webHoldDelay: 0, // Hold delay at apex (between frame 4 & 5)
+  webHoldDelay: 500, // Hold delay at apex (between frame 4 & 5)
   // 1. Web strand animation
   webUpDuration: 700, // Upward morph duration to apex (Frame 1 -> 4)
 }
 
 const commit = __COMMIT_HASH__
 const currentYear = new Date().getFullYear()
+const footerEl = ref<HTMLElement | null>(null)
 const logoContainer = ref<HTMLElement | null>(null)
 const thwipContainer = ref<HTMLElement | null>(null)
 const handEl = ref<HTMLElement | null>(null)
 const showThwip = ref(false)
 
-const quips = ['thwip', 'go web go', 'fly', 'shazam', 'up up and away web', 'web... stop...']
-let lastQuip = ''
+const isAchievementModalOpen = ref(false)
+const isFooterVisible = ref(false)
+const LOCAL_THWIP_KEY = 'local_thwip_count'
+const localThwips = ref<number>(parseInt(localStorage.getItem(LOCAL_THWIP_KEY) || '0', 10) || 0)
+const thwips = ref<null | number>(null)
+let pendingDelta = 0
+let debounceTimer: null | number = null
+let footerObserver: IntersectionObserver | null = null
+
+const { data: thwipData } = useQuery<{ count: number }>({
+  enabled: isFooterVisible,
+  gcTime: 0,
+  queryFn: async () => {
+    const res = await fetch('/api/thwip', { cache: 'no-store' })
+    if (!res.ok) throw new Error(`Failed to fetch thwips: ${res.status}`)
+    return res.json()
+  },
+  queryKey: ['thwips'],
+  staleTime: 0,
+})
+
+watch(
+  thwipData,
+  (data) => {
+    if (data && typeof data.count === 'number') {
+      thwips.value = data.count + pendingDelta
+    }
+  },
+  { immediate: true },
+)
+
+function handleThwipComplete() {
+  thwips.value = (thwips.value ?? 0) + 1
+  pendingDelta += 1
+  localThwips.value += 1
+  try {
+    localStorage.setItem(LOCAL_THWIP_KEY, localThwips.value.toString())
+  } catch {
+    // ignore storage errors
+  }
+
+  if (localThwips.value === 91) {
+    triggerEasterEggEmail()
+  } else if (localThwips.value === 100) {
+    isAchievementModalOpen.value = true
+  }
+
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+  }
+
+  debounceTimer = window.setTimeout(() => {
+    const deltaToFlush = pendingDelta
+    pendingDelta = 0
+    debounceTimer = null
+    void persistThwipDelta(deltaToFlush)
+  }, 1000)
+}
+
+async function persistThwipDelta(delta: number) {
+  if (delta <= 0) return
+  try {
+    const res = await fetch('/api/thwip', {
+      body: JSON.stringify({ delta }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    })
+    if (!res.ok) {
+      console.error('Failed to increment thwips', res.statusText)
+    } else {
+      const data = (await res.json()) as { count?: number }
+      if (typeof data.count === 'number') {
+        thwips.value = data.count + pendingDelta
+      }
+    }
+  } catch (err) {
+    console.error('Failed to persist thwips counter', err)
+  }
+}
+
+function triggerEasterEggEmail() {
+  const { body, subject, to } = getEasterEggEmail()
+  const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  window.location.href = mailtoUrl
+}
+
+const quips = getEasterEggQuips()
 
 const random = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
 
-const getRandomQuip = () => {
-  const availableQuips = quips.filter((q) => q !== lastQuip)
-  const selected = availableQuips[Math.floor(Math.random() * availableQuips.length)]
-  lastQuip = selected
-  return selected
+const getNextQuip = () => {
+  return quips[localThwips.value % quips.length]
 }
 
 function dismissThwipAnimation() {
@@ -164,7 +268,7 @@ function spawnQuipThrow() {
   const tailClass = direction ? 'speech-bubble-left' : 'speech-bubble-right'
 
   const quipMessage = document.createElement('span')
-  quipMessage.textContent = getRandomQuip()
+  quipMessage.textContent = getNextQuip()
   quipMessage.ariaLive = 'polite'
   quipMessage.className = `speech-bubble ${tailClass} rounded-full bg-light px-2.5 py-0.5 text-ui-small font-medium text-gray-950 z-30 pointer-events-none absolute shadow-md whitespace-nowrap`
 
@@ -203,6 +307,11 @@ function spawnQuipThrow() {
 }
 
 function triggerThwipAnimation() {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+    debounceTimer = null
+  }
+
   const el = handEl.value
   if (el) {
     void import('animejs').then(({ animate }) => {
@@ -255,6 +364,7 @@ const bounceBack = (targetY: number) => {
       isSnapping = false
       showThwip.value = false
       dismissThwipAnimation()
+      handleThwipComplete()
     }
   }
 
@@ -300,11 +410,37 @@ const handleScroll = () => {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
+  if (footerEl.value) {
+    footerObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          isFooterVisible.value = true
+          if (footerObserver) {
+            footerObserver.disconnect()
+            footerObserver = null
+          }
+        }
+      },
+      { rootMargin: '200px' },
+    )
+    footerObserver.observe(footerEl.value)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  if (footerObserver) {
+    footerObserver.disconnect()
+    footerObserver = null
+  }
   if (scrollTimeout) clearTimeout(scrollTimeout)
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+    const deltaToFlush = pendingDelta
+    debounceTimer = null
+    pendingDelta = 0
+    void persistThwipDelta(deltaToFlush)
+  }
   cancelBounce()
 })
 </script>

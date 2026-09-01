@@ -49,3 +49,4 @@ opencode.json
 supabase/.temp/
 supabase/dumps/
 supabase/seed.sql
+.env*

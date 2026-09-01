@@ -15,7 +15,13 @@ const AUTH_SCOPED_PREFIXES = ['trips', 'trip-images', 'trips-with-images', 'admi
 // blog listing + gated markdown, now page). These must never be written to
 // localStorage: a persisted cache would let the next visitor see the previous
 // user's gated data without re-checking auth.
-const SENSITIVE_PREFIXES = [...AUTH_SCOPED_PREFIXES, 'blog-posts', 'blog-post', 'blog-post-content']
+const SENSITIVE_PREFIXES = [
+  ...AUTH_SCOPED_PREFIXES,
+  'blog-posts',
+  'blog-post',
+  'blog-post-content',
+  'thwips',
+]
 
 function isAdminKey(key: string): boolean {
   return key.startsWith('admin')
