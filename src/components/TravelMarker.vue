@@ -76,10 +76,14 @@ function buildTooltipContent(): Element {
 }
 
 function onTooltipMount(instance: Instance) {
-  instance.popper.querySelector('img')?.addEventListener('click', () => {
-    instance.hide()
-    openLightbox()
-  })
+  instance.popper.querySelector('img')?.addEventListener(
+    'click',
+    () => {
+      instance.hide()
+      openLightbox()
+    },
+    { once: true },
+  )
 }
 
 function openLightbox() {

@@ -186,14 +186,34 @@ router.afterEach((to) => {
   applyRouteMeta(to)
   trackPageView(to.path)
 
+  if (typeof window !== 'undefined') {
+    sessionStorage.removeItem('chunk_reload_target')
+  }
+
   // Reset any open modals on navigation
   ;[isLightBoxOpen, isPhotoLightBoxOpen, isWorkModalOpen, isAuthModalOpen].forEach((modal) => {
     modal.value = false
   })
 })
 
-router.onError((error) => {
+router.onError((error, to) => {
   console.error('[router] Navigation error:', error)
+
+  const msg = error instanceof Error ? error.message : String(error)
+  const isChunkError =
+    msg.includes('Failed to fetch dynamically imported module') ||
+    msg.includes('loading chunk') ||
+    msg.includes('Loading chunk') ||
+    msg.includes('Unexpected token') ||
+    msg.includes('Unable to preload CSS')
+
+  if (isChunkError && to?.fullPath && typeof window !== 'undefined') {
+    const key = 'chunk_reload_target'
+    if (sessionStorage.getItem(key) !== to.fullPath) {
+      sessionStorage.setItem(key, to.fullPath)
+      window.location.assign(to.fullPath)
+    }
+  }
 })
 
 export default router

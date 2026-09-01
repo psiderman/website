@@ -103,8 +103,16 @@ import type { NowEntry } from '@/data/now'
 
 const { entries: nowEntries, error, isLoading } = useNow()
 
-const entryLabel = (entry: NowEntry) =>
-  entry.date ? format(parse(entry.date, 'yyyy-MM-dd', new Date()), 'MMM ’yy').toLowerCase() : ''
+const entryLabel = (entry: NowEntry) => {
+  if (!entry.date) return ''
+  try {
+    const parsed = parse(entry.date, 'yyyy-MM-dd', new Date())
+    if (isNaN(parsed.getTime())) return entry.date
+    return format(parsed, 'MMM ’yy').toLowerCase()
+  } catch {
+    return entry.date
+  }
+}
 
 const renderMarkdown = (raw: string) => {
   const parsed = marked.parse(raw, { breaks: true })

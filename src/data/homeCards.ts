@@ -158,7 +158,7 @@ export const cards: Card[] = [
     title: 'blr maps',
   },
   {
-    arrow: 'external',
+    arrow: 'right',
     bgClass: 'bg-blue-900 dark:bg-blue-950',
     group: ['life'],
     id: 'resume',

@@ -70,5 +70,24 @@ if ('scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual'
 }
 
+// Auto-recover from stale chunks deployed after the current tab was opened
+function onPreloadError(event: Event) {
+  event.preventDefault()
+  window.removeEventListener('vite:preloadError', onPreloadError)
+  const key = 'vite_preload_reload'
+  if (!sessionStorage.getItem(key)) {
+    sessionStorage.setItem(key, '1')
+    window.location.reload()
+  }
+}
+
+window.addEventListener('vite:preloadError', onPreloadError, { once: true })
+
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    window.removeEventListener('vite:preloadError', onPreloadError)
+  })
+}
+
 await router.isReady()
 app.mount('#app')
