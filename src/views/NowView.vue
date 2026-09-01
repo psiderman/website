@@ -1,81 +1,59 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
     <div class="desktop:px-20 flex flex-col px-4">
-      <div class="flex min-h-[calc(100svh-5rem)] flex-col gap-20 pt-10">
-        <!-- <div class="text-ui flex flex-row items-center justify-start gap-2">
-          <router-link to="/" class="breadcrumb main">home</router-link>
-          <ChevronRight class="text-text-secondary" :size="16" />
-          <router-link to="/now" class="breadcrumb level">now</router-link>
-        </div> -->
-
-        <div v-if="isLoadingSlug || isLoadingMarkdown || isLoadingImages" class="w-full grow">
-          <GenericLoader />
+      <div class="flex min-h-[calc(100svh-5rem)] flex-col gap-20 pt-20">
+        <div class="text-p mx-auto w-full max-w-prose text-left">
+          <h1
+            v-reveal
+            v-tooltip="{ content: 'you don’t have a now page?', placement: 'right' }"
+            class="text-display -mb-14 w-fit"
+          >
+            /<a href="https://nownownow.com/about" target="_blank" class="underline">now</a>
+          </h1>
         </div>
 
         <div
-          v-else-if="slugError || markdownError"
-          class="bg-surface-secondary flex h-full w-full grow items-center justify-center rounded-xl"
+          v-if="images.length > 0"
+          class="noscrollbar desktop:mx-0 desktop:w-full desktop:overflow-visible desktop:px-0 -mx-4 flex w-[calc(100%+2rem)] overflow-x-auto px-4"
         >
-          <p class="text-mono text-text-tertiary">Error loading post.</p>
+          <div
+            class="desktop:grid desktop:w-full desktop:min-w-full desktop:mx-0 mx-auto flex w-fit gap-4"
+            :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
+          >
+            <button
+              v-for="(img, idx) in images"
+              :key="img.name"
+              v-reveal="idx * 70 + 70"
+              type="button"
+              :aria-label="`Open ${img.name}`"
+              class="bg-dark desktop:h-full desktop:w-full desktop:shrink aspect-3/5 h-72 w-auto shrink-0 cursor-pointer rounded-xl object-cover transition-opacity hover:opacity-95"
+              @click="triggerLightbox(idx)"
+            >
+              <img
+                v-lazy="img.url"
+                class="aspect-3/5 h-full w-full rounded-xl object-cover"
+                :alt="img.name"
+                width="300"
+                height="500"
+              />
+            </button>
+          </div>
         </div>
 
-        <template v-else-if="slug">
-          <!-- Render images at the top -->
-          <div class="text-p mx-auto w-full max-w-prose text-left">
-            <h1
-              v-reveal
-              v-tooltip="{ content: 'you don’t have a now page?', placement: 'right' }"
-              class="text-display -mb-14 w-fit"
-            >
-              /<a href="https://nownownow.com/about" target="_blank" class="underline">now</a>
-            </h1>
-          </div>
+        <div
+          v-reveal="100"
+          class="text-p text-text-secondary mx-auto -mb-12 w-full max-w-prose text-left"
+        >
+          <h2 class="text-h1">{{ updatedLabel }}</h2>
+        </div>
 
-          <div
-            v-if="images && images.length > 0"
-            class="noscrollbar desktop:mx-0 desktop:w-full desktop:overflow-visible desktop:px-0 -mx-4 flex w-[calc(100%+2rem)] overflow-x-auto px-4"
-          >
-            <div
-              class="desktop:grid desktop:w-full desktop:min-w-full desktop:mx-0 mx-auto flex w-fit gap-4"
-              :style="{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }"
-            >
-              <button
-                v-for="(img, idx) in images"
-                :key="img.name"
-                v-reveal="idx * 70 + 70"
-                type="button"
-                :aria-label="`Open ${img.name}`"
-                class="bg-dark desktop:h-full desktop:w-full desktop:shrink aspect-3/5 h-72 w-auto shrink-0 cursor-pointer rounded-xl object-cover transition-opacity hover:opacity-95"
-                @click="triggerLightbox(idx)"
-              >
-                <img
-                  v-lazy="img.url"
-                  class="aspect-3/5 h-full w-full rounded-xl object-cover"
-                  :alt="img.name"
-                  width="300"
-                  height="500"
-                />
-              </button>
-            </div>
-          </div>
-
-          <div
-            v-reveal="100"
-            class="text-p text-text-secondary mx-auto -mb-12 w-full max-w-prose text-left"
-          >
-            <h2 class="text-h2">
-              {{ format(new Date(`${slug}-01`), 'MMM ’yy').toLocaleLowerCase() }}
-            </h2>
-          </div>
-
-          <!-- Render parsed markdown -->
-          <div
-            v-if="parsedMarkdown"
-            v-reveal="150"
-            class="text-p markdown-content text-text-primary mx-auto max-w-prose overflow-hidden"
-            v-html="parsedMarkdown"
-          ></div>
-        </template>
+        <!-- Render parsed markdown -->
+        <div
+          v-if="parsedMarkdown"
+          v-reveal="150"
+          class="text-p markdown-content text-text-primary mx-auto max-w-prose overflow-hidden"
+          v-html="parsedMarkdown"
+        ></div>
       </div>
     </div>
     <ContactForm />
@@ -83,38 +61,30 @@
 </template>
 
 <script setup lang="ts">
-import { format } from 'date-fns'
+import { format, parse } from 'date-fns'
 import DOMPurify from 'dompurify'
 import { marked } from 'marked'
 import { computed } from 'vue'
 
-import GenericLoader from '@/components/GenericLoader.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
 import { isPhotoLightBoxOpen, photoLightBoxData } from '@/composables/useGlobal'
-import { useNow } from '@/composables/useNow'
+import { nowImages, nowMarkdown, nowUpdated } from '@/data/now'
 
-const {
-  images,
-  isLoadingImages,
-  isLoadingMarkdown,
-  isLoadingSlug,
-  markdownContent,
-  markdownError,
-  slug,
-  slugError,
-} = useNow()
+const images = nowImages
 
-// Parse markdown to HTML
+const updatedLabel = nowUpdated
+  ? format(parse(`${nowUpdated}-01`, 'yyyy-MM-dd', new Date()), 'MMM ’yy').toLowerCase()
+  : ''
+
 const parsedMarkdown = computed(() => {
-  if (!markdownContent.value) return ''
-  const raw = marked.parse(markdownContent.value, { breaks: true })
+  const raw = marked.parse(nowMarkdown, { breaks: true })
   return DOMPurify.sanitize(raw as string)
 })
 
 const triggerLightbox = (clickedIdx: number) => {
-  if (!images.value || images.value.length === 0) return
+  if (images.length === 0) return
 
-  const allImages = images.value.map((img) => ({
+  const allImages = images.map((img) => ({
     caption: null,
     thumbnailUrl: img.url,
     url: img.url,
@@ -126,7 +96,7 @@ const triggerLightbox = (clickedIdx: number) => {
     currentTripSlug: '',
     images: orderedImages,
     initialIndex: 0,
-    tripTitle: slug.value ? format(new Date(`${slug.value}-01`), 'MMM ’yy').toLowerCase() : 'now',
+    tripTitle: updatedLabel || 'now',
   }
   isPhotoLightBoxOpen.value = true
 }
@@ -134,16 +104,4 @@ const triggerLightbox = (clickedIdx: number) => {
 
 <style scoped>
 @reference "@/style.css";
-
-.breadcrumb {
-  @apply hover:bg-hover active:bg-press rounded-lg px-2 py-1;
-
-  &.main {
-    @apply text-text-tertiary;
-  }
-
-  &.level {
-    @apply text-text-secondary;
-  }
-}
 </style>

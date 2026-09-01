@@ -5,27 +5,27 @@
         <div
           v-reveal
           data-sync="post-breadcrumbs"
-          class="text-ui flex flex-row items-center justify-start gap-2"
+          class="text-p mx-auto -mb-20 flex w-full max-w-prose flex-row items-center justify-start gap-2"
         >
-          <router-link to="/" class="breadcrumb main">home</router-link>
+          <router-link to="/" class="breadcrumb text-ui main">home</router-link>
           <ChevronRight class="text-text-secondary" :size="16" />
-          <router-link to="/words" class="breadcrumb main">words</router-link>
+          <router-link to="/words" class="breadcrumb text-ui main">words</router-link>
           <template v-if="post?.title">
             <ChevronRight class="text-text-secondary" :size="16" />
-            <p class="breadcrumb level">{{ post.title }}</p>
+            <p class="breadcrumb text-ui level">{{ post.title }}</p>
           </template>
         </div>
 
         <div
           v-if="isLoading"
-          class="bg-surface-secondary flex min-h-120 w-full grow flex-col items-center justify-center"
+          class="bg-surface-secondary text-p mx-auto mt-10 flex min-h-120 w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
         >
           <GenericLoader />
         </div>
 
         <div
           v-else-if="isNotFound"
-          class="bg-surface-secondary flex min-h-120 w-full grow flex-col items-center justify-center gap-4 rounded-xl"
+          class="bg-surface-secondary text-p mx-auto mt-10 flex min-h-120 w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
         >
           <FileX :size="32" class="text-text-tertiary" />
           <p class="text-mono text-text-tertiary">The post you're trying to find doesn't exist.</p>
@@ -33,7 +33,7 @@
 
         <div
           v-else-if="error"
-          class="bg-surface-secondary flex min-h-120 w-full grow flex-col items-center justify-center gap-4 rounded-xl"
+          class="bg-surface-secondary text-p mx-auto mt-10 flex min-h-120 w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
         >
           <FileExclamationPoint :size="32" class="text-text-tertiary" />
           <p class="text-mono text-text-tertiary">Error loading post.</p>
@@ -125,7 +125,7 @@ const parsedMarkdown = computed(() => {
 @reference "@/style.css";
 
 .breadcrumb {
-  @apply hover:bg-hover active:bg-press rounded-lg px-2 py-1;
+  @apply hover:bg-hover active:bg-press -mx-2 rounded-lg px-2 py-1;
 
   &.main {
     @apply text-text-tertiary;

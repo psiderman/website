@@ -86,7 +86,6 @@ const router = createRouter({
     {
       component: () => import('../views/NowView.vue'),
       meta: {
-        description: 'What I’m up to right now, in my own words.',
         title: 'Now | Karan Sanas',
       },
       name: 'Now',
@@ -95,7 +94,6 @@ const router = createRouter({
     {
       component: () => import('../views/TravelView.vue'),
       meta: {
-        description: 'Trips, photos, and the story behind each one.',
         title: 'Travel | Karan Sanas',
       },
       name: 'Travel',
@@ -104,7 +102,6 @@ const router = createRouter({
     {
       component: () => import('../views/WritingView.vue'),
       meta: {
-        description: 'Essays, poems, recaps, and everything else I write.',
         title: 'Words | Karan Sanas',
       },
       name: 'Words',
@@ -113,8 +110,7 @@ const router = createRouter({
     {
       component: () => import('../views/PostView.vue'),
       meta: {
-        description: 'A piece of writing.',
-        title: 'Writing | Karan Sanas',
+        title: 'Words | Karan Sanas',
       },
       name: 'Post',
       path: '/words/:slug',
@@ -122,7 +118,6 @@ const router = createRouter({
     {
       component: () => import('../views/TermsView.vue'),
       meta: {
-        description: 'Terms of use for psiderman.com.',
         title: 'Terms | Karan Sanas',
       },
       name: 'Terms',
@@ -131,7 +126,6 @@ const router = createRouter({
     {
       component: () => import('../views/PrivacyView.vue'),
       meta: {
-        description: 'How psiderman.com handles your data.',
         title: 'Privacy | Karan Sanas',
       },
       name: 'Privacy',
@@ -140,7 +134,6 @@ const router = createRouter({
     {
       component: () => import('../views/NotFoundView.vue'),
       meta: {
-        description: 'That page doesn’t exist.',
         layout: 'blank',
         noindex: true,
         title: 'Page Not Found | Karan Sanas',

@@ -1,5 +1,5 @@
 <template>
-  <div data-sync="contact-form" class="desktop:px-20 w-full px-4 py-10">
+  <div data-sync="contact-form" class="desktop:px-20 desktop:py-20 w-full px-4 py-10">
     <div
       class="desktop:p-20 desktop:gap-6 flex flex-col items-center justify-center gap-2 rounded-xl bg-gray-950 p-6 py-12 dark:bg-zinc-950"
     >
@@ -126,7 +126,10 @@ async function copyEmail(event: MouseEvent) {
           onComplete: () => {
             document.body.removeChild(copiedMessage)
           },
-          opacity: [{ duration: 200, to: 1 }, { duration: 1300, to: 0 }],
+          opacity: [
+            { duration: 200, to: 1 },
+            { duration: 1300, to: 0 },
+          ],
         })
       } else {
         const direction = random(0, 1)

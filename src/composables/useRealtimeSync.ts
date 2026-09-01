@@ -47,17 +47,6 @@ export function initRealtimeSync(): RealtimeChannel {
         scheduleInvalidate(['trips', 'trips-with-images', 'admin-trips'])
       },
     )
-.on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'now',
-      },
-      () => {
-        scheduleInvalidate(['now-posts', 'now-markdown', 'now-images'])
-      },
-    )
     .on(
       'postgres_changes',
       {

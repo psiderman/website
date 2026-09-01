@@ -184,22 +184,14 @@ import {
   lightBoxData,
   photoLightBoxData,
 } from '@/composables/useGlobal'
-import { useNow } from '@/composables/useNow'
 import { type ExtraCard, extraCards as staticExtraCards } from '@/data/extraCards'
 import { type Card, intros, cards as staticCards } from '@/data/homeCards'
+import { nowImages } from '@/data/now'
 import { FILTER_GROUPS } from '@/types'
 
 import type { FilterGroupId } from '@/types'
 import type { ComponentPublicInstance } from 'vue'
 
-const {
-  images: nowImages,
-  isLoadingImages: isLoadingNowImages,
-  isLoadingSlug: isLoadingNowSlug,
-  slugError: nowSlugError,
-} = useNow()
-
-// Convert extraCards to reactive ref
 const extraCards = ref<Partial<Record<FilterGroupId, ExtraCard[]>>>(staticExtraCards)
 
 const filterGroups = FILTER_GROUPS
@@ -347,9 +339,9 @@ const filteredCards = computed<GridCard[]>(() => {
     if (card.id === 'now') {
       return {
         ...card,
-        images: nowImages.value?.map((img) => img.url) || [],
-        isError: !!nowSlugError.value,
-        isLoading: isLoadingNowImages.value || isLoadingNowSlug.value,
+        images: nowImages.map((img) => img.url),
+        isError: false,
+        isLoading: false,
       }
     }
     return card

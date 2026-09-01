@@ -68,6 +68,7 @@
   --text-display: var(--text-size-42);
   --text-h1: var(--text-size-33);
   --text-h2: var(--text-size-21);
+  --text-p-large: var(--text-size-19);
   --text-p: var(--text-size-17);
   --text-p-small: var(--text-size-13);
   --text-mono: var(--text-size-13);
@@ -76,6 +77,7 @@
   --leading-11: 1rem;
   --leading-13: 1rem;
   --leading-17: 1.5rem;
+  --leading-19: 2rem;
   --leading-21: 1.5rem;
   --leading-33: 2.5rem;
   --leading-42: 3.5rem;
@@ -83,6 +85,7 @@
   --tracking-11: 0.015em;
   --tracking-13: 0em;
   --tracking-17: -0.01em;
+  --tracking-19: -0.015em;
   --tracking-21: -0.015em;
   --tracking-33: -0.025em;
   --tracking-42: -0.03em;
@@ -415,6 +418,11 @@
     @apply tracking-21 leading-21;
     text-wrap: balance;
   }
+  .text-p-large {
+    @apply font-serif;
+    @apply font-normal;
+    @apply tracking-19 leading-19;
+  }
   .text-p {
     @apply font-serif;
     @apply font-normal;
@@ -489,10 +497,10 @@
   /* Markdown text */
   .markdown-content {
     & p {
-      @apply text-p;
+      @apply text-p desktop:text-p-large;
       @apply font-serif;
       @apply font-normal;
-      @apply tracking-17 leading-17;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply mb-10;
 
       /* Reduce bottom margin if the very next element is another paragraph */
@@ -682,6 +690,7 @@
   --text-size-11: 0.6875rem;
   --text-size-13: 0.8125rem;
   --text-size-17: 1.0625rem;
+  --text-size-19: 1.1875rem;
   --text-size-21: 1.3125rem;
   --text-size-33: 2.0625rem;
   --text-size-42: 2.625rem;
