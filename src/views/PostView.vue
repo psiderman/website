@@ -56,7 +56,7 @@
               type="button"
               @click="isAuthModalOpen = true"
             >
-              log in
+              Log in
             </button>
             <router-link v-else to="/words" class="btn primary mt-8">
               <ArrowLeft :size="16" /> Back to words

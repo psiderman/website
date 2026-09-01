@@ -121,11 +121,7 @@ const getAnonName = (id: string) => {
 
 const userName = computed(() => {
   if (!currentUser.value) return getAnonName(activeUserId.value)
-  return (
-    currentUser.value.user_metadata?.full_name?.split(' ')[0] ||
-    currentUser.value.email?.split('@')[0] ||
-    getAnonName(activeUserId.value)
-  )
+  return currentUser.value.user_metadata?.full_name?.split(' ')[0] || getAnonName(activeUserId.value)
 })
 
 const userAvatar = computed(() => {

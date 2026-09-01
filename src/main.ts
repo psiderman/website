@@ -48,8 +48,8 @@ if (import.meta.env.PROD && ['psiderman.com'].includes(window.location.hostname)
     sendDefaultPii: true,
     // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
     tracePropagationTargets: ['localhost', /^https:\/\/psiderman\.com\/api/],
-    // Tracing
-    tracesSampleRate: 1.0, // Capture 100% of the transactions
+    // Tracing: 25% sample — enough signal for a personal site without full quota burn
+    tracesSampleRate: 0.25,
   })
 }
 

@@ -52,6 +52,50 @@ export const photoLightBoxData = ref<{
 export const isWorkModalOpen = ref(false)
 export const workData = ref<null | WorkDetail>(null)
 
+type PhotoLightboxImageInput = {
+  caption?: null | string
+  clearance?: ClearanceLevel | null | string
+  height?: null | number
+  thumbnailUrl?: string
+  url: string
+  width?: null | number
+}
+
+export function openLightbox(data: {
+  description?: string
+  images?: { clearance?: ClearanceLevel; url: string }[]
+  tags?: LightBoxTag[]
+  title?: string
+  videos?: string[]
+}) {
+  lightBoxData.value = {
+    description: data.description ?? '',
+    images: data.images ?? [],
+    tags: data.tags,
+    title: data.title ?? '',
+    videos: data.videos,
+  }
+  isLightBoxOpen.value = true
+}
+
+export function openPhotoLightbox(
+  images: PhotoLightboxImageInput[],
+  options: { initialIndex?: number; title?: string; tripSlug?: string } = {},
+) {
+  if (images.length === 0) return
+
+  const start = options.initialIndex ?? 0
+  const orderedImages = [...images.slice(start), ...images.slice(0, start)]
+
+  photoLightBoxData.value = {
+    currentTripSlug: options.tripSlug ?? '',
+    images: orderedImages,
+    initialIndex: 0,
+    tripTitle: options.title ?? '',
+  }
+  isPhotoLightBoxOpen.value = true
+}
+
 const activeModal = computed(() => {
   if (isWorkModalOpen.value) return 'work'
   if (isLightBoxOpen.value) return 'lightbox'

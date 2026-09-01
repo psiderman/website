@@ -9,7 +9,7 @@ const PERSIST_PREFIX = 'tanstack-query'
 // on one of these means the session is genuinely dead — sign out. Errors on
 // public queries (home cards, movies, now, spotify, guestbook) must NOT log
 // the user out, since those can fail transiently while a session is fine.
-const AUTH_SCOPED_PREFIXES = ['trips', 'trip-images', 'trips-with-images', 'admin']
+const AUTH_SCOPED_PREFIXES = ['trips', 'trip-images', 'trips-with-images', 'admin', 'admin-blog']
 
 // Queries whose results depend on the signed-in user (clearance-gated trips,
 // blog listing + gated markdown, now page). These must never be written to
@@ -84,7 +84,7 @@ const adminKeys = [
   ['admin-trips'],
   ['admin-images'],
   ['admin-guestbook'],
-  ['admin'],
+  ['admin-blog'],
 ]
 
 adminKeys.forEach((key) => {

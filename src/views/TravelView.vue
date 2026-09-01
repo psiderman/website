@@ -47,7 +47,10 @@
                 class="border-border-primary bg-surface-primary desktop:h-fit noscrollbar desktop:w-full desktop:snap-start desktop:scroll-mt-14 pointer-events-auto flex h-80 w-[90svw] snap-center snap-always flex-col overflow-y-scroll rounded-xl border p-0 transition-colors duration-200"
                 :class="[currentUser?.id ? 'cursor-pointer hover:shadow-xs' : '']"
                 :data-sync="travel.slug"
+                :tabindex="currentUser?.id ? 0 : undefined"
+                :role="currentUser?.id ? 'button' : undefined"
                 @click="handleTripClick(travel.slug)"
+                @keydown="(e: KeyboardEvent) => handleCardKeydown(travel.slug, e)"
               >
                 <!-- Card Image Gallery Row -->
                 <div
@@ -219,10 +222,9 @@ import TheListIndicator from '@/components/TheListIndicator.vue'
 import TravelMap from '@/components/TravelMap.vue'
 import { currentUser } from '@/composables/useAuth'
 import { isAuthModalOpen } from '@/composables/useAuth'
-import { isPhotoLightBoxOpen, photoLightBoxData } from '@/composables/useGlobal'
+import { isPhotoLightBoxOpen, openPhotoLightbox, photoLightBoxData } from '@/composables/useGlobal'
 import {
   isHighClearance,
-  type TravelImage,
   type TripWithImages,
   useTravelsWithImages,
 } from '@/composables/useTravel'
@@ -251,6 +253,13 @@ function handleTripClick(slug: string) {
   const el = cardRefs.value[slug]
   if (el) {
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+  }
+}
+
+const handleCardKeydown = (slug: string, event: KeyboardEvent) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    handleTripClick(slug)
   }
 }
 
@@ -305,23 +314,11 @@ const sortedYears = computed(() => {
 const triggerLightbox = (travel: TripWithImages, clickedIdx: number) => {
   if (!travel.images || travel.images.length === 0) return
 
-  const allImages = travel.images.map((img: TravelImage) => ({
-    caption: img.caption,
-    clearance: img.clearance,
-    height: img.height,
-    thumbnailUrl: img.thumbnailUrl,
-    url: img.url,
-    width: img.width,
-  }))
-  const orderedImages = [...allImages.slice(clickedIdx), ...allImages.slice(0, clickedIdx)]
-
-  photoLightBoxData.value = {
-    currentTripSlug: travel.slug,
-    images: orderedImages,
-    initialIndex: 0,
-    tripTitle: travel.title,
-  }
-  isPhotoLightBoxOpen.value = true
+  openPhotoLightbox(travel.images, {
+    initialIndex: clickedIdx,
+    title: travel.title,
+    tripSlug: travel.slug,
+  })
 }
 
 function setupIntersectionObserver() {

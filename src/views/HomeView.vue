@@ -38,53 +38,56 @@
       ref="filterBarRef"
       class="bg-background border-border-primary noscrollbar desktop:h-20 sticky top-0 z-20 mb-10 flex w-full items-end justify-center overflow-x-scroll overflow-y-visible border-b"
     >
-      <TabGroup :selected-index="selectedTabIndex" as="template" @change="handleTabChange">
-        <TabList
-          ref="tabContainerRef"
-          class="max-w-container desktop:justify-center desktop:px-20 relative flex w-full flex-row items-start justify-between gap-1"
+      <div
+        ref="tabContainerRef"
+        role="tablist"
+        class="max-w-container desktop:justify-center desktop:px-20 relative flex w-full flex-row items-start justify-between gap-1"
+      >
+        <button
+          v-for="(grp, idx) in filterGroups"
+          :key="grp.id"
+          :ref="(el) => setTabRef(grp.id, el)"
+          v-reveal="Math.min(idx * 50, 350)"
+          type="button"
+          role="tab"
+          :aria-selected="selectedTabIndex === idx"
+          :aria-label="grp.label"
+          class="text-ui font-sans-alt focus-visible:bg-hover desktop:shrink-0 desktop:px-5 focus-visible:border-surface-tertiary relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl border border-b-0 border-transparent p-4 transition-colors duration-200 focus-visible:outline-0!"
+          :class="[
+            selectedTabIndex === idx
+              ? 'text-text-primary font-normal'
+              : 'text-text-secondary hover:bg-hover opacity-60 hover:opacity-100',
+          ]"
+          @click="handleTabClick(grp.id)"
+          @keydown="handleTabKeydown"
         >
-          <Tab v-for="(grp, idx) in filterGroups" :key="grp.id" v-slot="{ selected }" as="template">
-            <button
-              :ref="(el) => setTabRef(grp.id, el)"
-              v-reveal="Math.min(idx * 50, 350)"
-              :aria-label="grp.label"
-              class="text-ui font-sans-alt focus-visible:bg-hover desktop:shrink-0 desktop:px-5 focus-visible:border-surface-tertiary relative flex shrink cursor-pointer flex-row items-center justify-center gap-2 rounded-t-xl border border-b-0 border-transparent p-4 transition-colors duration-200 focus-visible:outline-0!"
-              :class="[
-                selected
-                  ? 'text-text-primary font-normal'
-                  : 'text-text-secondary hover:bg-hover opacity-60 hover:opacity-100',
-              ]"
-              @click="handleTabClick(grp.id)"
-            >
-              <div v-reveal class="flex h-6 items-center justify-center">
-                <component :is="grp.icon" :size="20" aria-hidden="true" />
-              </div>
-              <div
-                class="desktop:grid hidden transition-all duration-500 ease-out"
-                :class="
-                  selected
-                    ? 'grid-cols-[1fr] opacity-100'
-                    : 'pointer-events-none -ml-2 grid-cols-[0fr] opacity-0'
-                "
-              >
-                <p class="overflow-hidden whitespace-nowrap">
-                  {{ grp.label }}
-                </p>
-              </div>
-            </button>
-          </Tab>
-
-          <!-- Smooth moving indicator -->
+          <div v-reveal class="flex h-6 items-center justify-center">
+            <component :is="grp.icon" :size="20" aria-hidden="true" />
+          </div>
           <div
-            class="bg-surface-inverted pointer-events-none absolute bottom-0 left-0 h-1.5 rounded-t-lg transition-all duration-500 ease-out"
-            :style="{
-              transform: `translateX(${indicatorStyle.left}px)`,
-              width: `${indicatorStyle.width}px`,
-              opacity: indicatorStyle.ready ? 1 : 0,
-            }"
-          ></div>
-        </TabList>
-      </TabGroup>
+            class="desktop:grid hidden transition-all duration-500 ease-out"
+            :class="
+              selectedTabIndex === idx
+                ? 'grid-cols-[1fr] opacity-100'
+                : 'pointer-events-none -ml-2 grid-cols-[0fr] opacity-0'
+            "
+          >
+            <p class="overflow-hidden whitespace-nowrap">
+              {{ grp.label }}
+            </p>
+          </div>
+        </button>
+
+        <!-- Smooth moving indicator -->
+        <div
+          class="bg-surface-inverted pointer-events-none absolute bottom-0 left-0 h-1.5 rounded-t-lg transition-all duration-500 ease-out"
+          :style="{
+            transform: `translateX(${indicatorStyle.left}px)`,
+            width: `${indicatorStyle.width}px`,
+            opacity: indicatorStyle.ready ? 1 : 0,
+          }"
+        ></div>
+      </div>
     </div>
 
     <!-- Grid -->
@@ -125,9 +128,11 @@
         :title="card.title"
         :arrow="card.arrow"
         :size="card.size"
+        :focusable="card.focusable"
         :bg-class="card.bgClass"
         :img="card.size === 'sm' ? card.imageUrl : undefined"
         :link="card.link"
+        @activate="handleCardClick(card)"
         @click="handleCardClick(card)"
       >
         <component
@@ -172,7 +177,6 @@
 </template>
 
 <script setup lang="ts">
-import { Tab, TabGroup, TabList } from '@headlessui/vue'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -180,19 +184,13 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 import CardCarousel from '@/components/cards/CardCarousel.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
-import {
-  isLightBoxOpen,
-  isPhotoLightBoxOpen,
-  lightBoxData,
-  photoLightBoxData,
-} from '@/composables/useGlobal'
+import { openLightbox, openPhotoLightbox } from '@/composables/useGlobal'
 import { type ExtraCard, extraCards as staticExtraCards } from '@/data/extraCards'
 import { type Card, intros, cards as staticCards } from '@/data/homeCards'
 import { nowImages } from '@/data/now'
 import { FILTER_GROUPS } from '@/types'
 
 import type { FilterGroupId } from '@/types'
-import type { ComponentPublicInstance } from 'vue'
 
 const extraCards = ref<Partial<Record<FilterGroupId, ExtraCard[]>>>(staticExtraCards)
 
@@ -216,7 +214,7 @@ const getHtmlElement = (el: unknown): HTMLElement | null => {
 
 const filterBarRef = ref<HTMLElement | null>(null)
 const gridRef = ref<HTMLElement | null>(null)
-const tabContainerRef = ref<ComponentPublicInstance | HTMLElement | null>(null)
+const tabContainerRef = ref<HTMLElement | null>(null)
 const tabRefs = ref<Record<string, HTMLElement>>({})
 
 const setTabRef = (id: string, el: unknown) => {
@@ -299,13 +297,38 @@ const activeFilter = computed<FilterGroupId>(
   () => filterGroups[selectedTabIndex.value]?.id || 'home',
 )
 
-const handleTabChange = (index: number) => {
-  selectedTabIndex.value = index
-}
-
 const handleTabClick = (id: FilterGroupId) => {
+  const idx = filterGroups.findIndex((g) => g.id === id)
+  if (idx > -1) selectedTabIndex.value = idx
   if (activeFilter.value === id) {
     scrollToFilterBar(prefersReducedMotion ? 'auto' : 'smooth', true)
+  }
+}
+
+// Arrow-key navigation across the filter tabs. Tab itself steps through each
+// button (all are tabbable); arrows offer the usual tablist roving as well.
+const handleTabKeydown = (event: KeyboardEvent) => {
+  const current = filterGroups.findIndex((g) => g.id === activeFilter.value)
+  let next = -1
+  switch (event.key) {
+    case 'ArrowLeft':
+      next = (current - 1 + filterGroups.length) % filterGroups.length
+      break
+    case 'ArrowRight':
+      next = (current + 1) % filterGroups.length
+      break
+    case 'End':
+      next = filterGroups.length - 1
+      break
+    case 'Home':
+      next = 0
+      break
+  }
+  if (next > -1) {
+    event.preventDefault()
+    const id = filterGroups[next]!.id
+    selectedTabIndex.value = next
+    void nextTick(() => tabRefs.value[id]?.focus({ preventScroll: true }))
   }
 }
 
@@ -330,6 +353,7 @@ interface GridCard extends Card {
   coverVid?: string
   extraIndex?: number
   extraKey?: string
+  focusable?: boolean
   isError?: boolean
   isExtra?: boolean
   isLoading?: boolean
@@ -374,6 +398,7 @@ const filteredCards = computed<GridCard[]>(() => {
         coverVid: extra.coverVid,
         extraIndex: idx,
         extraKey: activeFilter.value,
+        focusable: extra.size === 'md' && !extra.link,
         group: [activeFilter.value],
         id: `extra_${activeFilter.value}_${idx}`,
         images: extra.images,
@@ -399,22 +424,10 @@ const filteredCards = computed<GridCard[]>(() => {
 
 function openCarouselPhotoLightbox(extra: ExtraCard, startIndex = 0) {
   if (!extra.images || extra.images.length === 0) return
-
-  const allImages = extra.images.map((url) => ({
-    caption: null,
-    thumbnailUrl: url,
-    url,
-  }))
-
-  const orderedImages = [...allImages.slice(startIndex), ...allImages.slice(0, startIndex)]
-
-  photoLightBoxData.value = {
-    currentTripSlug: '',
-    images: orderedImages,
-    initialIndex: 0,
-    tripTitle: extra.title || '',
-  }
-  isPhotoLightBoxOpen.value = true
+  openPhotoLightbox(
+    extra.images.map((url) => ({ thumbnailUrl: url, url })),
+    { initialIndex: startIndex, title: extra.title || '' },
+  )
 }
 
 const handleCarouselClick = (card: GridCard, idx: number) => {
@@ -433,14 +446,13 @@ const handleCardClick = (card: GridCard) => {
       if (extra.lightbox) {
         openCarouselPhotoLightbox(extra, 0)
       } else {
-        lightBoxData.value = {
+        openLightbox({
           description: extra.description || '',
           images: extra.images?.map((url) => ({ clearance: 'public' as const, url })) || [],
           tags: extra.tags,
           title: extra.title || '',
           videos: extra.videos || [],
-        }
-        isLightBoxOpen.value = true
+        })
       }
     }
   }

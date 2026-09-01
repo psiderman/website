@@ -159,7 +159,7 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
     {
       coverVid: new URL('../assets/work/shots/button.mp4', import.meta.url).href,
       size: 'md',
-      title: 'Skeumorphic Button',
+      title: 'Skeuomorphic Button',
       videos: [new URL('../assets/work/shots/button.mp4', import.meta.url).href],
     },
     {

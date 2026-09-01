@@ -7,6 +7,7 @@
         placement: 'bottom',
       }"
       href="https://share.google/eakcO826TmMal2uqb"
+      target="_blank"
       class="rounded-full"
     >
       <div

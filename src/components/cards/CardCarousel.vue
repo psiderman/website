@@ -96,6 +96,7 @@ const isInteracting = ref(false)
 const scrollContainer = ref<HTMLElement | null>(null)
 
 let autoPlayInterval: null | number = null
+let autoPlayTimer: null | number = null
 let interactionTimeout: null | number = null
 
 const originalLength = computed(() => props.images?.length || 0)
@@ -214,13 +215,14 @@ const stopAutoPlay = () => {
 
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeyDown)
-  setTimeout(() => {
+  autoPlayTimer = window.setTimeout(() => {
     startAutoPlay()
   }, 2000)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleGlobalKeyDown)
+  if (autoPlayTimer) clearTimeout(autoPlayTimer)
   stopAutoPlay()
   if (interactionTimeout) clearTimeout(interactionTimeout)
 })

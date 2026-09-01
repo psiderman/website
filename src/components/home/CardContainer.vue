@@ -2,9 +2,12 @@
   <component
     :is="link ? 'button' : 'div'"
     :data-sync="'card-' + title.toLowerCase().replace(/\s+/g, '-')"
+    :tabindex="link || focusable ? 0 : -1"
+    :role="link || focusable ? 'button' : undefined"
     class="border-border-primary bg-surface-primary pointer-events-auto flex flex-col gap-2 rounded-xl border p-2 transition-colors duration-200"
-    :class="[heightClass, { clickable: link }]"
+    :class="[heightClass, { clickable: link || focusable }]"
     @click="handleClick"
+    @keydown="handleKeydown"
   >
     <div
       class="relative flex size-full grow items-center justify-center overflow-hidden rounded-lg"
@@ -65,6 +68,7 @@ import { openLink } from '@/utils'
 interface Props {
   arrow?: 'external' | 'help' | 'none' | 'right'
   bgClass?: string
+  focusable?: boolean
   img?: string
   link?: string
   size: 'lg' | 'md' | 'sm'
@@ -73,7 +77,12 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   arrow: 'right',
+  focusable: false,
 })
+
+const emit = defineEmits<{
+  (e: 'activate'): void
+}>()
 
 const icon = computed(() => {
   const icons = {
@@ -112,6 +121,16 @@ const handleClick = (event: MouseEvent) => {
     router.push(props.link)
   }
 }
+
+// Keyboard activation for link-less (focusable) cards. Native <button> roots
+// already fire click on Enter/Space, so only handle the div path here.
+const handleKeydown = (event: KeyboardEvent) => {
+  if (props.link || !props.focusable) return
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    emit('activate')
+  }
+}
 </script>
 
 <style scoped>
@@ -119,5 +138,9 @@ const handleClick = (event: MouseEvent) => {
 
 button.clickable {
   @apply cursor-pointer hover:shadow-sm;
+}
+
+.clickable {
+  @apply focus-visible:ring-surface-inverted focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
 }
 </style>
