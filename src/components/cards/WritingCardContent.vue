@@ -19,9 +19,9 @@
         alt="a picture of me writing on a desk"
         class="size-full object-cover"
       />
-      <p v-if="latestPost" class="text-light/30 text-mono absolute top-0 left-0 p-4">
+      <p v-if="latestDate" class="text-light/30 text-mono absolute top-0 left-0 p-4">
         Last published <br />
-        {{ formatDistanceToNowStrict(latestPost.date) }} ago
+        {{ formatDistanceToNowStrict(latestDate) }} ago
       </p>
     </template>
   </div>
@@ -33,10 +33,27 @@ import { formatDistanceToNowStrict } from 'date-fns'
 import { computed } from 'vue'
 
 import { useBlogPosts } from '@/composables/useBlog'
+import { useQuotes } from '@/composables/useQuotes'
 
 import GenericLoader from '../GenericLoader.vue'
 
-const { error, isLoading, posts } = useBlogPosts()
+const { error: blogError, isLoading: isLoadingBlog, posts } = useBlogPosts()
+const { error: quotesError, isLoading: isLoadingQuotes, quotes } = useQuotes()
 
-const latestPost = computed(() => posts.value?.[0] ?? null)
+const isLoading = computed(() => isLoadingBlog.value || isLoadingQuotes.value)
+const error = computed(() => blogError.value || quotesError.value)
+
+const latestDate = computed(() => {
+  const timestamps: number[] = []
+  if (posts.value?.[0]?.date) {
+    const t = new Date(posts.value[0].date).getTime()
+    if (!Number.isNaN(t)) timestamps.push(t)
+  }
+  if (quotes.value?.[0]?.date) {
+    const t = new Date(quotes.value[0].date).getTime()
+    if (!Number.isNaN(t)) timestamps.push(t)
+  }
+  if (!timestamps.length) return null
+  return new Date(Math.max(...timestamps))
+})
 </script>

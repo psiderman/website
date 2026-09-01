@@ -20,6 +20,7 @@ const SENSITIVE_PREFIXES = [
   'blog-posts',
   'blog-post',
   'blog-post-content',
+  'quotes',
   'thwips',
 ]
 
@@ -99,6 +100,7 @@ const adminKeys = [
   ['admin-images'],
   ['admin-guestbook'],
   ['admin-blog'],
+  ['admin-quotes'],
   ['admin-user-page-views'],
 ]
 

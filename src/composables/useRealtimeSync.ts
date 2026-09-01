@@ -83,6 +83,17 @@ export function initRealtimeSync(): RealtimeChannel {
     .on(
       'postgres_changes',
       {
+        event: '*',
+        schema: 'public',
+        table: 'quotes',
+      },
+      () => {
+        scheduleInvalidate(['quotes', 'admin-quotes'])
+      },
+    )
+    .on(
+      'postgres_changes',
+      {
         event: 'UPDATE',
         schema: 'public',
         table: 'user_roles',

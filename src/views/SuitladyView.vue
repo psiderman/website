@@ -1000,6 +1000,153 @@
               </Disclosure>
             </div>
           </TabPanel>
+
+          <!-- Quotes Tab Panel -->
+          <TabPanel class="outline-none">
+            <div class="flex flex-col gap-3 p-4">
+              <div>
+                <button
+                  class="btn stroke text-ui-small flex w-full cursor-pointer items-center justify-center gap-1.5 py-2.5"
+                  type="button"
+                  @click="openAddQuoteModal"
+                >
+                  <Plus :size="16" /> Add quote
+                </button>
+              </div>
+
+              <Disclosure
+                v-for="quote in quotesList"
+                :key="quote.id"
+                v-slot="{ close }"
+                as="div"
+                class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
+              >
+                <DisclosureButton
+                  class="flex w-full cursor-pointer flex-row items-center justify-between p-3 text-left"
+                >
+                  <div class="flex min-w-0 flex-col gap-0">
+                    <p class="text-ui text-text-primary truncate font-medium">
+                      {{ quote.title || quote.content }}
+                    </p>
+                    <p class="text-ui-small text-text-secondary truncate">
+                      {{ formatQuoteDate(quote.date)
+                      }}<span v-if="quote.title"> · {{ quote.content }}</span>
+                    </p>
+                  </div>
+                  <div class="flex shrink-0 flex-row items-center gap-2">
+                    <div
+                      class="text-ui border-border-primary bg-surface-primary relative inline-flex h-8 min-w-28 cursor-pointer items-center justify-between gap-3 rounded-lg border px-2.5 py-0"
+                    >
+                      <div class="flex flex-row items-center justify-start gap-1">
+                        <div
+                          :class="getRoleBadgeClass(getEditQuoteForm(quote).clearance)"
+                          class="h-4 w-1.5 rounded-full"
+                        ></div>
+                        <span>{{ getEditQuoteForm(quote).clearance }}</span>
+                      </div>
+
+                      <ChevronDown :size="14" class="shrink-0 opacity-70" />
+
+                      <select
+                        v-model="getEditQuoteForm(quote).clearance"
+                        class="absolute inset-0 size-full cursor-pointer opacity-0"
+                        @click.stop
+                        @change="saveQuoteClearance(quote)"
+                      >
+                        <option v-for="level in quoteClearanceLevels" :key="level" :value="level">
+                          {{ level }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </DisclosureButton>
+
+                <DisclosurePanel
+                  class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
+                >
+                  <div class="flex flex-col gap-2">
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Clearance</span>
+                      <div
+                        class="text-ui border-border-primary bg-surface-primary relative inline-flex h-8 min-w-28 cursor-pointer items-center justify-between gap-3 rounded-lg border px-2.5 py-0"
+                      >
+                        <div class="flex flex-row items-center justify-start gap-1">
+                          <div
+                            :class="getRoleBadgeClass(getEditQuoteForm(quote).clearance)"
+                            class="h-4 w-1.5 rounded-full"
+                          ></div>
+                          <span>{{ getEditQuoteForm(quote).clearance }}</span>
+                        </div>
+                        <ChevronDown :size="14" class="shrink-0 opacity-70" />
+                        <select
+                          v-model="getEditQuoteForm(quote).clearance"
+                          class="absolute inset-0 size-full cursor-pointer opacity-0"
+                        >
+                          <option v-for="level in quoteClearanceLevels" :key="level" :value="level">
+                            {{ level }}
+                          </option>
+                        </select>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Title</span>
+                      <input
+                        v-model="getEditQuoteForm(quote).title"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                        placeholder="Optional title"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Date</span>
+                      <input
+                        v-model="getEditQuoteForm(quote).date"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="date"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Content</span>
+                      <textarea
+                        v-model="getEditQuoteForm(quote).content"
+                        rows="4"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        placeholder="Quote content..."
+                      ></textarea>
+                    </label>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-2 pt-2">
+                    <div class="flex gap-2">
+                      <button
+                        class="btn primary"
+                        type="button"
+                        :disabled="savingQuoteId === quote.id"
+                        @click="saveQuote(quote, close)"
+                      >
+                        {{ savingQuoteId === quote.id ? 'Saving...' : 'Save' }}
+                      </button>
+                      <button class="btn stroke" type="button" @click="resetQuote(quote)">
+                        Reset
+                      </button>
+                    </div>
+                    <button
+                      class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
+                      type="button"
+                      @click="deleteQuote(quote.id)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </DisclosurePanel>
+              </Disclosure>
+            </div>
+          </TabPanel>
         </TabPanels>
       </TabGroup>
 
@@ -1168,6 +1315,123 @@
           </div>
         </Dialog>
       </TransitionRoot>
+
+      <!-- Add Quote Bottom Sheet Modal -->
+      <TransitionRoot appear :show="isAddQuoteModalOpen" as="template">
+        <Dialog as="div" class="relative z-50" @close="isAddQuoteModalOpen = false">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0"
+            enter-to="opacity-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100"
+            leave-to="opacity-0"
+          >
+            <div class="bg-overlay fixed inset-0 backdrop-blur-xs" />
+          </TransitionChild>
+
+          <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center">
+              <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0 translate-y-full"
+                enter-to="opacity-100 translate-y-0"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100 translate-y-0"
+                leave-to="opacity-0 translate-y-full"
+              >
+                <DialogPanel
+                  class="bg-surface-primary border-border-primary text-text-primary flex w-full max-w-120 flex-col gap-4 rounded-t-2xl border p-6 shadow-2xl"
+                >
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-h3 font-semibold">Add Quote</h3>
+                    <button
+                      type="button"
+                      aria-label="Close modal"
+                      class="hover:bg-surface-secondary text-text-secondary hover:text-text-primary flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors"
+                      @click="isAddQuoteModalOpen = false"
+                    >
+                      <X :size="18" />
+                    </button>
+                  </div>
+
+                  <form class="flex flex-col gap-3" @submit.prevent="addQuote">
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Clearance</span>
+                      <div
+                        class="text-ui border-border-primary bg-surface-primary relative inline-flex h-8 min-w-28 cursor-pointer items-center justify-between gap-3 rounded-lg border px-2.5 py-0"
+                      >
+                        <div class="flex flex-row items-center justify-start gap-1">
+                          <div
+                            :class="getRoleBadgeClass(newQuoteForm.clearance)"
+                            class="h-4 w-1.5 rounded-full"
+                          ></div>
+                          <span>{{ newQuoteForm.clearance }}</span>
+                        </div>
+                        <ChevronDown :size="14" class="shrink-0 opacity-70" />
+                        <select
+                          v-model="newQuoteForm.clearance"
+                          class="absolute inset-0 size-full cursor-pointer opacity-0"
+                        >
+                          <option v-for="level in quoteClearanceLevels" :key="level" :value="level">
+                            {{ level }}
+                          </option>
+                        </select>
+                      </div>
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Title</span>
+                      <input
+                        v-model="newQuoteForm.title"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                        placeholder="Optional title"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Date</span>
+                      <input
+                        v-model="newQuoteForm.date"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="date"
+                        required
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Content</span>
+                      <textarea
+                        v-model="newQuoteForm.content"
+                        rows="4"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        placeholder="Short sentence / excerpt..."
+                        required
+                      ></textarea>
+                    </label>
+
+                    <div class="flex gap-2 pt-2">
+                      <button
+                        class="btn primary"
+                        type="submit"
+                        :disabled="isAddingQuote || !newQuoteForm.content.trim()"
+                      >
+                        {{ isAddingQuote ? 'Adding...' : 'Add Quote' }}
+                      </button>
+                      <button class="btn stroke" type="button" @click="isAddQuoteModalOpen = false">
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
     </div>
   </div>
 </template>
@@ -1194,6 +1458,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  Feather,
   GalleryHorizontal,
   KeyRound,
   Loader,
@@ -1240,6 +1505,7 @@ const tabs = [
   { icon: GalleryHorizontal, name: 'images' },
   { icon: Pencil, name: 'guestbook' },
   { icon: Notebook, name: 'blog' },
+  { icon: Feather, name: 'quotes' },
 ]
 
 const tabQueryKeys: Record<number, string[]> = {
@@ -1249,9 +1515,11 @@ const tabQueryKeys: Record<number, string[]> = {
   3: ['admin-images'],
   4: ['admin-guestbook'],
   5: ['admin-blog'],
+  6: ['admin-quotes'],
 }
 
 const clearanceLevels: ClearanceLevel[] = ['auth', 'known', 'friends', 'close']
+const quoteClearanceLevels: ClearanceLevel[] = ['public', 'friends', 'close']
 
 const queryClient = useQueryClient()
 const pendingRoles = reactive<Record<string, ClearanceLevel>>({})
@@ -2276,6 +2544,27 @@ const { data: blogPostsList } = useQuery({
   queryKey: ['admin-blog'],
 })
 
+interface QuoteForm {
+  clearance: ClearanceLevel
+  content: string
+  date: string
+  id: string
+  title: string
+}
+
+// ----------------------------------------------------
+// QUOTES
+// ----------------------------------------------------
+interface QuoteRecord {
+  clearance: ClearanceLevel
+  content: string
+  created_at: string
+  date: string
+  id: string
+  title?: null | string
+  updated_at: string
+}
+
 // The blog storage layout is `{slug}/{slug}.md` for public posts and
 // `pvt/{slug}/{slug}.md` for anything above public (mirrors useBlog.ts).
 function blogStoragePath(slug: string, clearance: ClearanceLevel): string {
@@ -2500,6 +2789,185 @@ async function saveBlog(post: BlogPostRecord, close?: () => void) {
     alert(`Failed to save blog post: ${errorMsg}`)
   } finally {
     savingBlogSlug.value = null
+  }
+}
+
+const editQuoteForms = reactive<Record<string, QuoteForm>>({})
+const savingQuoteId = ref<null | string>(null)
+const isAddQuoteModalOpen = ref(false)
+const isAddingQuote = ref(false)
+const newQuoteForm = reactive<{
+  clearance: ClearanceLevel
+  content: string
+  date: string
+  title: string
+}>({
+  clearance: 'public',
+  content: '',
+  date: format(new Date(), 'yyyy-MM-dd'),
+  title: '',
+})
+
+const { data: quotesList } = useQuery({
+  enabled: computed(() => isAdmin.value),
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .order('date', { ascending: false })
+
+    if (error) throw error
+    return (data || []) as QuoteRecord[]
+  },
+  queryKey: ['admin-quotes'],
+})
+
+async function addQuote() {
+  const content = newQuoteForm.content.trim()
+  if (!content) return
+
+  isAddingQuote.value = true
+  try {
+    const { error } = await supabase.from('quotes').insert({
+      clearance: newQuoteForm.clearance,
+      content,
+      date: newQuoteForm.date,
+      title: newQuoteForm.title.trim() || null,
+    })
+
+    if (error) throw error
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-quotes'] })
+    await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+
+    isAddQuoteModalOpen.value = false
+    newQuoteForm.content = ''
+    newQuoteForm.title = ''
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to add quote: ${errorMsg}`)
+  } finally {
+    isAddingQuote.value = false
+  }
+}
+
+async function deleteQuote(id: string) {
+  if (!confirm('Are you sure you want to delete this quote?')) return
+
+  try {
+    const { error } = await supabase.from('quotes').delete().eq('id', id)
+    if (error) throw error
+
+    delete editQuoteForms[id]
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-quotes'] })
+    await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to delete quote: ${errorMsg}`)
+  }
+}
+
+function formatQuoteDate(dateStr: null | string) {
+  if (!dateStr) return ''
+  try {
+    return format(new Date(dateStr), 'dd MMMM yyyy')
+  } catch {
+    return dateStr
+  }
+}
+
+function getEditQuoteForm(quote: QuoteRecord): QuoteForm {
+  if (!editQuoteForms[quote.id]) {
+    editQuoteForms[quote.id] = {
+      clearance: quote.clearance || 'public',
+      content: quote.content || '',
+      date: quote.date ? (quote.date.length >= 10 ? quote.date.slice(0, 10) : quote.date) : '',
+      id: quote.id,
+      title: quote.title || '',
+    }
+  }
+  return editQuoteForms[quote.id]
+}
+
+function openAddQuoteModal() {
+  newQuoteForm.clearance = 'public'
+  newQuoteForm.content = ''
+  newQuoteForm.date = format(new Date(), 'yyyy-MM-dd')
+  newQuoteForm.title = ''
+  isAddQuoteModalOpen.value = true
+}
+
+function resetQuote(quote: QuoteRecord) {
+  editQuoteForms[quote.id] = {
+    clearance: quote.clearance || 'public',
+    content: quote.content || '',
+    date: quote.date ? (quote.date.length >= 10 ? quote.date.slice(0, 10) : quote.date) : '',
+    id: quote.id,
+    title: quote.title || '',
+  }
+}
+
+async function saveQuote(quote: QuoteRecord, close?: () => void) {
+  const form = getEditQuoteForm(quote)
+  const trimmedContent = form.content.trim()
+  if (!trimmedContent) {
+    alert('Quote content cannot be empty.')
+    return
+  }
+
+  const trimmedTitle = form.title.trim() || null
+
+  savingQuoteId.value = quote.id
+  try {
+    const { error } = await supabase
+      .from('quotes')
+      .update({
+        clearance: form.clearance,
+        content: trimmedContent,
+        date: form.date,
+        title: trimmedTitle,
+      })
+      .eq('id', quote.id)
+
+    if (error) throw error
+
+    quote.content = trimmedContent
+    quote.clearance = form.clearance
+    quote.date = form.date
+    quote.title = trimmedTitle
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-quotes'] })
+    await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+
+    close?.()
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to save quote: ${errorMsg}`)
+  } finally {
+    savingQuoteId.value = null
+  }
+}
+
+async function saveQuoteClearance(quote: QuoteRecord) {
+  const form = getEditQuoteForm(quote)
+  try {
+    const { error } = await supabase
+      .from('quotes')
+      .update({
+        clearance: form.clearance,
+      })
+      .eq('id', quote.id)
+
+    if (error) throw error
+
+    quote.clearance = form.clearance
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-quotes'] })
+    await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to update quote clearance: ${errorMsg}`)
   }
 }
 </script>

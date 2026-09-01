@@ -123,4 +123,5 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
   queryClient.invalidateQueries({ queryKey: ['blog-posts'] })
   queryClient.invalidateQueries({ queryKey: ['blog-post'] })
   queryClient.invalidateQueries({ queryKey: ['blog-post-content'] })
+  queryClient.invalidateQueries({ queryKey: ['quotes'] })
 })
