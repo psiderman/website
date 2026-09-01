@@ -91,16 +91,14 @@ const isHome = computed(() => route.name === 'Home' || route.path === '/')
   .avatar-scroll-out {
     animation: avatar-scroll-out linear both;
     animation-timeline: scroll();
-    animation-range: 0 70px;
+    animation-range: 0 80px;
   }
 }
 
 @keyframes avatar-scroll-out {
   to {
     opacity: 0;
-    transform: translateY(-70px);
-    max-width: 0;
-    margin-right: -1rem;
+    transform: translateY(-4px);
     pointer-events: none;
     visibility: hidden;
   }
