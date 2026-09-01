@@ -49,9 +49,9 @@
           v-tooltip="'scroll down'"
           href="https://www.youtube.com/watch?v=6P65Y-q-ht4"
           target="_blank"
-          class="tabular-nums"
-          >thwips: {{ thwips !== null ? thwips : '...' }}</a
-        >
+          class="inline-flex items-center tabular-nums"
+          >thwips:&nbsp;<RollingNumber :value="thwips"
+        /></a>
       </div>
       <div v-reveal="500" class="flex w-full flex-row items-center justify-center gap-3">
         <p>© {{ currentYear }} Karan Sanas</p>
@@ -116,6 +116,7 @@
 import { useQuery } from '@tanstack/vue-query'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 
+import RollingNumber from '@/components/RollingNumber.vue'
 import ThwipAchievementModal from '@/components/ThwipAchievementModal.vue'
 import WebStrand from '@/components/WebStrand.vue'
 import { getEasterEggEmail, getEasterEggQuips } from '@/data/thwipEasterEgg'

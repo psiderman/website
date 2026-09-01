@@ -530,7 +530,7 @@
     }
 
     & ul {
-      @apply list-disc pl-6;
+      @apply mb-10 list-disc pl-6;
 
       & li:has(input[type='checkbox']) {
         @apply -ml-6 list-none;
@@ -548,6 +548,11 @@
 
       & p {
         @apply mb-0;
+      }
+
+      /* Reduce bottom margin if the very next element is another paragraph */
+      &:has(+ p, + ul, + ol) {
+        @apply mb-6;
       }
     }
 
