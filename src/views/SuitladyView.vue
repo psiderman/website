@@ -1211,7 +1211,7 @@ import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import { isAdmin } from '@/composables/useAuth'
 import { type PresenceUser } from '@/composables/useLive'
-import { type ClearanceLevel, isHighClearance } from '@/composables/useTravel'
+import { type ClearanceLevel, isHighClearance, sortTripImages } from '@/composables/useTravel'
 import { workHistory } from '@/data/work'
 import { getStorageUrl, supabase } from '@/supabase'
 
@@ -1988,14 +1988,7 @@ const tripsWithImagesGrouped = computed(() => {
     TripRecord & { trip_images?: TripImageRecord[] }
   >
   return list.map((trip) => {
-    const images: TripImageRecord[] = (trip.trip_images || []).slice().sort((a, b) => {
-      if (a.sort_order !== null && b.sort_order !== null) {
-        return a.sort_order - b.sort_order
-      }
-      const timeA = a.date_taken ? new Date(a.date_taken).getTime() : 0
-      const timeB = b.date_taken ? new Date(b.date_taken).getTime() : 0
-      return timeA - timeB
-    })
+    const images: TripImageRecord[] = sortTripImages(trip.trip_images || [])
 
     return {
       date: trip.date,

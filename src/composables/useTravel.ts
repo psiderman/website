@@ -43,6 +43,20 @@ export function isHighClearance(level?: ClearanceLevel | null | string): boolean
   return !!level && ['admin', 'close', 'friends'].includes(level)
 }
 
+/** Sort trip images by sort_order first, then date_taken ASC. */
+export function sortTripImages<
+  T extends { date_taken?: null | string; sort_order?: null | number },
+>(images: T[]): T[] {
+  return images.slice().sort((a, b) => {
+    if (a.sort_order != null && b.sort_order != null) {
+      return a.sort_order - b.sort_order
+    }
+    const timeA = a.date_taken ? new Date(a.date_taken).getTime() : 0
+    const timeB = b.date_taken ? new Date(b.date_taken).getTime() : 0
+    return timeA - timeB
+  })
+}
+
 export function useTravelsWithImages() {
   const {
     data: travelsWithImages,
@@ -70,16 +84,13 @@ export function useTravelsWithImages() {
         const rawImages = (row.trip_images as Array<Record<string, unknown>>) || []
 
         // Sort images by sort_order or date_taken ASC
-        rawImages.sort((a, b) => {
-          if (a.sort_order !== null && b.sort_order !== null) {
-            return (a.sort_order as number) - (b.sort_order as number)
-          }
-          const timeA = a.date_taken ? new Date(a.date_taken as string).getTime() : 0
-          const timeB = b.date_taken ? new Date(b.date_taken as string).getTime() : 0
-          return timeA - timeB
-        })
+        const sortedImages = sortTripImages(
+          rawImages as Array<
+            Record<string, unknown> & { date_taken?: null | string; sort_order?: null | number }
+          >,
+        )
 
-        const mappedImages: TravelImage[] = rawImages.map((img) => {
+        const mappedImages: TravelImage[] = sortedImages.map((img) => {
           const storagePath = img.storage_path as string
           const name = storagePath.split('/').pop() || storagePath
           const url = getStorageUrl('travel', storagePath)
