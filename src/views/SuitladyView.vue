@@ -809,7 +809,11 @@
                   </button>
                 </div>
                 <div class="drawing-board relative h-80! w-full">
-                  <svg class="size-full">
+                  <svg
+                    class="size-full"
+                    :viewBox="entry.viewBox"
+                    preserveAspectRatio="xMidYMid meet"
+                  >
                     <path
                       v-for="(pathD, idx) in entry.svgPaths"
                       :key="idx"
@@ -2209,9 +2213,11 @@ const parsedGuestbookEntries = computed(() => {
   return (guestbookEntries.value || []).map((entry) => {
     const strokes = parseStrokes(entry.strokes)
     const svgPaths = strokes.map(getSvgPathFromStroke).filter(Boolean)
+    const viewBox = getDrawingViewBox(strokes)
     return {
       ...entry,
       svgPaths,
+      viewBox,
     }
   })
 })
@@ -2303,6 +2309,33 @@ function formatBlogDate(dateStr: null | string) {
   } catch {
     return dateStr
   }
+}
+
+function getDrawingViewBox(strokes: number[][][]) {
+  if (!strokes.length) return undefined
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  for (const stroke of strokes) {
+    for (const pt of stroke) {
+      if (pt && pt.length >= 2) {
+        if (pt[0] < minX) minX = pt[0]
+        if (pt[1] < minY) minY = pt[1]
+        if (pt[0] > maxX) maxX = pt[0]
+        if (pt[1] > maxY) maxY = pt[1]
+      }
+    }
+  }
+  if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
+    return undefined
+  }
+  const padding = 16
+  const x = minX - padding
+  const y = minY - padding
+  const w = Math.max(1, maxX - minX + padding * 2)
+  const h = Math.max(1, maxY - minY + padding * 2)
+  return `${x} ${y} ${w} ${h}`
 }
 
 function getEditBlogForm(post: BlogPostRecord): BlogForm {

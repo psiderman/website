@@ -11,11 +11,15 @@
     <svg
       class="canvas group"
       @pointerdown="handlePointerDown"
+      @pointerleave="handlePointerUp"
       @pointermove="handlePointerMove"
       @pointerup="handlePointerUp"
-      @pointerleave="handlePointerUp"
     >
-      <g v-if="strokes.length === 0 && currentStroke.length === 0" class="pointer-events-none">
+      <g
+        v-if="strokes.length === 0 && currentStroke.length === 0"
+        class="pointer-events-none"
+        :transform="bgTransform"
+      >
         <path
           v-for="(points, i) in backgroundStrokes.slice(0, visibleBgStrokeIndex)"
           :key="'bg' + i"
@@ -46,6 +50,22 @@
       class="bg-surface-secondary text-ui-small text-text-tertiary absolute right-0 bottom-0 rounded-tl-xl px-2 py-1 transition-opacity duration-200 group-hover:opacity-0"
     >
       by {{ backgroundArtist }}
+    </div>
+
+    <!-- Background Animation Controls (Fast Forward) -->
+    <div
+      v-if="strokes.length === 0 && currentStroke.length === 0 && isDrawingAnimating"
+      class="pointer-events-auto absolute top-0 right-0 z-20 flex flex-row gap-1 p-1"
+    >
+      <button
+        v-tooltip="'Skip Animation'"
+        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
+        title="Skip Animation"
+        aria-label="Skip Animation"
+        @click.stop.prevent="skipAnimation"
+      >
+        <FastForward :size="16" stroke-width="0" class="fill-text-primary" />
+      </button>
     </div>
 
     <!-- Button Cluster -->
@@ -113,7 +133,7 @@ const visibleBgPointIndex = ref(0)
 </script>
 
 <script setup lang="ts">
-import { Check, MousePointer2, X } from '@lucide/vue'
+import { Check, FastForward, MousePointer2, X } from '@lucide/vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { format } from 'date-fns'
 import { getStroke } from 'perfect-freehand'
@@ -154,11 +174,30 @@ function persistDraft() {
   }
 }
 
+const containerWidth = ref(0)
+const containerHeight = ref(0)
+
 let observer: IntersectionObserver | null = null
+let resizeObserver: null | ResizeObserver = null
 let animInterval: number = 0
 
 function setupObserver(el: unknown) {
   if (el) {
+    const element = el as HTMLElement
+    containerWidth.value = element.clientWidth
+    containerHeight.value = element.clientHeight
+
+    if (!resizeObserver) {
+      resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          containerWidth.value = entry.contentRect.width
+          containerHeight.value = entry.contentRect.height
+        }
+      })
+    }
+    resizeObserver.disconnect()
+    resizeObserver.observe(element)
+
     if (!observer) {
       observer = new IntersectionObserver(
         (entries) => {
@@ -172,8 +211,12 @@ function setupObserver(el: unknown) {
       )
     }
     observer.disconnect()
-    observer.observe(el as Element)
+    observer.observe(element)
   } else {
+    if (resizeObserver) {
+      resizeObserver.disconnect()
+      resizeObserver = null
+    }
     if (observer) {
       observer.disconnect()
       observer = null
@@ -383,6 +426,73 @@ function stopAnimation() {
   }
 }
 
+const isDrawingAnimating = computed(() => {
+  return (
+    backgroundStrokes.value.length > 0 &&
+    visibleBgStrokeIndex.value < backgroundStrokes.value.length
+  )
+})
+
+function skipAnimation() {
+  stopAnimation()
+  visibleBgStrokeIndex.value = backgroundStrokes.value.length
+  visibleBgPointIndex.value = 0
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
+}
+
+const bgTransform = computed(() => {
+  if (!backgroundStrokes.value || backgroundStrokes.value.length === 0) {
+    return undefined
+  }
+  const cW = containerWidth.value
+  const cH = containerHeight.value
+  if (!cW || !cH) return undefined
+
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+
+  for (const stroke of backgroundStrokes.value) {
+    for (const pt of stroke) {
+      if (pt && pt.length >= 2) {
+        const x = pt[0]
+        const y = pt[1]
+        if (x < minX) minX = x
+        if (y < minY) minY = y
+        if (x > maxX) maxX = x
+        if (y > maxY) maxY = y
+      }
+    }
+  }
+
+  if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
+    return undefined
+  }
+
+  const padding = 16
+  const drawingW = Math.max(1, maxX - minX + padding * 2)
+  const drawingH = Math.max(1, maxY - minY + padding * 2)
+
+  const scale = Math.min(1, cW / drawingW, cH / drawingH)
+
+  const contentCenterX = (minX + maxX) / 2
+  const contentCenterY = (minY + maxY) / 2
+  const targetCenterX = cW / 2
+  const targetCenterY = cH / 2
+
+  if (scale < 1 || minX < padding || minY < padding || maxX > cW - padding || maxY > cH - padding) {
+    const tx = targetCenterX - contentCenterX * scale
+    const ty = targetCenterY - contentCenterY * scale
+    return `translate(${tx}, ${ty}) scale(${scale})`
+  }
+
+  return undefined
+})
+
 const currentStrokePath = computed(() => getSvgPathFromStroke(currentStroke.value))
 
 const hasUnsavedChanges = computed(() => {
@@ -405,6 +515,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
   if (observer) observer.disconnect()
+  if (resizeObserver) resizeObserver.disconnect()
   stopAnimation()
 })
 </script>
