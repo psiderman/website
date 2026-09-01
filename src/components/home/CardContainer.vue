@@ -96,11 +96,18 @@ const heightClass = computed(() => {
   return heights[props.size]
 })
 
-const handleClick = () => {
+const handleClick = (event: MouseEvent) => {
   if (!props.link) return
+
+  // Respect cmd/ctrl/shift/alt + click and middle-click: open in a new tab.
+  const newTab =
+    event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button === 1
 
   if (props.link.startsWith('http')) {
     openLink(props.link)
+  } else if (newTab) {
+    const url = router.resolve(props.link).href
+    window.open(`${window.location.origin}${url}`, '_blank', 'noopener')
   } else {
     router.push(props.link)
   }
