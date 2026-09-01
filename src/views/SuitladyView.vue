@@ -70,41 +70,6 @@
 
           <!-- Roles Tab Panel -->
           <TabPanel class="outline-none">
-            <!-- Online now -->
-            <div class="border-border-primary bg-surface-secondary border-b px-4 py-3">
-              <p class="text-ui-small text-text-tertiary tracking-wider uppercase">
-                online now · {{ liveVisitors.length }}
-              </p>
-              <div v-if="liveVisitors.length" class="mt-2 flex flex-col gap-1.5">
-                <div
-                  v-for="v in liveVisitors"
-                  :key="v.id"
-                  class="flex min-w-0 flex-row items-center gap-2"
-                >
-                  <img
-                    v-if="v.avatar"
-                    :src="v.avatar"
-                    referrerpolicy="no-referrer"
-                    class="size-6 shrink-0 rounded-full object-cover"
-                    alt=""
-                  />
-                  <div
-                    v-else
-                    class="bg-surface-tertiary text-text-tertiary flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold uppercase"
-                  >
-                    {{ getPresenceInitial(v.name) }}
-                  </div>
-                  <span class="text-ui text-text-primary truncate">{{ v.name }}</span>
-                  <span class="text-ui-small text-text-tertiary ml-auto shrink-0 truncate">
-                    {{ v.route }}
-                  </span>
-                </div>
-              </div>
-              <p v-else class="text-ui-small text-text-tertiary mt-2">
-                no one is online right now.
-              </p>
-            </div>
-
             <div v-for="user in sortedUserRolesList" :key="user.user_id">
               <div
                 class="border-border-primary relative flex w-full flex-row items-center justify-between gap-4 border-b px-4 py-4"
@@ -138,6 +103,18 @@
                       <p class="text-text-primary truncate font-medium">
                         {{ user.full_name }}
                       </p>
+                      <span
+                        v-if="user.isOnline"
+                        v-tooltip="{ content: 'Online now', allowHTML: true }"
+                        class="relative flex size-2 shrink-0 items-center justify-center"
+                      >
+                        <span
+                          class="absolute inline-flex size-full animate-ping rounded-full bg-green-500 opacity-75"
+                        ></span>
+                        <span
+                          class="relative inline-flex size-1.5 rounded-full bg-green-500"
+                        ></span>
+                      </span>
                       <span
                         v-if="
                           user.role === 'auth' &&
@@ -444,7 +421,6 @@
                             {{ level }}
                           </option>
                           <option value="public">public</option>
-                          <option value="admin">admin</option>
                         </select>
                       </div>
                     </label>
@@ -713,7 +689,6 @@
                                 >
                                   {{ level }}
                                 </option>
-                                <option value="admin">admin</option>
                               </select>
                             </div>
                           </label>
@@ -859,6 +834,170 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </TabPanel>
+
+          <!-- Blog Tab Panel -->
+          <TabPanel class="outline-none">
+            <div class="flex flex-col gap-3 p-4">
+              <Disclosure
+                v-for="post in blogPostsList"
+                :key="post.slug"
+                v-slot="{ close }"
+                as="div"
+                class="bg-surface-primary border-border-primary overflow-hidden rounded-xl border"
+              >
+                <DisclosureButton
+                  class="flex w-full cursor-pointer flex-row items-center justify-between p-3 text-left"
+                >
+                  <div class="flex min-w-0 flex-col gap-0">
+                    <p class="text-ui text-text-primary truncate font-medium">{{ post.title }}</p>
+                    <p class="text-ui-small text-text-secondary truncate">
+                      {{ formatBlogDate(post.date) }}
+                    </p>
+                  </div>
+                  <div class="flex shrink-0 flex-row items-center gap-2">
+                    <span
+                      class="text-ui-small text-text-tertiary px-2 uppercase"
+                    >
+                      {{ post.clearance }}
+                    </span>
+                    <span
+                      v-if="!getEditBlogForm(post).is_active"
+                      v-tooltip="{ content: 'Inactive' }"
+                      class="text-text-secondary flex size-6 items-center justify-center"
+                    >
+                      <span class="size-2 rounded-full bg-red-500"></span>
+                    </span>
+                  </div>
+                </DisclosureButton>
+
+                <DisclosurePanel
+                  class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
+                >
+                  <div class="flex flex-col gap-2">
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Clearance</span>
+                      <div
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
+                      >
+                        <div class="flex flex-row gap-2">
+                          <div
+                            :class="getRoleBadgeClass(getEditBlogForm(post).clearance)"
+                            class="h-6 w-1.5 rounded-full"
+                          ></div>
+                          <span>{{ getEditBlogForm(post).clearance }}</span>
+                        </div>
+                        <ChevronDown :size="14" class="shrink-0 opacity-70" />
+                        <select
+                          v-model="getEditBlogForm(post).clearance"
+                          class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        >
+                          <option v-for="level in clearanceLevels" :key="level" :value="level">
+                            {{ level }}
+                          </option>
+                          <option value="public">public</option>
+                        </select>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Title</span>
+                      <input
+                        v-model="getEditBlogForm(post).title"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Date</span>
+                      <input
+                        v-model="getEditBlogForm(post).date"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="date"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Minutes</span>
+                      <input
+                        v-model.number="getEditBlogForm(post).minutes"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="number"
+                        min="0"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Slug</span>
+                      <input
+                        v-model="getEditBlogForm(post).slug"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                        type="text"
+                      />
+                    </label>
+
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Excerpt</span>
+                      <textarea
+                        v-model="getEditBlogForm(post).excerpt"
+                        rows="3"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                      ></textarea>
+                    </label>
+                  </div>
+
+                  <div
+                    class="bg-surface-primary border-border-primary -mt-2 flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2 select-none"
+                    @click="
+                      getEditBlogForm(post).is_active = !getEditBlogForm(post).is_active
+                    "
+                  >
+                    <span class="text-ui text-text-primary">Is Active</span>
+                    <div
+                      class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 ease-in-out"
+                      :class="
+                        getEditBlogForm(post).is_active
+                          ? 'bg-surface-inverted'
+                          : 'bg-surface-secondary border-border-primary border'
+                      "
+                    >
+                      <span
+                        class="bg-surface-primary inline-block size-3.5 transform rounded-full shadow transition duration-200 ease-in-out"
+                        :class="
+                          getEditBlogForm(post).is_active ? 'translate-x-4.5' : 'translate-x-0.5'
+                        "
+                      />
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-2 pt-2">
+                    <div class="flex gap-2">
+                      <button
+                        class="btn primary"
+                        type="button"
+                        :disabled="savingBlogSlug === post.slug"
+                        @click="saveBlog(post, close)"
+                      >
+                        {{ savingBlogSlug === post.slug ? 'Saving...' : 'Save' }}
+                      </button>
+                      <button class="btn stroke" type="button" @click="resetBlog(post)">
+                        Reset
+                      </button>
+                    </div>
+                    <button
+                      class="text-ui-small cursor-pointer text-red-700 uppercase hover:underline"
+                      type="button"
+                      @click="deleteBlog(post.slug)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </DisclosurePanel>
+              </Disclosure>
             </div>
           </TabPanel>
         </TabPanels>
@@ -1060,6 +1199,7 @@ import {
   Loader,
   Luggage,
   MapPin,
+  Notebook,
   Pencil,
   Pin,
   Plus,
@@ -1084,6 +1224,7 @@ interface UserRoleRecord {
   created_at?: string
   email?: string
   full_name?: string
+  isOnline?: boolean
   last_sign_in_at?: string
   requested_clearance?: boolean
   requestedClearance?: boolean
@@ -1098,6 +1239,7 @@ const tabs = [
   { icon: Luggage, name: 'trip' },
   { icon: GalleryHorizontal, name: 'images' },
   { icon: Pencil, name: 'guestbook' },
+  { icon: Notebook, name: 'blog' },
 ]
 
 const tabQueryKeys: Record<number, string[]> = {
@@ -1106,6 +1248,7 @@ const tabQueryKeys: Record<number, string[]> = {
   2: ['admin-trips'],
   3: ['admin-images'],
   4: ['admin-guestbook'],
+  5: ['admin-blog'],
 }
 
 const clearanceLevels: ClearanceLevel[] = ['auth', 'known', 'friends', 'close']
@@ -1141,8 +1284,6 @@ onUnmounted(() => {
   liveChannel?.unsubscribe()
   liveChannel = null
 })
-
-const getPresenceInitial = (name?: string) => (name || '?').charAt(0).toUpperCase()
 
 // ----------------------------------------------------
 // PAGE VIEWS — click a user to see their browsing history.
@@ -1247,12 +1388,17 @@ const { data: userRolesList } = useQuery({
   queryKey: ['admin-user-roles'],
 })
 
+const onlineUserIds = computed(() => new Set(liveVisitors.value.map((v) => v.id)))
+
 const sortedUserRolesList = computed(() => {
   return (userRolesList.value || [])
     .filter((u) => u.role !== 'admin')
+    .map((u) => ({ ...u, isOnline: onlineUserIds.value.has(u.user_id) }))
     .sort((a, b) => {
       const aRequested = a.role === 'auth' && Boolean(a.requested_clearance ?? a.requestedClearance)
       const bRequested = b.role === 'auth' && Boolean(b.requested_clearance ?? b.requestedClearance)
+
+      if (a.isOnline !== b.isOnline) return a.isOnline ? -1 : 1
 
       if (aRequested !== bRequested) return aRequested ? -1 : 1
 
@@ -2081,6 +2227,29 @@ const parsedGuestbookEntries = computed(() => {
   })
 })
 
+interface BlogForm {
+  clearance: ClearanceLevel
+  date: string
+  excerpt: string
+  is_active: boolean
+  minutes: null | number
+  slug: string
+  title: string
+}
+
+// ----------------------------------------------------
+// BLOG TAB
+// ----------------------------------------------------
+interface BlogPostRecord {
+  clearance: ClearanceLevel
+  date: string
+  excerpt: null | string
+  is_active: boolean
+  minutes: null | number
+  slug: string
+  title: string
+}
+
 async function deleteGuestbookEntry(id: string) {
   if (!confirm('Are you sure you want to delete this drawing?')) return
 
@@ -2093,6 +2262,73 @@ async function deleteGuestbookEntry(id: string) {
     const errorMsg = err instanceof Error ? err.message : 'Unknown error'
     alert(`Failed to delete drawing: ${errorMsg}`)
   }
+}
+
+const editBlogForms = reactive<Record<string, BlogForm>>({})
+const savingBlogSlug = ref<null | string>(null)
+
+const { data: blogPostsList } = useQuery({
+  enabled: computed(() => isAdmin.value),
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from('blog')
+      .select('*')
+      .order('date', { ascending: false })
+
+    if (error) throw error
+    return (data || []) as BlogPostRecord[]
+  },
+  queryKey: ['admin-blog'],
+})
+
+// The blog storage layout is `{slug}/{slug}.md` for public posts and
+// `pvt/{slug}/{slug}.md` for anything above public (mirrors useBlog.ts).
+function blogStoragePath(slug: string, clearance: ClearanceLevel): string {
+  const base = `${slug}/${slug}.md`
+  return clearance === 'public' ? base : `pvt/${base}`
+}
+
+async function deleteBlog(slug: string) {
+  if (!confirm(`Are you sure you want to delete blog post "${slug}"?`)) return
+
+  try {
+    const { error } = await supabase.from('blog').delete().eq('slug', slug)
+    if (error) throw error
+
+    delete editBlogForms[slug]
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-blog'] })
+    await queryClient.invalidateQueries({ queryKey: ['blog-posts'] })
+    await queryClient.invalidateQueries({ queryKey: ['blog-post', slug] })
+    await queryClient.invalidateQueries({ queryKey: ['blog-post-content', slug] })
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to delete blog post: ${errorMsg}`)
+  }
+}
+
+function formatBlogDate(dateStr: null | string) {
+  if (!dateStr) return ''
+  try {
+    return format(new Date(dateStr), 'dd MMMM yyyy')
+  } catch {
+    return dateStr
+  }
+}
+
+function getEditBlogForm(post: BlogPostRecord): BlogForm {
+  if (!editBlogForms[post.slug]) {
+    editBlogForms[post.slug] = {
+      clearance: post.clearance || 'public',
+      date: post.date ? (post.date.length >= 10 ? post.date.slice(0, 10) : post.date) : '',
+      excerpt: post.excerpt || '',
+      is_active: !!post.is_active,
+      minutes: post.minutes ?? null,
+      slug: post.slug,
+      title: post.title || '',
+    }
+  }
+  return editBlogForms[post.slug]
 }
 
 function getSvgPathFromStroke(points: number[][]) {
@@ -2118,6 +2354,15 @@ function getSvgPathFromStroke(points: number[][]) {
   return d.join(' ')
 }
 
+async function hasBlogFile(path: string): Promise<boolean> {
+  const parts = path.split('/')
+  const folder = parts.slice(0, -1).join('/')
+  const filename = parts[parts.length - 1]
+  const { data, error } = await supabase.storage.from('blog').list(folder, { limit: 1000 })
+  if (error) throw error
+  return (data || []).some((o) => o.name === filename)
+}
+
 function parseStrokes(raw: unknown): number[][][] {
   if (!raw) return []
   if (typeof raw === 'string') {
@@ -2128,6 +2373,114 @@ function parseStrokes(raw: unknown): number[][][] {
     }
   }
   return raw as number[][][]
+}
+
+function resetBlog(post: BlogPostRecord) {
+  editBlogForms[post.slug] = {
+    clearance: post.clearance || 'public',
+    date: post.date ? (post.date.length >= 10 ? post.date.slice(0, 10) : post.date) : '',
+    excerpt: post.excerpt || '',
+    is_active: !!post.is_active,
+    minutes: post.minutes ?? null,
+    slug: post.slug,
+    title: post.title || '',
+  }
+}
+
+async function saveBlog(post: BlogPostRecord, close?: () => void) {
+  const form = getEditBlogForm(post)
+  const oldSlug = post.slug
+  const newSlug = form.slug.trim()
+  const oldClearance = post.clearance
+  const newClearance = form.clearance
+  savingBlogSlug.value = oldSlug
+
+  if (!newSlug) {
+    alert('Slug cannot be empty.')
+    savingBlogSlug.value = null
+    return
+  }
+
+  const oldPath = blogStoragePath(oldSlug, oldClearance)
+  const newPath = blogStoragePath(newSlug, newClearance)
+  const needsMove = oldPath !== newPath
+
+  try {
+    // Guard against slug collisions before touching anything.
+    if (newSlug !== oldSlug) {
+      const { data: clash, error: clashError } = await supabase
+        .from('blog')
+        .select('slug')
+        .eq('slug', newSlug)
+        .maybeSingle()
+      if (clashError) throw clashError
+      if (clash) throw new Error(`A post with the slug “${newSlug}” already exists.`)
+    }
+
+    // Move the markdown file first so a failure leaves the DB untouched.
+    if (needsMove) {
+      if (!(await hasBlogFile(oldPath))) {
+        throw new Error(`Blog file not found at “${oldPath}”.`)
+      }
+      if (await hasBlogFile(newPath)) {
+        throw new Error(`Destination file already exists at “${newPath}”.`)
+      }
+      const { error: moveError } = await supabase.storage
+        .from('blog')
+        .move(oldPath, newPath)
+      if (moveError) throw moveError
+    }
+
+    // minutes must stay > 0 (DB CHECK); collapes empty/zero back to null.
+    const minutes = form.minutes && form.minutes > 0 ? form.minutes : null
+
+    const { error } = await supabase
+      .from('blog')
+      .update({
+        clearance: newClearance,
+        date: form.date,
+        excerpt: form.excerpt.trim() || null,
+        is_active: form.is_active,
+        minutes,
+        slug: newSlug,
+        title: form.title,
+      })
+      .eq('slug', oldSlug)
+
+    if (error) {
+      // Best-effort rollback of the file move.
+      if (needsMove) {
+        await supabase.storage.from('blog').move(newPath, oldPath)
+      }
+      throw error
+    }
+
+    post.title = form.title
+    post.clearance = newClearance
+    post.date = form.date
+    post.excerpt = form.excerpt.trim() || null
+    post.is_active = form.is_active
+    post.minutes = minutes
+    post.slug = newSlug
+
+    if (newSlug !== oldSlug) {
+      delete editBlogForms[oldSlug]
+    }
+
+    await queryClient.invalidateQueries({ queryKey: ['admin-blog'] })
+    await queryClient.invalidateQueries({ queryKey: ['blog-posts'] })
+    await queryClient.invalidateQueries({ queryKey: ['blog-post', newSlug] })
+    await queryClient.invalidateQueries({ queryKey: ['blog-post-content', newSlug] })
+    await queryClient.invalidateQueries({ queryKey: ['blog-post', oldSlug] })
+    await queryClient.invalidateQueries({ queryKey: ['blog-post-content', oldSlug] })
+
+    close?.()
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+    alert(`Failed to save blog post: ${errorMsg}`)
+  } finally {
+    savingBlogSlug.value = null
+  }
 }
 </script>
 

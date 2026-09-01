@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-container flex w-full flex-col gap-0">
     <div class="desktop:px-20 flex flex-col px-4">
-      <div class="flex min-h-[calc(100svh-5rem)] flex-col gap-20 pt-20">
+      <div class="flex min-h-[calc(100svh-5rem)] flex-col gap-20 py-20">
         <div
           v-reveal
           data-sync="post-breadcrumbs"
@@ -85,7 +85,6 @@
         </template>
       </div>
     </div>
-    <ContactForm />
   </div>
 </template>
 
@@ -97,7 +96,6 @@ import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import GenericLoader from '@/components/GenericLoader.vue'
-import ContactForm from '@/components/home/ContactForm.vue'
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
 import { useBlogPost } from '@/composables/useBlog'
 
