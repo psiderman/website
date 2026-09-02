@@ -5,9 +5,11 @@ import { queryKeys } from '@/queryKeys'
 import { ensureSession, getStorageUrl, supabase } from '@/supabase'
 import { throwIfError } from '@/utils'
 
-export type ClearanceLevel = 'admin' | 'auth' | 'close' | 'friends' | 'known' | 'public'
+import type { ClearanceLevel, GalleryImage } from '@/types'
 
-export interface TravelImage {
+export type { ClearanceLevel }
+
+export interface TravelImage extends GalleryImage {
   caption: null | string
   clearance: ClearanceLevel
   dateTaken: Date | null

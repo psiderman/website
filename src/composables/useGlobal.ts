@@ -3,8 +3,8 @@ import { computed, ref } from 'vue'
 import { trackEvent } from '@/utils/analytics'
 
 import type { LightBoxTag } from '@/components/LightBox.vue'
-import type { ClearanceLevel } from '@/composables/useTravel'
 import type { WorkDetail } from '@/data/work'
+import type { GalleryImage } from '@/types'
 
 const _allowMultiplayer = ref(localStorage.getItem('allowMultiplayer') !== 'false')
 
@@ -18,7 +18,7 @@ const allowMultiplayer = computed({
 
 export interface LightBoxData {
   description?: string
-  images: { clearance?: ClearanceLevel; url: string }[]
+  images: GalleryImage[]
   tags?: LightBoxTag[]
   title?: string
   videos?: string[]
@@ -33,14 +33,7 @@ export type ModalState =
 
 export interface PhotoLightBoxData {
   currentTripSlug?: string
-  images: {
-    caption?: null | string
-    clearance?: ClearanceLevel | null | string
-    height?: null | number
-    thumbnailUrl?: string
-    url: string
-    width?: null | number
-  }[]
+  images: GalleryImage[]
   initialIndex?: number
   tripTitle?: string
 }
@@ -116,22 +109,13 @@ export const isAuthModalOpen = computed({
   },
 })
 
-type PhotoLightboxImageInput = {
-  caption?: null | string
-  clearance?: ClearanceLevel | null | string
-  height?: null | number
-  thumbnailUrl?: string
-  url: string
-  width?: null | number
-}
-
 export function openAuthModal() {
   modalState.value = { type: 'auth' }
 }
 
 export function openLightbox(data: {
   description?: string
-  images?: { clearance?: ClearanceLevel; url: string }[]
+  images?: GalleryImage[]
   tags?: LightBoxTag[]
   title?: string
   videos?: string[]
@@ -152,7 +136,7 @@ export function openLightbox(data: {
 }
 
 export function openPhotoLightbox(
-  images: PhotoLightboxImageInput[],
+  images: GalleryImage[],
   options: { initialIndex?: number; title?: string; tripSlug?: string } = {},
 ) {
   if (images.length === 0) return

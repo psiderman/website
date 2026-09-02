@@ -19,5 +19,16 @@ export const FILTER_GROUPS = [
   { icon: Music, id: 'music', label: 'Music' },
 ] as const
 
+export type ClearanceLevel = 'admin' | 'auth' | 'close' | 'friends' | 'known' | 'public'
 export type FilterGroupId = FilterGroupDef['id']
+
+export interface GalleryImage {
+  caption?: null | string
+  clearance?: ClearanceLevel | null | string
+  height?: null | number
+  thumbnailUrl?: string
+  url: string
+  width?: null | number
+}
+
 type FilterGroupDef = (typeof FILTER_GROUPS)[number]

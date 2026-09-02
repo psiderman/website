@@ -172,7 +172,7 @@ import CarouselIndicator from '@/components/CarouselIndicator.vue'
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import { isHighClearance } from '@/composables/useTravel'
 
-import type { ClearanceLevel } from '@/composables/useTravel'
+import type { GalleryImage } from '@/types'
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -183,14 +183,7 @@ export interface LightBoxTag {
 
 const props = defineProps<{
   description?: string
-  images: {
-    caption?: null | string
-    clearance?: ClearanceLevel
-    height?: null | number
-    thumbnailUrl?: string
-    url: string
-    width?: null | number
-  }[]
+  images: GalleryImage[]
   isOpen: boolean
   tags?: LightBoxTag[]
   title?: string

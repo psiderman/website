@@ -211,22 +211,14 @@ import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import { photoLightBoxData } from '@/composables/useGlobal'
-import { type ClearanceLevel, isHighClearance, useTravelsWithImages } from '@/composables/useTravel'
+import { isHighClearance, useTravelsWithImages } from '@/composables/useTravel'
+import type { GalleryImage } from '@/types'
 import { trackEvent } from '@/utils/analytics'
-
-interface PhotoLightBoxImage {
-  caption?: null | string
-  clearance?: ClearanceLevel | null | string
-  height?: null | number
-  thumbnailUrl?: string
-  url: string
-  width?: null | number
-}
 
 const props = withDefaults(
   defineProps<{
     currentTripSlug?: string
-    images?: PhotoLightBoxImage[]
+    images?: GalleryImage[]
     initialIndex?: number
     isOpen: boolean
     tripTitle?: string
@@ -263,7 +255,7 @@ const isDragging = ref(false)
 
 interface OutgoingCard {
   id: string
-  img: PhotoLightBoxImage
+  img: GalleryImage
   isExiting: boolean
   rotate: number
   x: number
@@ -278,7 +270,7 @@ const BUFFER_AHEAD = 3
 interface StackCard {
   depth: number
   id: string
-  img: PhotoLightBoxImage
+  img: GalleryImage
   imgIndex: number
   isBehind: boolean
   rotate: number
