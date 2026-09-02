@@ -4,6 +4,7 @@ import { isAuthModalOpen, openAuthModal } from '@/composables/useGlobal'
 import { forceSignOut, queryClient } from '@/queryClient'
 import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
+import { identifyUser } from '@/utils/analytics'
 
 import type { User } from '@supabase/supabase-js'
 
@@ -60,6 +61,7 @@ let initialized = false
 supabase.auth.onAuthStateChange(async (_event, session) => {
   currentUser.value = session?.user ?? null
   if (currentUser.value) {
+    identifyUser(currentUser.value.id)
     const urlParams =
       typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
     const requestedFromUrl = urlParams?.get('requested_clearance') === 'true'

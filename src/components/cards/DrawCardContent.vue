@@ -143,6 +143,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
 import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
+import { trackEvent } from '@/utils/analytics'
 
 import GenericLoader from '../GenericLoader.vue'
 
@@ -317,7 +318,13 @@ function handleKeyDown(e: KeyboardEvent) {
   }
 }
 
+let hasTrackedInteraction = false
+
 function handlePointerDown(e: PointerEvent) {
+  if (!hasTrackedInteraction) {
+    hasTrackedInteraction = true
+    trackEvent('draw_interact')
+  }
   const el = e.currentTarget as SVGElement
   el.setPointerCapture(e.pointerId)
   const rect = el.getBoundingClientRect()

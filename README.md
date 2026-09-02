@@ -1,6 +1,5 @@
 ![cover image](/public/og.png)
-*why are you looking at my repo, when you could be looking at my [website](https://psiderman.com) instead?*
-
+_why are you looking at my repo, when you could be looking at my [website](https://psiderman.com) instead?_
 
 # psiderman.com
 
@@ -9,7 +8,7 @@ i’ve always wanted to have a website that’s more than just my design portfol
 i think i’ve landed on an iteration that’s here to stay. i hope you find all the little easter eggs i’ve left in here.
 
 if there is something that you’d like to see on here, let me know.
- want to build your own?
+want to build your own?
 
 if you're a designer and you like what you see, and you want to make your own personal website, go ahead, fork this, copy it, edit, use it to guide your own personal website. the code is under the MIT license.
 
@@ -24,6 +23,7 @@ a dedicated domain name, free-tier subscriptions on a few platforms, a belief th
 i'm not being preachy, and i'm not joking. you literally can run this entire project for free. the domain name is necessary in the later stages.
 
 # stack
+
 - **[Figma](https://www.figma.com)** for designs
 - **[Vue 3](https://vuejs.org)** + **[Vite](https://vite.dev)** + **[Tailwind v4](https://tailwindcss.com)** for the static code
 - **[Vercel](https://vercel.com)** for hosting + serverless functions for APIs (spotify, letterboxd, etc.).
@@ -32,7 +32,7 @@ i'm not being preachy, and i'm not joking. you literally can run this entire pro
 - **[Mapbox](https://www.mapbox.com)** for the interactive travel map
 - **[Spotify](https://developer.spotify.com)** if you want to expose your listening activity. they require you to be on the premium plan to access the api, but since you're only connecting one account, you can continue using it in dev mode.
 - **[Sentry](https://sentry.io)** for errors.
-- **[Simple Analytics](https://www.simpleanalytics.com)** for privacy-first visitor count.
+- **[Umami](https://umami.is)** for privacy-friendly analytics and custom event tracking.
 
 # quick guide
 

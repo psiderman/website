@@ -25,6 +25,7 @@
       </span>
     </div>
 
+    <!-- eslint-disable-next-line vuejs-accessibility/mouse-events-have-key-events -->
     <button
       v-tooltip="tooltipConfig"
       type="button"
@@ -79,6 +80,8 @@
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue'
+
+import { trackEvent } from '@/utils/analytics'
 
 interface Props {
   hint?: boolean
@@ -195,6 +198,7 @@ const onPressEnd = () => {
     generateParticles()
     popping.value = true
     status.value = 'idle'
+    trackEvent('make_wish', { size: props.size }, { force: true })
     emit('wished')
 
     setTimeout(() => {

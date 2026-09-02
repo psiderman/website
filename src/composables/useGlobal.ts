@@ -1,5 +1,7 @@
 import { computed, ref } from 'vue'
 
+import { trackEvent } from '@/utils/analytics'
+
 import type { LightBoxTag } from '@/components/LightBox.vue'
 import type { ClearanceLevel } from '@/composables/useTravel'
 import type { WorkDetail } from '@/data/work'
@@ -141,6 +143,10 @@ export function openLightbox(data: {
     title: data.title ?? '',
     videos: data.videos,
   }
+  trackEvent('open_work_lightbox', {
+    images_count: data.images?.length ?? 0,
+    title: data.title ?? '',
+  })
   lightBoxData.value = formatted
   modalState.value = { data: formatted, type: 'lightbox' }
 }
@@ -160,11 +166,21 @@ export function openPhotoLightbox(
     initialIndex: 0,
     tripTitle: options.title ?? '',
   }
+  trackEvent('open_photo_lightbox', {
+    count: images.length,
+    title: options.title || options.tripSlug || 'photos',
+    trip_slug: options.tripSlug,
+  })
   photoLightBoxData.value = formatted
   modalState.value = { data: formatted, type: 'photoLightbox' }
 }
 
 export function openWorkModal(data: WorkDetail) {
+  trackEvent('open_work_modal', {
+    org_id: data.orgId,
+    org_name: data.orgName,
+    role: data.role,
+  })
   workData.value = data
   modalState.value = { data, type: 'work' }
 }

@@ -121,6 +121,7 @@ import ThwipAchievementModal from '@/components/ThwipAchievementModal.vue'
 import WebStrand from '@/components/WebStrand.vue'
 import { getEasterEggEmail, getEasterEggQuips } from '@/data/thwipEasterEgg'
 import { queryKeys } from '@/queryKeys'
+import { trackEvent } from '@/utils/analytics'
 
 // ==========================================
 // TIMING CONFIGURATION (edit values here)
@@ -161,6 +162,8 @@ const LOCAL_THWIP_KEY = 'local_thwip_count'
 const localThwips = ref<number>(parseInt(localStorage.getItem(LOCAL_THWIP_KEY) || '0', 10) || 0)
 const thwips = ref<null | number>(null)
 let pendingDelta = 0
+let sessionThwips = 0
+let hasTrackedFirstThwip = false
 let debounceTimer: null | number = null
 let footerObserver: IntersectionObserver | null = null
 
@@ -190,6 +193,13 @@ function handleThwipComplete() {
   thwips.value = (thwips.value ?? 0) + 1
   pendingDelta += 1
   localThwips.value += 1
+  sessionThwips += 1
+
+  if (!hasTrackedFirstThwip) {
+    hasTrackedFirstThwip = true
+    trackEvent('thwip_first')
+  }
+
   try {
     localStorage.setItem(LOCAL_THWIP_KEY, localThwips.value.toString())
   } catch {
@@ -211,7 +221,15 @@ function handleThwipComplete() {
     pendingDelta = 0
     debounceTimer = null
     void persistThwipDelta(deltaToFlush)
-  }, 1000)
+    trackEvent(
+      'thwip_session_total',
+      {
+        local_total: localThwips.value,
+        session_thwips: sessionThwips,
+      },
+      { force: true },
+    )
+  }, 1500)
 }
 
 async function persistThwipDelta(delta: number) {

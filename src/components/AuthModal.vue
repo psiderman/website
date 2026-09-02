@@ -121,6 +121,7 @@ import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import { supabase } from '@/supabase'
+import { trackEvent } from '@/utils/analytics'
 
 const props = defineProps<{
   isOpen: boolean
@@ -129,6 +130,16 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
 }>()
+
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (open) {
+      trackEvent('view_auth_modal')
+    }
+  },
+  { immediate: true },
+)
 
 const ICONS = [
   { icon: FaceSlightlySmiling, id: 'face-slightly-smiling' },

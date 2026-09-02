@@ -38,6 +38,20 @@
             site).
           </p>
 
+          <p>
+            I also use
+            <a
+              href="https://umami.is"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-text-secondary underline"
+              >Umami Analytics</a
+            >
+            to understand site usage and performance. Umami does not use cookies or collect personal
+            tracking data across other sites. If you are logged in, aggregated interactions on this
+            site are linked to your internal user ID.
+          </p>
+
           <h2 class="text-h2 pt-4 font-semibold">3. Google API Limited Use Adherence</h2>
           <p>
             My use and transfer of information received from Google APIs to any other app will

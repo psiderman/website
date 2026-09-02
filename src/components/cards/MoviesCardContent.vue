@@ -39,6 +39,7 @@
           :tabindex="activeFocusIndex === idx ? 0 : -1"
           :aria-label="`Open ${movie.title} on Letterboxd`"
           @focus="activeFocusIndex = idx"
+          @click="trackEvent('click_movie', { has_review: !!movie.review, title: movie.title })"
         />
         <img
           v-lazy="movie.cover"
@@ -89,6 +90,7 @@ import { formatDistanceToNowStrict } from 'date-fns'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import { queryKeys } from '@/queryKeys'
+import { trackEvent } from '@/utils/analytics'
 
 import GenericLoader from '../GenericLoader.vue'
 
