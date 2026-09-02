@@ -178,6 +178,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import CardCarousel from '@/components/cards/CardCarousel.vue'
 import CardContainer from '@/components/home/CardContainer.vue'
@@ -293,24 +294,33 @@ onUnmounted(() => {
   resizeObserver?.disconnect()
 })
 
-const selectedTabIndex = ref(0)
+const route = useRoute()
+const router = useRouter()
 
-const activeFilter = computed<FilterGroupId>(
-  () => filterGroups[selectedTabIndex.value]?.id || 'home',
-)
+const activeFilter = computed<FilterGroupId>(() => {
+  const p = route.query.p as FilterGroupId
+  return filterGroups.some((g) => g.id === p) ? p : 'home'
+})
+
+const selectedTabIndex = computed(() => filterGroups.findIndex((g) => g.id === activeFilter.value))
 
 const handleTabClick = (id: FilterGroupId) => {
-  const idx = filterGroups.findIndex((g) => g.id === id)
-  if (idx > -1) selectedTabIndex.value = idx
   if (activeFilter.value === id) {
     scrollToFilterBar(prefersReducedMotion ? 'auto' : 'smooth', true)
+    return
   }
+  router.replace({
+    query: {
+      ...route.query,
+      p: id === 'home' ? undefined : id,
+    },
+  })
 }
 
 // Arrow-key navigation across the filter tabs. Tab itself steps through each
 // button (all are tabbable); arrows offer the usual tablist roving as well.
 const handleTabKeydown = (event: KeyboardEvent) => {
-  const current = filterGroups.findIndex((g) => g.id === activeFilter.value)
+  const current = selectedTabIndex.value
   let next = -1
   switch (event.key) {
     case 'ArrowLeft':
@@ -329,7 +339,12 @@ const handleTabKeydown = (event: KeyboardEvent) => {
   if (next > -1) {
     event.preventDefault()
     const id = filterGroups[next]!.id
-    selectedTabIndex.value = next
+    router.replace({
+      query: {
+        ...route.query,
+        p: id === 'home' ? undefined : id,
+      },
+    })
     void nextTick(() => tabRefs.value[id]?.focus({ preventScroll: true }))
   }
 }
@@ -428,7 +443,11 @@ const filteredCards = computed<GridCard[]>(() => {
 function openCarouselPhotoLightbox(extra: ExtraCard, startIndex = 0) {
   if (!extra.images || extra.images.length === 0) return
   openPhotoLightbox(
-    extra.images.map((url) => ({ thumbnailUrl: url, url })),
+    extra.images.map((url, i) => ({
+      caption: extra.captions?.[i] || undefined,
+      thumbnailUrl: url,
+      url,
+    })),
     { initialIndex: startIndex, title: extra.title || '' },
   )
 }

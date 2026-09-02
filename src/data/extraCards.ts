@@ -5,6 +5,7 @@ import type { FilterGroupId } from '@/types'
 
 export interface ExtraCard {
   bgClass?: string
+  captions?: string[]
   carousel?: boolean
   cover?: string
   coverVid?: string
@@ -20,21 +21,6 @@ export interface ExtraCard {
 }
 
 export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
-  // life: [
-  //   {
-  //     carousel: true,
-  //     images: [
-  //       new URL('@/assets/gaming/arkham.webp', import.meta.url).href,
-  //       new URL('@/assets/gaming/budokai.webp', import.meta.url).href,
-  //       new URL('@/assets/gaming/hitman3.webp', import.meta.url).href,
-  //       new URL('@/assets/gaming/lis.webp', import.meta.url).href,
-  //       new URL('@/assets/gaming/spiderman.webp', import.meta.url).href,
-  //       new URL('@/assets/gaming/valo.webp', import.meta.url).href,
-  //     ],
-  //     size: 'md',
-  //     title: 'favorite',
-  //   },
-  // ],
   personal_finance: [
     {
       bgClass: 'bg-orange-500',
@@ -46,6 +32,16 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
   ],
   travel: [
     {
+      captions: [
+        'tour eiffel',
+        'blvd des italiens',
+        'pont st. louis',
+        'grande galerie',
+        'galerie des batailles',
+        'devant la statue du bailli de suffren',
+        'j’ai essayé',
+        'le cheval a bougé',
+      ],
       carousel: true,
       images: Array.from({ length: 8 }, (_, i) =>
         getStorageUrl('webp', 'dad_paris', `${i + 1}.webp`),
@@ -55,6 +51,23 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       title: 'dad in paris (25 yrs later)',
     },
     {
+      captions: [
+        'dotonbori, osaka, fujifilm ace',
+        'tamagawa, osaka, fujifilm ace',
+        'amerikamura, osaka, fujifilm ace',
+        'hogwarts, fujifilm ace',
+        'dotonbori, osaka, fujifilm ace',
+        'ginkaku-ji, kyoto, fujifilm ace',
+        'maruyama, kyoto, fujifilm ace',
+        'back from otagi nenbutsu-ji, kyoto, fujifilm ace',
+        'gion, kyoto, fujifilm ace',
+        'kenrokuen, kanazawa, fujifilm ace',
+        'kawaguchiko, mt.fuji, fujifilm ace',
+        'fuji-q, mt. fuji, fujifilm ace',
+        'tokyo ramen street, tokyo, fujifilm ace',
+        'arakurayama sengen park, mt.fuji, fujifilm ace',
+        'roppong, tokyo, fujifilm ace',
+      ],
       carousel: true,
       images: Array.from({ length: 15 }, (_, i) =>
         getStorageUrl('webp', 'japan_film', `${i + 1}.webp`),
@@ -62,6 +75,29 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       lightbox: true,
       size: 'md',
       title: 'japan on film',
+    },
+    {
+      captions: [
+        'camlica hill, istanbul',
+        'budapest',
+        'st. stephen’s basilica, budapest',
+        'camlica hill, istanbul',
+        'eminonu, istanbul',
+        'elisabeth bridge, budapest',
+        'moda park, istanbul',
+        'central market hall, budapest',
+        'fener, istanbul',
+        'astoria, budapest',
+        'gellert hill, budapest',
+        'inner city, budapest',
+      ],
+      carousel: true,
+      images: Array.from({ length: 12 }, (_, i) =>
+        getStorageUrl('webp', 'ist_bud', `${i + 1}.webp`),
+      ),
+      lightbox: true,
+      size: 'md',
+      title: 'olympus superzoom 80g + kodak ultramax 400',
     },
   ],
   work: [
