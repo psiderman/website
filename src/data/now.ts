@@ -36,22 +36,23 @@ export function parseFrontmatter(raw: string): ParsedFrontmatter {
     const line = rawLine.trim()
     if (!line) continue
 
-    const numericKey = /^(\d+):\s*(.*)$/.exec(line)
-    if (numericKey) {
-      const index = parseInt(numericKey[1], 10) - 1
-      captions[index] = numericKey[2].trim().replace(/^["']|["']$/g, '')
-      continue
-    }
+    const colonIndex = line.indexOf(':')
+    if (colonIndex === -1) continue
 
-    const dateMatch = /^date:\s*(.+)$/.exec(line)
-    if (dateMatch) {
-      date = dateMatch[1].trim().replace(/^["']|["']$/g, '')
-      continue
-    }
+    const key = line.slice(0, colonIndex).trim()
+    const value = line
+      .slice(colonIndex + 1)
+      .trim()
+      .replace(/^["']/, '')
+      .replace(/["']$/, '')
 
-    const titleMatch = /^title:\s*(.+)$/.exec(line)
-    if (titleMatch) {
-      title = titleMatch[1].trim().replace(/^["']|["']$/g, '')
+    if (/^\d+$/.test(key)) {
+      const index = parseInt(key, 10) - 1
+      captions[index] = value
+    } else if (key === 'date') {
+      date = value
+    } else if (key === 'title') {
+      title = value
     }
   }
 

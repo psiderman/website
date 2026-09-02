@@ -3,8 +3,11 @@ import js from '@eslint/js'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import perfectionist from 'eslint-plugin-perfectionist'
+import * as regexp from 'eslint-plugin-regexp'
+import tailwind from 'eslint-plugin-tailwindcss'
 import unusedImports from 'eslint-plugin-unused-imports'
 import vue from 'eslint-plugin-vue'
+import vueAccessibility from 'eslint-plugin-vuejs-accessibility'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
@@ -60,6 +63,7 @@ export default defineConfigWithVueTs(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...vue.configs['flat/strongly-recommended'],
+  regexp.configs['flat/recommended'],
   // ...vueI18n.configs['flat/recommended'],
   vueTsConfigs.recommended,
 
@@ -76,7 +80,9 @@ export default defineConfigWithVueTs(
     name: 'app/rules',
 
     plugins: {
+      tailwindcss: tailwind,
       'unused-imports': unusedImports,
+      'vuejs-accessibility': vueAccessibility,
     },
 
     rules: {
@@ -169,11 +175,18 @@ export default defineConfigWithVueTs(
         },
       ],
 
-      'unused-imports/no-unused-imports': 'error',
+      /*
+       * Tailwind
+       */
+      'tailwindcss/classnames-order': 'off', // handled by prettier-plugin-tailwindcss
 
       /*
        * Vue
        */
+
+      'tailwindcss/no-custom-classname': 'off', // Tailwind v4 dynamic classes
+
+      'unused-imports/no-unused-imports': 'error',
 
       'unused-imports/no-unused-vars': [
         'warn',
@@ -219,8 +232,31 @@ export default defineConfigWithVueTs(
       'vue/no-multiple-template-root': 'off',
 
       'vue/padding-line-between-blocks': ['error', 'always'],
-
       'vue/require-default-prop': 'off',
+
+      /*
+       * Accessibility (warnings for progressive adoption)
+       */
+      'vuejs-accessibility/alt-text': 'warn',
+      'vuejs-accessibility/anchor-has-content': 'warn',
+      'vuejs-accessibility/aria-props': 'warn',
+      'vuejs-accessibility/aria-role': 'warn',
+      'vuejs-accessibility/aria-unsupported-elements': 'warn',
+      'vuejs-accessibility/click-events-have-key-events': 'warn',
+      'vuejs-accessibility/form-control-has-label': 'warn',
+      'vuejs-accessibility/heading-has-content': 'warn',
+      'vuejs-accessibility/iframe-has-title': 'warn',
+      'vuejs-accessibility/interactive-supports-focus': 'warn',
+      'vuejs-accessibility/label-has-for': 'warn',
+      'vuejs-accessibility/media-has-caption': 'warn',
+      'vuejs-accessibility/mouse-events-have-key-events': 'warn',
+      'vuejs-accessibility/no-access-key': 'warn',
+      'vuejs-accessibility/no-autofocus': 'warn',
+      'vuejs-accessibility/no-distracting-elements': 'warn',
+      'vuejs-accessibility/no-redundant-roles': 'warn',
+      'vuejs-accessibility/no-static-element-interactions': 'warn',
+      'vuejs-accessibility/role-has-required-aria-props': 'warn',
+      'vuejs-accessibility/tabindex-no-positive': 'warn',
     },
 
     settings: {
@@ -259,6 +295,7 @@ export default defineConfigWithVueTs(
     rules: {
       '@typescript-eslint/no-unused-expressions': 'off',
       'no-unused-expressions': 'off',
+      'perfectionist/sort-objects': 'off',
     },
   },
 )

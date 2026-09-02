@@ -249,7 +249,7 @@ onUnmounted(() => {
     transform: translate(0.5px, -0.5px) rotate(-1deg);
   }
   100% {
-    transform: translate(0px, 0px) rotate(0deg);
+    transform: translate(0, 0) rotate(0deg);
   }
 }
 

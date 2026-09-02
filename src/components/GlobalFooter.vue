@@ -460,13 +460,13 @@ onUnmounted(() => {
 .speech-bubble-left::before {
   left: 20%;
   border-width: 6px 6px 0 1px;
-  border-color: var(--color-light, #ffffff) transparent transparent transparent;
+  border-color: var(--color-light, #fff) transparent transparent transparent;
 }
 
 /* Flinging left -> tail on right pointing back toward hand */
 .speech-bubble-right::before {
   right: 20%;
   border-width: 6px 1px 0 6px;
-  border-color: var(--color-light, #ffffff) transparent transparent transparent;
+  border-color: var(--color-light, #fff) transparent transparent transparent;
 }
 </style>
