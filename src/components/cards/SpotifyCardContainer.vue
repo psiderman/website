@@ -24,6 +24,7 @@
           target="_blank"
           :tabindex="activeFocusIndex === idx ? 0 : -1"
           @focus="activeFocusIndex = idx"
+          @click="handleTrackClick(t)"
         >
           <p class="h-4 w-4 shrink-0 text-right tabular-nums opacity-60">{{ idx + 1 }}</p>
           <div class="flex grow flex-row items-center gap-1 truncate">
@@ -59,7 +60,7 @@
               ? 'group-hover:border-light/25 group-hover:bg-dark/80 cursor-pointer'
               : '',
           ]"
-          @click="playerClick(now_playing.song_url)"
+          @click="handlePlayerClick(now_playing.song_url)"
         >
           <!-- Color overlay -->
           <div
@@ -137,6 +138,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
 import { currentUser } from '@/composables/useAuth.ts'
 import { useSpotify } from '@/composables/useSpotify'
+import { trackEvent } from '@/utils/analytics'
 
 import GenericLoader from '../GenericLoader.vue'
 
@@ -156,8 +158,23 @@ const {
   focusSibling,
   isRecentLoading,
   now_playing,
-  playerClick,
+  playerClick: basePlayerClick,
 } = useSpotify()
+
+const handleTrackClick = (track: { artist: string; title: string }) => {
+  trackEvent('click_spotify_track', {
+    artist: track.artist,
+    title: track.title,
+  })
+}
+
+const handlePlayerClick = (url: null | string) => {
+  trackEvent('click_spotify_player', {
+    artist: now_playing.value.artist || '',
+    title: now_playing.value.title || '',
+  })
+  basePlayerClick(url)
+}
 </script>
 
 <style scoped>

@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/vue-query'
-import { format, parse } from 'date-fns'
+import { format } from 'date-fns'
 import { computed, type Ref } from 'vue'
 
 import { currentUser, ensureUserRole } from '@/composables/useAuth'
-import { supabase } from '@/supabase'
+import { queryKeys } from '@/queryKeys'
+import { ensureSession, supabase } from '@/supabase'
+import { parseDateColumn, throwIfError } from '@/utils'
 
 import type { ClearanceLevel } from '@/composables/useTravel'
 
@@ -48,7 +50,7 @@ export function useBlogPost(slug: Ref<string> | string) {
     queryFn: async () => {
       if (!slugRef.value) return null
 
-      await supabase.auth.getSession()
+      await ensureSession()
 
       const { data, error } = await supabase
         .from('blog')
@@ -57,10 +59,10 @@ export function useBlogPost(slug: Ref<string> | string) {
         .eq('is_active', true)
         .maybeSingle()
 
-      if (error) throw error
+      throwIfError(error)
       return data ? rowToBlogPost(data as Record<string, unknown>) : null
     },
-    queryKey: ['blog-post', slugRef],
+    queryKey: queryKeys.blog.post(slugRef),
   })
 
   const {
@@ -94,7 +96,7 @@ export function useBlogPost(slug: Ref<string> | string) {
         markdown: await data.text(),
       }
     },
-    queryKey: ['blog-post-content', slugRef],
+    queryKey: queryKeys.blog.content(slugRef),
   })
 
   return {
@@ -114,7 +116,7 @@ export function useBlogPosts() {
     isLoading,
   } = useQuery<BlogPost[]>({
     queryFn: async () => {
-      await supabase.auth.getSession()
+      await ensureSession()
 
       const { data, error } = await supabase
         .from('blog')
@@ -122,7 +124,7 @@ export function useBlogPosts() {
         .eq('is_active', true)
         .order('date', { ascending: false })
 
-      if (error) throw error
+      throwIfError(error)
 
       const rows = (data ?? []).map((row) => rowToBlogPost(row as Record<string, unknown>))
       const role = await ensureUserRole()
@@ -135,7 +137,7 @@ export function useBlogPosts() {
         hasAccess: hasBlogAccess(post.clearance, effectiveRole(role)),
       }))
     },
-    queryKey: ['blog-posts'],
+    queryKey: queryKeys.blog.list,
   })
 
   return { error, isLoading, posts }
@@ -163,9 +165,9 @@ function hasBlogAccess(required: ClearanceLevel, role: null | string): boolean {
 function rowToBlogPost(row: Record<string, unknown>): BlogPost {
   return {
     clearance: (row.clearance as ClearanceLevel) || 'admin',
-    // Postgres `date` returns "YYYY-MM-DD"; parsing it as local midnight avoids
-    // the UTC-midnight off-by-one that shifts dates a day early west of UTC.
-    date: parse(row.date as string, 'yyyy-MM-dd', new Date()),
+    // Postgres `date` returns "YYYY-MM-DD"; local-midnight parse avoids the
+    // UTC off-by-one that shifts dates a day early west of UTC.
+    date: parseDateColumn(row.date),
     excerpt: (row.excerpt as string) ?? '',
     hasAccess: false,
     isActive: (row.is_active as boolean) ?? true,

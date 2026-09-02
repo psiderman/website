@@ -64,6 +64,7 @@ import { computed, ref } from 'vue'
 
 import router from '@/router'
 import { openLink } from '@/utils'
+import { trackEvent } from '@/utils/analytics'
 
 interface Props {
   arrow?: 'external' | 'help' | 'none' | 'right'
@@ -108,6 +109,13 @@ const heightClass = computed(() => {
 const handleClick = (event: MouseEvent) => {
   if (!props.link) return
 
+  trackEvent('click_home_card', {
+    card_id: props.title.toLowerCase().replace(/\s+/g, '-'),
+    link: props.link,
+    size: props.size,
+    title: props.title,
+  })
+
   // Respect cmd/ctrl/shift/alt + click and middle-click: open in a new tab.
   const newTab =
     event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button === 1
@@ -128,6 +136,11 @@ const handleKeydown = (event: KeyboardEvent) => {
   if (props.link || !props.focusable) return
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault()
+    trackEvent('click_home_card', {
+      card_id: props.title.toLowerCase().replace(/\s+/g, '-'),
+      size: props.size,
+      title: props.title,
+    })
     emit('activate')
   }
 }

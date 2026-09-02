@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/vue-query'
-import { parse } from 'date-fns'
 
-import { supabase } from '@/supabase'
+import { queryKeys } from '@/queryKeys'
+import { ensureSession, supabase } from '@/supabase'
+import { parseDateColumn, throwIfError } from '@/utils'
 
 import type { ClearanceLevel } from '@/composables/useTravel'
 
@@ -22,18 +23,18 @@ export function useQuotes() {
     isLoading,
   } = useQuery<Quote[]>({
     queryFn: async () => {
-      await supabase.auth.getSession()
+      await ensureSession()
 
       const { data, error } = await supabase
         .from('quotes')
         .select('*')
         .order('date', { ascending: false })
 
-      if (error) throw error
+      throwIfError(error)
 
       return (data ?? []).map((row) => rowToQuote(row as Record<string, unknown>))
     },
-    queryKey: ['quotes'],
+    queryKey: queryKeys.quotes,
   })
 
   return { error, isLoading, quotes }
@@ -44,7 +45,7 @@ function rowToQuote(row: Record<string, unknown>): Quote {
     clearance: (row.clearance as ClearanceLevel) || 'public',
     content: (row.content as string) ?? '',
     created_at: row.created_at as string | undefined,
-    date: row.date ? parse(row.date as string, 'yyyy-MM-dd', new Date()) : new Date(),
+    date: parseDateColumn(row.date),
     id: row.id as string,
     title: (row.title as string) || null,
     updated_at: row.updated_at as string | undefined,

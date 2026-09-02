@@ -123,7 +123,7 @@ const gameImages = Object.entries(
   }),
 )
   .map(([path, url]) => {
-    const name = (path.split('/').pop() ?? path).replace(/\.(webp|jpg|jpeg|png)$/i, '')
+    const name = (path.split('/').pop() ?? path).replace(/\.(?:webp|jpg|jpeg|png)$/i, '')
     return { caption: GAME_CAPTIONS[name] || name, name, url }
   })
   .sort((a, b) => a.name.localeCompare(b.name))
@@ -153,7 +153,7 @@ const pcImages = Object.entries(
     import: 'default',
   }),
 ).map(([path, url]) => ({
-  name: (path.split('/').pop() ?? path).replace(/\.(jpeg|jpg|png|webp)$/i, ''),
+  name: (path.split('/').pop() ?? path).replace(/\.(?:jpeg|jpg|png|webp)$/i, ''),
   url,
 }))
 

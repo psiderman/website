@@ -109,6 +109,7 @@
                   <!-- Short Fragment / Quote -->
                   <div
                     v-else
+                    :ref="(el) => observeFragment(el, item)"
                     v-reveal="item.revealDelay"
                     :data-sync="item.id"
                     class="relative -m-4 rounded-xl p-4"
@@ -160,6 +161,7 @@ import TheListIndicator from '@/components/TheListIndicator.vue'
 import { useBlogPosts } from '@/composables/useBlog'
 import { useQuotes } from '@/composables/useQuotes'
 import { isHighClearance } from '@/composables/useTravel'
+import { trackEvent } from '@/utils/analytics'
 
 import type { BlogPost } from '@/composables/useBlog'
 import type { Quote } from '@/composables/useQuotes'
@@ -175,6 +177,30 @@ type QuoteWithReveal = Quote & {
 }
 
 type WritingFeedItem = PostWithReveal | QuoteWithReveal
+
+const viewedFragmentIds = new Set<string>()
+
+function observeFragment(el: unknown, item: QuoteWithReveal) {
+  if (!el || !(el instanceof HTMLElement) || viewedFragmentIds.has(item.id)) return
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0]?.isIntersecting) {
+        if (!viewedFragmentIds.has(item.id)) {
+          viewedFragmentIds.add(item.id)
+          trackEvent('view_fragment', {
+            fragment_id: item.id,
+            title: item.title || 'untitled',
+          })
+        }
+        observer.disconnect()
+      }
+    },
+    { rootMargin: '0px 0px 20% 0px' },
+  )
+
+  observer.observe(el)
+}
 
 function renderMarkdown(raw: string) {
   if (!raw) return ''

@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable-next-line vuejs-accessibility/mouse-events-have-key-events -->
   <div
     ref="scrollContainer"
     class="bg-surface-primary noscrollbar relative flex size-full snap-x snap-mandatory flex-row gap-2 overflow-x-auto scroll-smooth"
@@ -26,7 +27,7 @@
           content: `${movie.title}, ${formatDistanceToNowStrict(movie.watched_date)} ago`,
           group: 'movies',
         }"
-        class="group border-border-primary dark:border-surface-tertiary has-focus-visible:outline-surface-inverted relative block aspect-2/3 h-full shrink-0 snap-start snap-always overflow-hidden rounded-lg border has-focus-visible:outline-2 has-focus-visible:-outline-offset-2"
+        class="group border-border-primary dark:border-surface-tertiary has-focus-visible:outline-surface-inverted relative block aspect-2/3 h-full shrink-0 snap-start snap-always overflow-hidden rounded-lg border border-t-0 has-focus-visible:outline-2 has-focus-visible:-outline-offset-2"
       >
         <a
           v-if="movie.link"
@@ -38,6 +39,7 @@
           :tabindex="activeFocusIndex === idx ? 0 : -1"
           :aria-label="`Open ${movie.title} on Letterboxd`"
           @focus="activeFocusIndex = idx"
+          @click="trackEvent('click_movie', { has_review: !!movie.review, title: movie.title })"
         />
         <img
           v-lazy="movie.cover"
@@ -58,23 +60,16 @@
           <p class="text-light/80 line-clamp-8 text-ellipsis">“{{ movie.review }}”</p>
         </div>
         <div
-          class="bg-dark/50 pointer-events-none absolute top-0 left-0 mx-auto flex w-fit flex-row items-center justify-center gap-1 rounded-br-lg px-1.5 py-1 backdrop-blur-md"
+          class="bg-surface-primary rounded-b-special border-border-primary dark:border-surface-tertiary pointer-events-none absolute inset-x-0 top-0 z-20 mx-auto flex w-fit flex-row items-center justify-center gap-1 border border-t-0 px-2.5 py-1 shadow-sm"
         >
           <Star :size="12" class="-ml-0.5 fill-amber-500" stroke-width="0" />
-          <span class="text-mono text-light">
+          <span class="text-mono text-text-primary">
             {{ movie.rating?.toFixed(1) }}
           </span>
         </div>
-        <button
-          v-if="movie.review"
-          type="button"
-          :aria-expanded="activeReviewId === movie.id"
-          :aria-label="activeReviewId === movie.id ? 'Hide review' : 'Show review'"
-          class="bg-dark/50 text-light desktop:hidden absolute top-0 right-0 z-10 flex w-fit cursor-pointer flex-row items-center justify-center gap-1 rounded-bl-lg px-1.5 py-1.5 backdrop-blur-md after:absolute after:top-1/2 after:left-1/2 after:h-12 after:w-12 after:-translate-x-1/2 after:-translate-y-1/2 after:content-['']"
-          @click.stop="toggleReview(movie.id)"
-        >
-          <TextAlignStart :size="12" />
-        </button>
+        <div
+          class="border-border-primary dark:border-surface-tertiary pointer-events-none absolute -inset-x-px top-0 z-19 h-5 rounded-t-lg border border-b-0 bg-transparent"
+        ></div>
       </div>
     </template>
 
@@ -89,10 +84,13 @@
 </template>
 
 <script setup lang="ts">
-import { OctagonAlert, Star, TextAlignStart } from '@lucide/vue'
+import { OctagonAlert, Star } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query'
 import { formatDistanceToNowStrict } from 'date-fns'
 import { onMounted, onUnmounted, ref } from 'vue'
+
+import { queryKeys } from '@/queryKeys'
+import { trackEvent } from '@/utils/analytics'
 
 import GenericLoader from '../GenericLoader.vue'
 
@@ -112,17 +110,13 @@ const { data: movies, isLoading: loading } = useQuery({
     if (!res.ok) throw new Error('Failed to fetch movies')
     return (await res.json()) as Movie[]
   },
-  queryKey: ['movies'],
+  queryKey: queryKeys.movies,
 })
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const isHovered = ref(false)
 const isInteracting = ref(false)
 const activeReviewId = ref<null | string>(null)
-
-const toggleReview = (id: string) => {
-  activeReviewId.value = activeReviewId.value === id ? null : id
-}
 
 let autoPlayInterval: null | number = null
 let interactionTimeout: null | number = null

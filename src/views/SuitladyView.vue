@@ -2740,7 +2740,7 @@ async function saveBlog(post: BlogPostRecord, close?: () => void) {
       if (moveError) throw moveError
     }
 
-    // minutes must stay > 0 (DB CHECK); collapes empty/zero back to null.
+    // minutes must stay > 0 (DB CHECK); collapse empty/zero back to null.
     const minutes = form.minutes && form.minutes > 0 ? form.minutes : null
 
     const { error } = await supabase

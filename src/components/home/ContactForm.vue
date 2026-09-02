@@ -13,7 +13,7 @@
         <button
           v-tooltip="{ content: 'write me', group: 'contact-form' }"
           class="btn inverted desktop:flex hidden"
-          @click="copyEmail"
+          @click="handleCopyEmail"
         >
           copy email
         </button>
@@ -23,7 +23,7 @@
           v-tooltip="{ content: btn.tooltip, group: 'contact-form' }"
           class="btn icon-only inverted"
           :aria-label="btn.tooltip"
-          @click="openLink(btn.link)"
+          @click="handleButtonClick(btn)"
         >
           <FA :icon="btn.logo" />
         </button>
@@ -42,6 +42,7 @@ import {
 } from '@fortawesome/free-brands-svg-icons'
 
 import { openLink } from '@/utils'
+import { trackEvent } from '@/utils/analytics'
 
 const buttons = [
   {
@@ -78,7 +79,17 @@ const buttons = [
 
 const random = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
 
-async function copyEmail(event: MouseEvent) {
+const handleButtonClick = (btn: (typeof buttons)[number]) => {
+  if (btn.id === 'reddit') {
+    trackEvent('click_rickroll', { platform: 'reddit' })
+  } else {
+    trackEvent('click_contact_link', { platform: btn.id })
+  }
+  openLink(btn.link)
+}
+
+async function handleCopyEmail(event: MouseEvent) {
+  trackEvent('copy_email')
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText('hi@psiderman.com')

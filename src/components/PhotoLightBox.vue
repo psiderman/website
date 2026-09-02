@@ -212,6 +212,7 @@ import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import { photoLightBoxData } from '@/composables/useGlobal'
 import { type ClearanceLevel, isHighClearance, useTravelsWithImages } from '@/composables/useTravel'
+import { trackEvent } from '@/utils/analytics'
 
 interface PhotoLightBoxImage {
   caption?: null | string
@@ -326,6 +327,16 @@ function goToNextTrip() {
   const target = nextTrip.value
   if (!target) return
 
+  trackEvent(
+    'trip_lightbox_action',
+    {
+      action: 'next_trip',
+      from_trip: props.currentTripSlug,
+      to_trip: target.slug,
+    },
+    { force: true },
+  )
+
   const targetImages = target.images.map((img) => ({
     caption: img.caption,
     clearance: img.clearance,
@@ -346,6 +357,14 @@ function goToNextTrip() {
 }
 
 function startOver() {
+  trackEvent(
+    'trip_lightbox_action',
+    {
+      action: 'replay',
+      trip_slug: props.currentTripSlug,
+    },
+    { force: true },
+  )
   outgoingCards.value = []
   dragX.value = 0
   dragY.value = 0
@@ -651,6 +670,14 @@ watch(isEnded, (ended) => {
     autoCloseTimer = null
   }
 
+  if (ended) {
+    trackEvent('trip_lightbox_end', {
+      count: props.images.length,
+      trip_slug: props.currentTripSlug,
+      trip_title: props.tripTitle,
+    })
+  }
+
   if (ended && props.isOpen && (!props.currentTripSlug || !nextTrip.value)) {
     if (outgoingCards.value.length > 0) {
       autoCloseTimer = window.setTimeout(() => {
@@ -673,6 +700,16 @@ const closeModal = () => {
   if (autoCloseTimer) {
     clearTimeout(autoCloseTimer)
     autoCloseTimer = null
+  }
+  if (isEnded.value) {
+    trackEvent(
+      'trip_lightbox_action',
+      {
+        action: 'close',
+        trip_slug: props.currentTripSlug,
+      },
+      { force: true },
+    )
   }
   emit('update:isOpen', false)
 }

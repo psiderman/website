@@ -1,5 +1,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 
+import { trackEvent } from '@/utils/analytics'
+
 export type Theme = 'dark' | 'light' | 'system'
 
 export const theme = ref<Theme>('system')
@@ -22,6 +24,7 @@ export const setTheme = (newTheme: Theme) => {
   theme.value = newTheme
   localStorage.setItem('theme', newTheme)
   updateTheme()
+  trackEvent('change_theme', { theme: newTheme })
 }
 
 export const initTheme = () => {

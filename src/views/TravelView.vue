@@ -222,12 +222,9 @@ import TheListIndicator from '@/components/TheListIndicator.vue'
 import TravelMap from '@/components/TravelMap.vue'
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
 import { isPhotoLightBoxOpen, openPhotoLightbox, photoLightBoxData } from '@/composables/useGlobal'
-import {
-  isHighClearance,
-  type TripWithImages,
-  useTravelsWithImages,
-} from '@/composables/useTravel'
+import { isHighClearance, type TripWithImages, useTravelsWithImages } from '@/composables/useTravel'
 import { getStorageUrl } from '@/supabase'
+import { trackEvent } from '@/utils/analytics'
 
 const { error, isLoading, travelsWithImages } = useTravelsWithImages()
 const activeTripSlug = ref<null | string>(null)
@@ -247,6 +244,7 @@ function handleTripClick(slug: string) {
   if (debounceTimer) {
     clearTimeout(debounceTimer)
   }
+  trackEvent('set_active_trip', { trip_slug: slug })
   activeTripSlug.value = slug
 
   const el = cardRefs.value[slug]

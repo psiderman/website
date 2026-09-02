@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/vue-query'
 import { format } from 'date-fns'
 
-import { getStorageUrl, supabase } from '@/supabase'
+import { queryKeys } from '@/queryKeys'
+import { ensureSession, getStorageUrl, supabase } from '@/supabase'
+import { throwIfError } from '@/utils'
 
 export type ClearanceLevel = 'admin' | 'auth' | 'close' | 'friends' | 'known' | 'public'
 
@@ -66,8 +68,7 @@ export function useTravelsWithImages() {
   } = useQuery<TripWithImages[]>({
     gcTime: 1000 * 60 * 60, // 1 hour
     queryFn: async () => {
-      // Ensure session is fresh (refreshes token if expired, or clears it for anon request)
-      await supabase.auth.getSession()
+      await ensureSession()
 
       // 1. Fetch trips joined with trip_images (RLS filters clearance automatically)
       const { data: tripsData, error: tripsError } = await supabase
@@ -75,7 +76,7 @@ export function useTravelsWithImages() {
         .select('*, trip_images(*)')
         .order('date', { ascending: false })
 
-      if (tripsError) throw tripsError
+      throwIfError(tripsError)
       if (!tripsData) return []
 
       // 2. Map trips and their images using public storage URLs
@@ -119,7 +120,7 @@ export function useTravelsWithImages() {
         }
       })
     },
-    queryKey: ['trips-with-images'],
+    queryKey: queryKeys.travel.tripsWithImages,
     staleTime: 1000 * 60 * 15, // Cache for 15 minutes
   })
 

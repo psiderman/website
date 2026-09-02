@@ -1,0 +1,29 @@
+{
+  "extends": ["stylelint-config-standard-vue"],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "theme",
+          "source",
+          "utility",
+          "variant",
+          "custom-variant",
+          "plugin",
+          "apply",
+          "reference"
+        ]
+      }
+    ],
+    "at-rule-prelude-no-invalid": null,
+    "at-rule-empty-line-before": null,
+    "declaration-empty-line-before": null,
+    "rule-empty-line-before": null,
+    "property-no-vendor-prefix": null,
+    "no-empty-source": null,
+    "selector-class-pattern": null,
+    "keyframes-name-pattern": null
+  },
+  "ignoreFiles": ["**/dist/**", "**/node_modules/**", "**/.vercel/**"]
+}

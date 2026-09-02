@@ -1,5 +1,6 @@
 import { currentUser, currentUserRole } from '@/composables/useAuth'
 import { queryClient } from '@/queryClient'
+import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
 
 import type { RealtimeChannel } from '@supabase/supabase-js'
@@ -44,7 +45,11 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'trips',
       },
       () => {
-        scheduleInvalidate(['trips', 'trips-with-images', 'admin-trips'])
+        scheduleInvalidate([
+          ...queryKeys.travel.trips,
+          ...queryKeys.travel.tripsWithImages,
+          ...queryKeys.admin.trips,
+        ])
       },
     )
     .on(
@@ -55,7 +60,11 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'blog',
       },
       () => {
-        scheduleInvalidate(['blog-posts', 'blog-post', 'blog-post-content'])
+        scheduleInvalidate([
+          ...queryKeys.blog.list,
+          ...queryKeys.blog.postBase,
+          ...queryKeys.blog.contentBase,
+        ])
       },
     )
     .on(
@@ -66,7 +75,7 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'guestbook',
       },
       () => {
-        scheduleInvalidate(['guestbook', 'admin-guestbook'])
+        scheduleInvalidate([...queryKeys.guestbook.list, ...queryKeys.admin.guestbook])
       },
     )
     .on(
@@ -77,7 +86,7 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'work_people',
       },
       () => {
-        scheduleInvalidate(['work-people', 'admin-work-people'])
+        scheduleInvalidate([...queryKeys.workPeople.list, ...queryKeys.admin.workPeople])
       },
     )
     .on(
@@ -88,7 +97,7 @@ export function initRealtimeSync(): RealtimeChannel {
         table: 'quotes',
       },
       () => {
-        scheduleInvalidate(['quotes', 'admin-quotes'])
+        scheduleInvalidate([...queryKeys.quotes, ...queryKeys.admin.quotes])
       },
     )
     .on(
@@ -105,7 +114,7 @@ export function initRealtimeSync(): RealtimeChannel {
           currentUserRole.value = record.role
           scheduleInvalidate([null])
         }
-        scheduleInvalidate(['admin-user-roles'])
+        scheduleInvalidate([...queryKeys.admin.userRoles])
       },
     )
     .subscribe((status, err) => {

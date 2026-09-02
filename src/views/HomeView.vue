@@ -187,6 +187,7 @@ import { useNow } from '@/composables/useNow'
 import { type ExtraCard, extraCards as staticExtraCards } from '@/data/extraCards'
 import { type Card, intros, cards as staticCards } from '@/data/homeCards'
 import { FILTER_GROUPS } from '@/types'
+import { trackEvent } from '@/utils/analytics'
 
 import type { FilterGroupId } from '@/types'
 
@@ -333,7 +334,8 @@ const handleTabKeydown = (event: KeyboardEvent) => {
   }
 }
 
-watch(activeFilter, async () => {
+watch(activeFilter, async (newTab) => {
+  trackEvent('switch_home_tab', { tab: newTab })
   if (settleTimeoutId) clearTimeout(settleTimeoutId)
   await nextTick()
   updateIndicator()

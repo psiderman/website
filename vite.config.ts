@@ -31,7 +31,7 @@ export default defineConfig({
             if (id.includes('mapbox-gl')) return 'vendor-mapbox'
             if (id.includes('@headlessui/vue')) return 'vendor-ui'
             if (id.match(/date-fns/)) return 'vendor-utility'
-            if (id.match(/vue|vue-router|pinia/)) return 'vendor-vue'
+            if (id.match(/vue-router|vue|pinia/)) return 'vendor-vue'
           }
         },
       },

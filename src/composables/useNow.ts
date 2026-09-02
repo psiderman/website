@@ -5,7 +5,9 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import { type NowEntry, type NowGalleryImage, parseFrontmatter } from '@/data/now'
+import { queryKeys } from '@/queryKeys'
 import { getStorageUrl, supabase } from '@/supabase'
+import { throwIfError } from '@/utils'
 
 const IMAGE_EXT = /\.(?:webp|jpg|jpeg|png)$/i
 
@@ -29,7 +31,7 @@ export function useNow() {
       const entries = await listNowBucket()
       return entries
     },
-    queryKey: ['now-entries-content'],
+    queryKey: queryKeys.now,
     staleTime: 1000 * 60 * 5, // 5 mins
   })
 
@@ -66,7 +68,7 @@ async function listNowBucket(): Promise<RemoteNowEntry[]> {
     limit: 200,
     sortBy: { column: 'name', order: 'asc' },
   })
-  if (error) throw error
+  throwIfError(error)
   if (!folders) return []
 
   const validFolders = folders.filter((folder) => !isFile(folder.name))
@@ -78,7 +80,7 @@ async function listNowBucket(): Promise<RemoteNowEntry[]> {
         limit: 200,
         sortBy: { column: 'name', order: 'asc' },
       })
-      if (filesError) throw filesError
+      throwIfError(filesError)
       if (!files || files.length === 0) return null
 
       const mdName = files.find((f) => f.name.endsWith('.md'))?.name

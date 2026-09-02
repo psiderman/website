@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
+import { queryKeys } from '@/queryKeys'
 import { openLink } from '@/utils'
 
 export interface DisplayTrack extends Omit<Track, 'duration'> {
@@ -46,7 +47,7 @@ export function useSpotify() {
       if (!res.ok) throw new Error('Failed to fetch now playing')
       return await res.json()
     },
-    queryKey: ['now-playing'],
+    queryKey: queryKeys.nowPlaying,
     refetchInterval: 30000,
     refetchOnWindowFocus: true,
   })
@@ -90,7 +91,7 @@ export function useSpotify() {
       if (!res.ok) throw new Error('Failed to fetch recently played tracks')
       return (await res.json()) as Track[]
     },
-    queryKey: ['recently-played'],
+    queryKey: queryKeys.recentlyPlayed,
   })
 
   const formatTrackDuration = (duration: number) => {

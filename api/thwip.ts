@@ -1,15 +1,12 @@
 import { Redis } from '@upstash/redis'
 
-const ALLOWED_HOSTNAMES = new Set(['127.0.0.1', 'localhost', 'psiderman.com', 'www.psiderman.com'])
+import { isAllowedRequest } from './_lib/origin.js'
 
 let cachedRedis: null | Redis = null
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function handler(req: any, res: any) {
-  // Soft browser-only gate: missing Origin (same-origin/curl) is allowed,
-  // a present Origin must be trusted. Referer is never trusted.
-  const origin = req.headers.origin ?? ''
-  if (origin && !isAllowedOrigin(origin)) {
+  if (!isAllowedRequest(req)) {
     return res.status(403).json({ error: 'Forbidden' })
   }
 
@@ -69,13 +66,4 @@ function getRedis(): Redis {
   }
 
   return cachedRedis
-}
-
-function isAllowedOrigin(origin: string | undefined): boolean {
-  if (!origin) return false
-  try {
-    return ALLOWED_HOSTNAMES.has(new URL(origin).hostname)
-  } catch {
-    return false
-  }
 }
