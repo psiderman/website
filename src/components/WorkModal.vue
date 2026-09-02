@@ -195,8 +195,7 @@
                       v-reveal="sortedPeople.length * 50"
                       class="text-ui-small text-text-tertiary mt-auto text-left"
                     >
-                      DM me if you'd like me to remove your icon, or if you want your tooltip to say
-                      anything at all!
+                      DM me if you'd like me to make changes to your picture, link, or tooltip text.
                     </p>
                   </div>
                 </div>

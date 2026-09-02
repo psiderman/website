@@ -5,11 +5,12 @@
   <div
     v-else
     :ref="setupObserver"
-    class="drawing-board group outline-surface-inverted pointer-events-auto focus-visible:outline-2 focus-visible:outline-offset-2"
+    class="drawing-board group outline-surface-inverted pointer-events-auto touch-none select-none focus-visible:outline-2 focus-visible:outline-offset-2"
   >
     <!-- Drawing Surface -->
     <svg
       class="canvas group"
+      @pointercancel="handlePointerUp"
       @pointerdown="handlePointerDown"
       @pointerleave="handlePointerUp"
       @pointermove="handlePointerMove"
@@ -272,9 +273,9 @@ function getSvgPathFromStroke(points: number[][]) {
   const outline = getStroke(points, {
     simulatePressure: false,
     size: 6,
-    smoothing: 0.7,
-    streamline: 0.3,
-    thinning: 0.5,
+    smoothing: 0.5,
+    streamline: 0.5,
+    thinning: 0,
   })
   if (!outline.length) return ''
 
@@ -524,7 +525,11 @@ onUnmounted(() => {
 @reference "@/style.css";
 
 .drawing-board {
-  @apply border-border-primary relative size-full overflow-hidden rounded-lg border;
+  @apply border-border-primary relative size-full touch-none overflow-hidden rounded-lg border select-none;
+  touch-action: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
   background: url('@/assets/patterns/dot_grid.webp');
   background-size: 2.5%;
   @apply bg-repeat;

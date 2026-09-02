@@ -570,6 +570,47 @@ CREATE POLICY "Users can update their own guestbook entries" ON public.guestbook
   USING ((( SELECT auth.uid() AS uid) = user_id))
   WITH CHECK ((( SELECT auth.uid() AS uid) = user_id));
 
+CREATE TABLE public.quotes (
+  id         uuid                     DEFAULT gen_random_uuid() NOT NULL,
+  content    text                     NOT NULL,
+  date       date                     DEFAULT CURRENT_DATE NOT NULL,
+  clearance  public.clearance_level   DEFAULT 'public'::public.clearance_level NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  title      text                     NOT NULL
+);
+
+ALTER TABLE public.quotes
+  ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.quotes
+  ADD CONSTRAINT quotes_pkey PRIMARY KEY (id);
+
+GRANT ALL ON public.quotes TO anon;
+
+GRANT ALL ON public.quotes TO authenticated;
+
+GRANT ALL ON public.quotes TO service_role;
+
+CREATE TRIGGER set_quotes_updated_at
+  BEFORE UPDATE ON public.quotes
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE POLICY "Admins can manage quotes" ON public.quotes
+  TO authenticated
+  USING ((( SELECT public.get_my_role() AS get_my_role) = 'admin'::text))
+  WITH CHECK ((( SELECT public.get_my_role() AS get_my_role) = 'admin'::text));
+
+CREATE POLICY "Allow select quotes based on clearance" ON public.quotes
+  FOR SELECT
+  USING ((public.has_clearance(( SELECT auth.uid() AS uid), clearance) OR (( SELECT public.get_my_role() AS get_my_role) = 'admin'::text)));
+
+CREATE POLICY "Service role full access on quotes" ON public.quotes
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
 CREATE TABLE public.trip_images (
   id                uuid                     DEFAULT gen_random_uuid() NOT NULL,
   storage_object_id uuid,
@@ -605,13 +646,13 @@ GRANT ALL ON public.trip_images TO authenticated;
 
 GRANT ALL ON public.trip_images TO service_role;
 
-CREATE INDEX trip_images_storage_object_id_idx ON public.trip_images (storage_object_id);
-
-CREATE INDEX idx_trip_images_trip_slug ON public.trip_images (trip_slug);
+CREATE INDEX trip_images_trip_slug_idx ON public.trip_images (trip_slug, sort_order);
 
 CREATE INDEX idx_trip_images_date_taken ON public.trip_images (date_taken);
 
-CREATE INDEX trip_images_trip_slug_idx ON public.trip_images (trip_slug, sort_order);
+CREATE INDEX idx_trip_images_trip_slug ON public.trip_images (trip_slug);
+
+CREATE INDEX trip_images_storage_object_id_idx ON public.trip_images (storage_object_id);
 
 CREATE TRIGGER set_trip_images_updated_at
   BEFORE UPDATE ON public.trip_images

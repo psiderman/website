@@ -62,6 +62,7 @@
               @click="openWorkModal(block.org_id)"
             >
               <ArrowUpRight
+                v-if="block.clickable"
                 :size="16"
                 class="text-border-high-contrast pointer-events-none absolute top-2 right-2"
               />
