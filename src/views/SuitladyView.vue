@@ -1474,7 +1474,6 @@ import {
 } from '@lucide/vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { format } from 'date-fns'
-import { getStroke } from 'perfect-freehand'
 import { computed, reactive, ref, watch } from 'vue'
 
 import TheListIndicator from '@/components/TheListIndicator.vue'
@@ -1483,6 +1482,7 @@ import { activePresenceUsers, useLive } from '@/composables/useLive'
 import { type ClearanceLevel, isHighClearance, sortTripImages } from '@/composables/useTravel'
 import { workHistory } from '@/data/work'
 import { getStorageUrl, supabase } from '@/supabase'
+import { getStrokeBounds, getStrokePath } from '@/utils/drawing'
 
 interface UserRoleRecord {
   avatar_url?: string
@@ -2580,30 +2580,9 @@ function formatBlogDate(dateStr: null | string) {
 }
 
 function getDrawingViewBox(strokes: number[][][]) {
-  if (!strokes.length) return undefined
-  let minX = Infinity
-  let minY = Infinity
-  let maxX = -Infinity
-  let maxY = -Infinity
-  for (const stroke of strokes) {
-    for (const pt of stroke) {
-      if (pt && pt.length >= 2) {
-        if (pt[0] < minX) minX = pt[0]
-        if (pt[1] < minY) minY = pt[1]
-        if (pt[0] > maxX) maxX = pt[0]
-        if (pt[1] > maxY) maxY = pt[1]
-      }
-    }
-  }
-  if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
-    return undefined
-  }
-  const padding = 16
-  const x = minX - padding
-  const y = minY - padding
-  const w = Math.max(1, maxX - minX + padding * 2)
-  const h = Math.max(1, maxY - minY + padding * 2)
-  return `${x} ${y} ${w} ${h}`
+  const b = getStrokeBounds(strokes)
+  if (!b) return undefined
+  return `${b.minX} ${b.minY} ${b.w} ${b.h}`
 }
 
 function getEditBlogForm(post: BlogPostRecord): BlogForm {
@@ -2622,26 +2601,11 @@ function getEditBlogForm(post: BlogPostRecord): BlogForm {
 }
 
 function getSvgPathFromStroke(points: number[][]) {
-  if (!points?.length) return ''
-  const outline = getStroke(points, {
-    simulatePressure: false,
-    size: 6,
+  return getStrokePath(points, {
     smoothing: 0.7,
     streamline: 0.3,
     thinning: 0.5,
   })
-  if (!outline.length) return ''
-
-  const d = outline.reduce(
-    (acc, [x0, y0], i, arr) => {
-      const [x1, y1] = arr[(i + 1) % arr.length]
-      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
-      return acc
-    },
-    ['M', ...outline[0], 'Q'],
-  )
-  d.push('Z')
-  return d.join(' ')
 }
 
 async function hasBlogFile(path: string): Promise<boolean> {
