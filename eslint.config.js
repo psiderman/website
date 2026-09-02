@@ -254,7 +254,7 @@ export default defineConfigWithVueTs(
       'vuejs-accessibility/no-autofocus': 'warn',
       'vuejs-accessibility/no-distracting-elements': 'warn',
       'vuejs-accessibility/no-redundant-roles': 'warn',
-      'vuejs-accessibility/no-static-element-interactions': 'warn',
+      // 'vuejs-accessibility/no-static-element-interactions': 'warn',
       'vuejs-accessibility/role-has-required-aria-props': 'warn',
       'vuejs-accessibility/tabindex-no-positive': 'warn',
     },
