@@ -97,12 +97,9 @@ function rebuildSingleton(groupId: string) {
     entry.singleton.setInstances(arr)
   } else if (arr.length >= 2) {
     entry.singleton = createSingleton(arr, {
-      allowHTML: false,
-      appendTo: () => document.body,
-      delay: [100, 0],
+      ...BASE_PROPS,
       moveTransition: 'transform 0.15s ease-out',
       overrides: ['content', 'placement', 'allowHTML'],
-      theme: 'tippy-small',
     })
   }
 }
