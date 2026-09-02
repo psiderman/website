@@ -229,7 +229,7 @@ function handleThwipComplete() {
       },
       { force: true },
     )
-  }, 1500)
+  }, 2500)
 }
 
 async function persistThwipDelta(delta: number) {

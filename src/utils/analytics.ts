@@ -21,6 +21,12 @@ export interface TrackOptions {
 
 const sessionTrackedEvents = new Set<string>()
 
+let pendingIdentify: null | string = null
+const pendingTracks: Array<{ eventName: string; payload: Record<string, unknown> }> = []
+let flushTimer: null | number = null
+let flushAttempts = 0
+const MAX_FLUSH_ATTEMPTS = 20 // 20 * 250ms = 5s max
+
 if (typeof window !== 'undefined') {
   try {
     const saved = sessionStorage.getItem('umami_tracked_events')
@@ -38,8 +44,13 @@ if (typeof window !== 'undefined') {
  */
 export function identifyUser(userId?: string) {
   const uid = userId ?? currentUser.value?.id
-  if (typeof window !== 'undefined' && window.umami?.identify && uid) {
+  if (typeof window === 'undefined' || !uid) return
+
+  if (window.umami?.identify) {
     window.umami.identify({ userId: uid })
+  } else {
+    pendingIdentify = uid
+    ensureFlushLoop()
   }
 }
 
@@ -72,6 +83,46 @@ export function trackEvent(
 
   if (window.umami?.track) {
     window.umami.track(eventName, payload)
+  } else {
+    pendingTracks.push({ eventName, payload })
+    ensureFlushLoop()
+  }
+}
+
+function ensureFlushLoop() {
+  if (typeof window === 'undefined' || flushTimer !== null) return
+
+  flushAttempts = 0
+  flushTimer = window.setInterval(() => {
+    flushAttempts += 1
+    flushQueues()
+  }, 250)
+}
+
+function flushQueues() {
+  if (typeof window === 'undefined') return
+
+  const hasSdk = typeof window.umami?.track === 'function'
+  const hasIdentifySdk = typeof window.umami?.identify === 'function'
+
+  if (hasSdk) {
+    if (pendingIdentify && hasIdentifySdk) {
+      window.umami!.identify!({ userId: pendingIdentify })
+      pendingIdentify = null
+    }
+    while (pendingTracks.length > 0) {
+      const item = pendingTracks.shift()
+      if (item) {
+        window.umami!.track!(item.eventName, item.payload)
+      }
+    }
+  }
+
+  if ((!pendingIdentify && pendingTracks.length === 0) || flushAttempts >= MAX_FLUSH_ATTEMPTS) {
+    if (flushTimer !== null) {
+      clearInterval(flushTimer)
+      flushTimer = null
+    }
   }
 }
 
