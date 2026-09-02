@@ -151,6 +151,7 @@
 
                   <select
                     v-model="pendingRoles[user.user_id]"
+                    aria-label="Change user clearance role"
                     class="absolute inset-0 size-full cursor-pointer opacity-0"
                     @click.stop
                     @change="saveRole(user)"
@@ -244,6 +245,7 @@
                             v-if="person.linkedin"
                             :href="person.linkedin"
                             target="_blank"
+                            :aria-label="`${person.name} LinkedIn profile`"
                             @click.stop
                           >
                             <ExternalLink :size="12" class="text-text-tertiary" />
@@ -376,6 +378,7 @@
                       v-tooltip="{ content: 'Instagram' }"
                       :href="trip.instagram_link"
                       target="_blank"
+                      :aria-label="`${trip.title} Instagram`"
                       class="text-text-secondary hover:text-text-primary flex size-6 items-center justify-center"
                       @click.stop
                     >
@@ -388,6 +391,7 @@
                       v-tooltip="{ content: 'Maps' }"
                       :href="trip.maps_list_link"
                       target="_blank"
+                      :aria-label="`${trip.title} Maps`"
                       class="text-text-secondary hover:text-text-primary flex size-6 items-center justify-center"
                       @click.stop
                     >
@@ -465,8 +469,11 @@
                     </label>
                   </div>
 
-                  <div
-                    class="bg-surface-primary border-border-primary -mt-2 flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2 select-none"
+                  <button
+                    type="button"
+                    role="switch"
+                    :aria-checked="getEditTripForm(trip).repeat_visit"
+                    class="bg-surface-primary border-border-primary -mt-2 flex h-10.5 w-full cursor-pointer items-center justify-between rounded-xl border px-3 py-2 text-left select-none"
                     @click="
                       getEditTripForm(trip).repeat_visit = !getEditTripForm(trip).repeat_visit
                     "
@@ -487,7 +494,7 @@
                         "
                       />
                     </div>
-                  </div>
+                  </button>
 
                   <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
                     <span class="pl-1.5">Description (one line per paragraph)</span>
@@ -726,6 +733,7 @@
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   class="text-text-tertiary hover:text-text-primary shrink-0 transition-colors"
+                                  aria-label="Open location in Google Maps"
                                   title="Open in Google Maps"
                                 >
                                   <ExternalLink :size="14" />
@@ -952,8 +960,11 @@
                     </label>
                   </div>
 
-                  <div
-                    class="bg-surface-primary border-border-primary -mt-2 flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2 select-none"
+                  <button
+                    type="button"
+                    role="switch"
+                    :aria-checked="getEditBlogForm(post).is_active"
+                    class="bg-surface-primary border-border-primary -mt-2 flex h-10.5 w-full cursor-pointer items-center justify-between rounded-xl border px-3 py-2 text-left select-none"
                     @click="getEditBlogForm(post).is_active = !getEditBlogForm(post).is_active"
                   >
                     <span class="text-ui text-text-primary">Is Active</span>
@@ -972,7 +983,7 @@
                         "
                       />
                     </div>
-                  </div>
+                  </button>
 
                   <div class="flex items-center justify-between gap-2 pt-2">
                     <div class="flex gap-2">
@@ -1049,6 +1060,7 @@
 
                       <select
                         v-model="getEditQuoteForm(quote).clearance"
+                        aria-label="Change quote clearance level"
                         class="absolute inset-0 size-full cursor-pointer opacity-0"
                         @click.stop
                         @change="saveQuoteClearance(quote)"
