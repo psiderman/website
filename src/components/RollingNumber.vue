@@ -1,6 +1,6 @@
 <template>
   <span class="inline-flex items-center tabular-nums">
-    <span class="sr-only">{{ value !== null && value !== undefined ? value : '...' }}</span>
+    <span class="sr-only">{{ formattedValue !== '' ? formattedValue : '...' }}</span>
     <span v-if="value === null || value === undefined" aria-hidden="true">...</span>
     <span v-else aria-hidden="true" class="inline-flex items-baseline overflow-hidden">
       <span
@@ -27,9 +27,23 @@ const props = defineProps<{
 
 const isInitialized = ref(false)
 
+const formattedValue = computed(() => {
+  if (props.value === null || props.value === undefined) return ''
+  if (typeof props.value === 'number') {
+    return props.value.toLocaleString()
+  }
+  if (typeof props.value === 'string') {
+    const num = Number(props.value)
+    if (!Number.isNaN(num) && props.value.trim() !== '') {
+      return num.toLocaleString()
+    }
+  }
+  return String(props.value)
+})
+
 const digits = computed(() => {
   if (props.value === null || props.value === undefined) return []
-  const str = String(props.value)
+  const str = formattedValue.value
   const len = str.length
   return str.split('').map((char, index) => ({
     char,
