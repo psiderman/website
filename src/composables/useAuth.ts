@@ -4,7 +4,7 @@ import { isAuthModalOpen, openAuthModal } from '@/composables/useGlobal'
 import { forceSignOut, queryClient } from '@/queryClient'
 import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
-import { identifyUser } from '@/utils/analytics'
+import { clearIdentify, identifyUser } from '@/utils/analytics'
 
 import type { User } from '@supabase/supabase-js'
 
@@ -20,6 +20,7 @@ export const isAdmin = computed(() => currentUserRole.value === 'admin')
 // Sign out and wipe all cached query data (incl. localStorage persistence)
 // so the next user never sees this user's trips, travel images, etc.
 export async function signOut() {
+  clearIdentify()
   await forceSignOut()
   currentUser.value = null
   currentUserRole.value = null

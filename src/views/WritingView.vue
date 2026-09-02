@@ -152,7 +152,7 @@ import { CloudAlert, Ghost, Lock } from '@lucide/vue'
 import { format } from 'date-fns'
 import DOMPurify from 'dompurify'
 import { marked } from 'marked'
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 
 import GenericLoader from '@/components/GenericLoader.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
@@ -179,28 +179,49 @@ type QuoteWithReveal = Quote & {
 type WritingFeedItem = PostWithReveal | QuoteWithReveal
 
 const viewedFragmentIds = new Set<string>()
+const fragmentElementMap = new WeakMap<Element, QuoteWithReveal>()
+
+let sharedFragmentObserver: IntersectionObserver | null = null
+
+function getFragmentObserver() {
+  if (typeof window === 'undefined') return null
+  if (!sharedFragmentObserver) {
+    sharedFragmentObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const item = fragmentElementMap.get(entry.target)
+            if (item && !viewedFragmentIds.has(item.id)) {
+              viewedFragmentIds.add(item.id)
+              trackEvent('view_fragment', {
+                fragment_id: item.id,
+                title: item.title || 'untitled',
+              })
+            }
+            sharedFragmentObserver?.unobserve(entry.target)
+            fragmentElementMap.delete(entry.target)
+          }
+        }
+      },
+      { rootMargin: '0px 0px 20% 0px' },
+    )
+  }
+  return sharedFragmentObserver
+}
 
 function observeFragment(el: unknown, item: QuoteWithReveal) {
   if (!el || !(el instanceof HTMLElement) || viewedFragmentIds.has(item.id)) return
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0]?.isIntersecting) {
-        if (!viewedFragmentIds.has(item.id)) {
-          viewedFragmentIds.add(item.id)
-          trackEvent('view_fragment', {
-            fragment_id: item.id,
-            title: item.title || 'untitled',
-          })
-        }
-        observer.disconnect()
-      }
-    },
-    { rootMargin: '0px 0px 20% 0px' },
-  )
-
-  observer.observe(el)
+  fragmentElementMap.set(el, item)
+  getFragmentObserver()?.observe(el)
 }
+
+onBeforeUnmount(() => {
+  if (sharedFragmentObserver) {
+    sharedFragmentObserver.disconnect()
+    sharedFragmentObserver = null
+  }
+})
 
 function renderMarkdown(raw: string) {
   if (!raw) return ''

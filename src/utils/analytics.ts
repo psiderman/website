@@ -22,7 +22,12 @@ export interface TrackOptions {
 const sessionTrackedEvents = new Set<string>()
 
 let pendingIdentify: null | string = null
-const pendingTracks: Array<{ eventName: string; payload: Record<string, unknown> }> = []
+const pendingTracks: Array<{
+  dedupKey: string
+  eventName: string
+  isForce: boolean
+  payload: Record<string, unknown>
+}> = []
 let flushTimer: null | number = null
 let flushAttempts = 0
 const MAX_FLUSH_ATTEMPTS = 20 // 20 * 250ms = 5s max
@@ -37,6 +42,13 @@ if (typeof window !== 'undefined') {
   } catch {
     // ignore storage errors
   }
+}
+
+/**
+ * Clears pending identification state.
+ */
+export function clearIdentify() {
+  pendingIdentify = null
 }
 
 /**
@@ -73,18 +85,19 @@ export function trackEvent(
     return
   }
 
-  sessionTrackedEvents.add(dedupKey)
-  persistTrackedEvents()
-
   const payload: Record<string, unknown> = { ...data }
   if (currentUser.value?.id) {
     payload.userId = currentUser.value.id
   }
 
   if (window.umami?.track) {
+    if (!isForce) {
+      sessionTrackedEvents.add(dedupKey)
+      persistTrackedEvents()
+    }
     window.umami.track(eventName, payload)
   } else {
-    pendingTracks.push({ eventName, payload })
+    pendingTracks.push({ dedupKey, eventName, isForce, payload })
     ensureFlushLoop()
   }
 }
@@ -113,9 +126,13 @@ function flushQueues() {
     while (pendingTracks.length > 0) {
       const item = pendingTracks.shift()
       if (item) {
+        if (!item.isForce) {
+          sessionTrackedEvents.add(item.dedupKey)
+        }
         window.umami!.track!(item.eventName, item.payload)
       }
     }
+    persistTrackedEvents()
   }
 
   if ((!pendingIdentify && pendingTracks.length === 0) || flushAttempts >= MAX_FLUSH_ATTEMPTS) {
