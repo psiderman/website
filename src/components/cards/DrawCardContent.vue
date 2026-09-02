@@ -148,13 +148,13 @@ const visibleBgPointIndex = ref(0)
 import { FastForward, MousePointer2, Repeat, Save, Trash2 } from '@lucide/vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { format } from 'date-fns'
-import { getStroke } from 'perfect-freehand'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
 import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
 import { trackEvent } from '@/utils/analytics'
+import { getStrokeBounds, getStrokePath } from '@/utils/drawing'
 
 import GenericLoader from '../GenericLoader.vue'
 
@@ -282,26 +282,11 @@ function clearStrokes() {
 }
 
 function getSvgPathFromStroke(points: number[][]) {
-  if (!points.length) return ''
-  const outline = getStroke(points, {
-    simulatePressure: false,
-    size: 6,
+  return getStrokePath(points, {
     smoothing: 0.5,
     streamline: 0.5,
     thinning: 0,
   })
-  if (!outline.length) return ''
-
-  const d = outline.reduce(
-    (acc, [x0, y0], i, arr) => {
-      const [x1, y1] = arr[(i + 1) % arr.length]
-      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
-      return acc
-    },
-    ['M', ...outline[0], 'Q'],
-  )
-  d.push('Z')
-  return d.join(' ')
 }
 
 function handleKeyDown(e: KeyboardEvent) {
@@ -479,31 +464,11 @@ const bgTransform = computed(() => {
   const cH = containerHeight.value
   if (!cW || !cH) return undefined
 
-  let minX = Infinity
-  let minY = Infinity
-  let maxX = -Infinity
-  let maxY = -Infinity
-
-  for (const stroke of backgroundStrokes.value) {
-    for (const pt of stroke) {
-      if (pt && pt.length >= 2) {
-        const x = pt[0]
-        const y = pt[1]
-        if (x < minX) minX = x
-        if (y < minY) minY = y
-        if (x > maxX) maxX = x
-        if (y > maxY) maxY = y
-      }
-    }
-  }
-
-  if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
-    return undefined
-  }
+  const bounds = getStrokeBounds(backgroundStrokes.value, 16)
+  if (!bounds) return undefined
 
   const padding = 16
-  const drawingW = Math.max(1, maxX - minX + padding * 2)
-  const drawingH = Math.max(1, maxY - minY + padding * 2)
+  const { h: drawingH, maxX, maxY, minX, minY, w: drawingW } = bounds
 
   const scale = Math.min(1, cW / drawingW, cH / drawingH)
 
