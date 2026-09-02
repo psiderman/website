@@ -1475,11 +1475,11 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { format } from 'date-fns'
 import { getStroke } from 'perfect-freehand'
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import { isAdmin } from '@/composables/useAuth'
-import { type PresenceUser } from '@/composables/useLive'
+import { activePresenceUsers, useLive } from '@/composables/useLive'
 import { type ClearanceLevel, isHighClearance, sortTripImages } from '@/composables/useTravel'
 import { workHistory } from '@/data/work'
 import { getStorageUrl, supabase } from '@/supabase'
@@ -1527,31 +1527,10 @@ const pendingRoles = reactive<Record<string, ClearanceLevel>>({})
 // ----------------------------------------------------
 // LIVE VISITORS — read the public presence room without tracking ourselves.
 // ----------------------------------------------------
-const liveVisitors = ref<PresenceUser[]>([])
-let liveChannel: null | ReturnType<typeof supabase.channel> = null
-
-function subscribeLiveVisitors() {
-  if (liveChannel) return
-  liveChannel = supabase.channel('live:site')
-  liveChannel
-    .on('presence', { event: 'sync' }, () => {
-      if (!liveChannel) return
-      const state = liveChannel.presenceState()
-      const users: PresenceUser[] = []
-      for (const id in state) {
-        const presences = state[id] as unknown as PresenceUser[]
-        if (presences.length > 0) users.push(presences[0])
-      }
-      liveVisitors.value = users.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-    })
-    .subscribe()
-}
-
-onMounted(subscribeLiveVisitors)
-onUnmounted(() => {
-  liveChannel?.unsubscribe()
-  liveChannel = null
-})
+useLive()
+const liveVisitors = computed(() =>
+  [...activePresenceUsers.value].sort((a, b) => (a.name || '').localeCompare(b.name || '')),
+)
 
 // ----------------------------------------------------
 // PAGE VIEWS — click a user to see their browsing history.
@@ -1703,8 +1682,8 @@ const roleBadgeClasses: Record<ClearanceLevel, string> = {
   admin: 'bg-red-500 dark:bg-red-400',
   auth: 'bg-yellow-500 dark:bg-yellow-400',
   close: 'bg-green-500 dark:bg-green-400',
-  friends: 'bg-purple-500 dark:purple-400',
-  known: 'bg-blue-500 dark:blue-400',
+  friends: 'bg-purple-500 dark:bg-purple-400',
+  known: 'bg-blue-500 dark:bg-blue-400',
   public: 'bg-dark',
 }
 
