@@ -234,6 +234,7 @@ import { format } from 'date-fns'
 import DOMPurify from 'dompurify'
 import { computed, nextTick, ref, watch } from 'vue'
 
+import { queryKeys } from '@/queryKeys'
 import { getStorageUrl, supabase } from '@/supabase'
 
 import type { WorkDetail, WorkPerson } from '@/data/work'
@@ -340,7 +341,7 @@ const { data: peopleData } = useQuery({
     if (error) throw error
     return data as WorkPerson[]
   },
-  queryKey: ['work-people', activeOrgId],
+  queryKey: queryKeys.workPeople.byOrg(activeOrgId),
 })
 
 const sortedPeople = computed(() => {

@@ -1,6 +1,7 @@
 <template>
   <div
     ref="scrollContainer"
+    tab
     class="bg-surface-primary noscrollbar relative flex size-full snap-x snap-mandatory flex-row gap-2 overflow-x-auto scroll-smooth"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
@@ -9,6 +10,8 @@
     @scroll="handleInteraction"
     @keydown.right.prevent="focusSibling(1)"
     @keydown.left.prevent="focusSibling(-1)"
+    @focus="isHovered = true"
+    @blur="isHovered = true"
   >
     <div
       v-if="loading"
@@ -58,10 +61,10 @@
           <p class="text-light/80 line-clamp-8 text-ellipsis">“{{ movie.review }}”</p>
         </div>
         <div
-          class="bg-dark/50 pointer-events-none absolute top-0 left-0 mx-auto flex w-fit flex-row items-center justify-center gap-1 rounded-br-lg px-1.5 py-1 backdrop-blur-md"
+          class="bg-surface-primary rounded-b-special pointer-events-none absolute inset-x-0 top-0 mx-auto flex w-fit flex-row items-center justify-center gap-1 px-2.5 py-1 backdrop-blur-md"
         >
           <Star :size="12" class="-ml-0.5 fill-amber-500" stroke-width="0" />
-          <span class="text-mono text-light">
+          <span class="text-mono text-text-primary">
             {{ movie.rating?.toFixed(1) }}
           </span>
         </div>
@@ -94,6 +97,8 @@ import { useQuery } from '@tanstack/vue-query'
 import { formatDistanceToNowStrict } from 'date-fns'
 import { onMounted, onUnmounted, ref } from 'vue'
 
+import { queryKeys } from '@/queryKeys'
+
 import GenericLoader from '../GenericLoader.vue'
 
 interface Movie {
@@ -112,7 +117,7 @@ const { data: movies, isLoading: loading } = useQuery({
     if (!res.ok) throw new Error('Failed to fetch movies')
     return (await res.json()) as Movie[]
   },
-  queryKey: ['movies'],
+  queryKey: queryKeys.movies,
 })
 
 const scrollContainer = ref<HTMLElement | null>(null)

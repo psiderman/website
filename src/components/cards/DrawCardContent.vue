@@ -141,6 +141,7 @@ import { getStroke } from 'perfect-freehand'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
+import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
 
 import GenericLoader from '../GenericLoader.vue'
@@ -242,7 +243,7 @@ const { data: latestDrawing, isLoading } = useQuery({
 
     return data
   },
-  queryKey: ['guestbook', 'latest'],
+  queryKey: queryKeys.guestbook.latest,
 })
 
 const backgroundStrokes = computed(() => {
@@ -380,7 +381,7 @@ const {
     resetSaveState()
     visibleBgStrokeIndex.value = 0
     visibleBgPointIndex.value = 0
-    await queryClient.invalidateQueries({ queryKey: ['guestbook', 'latest'] })
+    await queryClient.invalidateQueries({ queryKey: queryKeys.guestbook.latest })
     startAnimation()
   },
 })

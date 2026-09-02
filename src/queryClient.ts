@@ -1,6 +1,7 @@
 import { experimental_createQueryPersister } from '@tanstack/query-persist-client-core'
 import { QueryCache, QueryClient } from '@tanstack/vue-query'
 
+import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
 
 const PERSIST_PREFIX = 'tanstack-query'
@@ -9,7 +10,13 @@ const PERSIST_PREFIX = 'tanstack-query'
 // on one of these means the session is genuinely dead — sign out. Errors on
 // public queries (home cards, movies, now, spotify, guestbook) must NOT log
 // the user out, since those can fail transiently while a session is fine.
-const AUTH_SCOPED_PREFIXES = ['trips', 'trip-images', 'trips-with-images', 'admin', 'admin-blog']
+const AUTH_SCOPED_PREFIXES = [
+  queryKeys.travel.trips[0],
+  queryKeys.travel.tripImages[0],
+  queryKeys.travel.tripsWithImages[0],
+  'admin', // generic prefix matching every admin-* key
+  queryKeys.admin.blog[0],
+]
 
 // Queries whose results depend on the signed-in user (clearance-gated trips,
 // blog listing + gated markdown, now page). These must never be written to
@@ -17,11 +24,11 @@ const AUTH_SCOPED_PREFIXES = ['trips', 'trip-images', 'trips-with-images', 'admi
 // user's gated data without re-checking auth.
 const SENSITIVE_PREFIXES = [
   ...AUTH_SCOPED_PREFIXES,
-  'blog-posts',
-  'blog-post',
-  'blog-post-content',
-  'quotes',
-  'thwips',
+  queryKeys.blog.list[0],
+  queryKeys.blog.postBase[0],
+  queryKeys.blog.contentBase[0],
+  queryKeys.quotes[0],
+  queryKeys.thwips[0],
 ]
 
 function isAdminKey(key: string): boolean {
@@ -93,16 +100,7 @@ function isAuthScoped(key: readonly unknown[]): boolean {
 }
 
 // Set immediate fetch / no caching for all admin queries
-const adminKeys = [
-  ['admin-user-roles'],
-  ['admin-work-people'],
-  ['admin-trips'],
-  ['admin-images'],
-  ['admin-guestbook'],
-  ['admin-blog'],
-  ['admin-quotes'],
-  ['admin-user-page-views'],
-]
+const adminKeys = Object.values(queryKeys.admin)
 
 adminKeys.forEach((key) => {
   queryClient.setQueryDefaults(key, {

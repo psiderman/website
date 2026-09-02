@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 
 import { isAuthModalOpen, openAuthModal } from '@/composables/useGlobal'
 import { forceSignOut, queryClient } from '@/queryClient'
+import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
 
 import type { User } from '@supabase/supabase-js'
@@ -116,12 +117,12 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
   }
 
   // Invalidate travel & images cache globally on auth state changes
-  queryClient.invalidateQueries({ queryKey: ['trips-with-images'] })
-  queryClient.invalidateQueries({ queryKey: ['trip-images'] })
+  queryClient.invalidateQueries({ queryKey: queryKeys.travel.tripsWithImages })
+  queryClient.invalidateQueries({ queryKey: queryKeys.travel.tripImages })
   // Also refresh blog listing + post content (including gated posts whose
   // access changed once a user logs in or out).
-  queryClient.invalidateQueries({ queryKey: ['blog-posts'] })
-  queryClient.invalidateQueries({ queryKey: ['blog-post'] })
-  queryClient.invalidateQueries({ queryKey: ['blog-post-content'] })
-  queryClient.invalidateQueries({ queryKey: ['quotes'] })
+  queryClient.invalidateQueries({ queryKey: queryKeys.blog.list })
+  queryClient.invalidateQueries({ queryKey: queryKeys.blog.postBase })
+  queryClient.invalidateQueries({ queryKey: queryKeys.blog.contentBase })
+  queryClient.invalidateQueries({ queryKey: queryKeys.quotes })
 })

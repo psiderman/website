@@ -120,6 +120,7 @@ import RollingNumber from '@/components/RollingNumber.vue'
 import ThwipAchievementModal from '@/components/ThwipAchievementModal.vue'
 import WebStrand from '@/components/WebStrand.vue'
 import { getEasterEggEmail, getEasterEggQuips } from '@/data/thwipEasterEgg'
+import { queryKeys } from '@/queryKeys'
 
 // ==========================================
 // TIMING CONFIGURATION (edit values here)
@@ -171,7 +172,7 @@ const { data: thwipData } = useQuery<{ count: number }>({
     if (!res.ok) throw new Error(`Failed to fetch thwips: ${res.status}`)
     return res.json()
   },
-  queryKey: ['thwips'],
+  queryKey: queryKeys.thwips,
   staleTime: 0,
 })
 
