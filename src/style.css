@@ -521,6 +521,8 @@
     }
 
     & blockquote {
+      @apply text-p desktop:text-p-large;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply pl-4;
       @apply border-border-high-contrast border-l;
 
@@ -530,6 +532,8 @@
     }
 
     & ul {
+      @apply text-p desktop:text-p-large;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply mb-10 list-disc pl-6;
 
       & li:has(input[type='checkbox']) {
@@ -557,6 +561,8 @@
     }
 
     & ol {
+      @apply text-p desktop:text-p-large;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply list-decimal pl-6;
 
       & p {
@@ -565,10 +571,14 @@
     }
 
     & li {
+      @apply text-p desktop:text-p-large;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply my-1;
     }
 
     & pre {
+      @apply text-p desktop:text-p-large;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply bg-surface-tertiary;
       @apply rounded-lg p-4 px-8;
       @apply mb-10 overflow-scroll;
@@ -579,10 +589,14 @@
     }
 
     & a {
+      @apply text-p desktop:text-p-large;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply text-blue-700 underline visited:text-purple-700 dark:text-blue-600 dark:visited:text-purple-600;
     }
 
     & table {
+      @apply text-p desktop:text-p-large;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply bg-surface-primary my-10 w-full border-collapse overflow-hidden rounded-lg text-left;
 
       & th,
@@ -609,10 +623,14 @@
     }
 
     & em {
+      @apply text-p desktop:text-p-large;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply italic;
     }
 
     & del {
+      @apply text-p desktop:text-p-large;
+      @apply tracking-17 desktop:tracking-19 desktop:leading-19 leading-17;
       @apply text-text-tertiary line-through;
     }
   }

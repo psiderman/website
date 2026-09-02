@@ -1,6 +1,0 @@
-{
-  "*.{js,mjs,cjs,ts,mts,cts,tsx,vue}": ["eslint --fix", "prettier --write"],
-  "*.{css,vue}": ["stylelint --fix"],
-  "*.{json,md,yml,yaml}": ["prettier --write"],
-  "*.{js,mjs,cjs,ts,mts,cts,tsx,vue,json,md,yml,yaml,css}": ["cspell --no-must-find-files"]
-}
