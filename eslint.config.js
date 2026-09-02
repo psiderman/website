@@ -247,7 +247,14 @@ export default defineConfigWithVueTs(
       'vuejs-accessibility/heading-has-content': 'warn',
       'vuejs-accessibility/iframe-has-title': 'warn',
       'vuejs-accessibility/interactive-supports-focus': 'warn',
-      'vuejs-accessibility/label-has-for': 'warn',
+      'vuejs-accessibility/label-has-for': [
+        'warn',
+        {
+          required: {
+            some: ['nesting', 'id'],
+          },
+        },
+      ],
       'vuejs-accessibility/media-has-caption': 'warn',
       // 'vuejs-accessibility/mouse-events-have-key-events': 'warn',
       'vuejs-accessibility/no-access-key': 'warn',
