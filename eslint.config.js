@@ -249,7 +249,7 @@ export default defineConfigWithVueTs(
       'vuejs-accessibility/interactive-supports-focus': 'warn',
       'vuejs-accessibility/label-has-for': 'warn',
       'vuejs-accessibility/media-has-caption': 'warn',
-      'vuejs-accessibility/mouse-events-have-key-events': 'warn',
+      // 'vuejs-accessibility/mouse-events-have-key-events': 'warn',
       'vuejs-accessibility/no-access-key': 'warn',
       'vuejs-accessibility/no-autofocus': 'warn',
       'vuejs-accessibility/no-distracting-elements': 'warn',

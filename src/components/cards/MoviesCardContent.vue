@@ -1,5 +1,4 @@
 <template>
-  <!-- eslint-disable-next-line vuejs-accessibility/mouse-events-have-key-events -->
   <div
     ref="scrollContainer"
     class="bg-surface-primary noscrollbar relative flex size-full snap-x snap-mandatory flex-row gap-2 overflow-x-auto scroll-smooth"

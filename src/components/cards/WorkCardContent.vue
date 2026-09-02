@@ -6,9 +6,9 @@
   >
     <template v-if="careerData.length > 0">
       <!-- Gridlines -->
-      <div class="absolute z-0 flex w-full flex-col gap-1.5 px-10 py-12">
+      <div class="desktop:px-10 absolute z-0 flex w-full flex-col gap-1.5 px-0 py-12">
         <!-- Top Gridlines -->
-        <div class="absolute inset-x-10 -mt-10.5 flex h-fit flex-col gap-1.5">
+        <div class="desktop:inset-x-10 absolute inset-x-0 -mt-10.5 flex h-fit flex-col gap-1.5">
           <div v-for="tick in timelineData.topPaddingTicks" :key="tick.id" class="relative w-full">
             <div class="tick" :class="tick.widthClass"></div>
             <div
@@ -33,7 +33,7 @@
 
         <!-- Bottom Gridlines -->
         <!-- change bottom-1.5 if you change py-12 above. -->
-        <div class="absolute inset-x-10 bottom-1.5 flex h-fit flex-col gap-1.5">
+        <div class="desktop:inset-x-10 absolute inset-x-0 bottom-1.5 flex h-fit flex-col gap-1.5">
           <div
             v-for="tick in timelineData.bottomPaddingTicks"
             :key="tick.id"
@@ -45,7 +45,9 @@
       </div>
 
       <!-- Blocks -->
-      <div class="absolute z-10 -mt-px flex w-full flex-col px-10 py-10.5 pl-20">
+      <div
+        class="desktop:px-10 desktop:pl-20 absolute z-10 -mt-px flex w-full flex-col px-2 py-10.5 pl-12"
+      >
         <div
           v-for="(block, idx) in timelineData.blocks"
           :key="`${block.org}-${block.startDate}`"
@@ -91,12 +93,14 @@
 
       <!-- Today Indicator -->
       <div class="pointer-events-none absolute inset-0 z-20">
-        <div class="absolute top-10 right-6 left-9 h-0.75 bg-red-500 dark:bg-red-600">
+        <div
+          class="desktop:left-9 desktop:right-6 absolute top-10 right-4 left-0 h-0.75 bg-red-500 dark:bg-red-600"
+        >
           <div
             class="absolute left-0 -mt-0.75 -ml-1 size-2.25 rounded-full bg-red-500 dark:bg-red-600"
           ></div>
           <div
-            class="text-ui-small text-surface-secondary dark:text-dark absolute right-0 -mt-1.75 -mr-4 h-4.25 w-8 rounded-full bg-red-500 text-center dark:bg-red-600"
+            class="text-ui-small text-surface-secondary dark:text-dark desktop:rounded-r-full absolute right-0 -mt-1.75 -mr-4 h-4.25 w-8 rounded-full rounded-r-none bg-red-500 text-center dark:bg-red-600"
           >
             now
           </div>

@@ -47,21 +47,21 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
   travel: [
     {
       carousel: true,
-      images: Array.from({ length: 15 }, (_, i) =>
-        getStorageUrl('webp', 'japan_film', `${i + 1}.webp`),
-      ),
-      lightbox: true,
-      size: 'md',
-      title: 'japan on film',
-    },
-    {
-      carousel: true,
       images: Array.from({ length: 8 }, (_, i) =>
         getStorageUrl('webp', 'dad_paris', `${i + 1}.webp`),
       ),
       lightbox: true,
       size: 'md',
       title: 'dad in paris (25 yrs later)',
+    },
+    {
+      carousel: true,
+      images: Array.from({ length: 15 }, (_, i) =>
+        getStorageUrl('webp', 'japan_film', `${i + 1}.webp`),
+      ),
+      lightbox: true,
+      size: 'md',
+      title: 'japan on film',
     },
   ],
   work: [

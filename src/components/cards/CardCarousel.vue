@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-surface-secondary relative size-full rounded-lg"
+    class="bg-dark relative size-full rounded-lg"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
@@ -27,13 +27,14 @@
       <div
         v-for="(img, idx) in images"
         :key="`${img}-${idx}`"
-        class="size-full shrink-0 snap-center"
+        class="relative size-full shrink-0 snap-center"
         :class="{ 'cursor-pointer': props.interactive, 'pointer-events-none': !props.interactive }"
         @click.stop="props.interactive && emit('click-image', idx)"
+        @keypress.enter="props.interactive && emit('click-image', idx)"
       >
         <img
           v-lazy="img"
-          class="size-full object-cover"
+          class="size-full object-contain"
           :alt="title ? `${title} ${idx + 1}` : `Image ${idx + 1}`"
           width="300"
           height="500"

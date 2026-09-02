@@ -25,7 +25,6 @@
       </span>
     </div>
 
-    <!-- eslint-disable-next-line vuejs-accessibility/mouse-events-have-key-events -->
     <button
       v-tooltip="tooltipConfig"
       type="button"

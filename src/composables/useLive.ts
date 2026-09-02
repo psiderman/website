@@ -222,7 +222,7 @@ watch(
 
 // Global reactive state
 const hasOtherUsersOnRoom = ref(false)
-const activePresenceUsers = ref<PresenceUser[]>([])
+export const activePresenceUsers = ref<PresenceUser[]>([])
 const cursors = ref<Record<string, CursorData>>({})
 const touches = ref<Record<string, TouchData>>({})
 const windowWidth = ref(window.innerWidth)

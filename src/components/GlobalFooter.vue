@@ -21,7 +21,7 @@
 
     <!-- Footer Links -->
     <div class="text-ui flex flex-col items-center justify-center gap-4">
-      <div class="flex w-full flex-row items-center justify-center gap-3">
+      <div class="desktop:gap-3 flex w-full flex-row flex-wrap items-center justify-center gap-0">
         <router-link
           v-reveal="150"
           to="/terms"
@@ -49,7 +49,7 @@
           v-tooltip="'scroll down'"
           href="https://www.youtube.com/watch?v=6P65Y-q-ht4"
           target="_blank"
-          class="inline-flex items-center tabular-nums"
+          class="ml-2 inline-block items-center tabular-nums"
           >thwips:&nbsp;<RollingNumber :value="thwips"
         /></a>
       </div>

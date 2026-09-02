@@ -4,7 +4,7 @@
       class="desktop:p-20 desktop:gap-6 flex flex-col items-center justify-center gap-2 rounded-xl bg-gray-950 p-6 py-12 dark:bg-zinc-950"
     >
       <div class="flex flex-col gap-0 text-center">
-        <span class="text-ui text-text-tertiary">come say hi</span>
+        <span class="text-ui text-text-tertiary">have smth to say?</span>
         <p class="desktop:text-display text-h1 text-light">
           hi<span class="font-sans leading-14">@</span>psiderman.com
         </p>
