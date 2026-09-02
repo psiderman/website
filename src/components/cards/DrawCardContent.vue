@@ -53,19 +53,30 @@
       by {{ backgroundArtist }}
     </div>
 
-    <!-- Background Animation Controls (Fast Forward) -->
+    <!-- Background Animation Controls (Fast Forward / Replay) -->
     <div
-      v-if="strokes.length === 0 && currentStroke.length === 0 && isDrawingAnimating"
+      v-if="strokes.length === 0 && currentStroke.length === 0 && backgroundStrokes.length > 0"
       class="pointer-events-auto absolute top-0 right-0 z-20 flex flex-row gap-1 p-1"
     >
       <button
-        v-tooltip="'Skip Animation'"
-        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
-        title="Skip Animation"
-        aria-label="Skip Animation"
+        v-if="isDrawingAnimating"
+        v-tooltip="'Skip animation'"
+        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
+        title="Skip animation"
+        aria-label="Skip animation"
         @click.stop.prevent="skipAnimation"
       >
         <FastForward :size="16" stroke-width="0" class="fill-text-primary" />
+      </button>
+      <button
+        v-else
+        v-tooltip="'Replay animation'"
+        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
+        title="Replay animation"
+        aria-label="Replay animation"
+        @click.stop.prevent="replayAnimation"
+      >
+        <Repeat :size="16" />
       </button>
     </div>
 
@@ -76,17 +87,17 @@
     >
       <button
         v-tooltip="'Clear Drawing'"
-        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
+        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
         title="Clear Drawing"
         aria-label="Clear Drawing"
         @click.stop.prevent="clearStrokes"
       >
-        <X :size="16" />
+        <Trash2 :size="16" />
       </button>
 
       <button
         v-tooltip="'Save Drawing'"
-        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
+        class="bg-surface-secondary/80 hover:bg-surface-tertiary text-text-primary z-10 flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors"
         :class="{
           'animate-pulse cursor-not-allowed opacity-50': isSaving,
           'text-green-600 dark:text-green-500': isSaved && !hasUnsavedChanges,
@@ -96,7 +107,7 @@
         aria-label="Save Drawing"
         @click.stop.prevent="saveDrawing"
       >
-        <Check :size="16" />
+        <Save :size="16" />
       </button>
     </div>
 
@@ -134,7 +145,7 @@ const visibleBgPointIndex = ref(0)
 </script>
 
 <script setup lang="ts">
-import { Check, FastForward, MousePointer2, X } from '@lucide/vue'
+import { FastForward, MousePointer2, Repeat, Save, Trash2 } from '@lucide/vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { format } from 'date-fns'
 import { getStroke } from 'perfect-freehand'
@@ -441,6 +452,14 @@ const isDrawingAnimating = computed(() => {
     visibleBgStrokeIndex.value < backgroundStrokes.value.length
   )
 })
+
+function replayAnimation() {
+  stopAnimation()
+  visibleBgStrokeIndex.value = 0
+  visibleBgPointIndex.value = 0
+  trackEvent('draw_replay_animation')
+  startAnimation()
+}
 
 function skipAnimation() {
   stopAnimation()
