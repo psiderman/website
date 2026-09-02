@@ -1,25 +1,17 @@
 <template>
   <div class="flex w-full flex-col gap-0">
     <div class="desktop:h-[calc(100svh-80px)] flex h-svh flex-col">
-      <!-- Loading State -->
-      <div
-        v-if="isLoading"
-        class="max-w-container mx-auto flex size-full items-center justify-center"
-      >
-        <GenericLoader />
-      </div>
-
-      <!-- Error State -->
-      <div
-        v-else-if="error"
-        class="max-w-container bg-surface-secondary mx-auto flex size-full items-center justify-center"
-      >
-        <p class="text-mono text-text-tertiary">Error loading travels.</p>
-      </div>
+      <!-- Loading and Error State -->
+      <DataState
+        :loading="isLoading"
+        :error="!!error"
+        error-label="Error loading travels."
+        wrapper-class="max-w-container mx-auto size-full"
+      />
 
       <!-- Main Layout -->
       <div
-        v-else
+        v-if="!isLoading && !error"
         id="mapbox-bounds"
         class="desktop:grid desktop:px-0 desktop:grid-cols-[1fr_min(40%,400px)_min(60%,1020px)_1fr] noscrollbar border-border-primary relative z-0 size-full gap-8 overflow-hidden border-t"
       >
@@ -217,9 +209,9 @@
 import { Pin, Repeat, RepeatOff } from '@lucide/vue'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import GenericLoader from '@/components/GenericLoader.vue'
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import TravelMap from '@/components/TravelMap.vue'
+import DataState from '@/components/ui/DataState.vue'
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
 import { isPhotoLightBoxOpen, openPhotoLightbox, photoLightBoxData } from '@/composables/useGlobal'
 import { isHighClearance, type TripWithImages, useTravelsWithImages } from '@/composables/useTravel'

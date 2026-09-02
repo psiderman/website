@@ -2,39 +2,28 @@
   <div class="max-w-container flex w-full flex-col gap-0">
     <div class="desktop:px-20 flex flex-col px-4">
       <div class="flex min-h-[calc(100svh-5rem)] flex-col gap-20 py-20">
-        <div class="text-p mx-auto -mb-12 w-full max-w-prose">
-          <h1 v-reveal class="text-display text-left">words</h1>
+        <div class="text-p mx-auto w-full max-w-prose text-left">
+          <h1 v-reveal class="text-display w-fit">words</h1>
         </div>
 
         <div v-if="isLoading" class="text-p mx-auto -mb-12 w-full max-w-prose">
           <div class="bg-surface-secondary h-10 w-full rounded-xl"></div>
         </div>
 
-        <div
-          v-if="isLoading"
-          class="bg-surface-secondary text-p mx-auto flex w-full max-w-prose grow items-center justify-center rounded-xl"
-        >
-          <GenericLoader />
-        </div>
-
-        <div
-          v-else-if="error"
-          class="bg-surface-secondary text-p mx-auto flex w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
-        >
-          <CloudAlert :size="32" class="text-text-tertiary" />
-          <p class="text-mono text-text-tertiary">Error loading writing.</p>
-        </div>
-
-        <div
-          v-else-if="!hasItems"
+        <DataState
+          :loading="isLoading"
+          :error="!!error"
+          error-label="Error loading writing."
+          :empty="!hasItems"
+          empty-label="nothing published yet."
           data-sync="empty-posts"
-          class="bg-surface-secondary text-p mx-auto flex w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
-        >
-          <Ghost :size="32" class="text-text-tertiary" />
-          <p class="text-mono text-text-tertiary">nothing published yet.</p>
-        </div>
+          wrapper-class="text-p mx-auto w-full max-w-prose grow"
+        />
 
-        <div v-else class="text-p mx-auto flex w-full max-w-prose grow flex-col gap-12">
+        <div
+          v-if="!isLoading && !error && hasItems"
+          class="text-p mx-auto -mt-16 flex w-full max-w-prose grow flex-col gap-12"
+        >
           <TabGroup
             :selected-index="selectedTabIndex"
             as="div"
@@ -45,13 +34,12 @@
               <SegmentedTabs :options="tabOptions" :selected-index="selectedTabIndex" />
             </div>
 
-            <div
+            <DataState
               v-if="itemsByYear.length === 0"
-              class="bg-surface-secondary flex w-full grow flex-col items-center justify-center gap-4 rounded-xl py-16"
-            >
-              <Ghost :size="32" class="text-text-tertiary" />
-              <p class="text-mono text-text-tertiary">{{ emptyMessage }}</p>
-            </div>
+              :empty="true"
+              :empty-label="emptyMessage"
+              wrapper-class="w-full grow py-16"
+            />
 
             <div v-else class="flex flex-col gap-24">
               <div v-for="group in itemsByYear" :key="group.year" class="flex flex-col gap-12">
@@ -140,24 +128,24 @@
             </div>
           </TabGroup>
         </div>
-        <ContactForm />
       </div>
     </div>
+    <ContactForm />
   </div>
 </template>
 
 <script setup lang="ts">
 import { TabGroup } from '@headlessui/vue'
-import { CloudAlert, Ghost, Lock } from '@lucide/vue'
+import { Lock } from '@lucide/vue'
 import { format } from 'date-fns'
 import DOMPurify from 'dompurify'
 import { marked } from 'marked'
 import { computed, onBeforeUnmount, ref } from 'vue'
 
-import GenericLoader from '@/components/GenericLoader.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
 import SegmentedTabs, { type TabOption } from '@/components/SegmentedTabs.vue'
 import TheListIndicator from '@/components/TheListIndicator.vue'
+import DataState from '@/components/ui/DataState.vue'
 import { useBlogPosts } from '@/composables/useBlog'
 import { useQuotes } from '@/composables/useQuotes'
 import { isHighClearance } from '@/composables/useTravel'

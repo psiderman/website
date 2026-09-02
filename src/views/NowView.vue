@@ -12,31 +12,20 @@
           </h1>
         </div>
 
-        <div
-          v-if="isLoading"
-          class="bg-surface-secondary text-p mx-auto flex w-full max-w-prose grow items-center justify-center rounded-xl"
-        >
-          <GenericLoader />
-        </div>
-
-        <div
-          v-else-if="error"
-          class="bg-surface-secondary text-p mx-auto flex w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
-        >
-          <CloudAlert :size="32" class="text-text-tertiary" />
-          <p class="text-mono text-text-tertiary">Error loading now page.</p>
-        </div>
-
-        <div
-          v-else-if="!nowEntries || nowEntries.length === 0"
+        <DataState
+          :loading="isLoading"
+          :error="!!error"
+          error-label="Error loading now page."
+          :empty="!nowEntries || nowEntries.length === 0"
+          empty-label="nothing published yet."
           data-sync="empty-now"
-          class="bg-surface-secondary text-p mx-auto flex w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl"
-        >
-          <Ghost :size="32" class="text-text-tertiary" />
-          <p class="text-mono text-text-tertiary">nothing published yet.</p>
-        </div>
+          wrapper-class="text-p mx-auto w-full max-w-prose grow"
+        />
 
-        <div v-else class="flex flex-col">
+        <div
+          v-if="!isLoading && !error && nowEntries && nowEntries.length > 0"
+          class="flex flex-col"
+        >
           <section
             v-for="(entry, eId) in nowEntries"
             :key="entry.date"
@@ -89,13 +78,12 @@
 </template>
 
 <script setup lang="ts">
-import { CloudAlert, Ghost } from '@lucide/vue'
 import { format, parse } from 'date-fns'
 import DOMPurify from 'dompurify'
 import { marked } from 'marked'
 
-import GenericLoader from '@/components/GenericLoader.vue'
 import ContactForm from '@/components/home/ContactForm.vue'
+import DataState from '@/components/ui/DataState.vue'
 import { openPhotoLightbox } from '@/composables/useGlobal'
 import { useNow } from '@/composables/useNow'
 

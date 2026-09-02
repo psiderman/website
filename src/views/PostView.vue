@@ -5,7 +5,7 @@
         <div
           v-reveal
           data-sync="post-breadcrumbs"
-          class="text-p mx-auto -mb-20 flex w-full max-w-prose flex-row items-center justify-start gap-2"
+          class="text-p mx-auto flex w-full max-w-prose flex-row items-center justify-start gap-2"
         >
           <router-link to="/" class="breadcrumb text-ui main">home</router-link>
           <ChevronRight class="text-text-secondary" :size="16" />
@@ -16,52 +16,48 @@
           </template>
         </div>
 
+        <DataState
+          v-if="isLoading || isNotFound || error"
+          :loading="isLoading"
+          :error="!!error"
+          error-label="Error loading post."
+          :error-icon="FileExclamationPoint"
+          :empty="isNotFound"
+          empty-label="The post you're trying to find doesn't exist."
+          :empty-icon="FileX"
+          wrapper-class="text-p mx-auto w-full max-w-prose grow"
+        />
+
+        <!-- Login / clearance required to read this post -->
         <div
-          v-if="isLoading || isNotFound || error || content?.access === 'denied'"
-          :data-sync="content?.access === 'denied' ? 'post-denied' : undefined"
+          v-else-if="content?.access === 'denied'"
+          data-sync="post-denied"
           class="bg-surface-secondary text-p mx-auto mt-10 flex min-h-120 w-full max-w-prose grow flex-col items-center justify-center gap-4 rounded-xl p-10 text-center"
         >
-          <GenericLoader v-if="isLoading" />
-
-          <template v-else-if="isNotFound">
-            <FileX :size="32" class="text-text-tertiary" />
-            <p class="text-mono text-text-tertiary">
-              The post you're trying to find doesn't exist.
-            </p>
-          </template>
-
-          <template v-else-if="error">
-            <FileExclamationPoint :size="32" class="text-text-tertiary" />
-            <p class="text-mono text-text-tertiary">Error loading post.</p>
-          </template>
-
-          <!-- Login / clearance required to read this post -->
-          <template v-else-if="content?.access === 'denied'">
-            <Lock
-              :size="32"
-              aria-hidden="true"
-              class="text-text-tertiary dark:text-light dark:opacity-50"
-            />
-            <h2 class="text-h2">{{ post?.title }}</h2>
-            <p class="text-p text-text-tertiary max-w-sm text-center text-balance">
-              {{
-                currentUser
-                  ? 'this post isn’t public yet. if you think you should have access, DM me.'
-                  : 'log in to see if you have access.'
-              }}
-            </p>
-            <button
-              v-if="!currentUser"
-              class="btn primary mt-8"
-              type="button"
-              @click="isAuthModalOpen = true"
-            >
-              Log in
-            </button>
-            <router-link v-else to="/words" class="btn primary mt-8">
-              <ArrowLeft :size="16" /> Back to words
-            </router-link>
-          </template>
+          <Lock
+            :size="32"
+            aria-hidden="true"
+            class="text-text-tertiary dark:text-light dark:opacity-50"
+          />
+          <h2 class="text-h2">{{ post?.title }}</h2>
+          <p class="text-p text-text-tertiary max-w-sm text-center text-balance">
+            {{
+              currentUser
+                ? 'this post isn’t public yet. if you think you should have access, DM me.'
+                : 'log in to see if you have access.'
+            }}
+          </p>
+          <button
+            v-if="!currentUser"
+            class="btn primary mt-8"
+            type="button"
+            @click="isAuthModalOpen = true"
+          >
+            Log in
+          </button>
+          <router-link v-else to="/words" class="btn primary mt-8">
+            <ArrowLeft :size="16" /> Back to words
+          </router-link>
         </div>
 
         <!-- Render parsed markdown -->
@@ -84,7 +80,7 @@ import { marked } from 'marked'
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-import GenericLoader from '@/components/GenericLoader.vue'
+import DataState from '@/components/ui/DataState.vue'
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
 import { useBlogPost } from '@/composables/useBlog'
 
