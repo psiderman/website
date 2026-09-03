@@ -6,6 +6,31 @@ import { supabase } from '@/supabase'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 let syncChannel: null | RealtimeChannel = null
+let retryTimer: null | ReturnType<typeof setTimeout> = null
+let attempts = 0
+let warnedDegrade = false
+
+const MAX_RETRIES = 10
+const MAX_BACKOFF_MS = 30_000
+
+// Capped exponential backoff: 1s, 2s, 4s ... 30s. After MAX_RETRIES the
+// channel idles — the site works fine without realtime and we stop burning
+// cycles on an unreachable socket.
+const backoffMs = () => Math.min(1000 * 2 ** attempts, MAX_BACKOFF_MS)
+
+const scheduleRetry = () => {
+  if (attempts >= MAX_RETRIES) return
+  attempts++
+  if (retryTimer) clearTimeout(retryTimer)
+  retryTimer = setTimeout(() => {
+    retryTimer = null
+    if (syncChannel) {
+      syncChannel.unsubscribe()
+      syncChannel = null
+    }
+    syncChannel = buildSyncChannel()
+  }, backoffMs())
+}
 
 // Coalesce bursts of realtime events into a single refetch per key, so e.g. an
 // admin renaming 15 trips doesn't fire 15 cache invalidations. `null` marks a
@@ -34,6 +59,11 @@ const scheduleInvalidate = (keys: Array<null | string>) => {
 
 export function initRealtimeSync(): RealtimeChannel {
   if (syncChannel) return syncChannel
+  syncChannel = buildSyncChannel()
+  return syncChannel
+}
+
+function buildSyncChannel(): RealtimeChannel {
 
   syncChannel = supabase
     .channel('public-db-changes')
@@ -118,8 +148,19 @@ export function initRealtimeSync(): RealtimeChannel {
       },
     )
     .subscribe((status, err) => {
-      if (status === 'SUBSCRIBED') return
-      console.warn('[realtime] channel not subscribed:', status, err?.message ?? '')
+      if (status === 'SUBSCRIBED') {
+        attempts = 0
+        return
+      }
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+        // Degrade silently — the site is fully functional without realtime.
+        // Log the drop once per session; retries stay quiet.
+        if (!warnedDegrade) {
+          warnedDegrade = true
+          console.warn('[realtime] channel degraded:', status, err?.message ?? '')
+        }
+        scheduleRetry()
+      }
     })
 
   return syncChannel

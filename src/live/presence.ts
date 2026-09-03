@@ -20,6 +20,26 @@ import { cursors, type PresenceUser, touches } from './state'
 const LIVE_ROOM = 'live:site'
 
 export let channel: null | ReturnType<typeof supabase.channel> = null
+let retryTimer: null | ReturnType<typeof setTimeout> = null
+let attempts = 0
+let warnedDegrade = false
+
+const MAX_RETRIES = 10
+const MAX_BACKOFF_MS = 30_000
+
+const backoffMs = () => Math.min(1000 * 2 ** attempts, MAX_BACKOFF_MS)
+
+const scheduleJoinRetry = () => {
+  if (!global.allowMultiplayer.value) return
+  if (attempts >= MAX_RETRIES) return
+  attempts++
+  if (retryTimer) clearTimeout(retryTimer)
+  retryTimer = setTimeout(() => {
+    retryTimer = null
+    // Re-join is idempotent: joinRoom() leaves any half-open channel first.
+    joinRoom()
+  }, backoffMs())
+}
 
 export const hasOtherUsersOnRoom = ref(false)
 export const activePresenceUsers = ref<PresenceUser[]>([])
@@ -157,12 +177,27 @@ export function joinRoom() {
     })
     .subscribe((status) => {
       if (status === 'SUBSCRIBED' && global.allowMultiplayer.value) {
+        attempts = 0
         sendPresence(userColor.value)
+        return
+      }
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+        // Degrade silently — visitors simply stop appearing until the socket
+        // recovers. Log the drop once per session; retries stay quiet.
+        if (!warnedDegrade) {
+          warnedDegrade = true
+          console.warn('[live] presence channel degraded:', status)
+        }
+        scheduleJoinRetry()
       }
     })
 }
 
 export function leaveRoom() {
+  if (retryTimer) {
+    clearTimeout(retryTimer)
+    retryTimer = null
+  }
   if (channel) {
     channel.untrack()
     channel.unsubscribe()
