@@ -13,9 +13,9 @@
   <div class="bg-overlay absolute inset-0 flex h-svh flex-col items-center justify-center p-20">
     <div class="font-handwriting text-ui z-10 flex flex-col items-end font-normal">
       <div v-reveal class="-mx-6 flex items-start gap-1.5">
-        <img src="@/assets/svg/lyric_mark.svg" class="mt-1.5 size-5" />
+        <img src="@/assets/svg/lyric_mark.svg" class="mt-1.5 size-5" alt="“" />
         <p class="text-light text-display font-bold">I've been lost</p>
-        <img src="@/assets/svg/lyric_mark.svg" class="mt-1.5 size-5 rotate-180" />
+        <img src="@/assets/svg/lyric_mark.svg" class="mt-1.5 size-5 rotate-180" alt="”" />
       </div>
 
       <p

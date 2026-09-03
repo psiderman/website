@@ -16,6 +16,7 @@
         : 'bg-red-500 outline-4 outline-red-500/25 dark:bg-red-700 dark:outline-red-500/35'
     "
     @click="openLightbox"
+    @keydown.enter="openLightbox"
   >
     <Star v-if="isHighClearance(clearance)" :size="10" fill="#fff" stroke-width="0" />
   </div>

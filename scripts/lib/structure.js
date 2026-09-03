@@ -24,7 +24,7 @@ export function analyzeTripStructure(dirPath) {
   const nonPvtSubdirs = subdirs.filter((s) => s !== 'pvt')
   const isMulti =
     nonPvtSubdirs.length > 1 ||
-    (nonPvtSubdirs.length === 1 && /^\d{2}_\d{2}_/i.test(nonPvtSubdirs[0]))
+    (nonPvtSubdirs.length === 1 && /^\d{2}_\d{2}_/.test(nonPvtSubdirs[0]))
 
   if (isMulti) {
     const trips = []

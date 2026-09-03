@@ -1,6 +1,7 @@
 <template>
   <div class="avatar-stack flex flex-row items-center gap-0">
     <a
+      v-if="!global.allowMultiplayer.value"
       v-tooltip="{
         content: 'Wilson',
         group: 'header-avatars',
@@ -11,14 +12,12 @@
       class="rounded-full"
     >
       <div
-        v-if="!global.allowMultiplayer.value"
         v-reveal
         class="avatar outline-background relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-200 outline-4 dark:bg-zinc-200"
       >
         <img
           src="@/assets/svg/wilson.svg"
-          alt=""
-          aria-hidden="true"
+          alt="wilson the volleyball"
           class="z-10 size-9"
           width="36"
           height="36"
@@ -48,6 +47,7 @@
           class="bg-surface-tertiary absolute inset-0 size-full rounded-full object-cover"
           width="160"
           height="160"
+          :alt="user.name"
         />
         <span v-else class="text-sm font-semibold">
           {{ getInitial(user.name) }}
