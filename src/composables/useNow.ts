@@ -84,7 +84,8 @@ async function listNowBucket(): Promise<RemoteNowEntry[]> {
       if (!files || files.length === 0) return null
 
       const mdName = files.find((f) => f.name.endsWith('.md'))?.name
-      const parsed = mdName ? parseFrontmatter(await fetchNowFile(`${slug}/${mdName}`)) : null
+      if (!mdName) return null
+      const parsed = parseFrontmatter(await fetchNowFile(`${slug}/${mdName}`))
 
       const images: NowGalleryImage[] = files
         .filter((f) => IMAGE_EXT.test(f.name))
