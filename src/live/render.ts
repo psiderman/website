@@ -12,6 +12,7 @@ import {
   cursors,
   isHomeView,
   LIVE_CONFIG,
+  presenceTick,
   reactiveNow,
   scrollY,
   touches,
@@ -64,22 +65,22 @@ export const sortedPresenceUsers = computed(() => {
       const touch = touches.value[u.id]
 
       const cursorStale = cursor
-        ? reactiveNow.value - cursor.updatedAt > LIVE_CONFIG.USER_STALE_MS
+        ? presenceTick.value - cursor.updatedAt > LIVE_CONFIG.USER_STALE_MS
         : true
       const touchStale = touch
-        ? reactiveNow.value - touch.timestamp > LIVE_CONFIG.USER_STALE_MS
+        ? presenceTick.value - touch.timestamp > LIVE_CONFIG.USER_STALE_MS
         : true
       const isStale = isLocal ? false : cursorStale && touchStale
       return { ...u, isStale }
     })
+    // Stable order: local user first, then others in arrival order. Staleness
+    // is reflected via opacity only, never by reordering — otherwise the
+    // avatar row (and the header buttons beside it) shuffle every second as
+    // users cross the staleness boundary.
     .sort((a, b) => {
       if (a.id === activeUserId.value) return -1
       if (b.id === activeUserId.value) return 1
-
-      if (a.isStale && !b.isStale) return 1
-      if (!a.isStale && b.isStale) return -1
-
-      return a.id.localeCompare(b.id)
+      return 0
     })
 })
 

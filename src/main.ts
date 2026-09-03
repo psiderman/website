@@ -38,6 +38,8 @@ if (import.meta.env.PROD && ['psiderman.com'].includes(window.location.hostname)
       'Failed to fetch dynamically imported module',
       'Unable to preload CSS',
       'AbortError: Lock broken',
+      /ResizeObserver loop/,
+      /Java object is gone/,
     ],
     integrations: [Sentry.browserTracingIntegration({ router }), Sentry.replayIntegration()],
     replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.

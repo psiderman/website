@@ -26,13 +26,22 @@ import {
 let resizeObserver: null | ResizeObserver = null
 const activeWatchers: (() => void)[] = []
 
-const startLiveSession = () => {
-  isMobile.value = window.matchMedia('(pointer: coarse)').matches
-  updateBoxRects()
+const setupResizeObserver = () => {
+  if (resizeObserver || typeof ResizeObserver === 'undefined') return
   resizeObserver = new ResizeObserver(() => {
     updateBoxRects()
   })
   resizeObserver.observe(document.body)
+}
+
+const teardownResizeObserver = () => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
+}
+
+const startLiveSession = () => {
+  isMobile.value = window.matchMedia('(pointer: coarse)').matches
+  updateBoxRects()
 
   window.addEventListener('resize', handleResize)
   window.addEventListener('scroll', handleScroll, { passive: true })
@@ -40,6 +49,8 @@ const startLiveSession = () => {
   window.addEventListener('touchstart', handleTouchStart, { passive: true })
 
   joinRoom()
+
+  if (global.allowMultiplayer.value) setupResizeObserver()
 
   // Keep the presence route fresh without rejoining the single site room.
   activeWatchers.push(
@@ -56,8 +67,14 @@ const startLiveSession = () => {
     watch(
       () => global.allowMultiplayer.value,
       (allow) => {
-        if (allow) joinRoom()
-        else leaveRoom()
+        if (allow) {
+          joinRoom()
+          setupResizeObserver()
+          updateBoxRects()
+        } else {
+          leaveRoom()
+          teardownResizeObserver()
+        }
       },
     ),
   )
@@ -80,9 +97,7 @@ const stopLiveSession = () => {
   activeWatchers.length = 0
 
   leaveRoom()
-
-  resizeObserver?.disconnect()
-  resizeObserver = null
+  teardownResizeObserver()
 }
 
 export const toggleMultiplayer = () => {

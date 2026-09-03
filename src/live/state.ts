@@ -70,6 +70,10 @@ export const scrollY = ref(window.scrollY)
 export const boxRects = ref(new Map<string, BoxRect>())
 export const isMobile = ref(false)
 export const reactiveNow = ref(Date.now())
+// Long-period tick for presence staleness. Pushed forward at most every
+// USER_STALE_MS so the avatar row (and the header around it) doesn't
+// re-render every second — staleness is cosmetic-only and flips slowly.
+export const presenceTick = ref(Date.now())
 
 let pruningInterval: null | ReturnType<typeof setInterval> = null
 
@@ -78,6 +82,9 @@ export function startStalePruning() {
   pruningInterval = setInterval(() => {
     const now = Date.now()
     reactiveNow.value = now
+    if (now - presenceTick.value > LIVE_CONFIG.USER_STALE_MS) {
+      presenceTick.value = now
+    }
 
     // Cleanup stale cursors completely after timeout
     for (const id in cursors.value) {

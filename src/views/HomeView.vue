@@ -269,6 +269,12 @@ const updateIndicator = () => {
 
 let resizeObserver: null | ResizeObserver = null
 let settleTimeoutId: null | ReturnType<typeof setTimeout> = null
+// rAF-guard: coalesce all resize notifications in a frame into a single
+// indicator pass. Running the sync layout reads/writes here would otherwise
+// feed straight back into the observer (the label-width transition resizes
+// the tabs every frame), tripping "ResizeObserver loop limit exceeded".
+let rafScheduled = false
+let scheduleIndicatorUpdate = () => {}
 
 onMounted(() => {
   nextTick(() => {
@@ -278,13 +284,19 @@ onMounted(() => {
 
   const tabContainerEl = getHtmlElement(tabContainerRef.value)
   if (tabContainerEl && typeof ResizeObserver !== 'undefined') {
-    resizeObserver = new ResizeObserver(() => {
+    const run = () => {
+      rafScheduled = false
       updateIndicator()
-    })
+    }
+    scheduleIndicatorUpdate = () => {
+      if (rafScheduled) return
+      rafScheduled = true
+      window.requestAnimationFrame(run)
+    }
+    resizeObserver = new ResizeObserver(scheduleIndicatorUpdate)
+    // Observe the container only — button sizes are derived from it, so
+    // watching each tab individually only multiplies the churn.
     resizeObserver.observe(tabContainerEl)
-    Object.values(tabRefs.value).forEach((el) => {
-      if (el) resizeObserver?.observe(el)
-    })
   }
 })
 
@@ -292,6 +304,7 @@ onUnmounted(() => {
   if (settleTimeoutId) clearTimeout(settleTimeoutId)
   window.removeEventListener('resize', updateIndicator)
   resizeObserver?.disconnect()
+  scheduleIndicatorUpdate = () => {}
 })
 
 const route = useRoute()

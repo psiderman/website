@@ -1,20 +1,30 @@
 import { type BoxRect, boxRects, isMobile, scrollY, windowWidth } from './state'
 
+let rafScheduled = false
+
 export const updateBoxRects = () => {
-  const rects = new Map<string, BoxRect>()
-  document.querySelectorAll('[data-sync]').forEach((el) => {
-    const boxId = el.getAttribute('data-sync')
-    if (boxId) {
-      const rect = el.getBoundingClientRect()
-      rects.set(boxId, {
-        height: rect.height,
-        left: rect.left + window.scrollX,
-        top: rect.top + window.scrollY,
-        width: rect.width,
-      })
-    }
+  // Coalesce bursts of size changes into a single per-frame pass — otherwise
+  // the overlay's coords churn on every lazy-image load / font swap / tab
+  // transition, which also feeds the ResizeObserver loop.
+  if (rafScheduled) return
+  rafScheduled = true
+  window.requestAnimationFrame(() => {
+    rafScheduled = false
+    const rects = new Map<string, BoxRect>()
+    document.querySelectorAll('[data-sync]').forEach((el) => {
+      const boxId = el.getAttribute('data-sync')
+      if (boxId) {
+        const rect = el.getBoundingClientRect()
+        rects.set(boxId, {
+          height: rect.height,
+          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY,
+          width: rect.width,
+        })
+      }
+    })
+    boxRects.value = rects
   })
-  boxRects.value = rects
 }
 
 export const handleResize = () => {
