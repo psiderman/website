@@ -7,6 +7,7 @@ import SpotifyCardContainer from '@/components/cards/SpotifyCardContainer.vue'
 import TravelCardContent from '@/components/cards/TravelCardContent.vue'
 import WorkCardContent from '@/components/cards/WorkCardContent.vue'
 import WritingCardContent from '@/components/cards/WritingCardContent.vue'
+import { getStorageUrl } from '@/supabase'
 
 import type { FilterGroupId } from '@/types'
 
@@ -110,7 +111,7 @@ export const cards: Card[] = [
     bgClass: 'bg-amber-200 dark:bg-dark',
     group: ['building'],
     id: 'owensans',
-    imageUrl: new URL('../assets/home/owensans.webp', import.meta.url).href,
+    imageUrl: getStorageUrl('webp', 'home', 'owensans.webp'),
     link: 'https://owensans.vercel.app',
     size: 'sm',
     span: 'desktop:col-span-2 col-span-1',
@@ -121,7 +122,7 @@ export const cards: Card[] = [
     bgClass: 'bg-[#1ED760] dark:bg-linear-0 from-dark/50 to-dark/50',
     group: [],
     id: 'playlists',
-    imageUrl: new URL('../assets/home/spotify.webp', import.meta.url).href,
+    imageUrl: getStorageUrl('webp', 'home', 'spotify.webp'),
     link: 'https://links.psiderman.com/playlists',
     size: 'sm',
     span: 'desktop:col-span-2 col-span-1',
@@ -132,7 +133,7 @@ export const cards: Card[] = [
     bgClass: 'bg-orange-200 dark:bg-amber-950',
     group: ['building'],
     id: 'milestones',
-    imageUrl: new URL('../assets/home/milestones.webp', import.meta.url).href,
+    imageUrl: getStorageUrl('webp', 'home', 'milestones.webp'),
     link: 'https://milestones.psiderman.com',
     size: 'sm',
     span: 'desktop:col-span-2 col-span-1',
@@ -143,7 +144,7 @@ export const cards: Card[] = [
     bgClass: 'bg-emerald-900 dark:bg-emerald-950',
     group: ['money'],
     id: 'pf',
-    imageUrl: new URL('../assets/home/primer.webp', import.meta.url).href,
+    imageUrl: getStorageUrl('webp', 'home', 'primer.webp'),
     link: 'https://links.psiderman.com/primer',
     size: 'sm',
     span: 'desktop:col-span-2 col-span-1',
@@ -154,7 +155,7 @@ export const cards: Card[] = [
     bgClass: 'bg-rose-200 dark:bg-rose-950',
     group: ['life'],
     id: 'blr',
-    imageUrl: new URL('../assets/home/blr.webp', import.meta.url).href,
+    imageUrl: getStorageUrl('webp', 'home', 'blr.webp'),
     link: 'https://links.psiderman.com/blr',
     size: 'sm',
     span: 'desktop:col-span-2 col-span-1',
@@ -165,7 +166,7 @@ export const cards: Card[] = [
     bgClass: 'bg-blue-900 dark:bg-blue-950',
     group: ['life'],
     id: 'resume',
-    imageUrl: new URL('../assets/home/tattoo.webp', import.meta.url).href,
+    imageUrl: getStorageUrl('webp', 'home', 'tattoo.webp'),
     link: '/gaming',
     size: 'sm',
     span: 'desktop:col-span-2 col-span-1',
@@ -186,7 +187,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'what the internet people call delight, i call whimsy. we’re very short on whimsy as a species.',
       'those 5 seconds separate us from the machines, and i want you to have those 5 seconds today at least once.”',
     ],
-    cover: new URL('../assets/home/intro/building.webp', import.meta.url).href,
+    cover: getStorageUrl('webp', 'home/intro', 'building.webp'),
     title: 'the joy of building something, anything',
   },
   life: {
@@ -195,7 +196,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'i think i’ve landed on an iteration that’s here to stay. i hope you find all the little easter eggs i’ve left in here.',
       'if there is something that you’d like to see on here, let me know.”',
     ],
-    cover: new URL('../assets/home/intro/life.webp', import.meta.url).href,
+    cover: getStorageUrl('webp', 'home/intro', 'life.webp'),
     title: 'welcome to the psider-verse',
   },
   money: {
@@ -204,7 +205,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'the kind of person i am, inevitably, i tried to translate my obsession for managing your money into a product.',
       'foursight is that attempt.”',
     ],
-    cover: new URL('../assets/home/intro/money.webp', import.meta.url).href,
+    cover: getStorageUrl('webp', 'home/intro', 'money.webp'),
     title: 'on personal finance',
   },
   music: {
@@ -212,7 +213,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       '“in hindsight, taking up guitar at 14 to impress a girl wasn’t a very unique canon event. but since then, i’ve had an on again off again relationship with making covers for fun.',
       'i grew up in the mp3 era so i’ve never made a mixtape but making hyper-specific playlists is a close enough hobby.”',
     ],
-    cover: new URL('../assets/home/intro/music.webp', import.meta.url).href,
+    cover: getStorageUrl('webp', 'home/intro', 'music.webp'),
     title: 'to the beat',
   },
   travel: {
@@ -221,7 +222,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'it took me two months of solo one-bagging in south-east asia to realize i like slow travel in short bursts.',
       'travel is now part of my identity, and i try to have one flight booked in the next 6 months.”',
     ],
-    cover: new URL('../assets/home/intro/travel.webp', import.meta.url).href,
+    cover: getStorageUrl('webp', 'home/intro', 'travel.webp'),
     title: 'psiderman: far from home',
   },
   work: {
@@ -229,7 +230,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       '“my career has taken me through ed-tech, b2b saas, and fin-tech. i started out designing features, then systems, and eventually found myself designing products end-to-end.',
       'code always seemed aspirational. i don’t know about you, but today, llms make it easier to be all about the design engineering life. so i guess now i can professionally make rectangles <strong>and divs</strong>.”',
     ],
-    cover: new URL('../assets/home/intro/work.webp', import.meta.url).href,
+    cover: getStorageUrl('webp', 'home/intro', 'work.webp'),
     title: 'professional rectangle maker',
   },
 }

@@ -15,7 +15,7 @@
     </div>
     <template v-else>
       <img
-        src="@/assets/home/writing.webp"
+        v-lazy="getStorageUrl('webp', 'home', 'writing.webp')"
         alt="a picture of me writing on a desk"
         class="size-full object-cover"
       />
@@ -34,6 +34,7 @@ import { computed } from 'vue'
 
 import { useBlogPosts } from '@/composables/useBlog'
 import { useQuotes } from '@/composables/useQuotes'
+import { getStorageUrl } from '@/supabase'
 
 import GenericLoader from '../GenericLoader.vue'
 
