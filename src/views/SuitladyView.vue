@@ -296,6 +296,17 @@
                         class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
                       ></textarea>
                     </label>
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Department</span>
+                      <select
+                        v-model="getEditForm(person).dept"
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui rounded-xl border px-3 py-2"
+                      >
+                        <option v-for="dept in DEPARTMENTS" :key="dept" :value="dept">
+                          {{ dept }}
+                        </option>
+                      </select>
+                    </label>
                     <div class="flex items-center justify-between gap-2 p-2">
                       <div class="flex gap-2">
                         <button
@@ -1305,6 +1316,25 @@
                       ></textarea>
                     </label>
 
+                    <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                      <span class="pl-1.5">Department</span>
+                      <div
+                        class="bg-surface-primary border-border-primary text-text-primary text-ui relative flex h-10.5 cursor-pointer items-center justify-between rounded-xl border px-3 py-2"
+                      >
+                        <span>{{ newPersonForm.dept }}</span>
+                        <ChevronDown :size="14" class="shrink-0 opacity-70" />
+                        <select
+                          v-model="newPersonForm.dept"
+                          class="absolute inset-0 size-full cursor-pointer opacity-0"
+                          required
+                        >
+                          <option v-for="dept in DEPARTMENTS" :key="dept" :value="dept">
+                            {{ dept }}
+                          </option>
+                        </select>
+                      </div>
+                    </label>
+
                     <div class="flex gap-2 pt-2">
                       <button
                         class="btn primary"
@@ -1496,6 +1526,7 @@ import { activePresenceUsers, useLive } from '@/composables/useLive'
 import { type ClearanceLevel, isHighClearance, sortTripImages } from '@/composables/useTravel'
 import { workHistory } from '@/data/work'
 import { getStorageUrl, supabase } from '@/supabase'
+import { type Department, DEPARTMENTS } from '@/types'
 import { getStrokeBounds, getStrokePath } from '@/utils/drawing'
 
 interface UserRoleRecord {
@@ -1702,6 +1733,7 @@ const roleBadgeClasses: Record<ClearanceLevel, string> = {
 }
 
 interface PersonForm {
+  dept: Department
   imageName: string
   linkedin: string
   name: string
@@ -1712,6 +1744,7 @@ interface PersonForm {
 // PEOPLE TAB
 // ----------------------------------------------------
 interface WorkPersonRecord {
+  dept: Department
   imageName: string
   linkedin: null | string
   name: string
@@ -1791,6 +1824,7 @@ async function convertToSquareWebp(file: File, size = 400, quality = 0.85): Prom
 }
 
 const newPersonForm = reactive({
+  dept: 'Design' as Department,
   linkedin: '',
   name: '',
   orgId: '',
@@ -1853,6 +1887,7 @@ async function addPerson() {
     }
 
     const { error } = await supabase.from('work_people').insert({
+      dept: newPersonForm.dept,
       imageName: cleanImageName,
       linkedin: newPersonForm.linkedin.trim() || null,
       name: newPersonForm.name.trim(),
@@ -1865,6 +1900,7 @@ async function addPerson() {
     await queryClient.invalidateQueries({ queryKey: ['admin-work-people'] })
     await queryClient.invalidateQueries({ queryKey: ['work-people'] })
 
+    newPersonForm.dept = 'Design'
     newPersonForm.name = ''
     newPersonForm.linkedin = ''
     newPersonForm.quote = ''
@@ -2024,6 +2060,7 @@ function getEditForm(person: WorkPersonRecord): PersonForm {
   const key = getPersonKey(person)
   if (!editForms[key]) {
     editForms[key] = {
+      dept: person.dept || 'Design',
       imageName: person.imageName || '',
       linkedin: person.linkedin || '',
       name: person.name || '',
@@ -2093,6 +2130,7 @@ function handleSmartApostrophes(e: Event, update: (val: string) => void) {
 function resetPerson(person: WorkPersonRecord) {
   const key = getPersonKey(person)
   editForms[key] = {
+    dept: person.dept || 'Design',
     imageName: person.imageName || '',
     linkedin: person.linkedin || '',
     name: person.name || '',
@@ -2123,6 +2161,7 @@ async function savePerson(person: WorkPersonRecord, close?: () => void) {
     const { error } = await supabase
       .from('work_people')
       .update({
+        dept: form.dept,
         imageName: form.imageName,
         linkedin: form.linkedin || null,
         name: form.name,
@@ -2134,6 +2173,7 @@ async function savePerson(person: WorkPersonRecord, close?: () => void) {
     if (error) throw error
 
     person.name = form.name
+    person.dept = form.dept
     person.imageName = form.imageName
     person.linkedin = form.linkedin || null
     person.quote = form.quote || null
