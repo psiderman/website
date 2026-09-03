@@ -58,7 +58,7 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       ],
       carousel: true,
       images: Array.from({ length: 8 }, (_, i) => ({
-        placeholder: getStorageUrl('webp', 'thumbs', 'dad_paris', `${i + 1}.webp`),
+        placeholder: getStorageUrl('webp', 'thumb', 'dad_paris', `${i + 1}.webp`),
         src: getStorageUrl('webp', 'dad_paris', `${i + 1}.webp`),
       })),
       lightbox: true,
@@ -85,7 +85,7 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       ],
       carousel: true,
       images: Array.from({ length: 15 }, (_, i) => ({
-        placeholder: getStorageUrl('webp', 'thumbs', 'japan_film', `${i + 1}.webp`),
+        placeholder: getStorageUrl('webp', 'thumb', 'japan_film', `${i + 1}.webp`),
         src: getStorageUrl('webp', 'japan_film', `${i + 1}.webp`),
       })),
       lightbox: true,
@@ -109,7 +109,7 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       ],
       carousel: true,
       images: Array.from({ length: 12 }, (_, i) => ({
-        placeholder: getStorageUrl('webp', 'thumbs', 'ist_bud', `${i + 1}.webp`),
+        placeholder: getStorageUrl('webp', 'thumb', 'ist_bud', `${i + 1}.webp`),
         src: getStorageUrl('webp', 'ist_bud', `${i + 1}.webp`),
       })),
       lightbox: true,

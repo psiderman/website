@@ -19,7 +19,10 @@ export const FILTER_GROUPS = [
 ] as const
 
 export type ClearanceLevel = 'admin' | 'auth' | 'close' | 'friends' | 'known' | 'public'
+export type Department = 'Design' | 'Engineering' | 'Other' | 'Product'
+
 export type FilterGroupId = FilterGroupDef['id']
+export const DEPARTMENTS: Department[] = ['Design', 'Engineering', 'Product', 'Other']
 
 export interface GalleryImage {
   caption?: null | string

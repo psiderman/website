@@ -221,7 +221,10 @@ const { error, isLoading, travelsWithImages } = useTravelsWithImages()
 const activeTripSlug = ref<null | string>(null)
 
 const previewUrl = computed(() => {
-  return getStorageUrl('webp', 'map-preview.webp')
+  return {
+    placeholder: getStorageUrl('webp', 'thumb/map-preview.webp'),
+    src: getStorageUrl('webp', 'map-preview.webp'),
+  }
 })
 
 // Map to hold references to the DOM elements of the travel cards

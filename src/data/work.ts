@@ -1,3 +1,5 @@
+import type { Department } from '@/types'
+
 export interface WorkDetail {
   clickable?: boolean
   data?: {
@@ -21,6 +23,7 @@ export interface WorkDetail {
 }
 
 export interface WorkPerson {
+  dept?: Department
   imageName: string
   linkedin?: string
   name: string

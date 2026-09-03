@@ -47,7 +47,7 @@ export function useNow() {
       .sort((a, b) => (a.date < b.date ? 1 : -1))
   })
 
-  const images = computed(() => entries.value[0]?.images ?? [])
+  const images = computed<NowGalleryImage[]>(() => entries.value[0]?.images ?? [])
 
   return { entries, error, images, isLoading }
 }
@@ -84,14 +84,19 @@ async function listNowBucket(): Promise<RemoteNowEntry[]> {
       if (!files || files.length === 0) return null
 
       const mdName = files.find((f) => f.name.endsWith('.md'))?.name
-      const parsed = mdName ? parseFrontmatter(await fetchNowFile(`${slug}/${mdName}`)) : null
+      if (!mdName) return null
+      const parsed = parseFrontmatter(await fetchNowFile(`${slug}/${mdName}`))
 
       const images: NowGalleryImage[] = files
         .filter((f) => IMAGE_EXT.test(f.name))
-        .map((f) => ({
-          name: f.name,
-          url: getStorageUrl('now', slug, f.name),
-        }))
+        .map((f) => {
+          const url = getStorageUrl('now', slug, f.name)
+          return {
+            name: f.name,
+            placeholder: getStorageUrl('now', `thumb/${slug}/${f.name}`),
+            url,
+          }
+        })
         .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
         .map((img, idx) => ({ caption: parsed?.captions[idx] ?? '', ...img }))
 

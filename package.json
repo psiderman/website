@@ -75,6 +75,7 @@
     "dev:all": "concurrently \"npm run dev -- --host\" \"npm run dev:api\" \"cce serve\"",
     "dev:api": "vercel dev --listen 3001",
     "format": "prettier --write .",
+    "postbuild": "node scripts/generate-og-previews.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:style": "stylelint \"src/**/*.{css,vue}\"",

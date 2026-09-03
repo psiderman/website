@@ -168,7 +168,39 @@
                     <p class="text-text-tertiary text-ui-small tracking-wider uppercase">
                       People I worked with
                     </p>
-                    <div class="flex flex-row flex-wrap gap-1">
+                    <template v-if="peopleByDept.length > 1">
+                      <div
+                        v-for="group in peopleByDept"
+                        :key="group.dept"
+                        class="flex flex-col gap-1"
+                      >
+                        <p class="text-text-tertiary text-ui-small">{{ group.dept }}</p>
+                        <div class="flex flex-row flex-wrap gap-1">
+                          <component
+                            :is="person.linkedin ? 'a' : 'div'"
+                            v-for="(person, idx) in group.people"
+                            :key="person.name"
+                            v-reveal="(group.startIndex + idx) * 50"
+                            v-tooltip="{
+                              content: personTooltip(person),
+                              trigger: 'mouseenter',
+                              allowHTML: true,
+                            }"
+                            :href="person.linkedin"
+                            :target="person.linkedin ? '_blank' : undefined"
+                          >
+                            <img
+                              v-lazy="getWorkPersonUrl(work.orgId, person.imageName)"
+                              :alt="person.name"
+                              class="border-border-primary size-10 rounded-full border object-cover outline-0 transition-transform hover:scale-110"
+                              height="128"
+                              width="128"
+                            />
+                          </component>
+                        </div>
+                      </div>
+                    </template>
+                    <div v-else class="flex flex-row flex-wrap gap-1">
                       <component
                         :is="person.linkedin ? 'a' : 'div'"
                         v-for="(person, idx) in sortedPeople"
@@ -236,6 +268,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 
 import { queryKeys } from '@/queryKeys'
 import { getStorageUrl, supabase } from '@/supabase'
+import { type Department, DEPARTMENTS } from '@/types'
 
 import type { WorkDetail, WorkPerson } from '@/data/work'
 
@@ -335,7 +368,7 @@ const { data: peopleData } = useQuery({
     if (!orgId) return []
     const { data, error } = await supabase
       .from('work_people')
-      .select('name, imageName, linkedin, quote')
+      .select('name, imageName, linkedin, quote, dept')
       .eq('orgId', orgId)
 
     if (error) throw error
@@ -347,6 +380,22 @@ const { data: peopleData } = useQuery({
 const sortedPeople = computed(() => {
   const list = peopleData.value || []
   return [...list].sort((a, b) => a.name.localeCompare(b.name))
+})
+
+const peopleByDept = computed(() => {
+  const groups = new Map<Department, WorkPerson[]>()
+  for (const person of sortedPeople.value) {
+    const dept = person.dept ?? 'Design'
+    if (!groups.has(dept)) groups.set(dept, [])
+    groups.get(dept)!.push(person)
+  }
+  let offset = 0
+  return DEPARTMENTS.filter((d) => groups.has(d)).map((dept) => {
+    const people = groups.get(dept)!
+    const group = { dept, people, startIndex: offset }
+    offset += people.length
+    return group
+  })
 })
 
 const imageRefs = ref<HTMLElement[]>([])

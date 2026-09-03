@@ -76,7 +76,7 @@ import { Globe2 } from '@lucide/vue'
 import { addDays } from 'date-fns'
 import { onMounted, onUnmounted, ref } from 'vue'
 
-import { isHomeView } from '@/composables/useLive.ts'
+import { isHomeView } from '@/live'
 
 import MiniClock from './MiniClock.vue'
 import WishCircle from './WishCircle.vue'

@@ -18,6 +18,9 @@ import { computed } from 'vue'
 import { getStorageUrl } from '@/supabase'
 
 const previewUrl = computed(() => {
-  return getStorageUrl('webp', 'map-preview.webp')
+  return {
+    placeholder: getStorageUrl('webp', 'thumb/map-preview.webp'),
+    src: getStorageUrl('webp', 'map-preview.webp'),
+  }
 })
 </script>

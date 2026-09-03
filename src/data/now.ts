@@ -9,6 +9,7 @@ export interface NowEntry {
 
 export interface NowGalleryImage extends NowImage {
   caption: string
+  placeholder?: string
 }
 
 export interface NowImage {
