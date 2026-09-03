@@ -30,7 +30,7 @@ export const cards: Card[] = [
   {
     arrow: 'external',
     content: FoursightCardContent,
-    group: ['personal_finance'],
+    group: ['money'],
     hero: true,
     id: 'foursight',
     link: 'https://foursight.money/about',
@@ -141,7 +141,7 @@ export const cards: Card[] = [
   {
     arrow: 'external',
     bgClass: 'bg-emerald-900 dark:bg-emerald-950',
-    group: ['personal_finance'],
+    group: ['money'],
     id: 'pf',
     imageUrl: new URL('../assets/home/primer.webp', import.meta.url).href,
     link: 'https://links.psiderman.com/primer',
@@ -207,13 +207,13 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
     cover: new URL('../assets/home/intro/music.webp', import.meta.url).href,
     title: 'to the beat',
   },
-  personal_finance: {
+  money: {
     body: [
       '“somewhere along the way, i became the person who friends would come to for spreadsheets, budgeting, and investment questions. i found myself further down the rabbit hole, and i enjoyed it.',
       'the kind of person i am, inevitably, i tried to translate my obsession for managing your money into a product.',
       'foursight is that attempt.”',
     ],
-    cover: new URL('../assets/home/intro/personal_finance.webp', import.meta.url).href,
+    cover: new URL('../assets/home/intro/money.webp', import.meta.url).href,
     title: 'on personal finance',
   },
   travel: {

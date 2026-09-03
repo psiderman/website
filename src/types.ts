@@ -12,9 +12,8 @@ export const FILTER_GROUPS = [
   { icon: DoorOpen, id: 'home', label: 'Home' },
   { icon: Flower, id: 'life', label: 'Life' },
   { icon: BriefcaseBusiness, id: 'work', label: 'Work' },
-  { icon: BadgeIndianRupee, id: 'personal_finance', label: 'Money' },
+  { icon: BadgeIndianRupee, id: 'money', label: 'Money' },
   { icon: Hammer, id: 'building', label: 'Building' },
-  // { id: 'gaming', label: 'Gaming', icon: Joystick },
   { icon: PlaneTakeoff, id: 'travel', label: 'Travel' },
   { icon: Music, id: 'music', label: 'Music' },
 ] as const

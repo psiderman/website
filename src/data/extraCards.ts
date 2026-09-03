@@ -22,6 +22,15 @@ export interface ExtraCard {
 }
 
 export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
+  money: [
+    {
+      bgClass: 'bg-orange-500',
+      cover: new URL('@/assets/logos/foursight.webp', import.meta.url).href,
+      link: 'https://cal.com/foursight.money/onboarding-call',
+      size: 'sm',
+      title: 'talk foursight?',
+    },
+  ],
   music: [
     {
       size: 'md',
@@ -33,15 +42,6 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       link: 'https://links.psiderman.com/playlists',
       size: 'sm',
       title: 'playlists',
-    },
-  ],
-  personal_finance: [
-    {
-      bgClass: 'bg-orange-500',
-      cover: new URL('@/assets/logos/foursight.webp', import.meta.url).href,
-      link: 'https://cal.com/foursight.money/onboarding-call',
-      size: 'sm',
-      title: 'talk foursight?',
     },
   ],
   travel: [
