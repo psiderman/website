@@ -103,7 +103,7 @@ const router = createRouter({
       path: '/',
     },
     {
-      component: makeLazy(() => import('../views/SuitladyView.vue')),
+      component: makeLazy(() => import('@/cms/SuitLady.vue')),
       meta: {
         layout: 'blank',
         noindex: true,
