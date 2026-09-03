@@ -70,12 +70,7 @@
 import { MousePointer2, Smartphone } from '@lucide/vue'
 
 import { global } from '@/composables/useGlobal'
-import {
-  registerDriftEl,
-  renderCursors,
-  renderTouches,
-  unregisterDriftEl,
-} from '@/composables/useLive'
+import { registerDriftEl, renderCursors, renderTouches, unregisterDriftEl } from '@/live'
 
 import type { Directive } from 'vue'
 

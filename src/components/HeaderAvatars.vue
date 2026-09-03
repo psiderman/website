@@ -78,8 +78,7 @@ import DOMPurify from 'dompurify'
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import { global } from '@/composables/useGlobal'
 import { isHighClearance } from '@/composables/useTravel'
-
-import { activeUserId, type PresenceUser, sortedPresenceUsers } from '../composables/useLive'
+import { activeUserId, type PresenceUser, sortedPresenceUsers } from '@/live'
 
 // Presence names are user-supplied — reduce to plain text before it's
 // interpolated into the allowHTML tooltip.

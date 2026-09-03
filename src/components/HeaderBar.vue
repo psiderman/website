@@ -77,11 +77,11 @@
 <script setup lang="ts">
 import { LogIn, LogOut, MousePointer2, MousePointer2Off } from '@lucide/vue'
 
+import { toggleMultiplayer as baseToggleMultiplayer, isHomeView } from '@/live'
 import { trackEvent } from '@/utils/analytics'
 
 import { currentUser, isAuthModalOpen, signOut } from '../composables/useAuth'
 import { global } from '../composables/useGlobal'
-import { toggleMultiplayer as baseToggleMultiplayer, isHomeView } from '../composables/useLive'
 import HeaderAvatars from './HeaderAvatars.vue'
 import LocationWish from './LocationWish.vue'
 import ThemeToggle from './ThemeToggle.vue'

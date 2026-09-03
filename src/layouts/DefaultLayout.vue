@@ -41,7 +41,7 @@ import {
   photoLightBoxData,
   workData,
 } from '@/composables/useGlobal'
-import { useLive } from '@/composables/useLive'
+import { useLive } from '@/live'
 
 useLive()
 </script>

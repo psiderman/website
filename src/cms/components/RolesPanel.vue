@@ -99,7 +99,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, ref, watch } from 'vue'
 
 import { isAdmin } from '@/composables/useAuth'
-import { activePresenceUsers, useLive } from '@/composables/useLive'
+import { activePresenceUsers, useLive } from '@/live'
 import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
 
