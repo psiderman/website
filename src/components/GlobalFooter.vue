@@ -124,8 +124,18 @@ import { queryKeys } from '@/queryKeys'
 import { trackEvent } from '@/utils/analytics'
 
 // ==========================================
-// TIMING CONFIGURATION (edit values here)
+// CONFIGURATION (edit values here)
 // ==========================================
+
+// Prevents sending counter increments to backend while developing/testing
+const DEV_DISABLE_THWIP_INCREMENT = import.meta.env.DEV
+
+const AUDIO_CONFIG = {
+  enabled: true,
+  playbackRate: 1.0,
+  playDelay: 0, // Delay (in ms) to start playing sound relative to thwip trigger
+  volume: 0.5,
+}
 
 const TIMING = {
   // 4. Page Scroll Bounce-back
@@ -146,6 +156,23 @@ const TIMING = {
   webHoldDelay: 500, // Hold delay at apex (between frame 4 & 5)
   // 1. Web strand animation
   webUpDuration: 700, // Upward morph duration to apex (Frame 1 -> 4)
+}
+
+const thwipAudioModules = import.meta.glob<string>('@/assets/thwips/*.webm', {
+  eager: true,
+  import: 'default',
+})
+const thwipAudioUrls = Object.values(thwipAudioModules)
+
+function playThwipSound() {
+  if (!AUDIO_CONFIG.enabled || thwipAudioUrls.length === 0) return
+  const randomUrl = thwipAudioUrls[Math.floor(Math.random() * thwipAudioUrls.length)]
+  const audio = new Audio(randomUrl)
+  audio.volume = AUDIO_CONFIG.volume
+  audio.playbackRate = AUDIO_CONFIG.playbackRate
+  audio.play().catch(() => {
+    // Audio autoplay restrictions fallback
+  })
 }
 
 const commit = __COMMIT_HASH__
@@ -233,6 +260,7 @@ function handleThwipComplete() {
 }
 
 async function persistThwipDelta(delta: number) {
+  if (DEV_DISABLE_THWIP_INCREMENT) return
   if (delta <= 0) return
   try {
     const res = await fetch('/api/thwip', {
@@ -330,6 +358,14 @@ function triggerThwipAnimation() {
   if (debounceTimer) {
     clearTimeout(debounceTimer)
     debounceTimer = null
+  }
+
+  if (AUDIO_CONFIG.enabled) {
+    if (AUDIO_CONFIG.playDelay > 0) {
+      setTimeout(playThwipSound, AUDIO_CONFIG.playDelay)
+    } else {
+      playThwipSound()
+    }
   }
 
   const el = handEl.value

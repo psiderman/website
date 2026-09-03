@@ -124,10 +124,12 @@ const formatter = new Intl.DateTimeFormat('en-US', {
 })
 
 const updateTime = () => {
-  if (!formatter || isPopping.value) return
+  if (!formatter) return
 
   const formatted = formatter.format(new Date())
   currentTime.value = formatted
+
+  if (isPopping.value) return
 
   const parts = formatted.split(':')
   let h = parseInt(parts[0], 10)

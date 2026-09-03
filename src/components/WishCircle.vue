@@ -29,7 +29,7 @@
       v-tooltip="tooltipConfig"
       type="button"
       aria-label="Make a wish"
-      class="relative size-full cursor-cell touch-none overflow-hidden rounded-full border-transparent bg-amber-200 select-none [-webkit-touch-callout:none] dark:bg-amber-500/20"
+      class="relative size-full touch-none overflow-hidden rounded-full border-transparent bg-amber-200 select-none [-webkit-touch-callout:none] dark:bg-amber-500/20"
       :class="{
         'border-2': size === 'sm',
         'border-8!': size === 'lg',
