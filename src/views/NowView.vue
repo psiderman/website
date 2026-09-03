@@ -52,7 +52,7 @@
                   @click="triggerLightbox(entry, idx)"
                 >
                   <img
-                    v-lazy="img.url"
+                    v-lazy="{ src: img.url, placeholder: img.placeholder }"
                     class="aspect-3/5 size-full rounded-xl object-cover"
                     :alt="img.caption || img.name"
                     width="300"
@@ -113,7 +113,7 @@ const triggerLightbox = (entry: NowEntry, clickedIdx: number) => {
   openPhotoLightbox(
     entry.images.map((img) => ({
       caption: img.caption || null,
-      thumbnailUrl: img.url,
+      thumbnailUrl: img.placeholder,
       url: img.url,
     })),
     { initialIndex: clickedIdx, title: entryLabel(entry) || 'now' },

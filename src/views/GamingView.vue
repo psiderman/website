@@ -24,7 +24,7 @@
             <h2 class="text-h2">the rig</h2>
             <div class="grid grid-cols-6 gap-3">
               <img
-                v-lazy="pcSetup.pc.url"
+                v-lazy="{ src: pcSetup.pc.url, placeholder: pcSetup.pc.placeholder }"
                 v-tooltip="pcSetup.pc.title"
                 :alt="pcSetup.pc.alt"
                 class="bg-surface-secondary col-span-6 aspect-square w-full rounded-xl object-cover lg:col-span-5"
@@ -85,7 +85,7 @@
                 @click="triggerLightbox(idx)"
               >
                 <img
-                  v-lazy="game.url"
+                  v-lazy="{ src: game.url, placeholder: game.placeholder }"
                   :alt="game.caption"
                   class="size-full object-cover"
                   loading="lazy"
@@ -122,6 +122,7 @@ const GAME_NAMES = ['arkham', 'budokai', 'hitman3', 'lis', 'spiderman', 'valo']
 const gameImages = GAME_NAMES.map((name) => ({
   caption: GAME_CAPTIONS[name] || name,
   name,
+  placeholder: getStorageUrl('webp', 'thumb/gaming', `${name}.webp`),
   url: getStorageUrl('webp', 'gaming', `${name}.webp`),
 }))
 
@@ -161,6 +162,7 @@ const pcSetup = {
     })),
   pc: {
     alt: 'pc setup',
+    placeholder: getStorageUrl('webp', 'thumb/gaming/pc', 'pc.webp'),
     title: "this picture was taken before i got my playstation, but it's here in spirit.",
     url: getStorageUrl('webp', 'gaming/pc', 'pc.webp'),
   },
@@ -170,7 +172,7 @@ const triggerLightbox = (clickedIdx: number) => {
   openPhotoLightbox(
     gameImages.map((img) => ({
       caption: img.caption,
-      thumbnailUrl: img.url,
+      thumbnailUrl: img.placeholder,
       url: img.url,
     })),
     { initialIndex: clickedIdx, title: 'gaming' },

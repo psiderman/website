@@ -13,10 +13,6 @@ const IMAGE_EXT = /\.(?:webp|jpg|jpeg|png)$/i
 
 const isFile = (name: string) => /\.[a-z0-9]+$/i.test(name)
 
-interface NowGalleryImageWithThumb extends NowGalleryImage {
-  placeholder?: string
-}
-
 interface RemoteNowEntry {
   date: string
   images: NowGalleryImage[]
@@ -51,7 +47,7 @@ export function useNow() {
       .sort((a, b) => (a.date < b.date ? 1 : -1))
   })
 
-  const images = computed<NowGalleryImageWithThumb[]>(() => entries.value[0]?.images ?? [])
+  const images = computed<NowGalleryImage[]>(() => entries.value[0]?.images ?? [])
 
   return { entries, error, images, isLoading }
 }
