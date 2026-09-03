@@ -32,6 +32,36 @@
   ],
   "rewrites": [
     {
+      "destination": "/og-previews/building.html",
+      "has": [{ "key": "p", "type": "query", "value": "building" }],
+      "source": "/"
+    },
+    {
+      "destination": "/og-previews/life.html",
+      "has": [{ "key": "p", "type": "query", "value": "life" }],
+      "source": "/"
+    },
+    {
+      "destination": "/og-previews/money.html",
+      "has": [{ "key": "p", "type": "query", "value": "money" }],
+      "source": "/"
+    },
+    {
+      "destination": "/og-previews/music.html",
+      "has": [{ "key": "p", "type": "query", "value": "music" }],
+      "source": "/"
+    },
+    {
+      "destination": "/og-previews/travel.html",
+      "has": [{ "key": "p", "type": "query", "value": "travel" }],
+      "source": "/"
+    },
+    {
+      "destination": "/og-previews/work.html",
+      "has": [{ "key": "p", "type": "query", "value": "work" }],
+      "source": "/"
+    },
+    {
       "destination": "/index.html",
       "source": "/((?!api/.*).*)"
     }

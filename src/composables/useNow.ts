@@ -13,6 +13,10 @@ const IMAGE_EXT = /\.(?:webp|jpg|jpeg|png)$/i
 
 const isFile = (name: string) => /\.[a-z0-9]+$/i.test(name)
 
+interface NowGalleryImageWithThumb extends NowGalleryImage {
+  placeholder?: string
+}
+
 interface RemoteNowEntry {
   date: string
   images: NowGalleryImage[]
@@ -47,7 +51,7 @@ export function useNow() {
       .sort((a, b) => (a.date < b.date ? 1 : -1))
   })
 
-  const images = computed(() => entries.value[0]?.images ?? [])
+  const images = computed<NowGalleryImageWithThumb[]>(() => entries.value[0]?.images ?? [])
 
   return { entries, error, images, isLoading }
 }
@@ -88,10 +92,14 @@ async function listNowBucket(): Promise<RemoteNowEntry[]> {
 
       const images: NowGalleryImage[] = files
         .filter((f) => IMAGE_EXT.test(f.name))
-        .map((f) => ({
-          name: f.name,
-          url: getStorageUrl('now', slug, f.name),
-        }))
+        .map((f) => {
+          const url = getStorageUrl('now', slug, f.name)
+          return {
+            name: f.name,
+            placeholder: getStorageUrl('now', `thumb/${slug}/${f.name}`),
+            url,
+          }
+        })
         .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
         .map((img, idx) => ({ caption: parsed?.captions[idx] ?? '', ...img }))
 

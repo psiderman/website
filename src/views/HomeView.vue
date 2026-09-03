@@ -104,7 +104,7 @@
       >
         <div class="aspect-video">
           <img
-            v-lazy="activeDescription.cover"
+            v-lazy="{ src: activeDescription.cover, placeholder: activeDescription.placeholder }"
             class="border-border-primary size-full rounded-lg border object-cover"
             :alt="activeFilter"
             width="800"
@@ -384,7 +384,10 @@ const filteredCards = computed<GridCard[]>(() => {
     if (card.id === 'now') {
       return {
         ...card,
-        images: nowImages.value.map((img) => img.url),
+        images: nowImages.value.map((img) => ({
+          placeholder: img.placeholder,
+          src: img.url,
+        })),
         isError: !!nowError.value && nowImages.value.length === 0,
         isLoading: isNowLoading.value && nowImages.value.length === 0,
       }

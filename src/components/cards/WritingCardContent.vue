@@ -15,7 +15,10 @@
     </div>
     <template v-else>
       <img
-        v-lazy="getStorageUrl('webp', 'home', 'writing.webp')"
+        v-lazy="{
+          src: getStorageUrl('webp', 'home', 'writing.webp'),
+          placeholder: getStorageUrl('webp', 'thumb/home', 'writing.webp'),
+        }"
         alt="a picture of me writing on a desk"
         class="size-full object-cover"
       />

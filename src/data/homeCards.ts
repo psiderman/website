@@ -177,6 +177,7 @@ export const cards: Card[] = [
 export interface CardIntro {
   body: string[]
   cover: string
+  placeholder?: string
   title: string
 }
 
@@ -188,6 +189,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'those 5 seconds separate us from the machines, and i want you to have those 5 seconds today at least once.”',
     ],
     cover: getStorageUrl('webp', 'home/intro', 'building.webp'),
+    placeholder: getStorageUrl('webp', 'thumb/home/intro', 'building.webp'),
     title: 'the joy of building something, anything',
   },
   life: {
@@ -197,6 +199,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'if there is something that you’d like to see on here, let me know.”',
     ],
     cover: getStorageUrl('webp', 'home/intro', 'life.webp'),
+    placeholder: getStorageUrl('webp', 'thumb/home/intro', 'life.webp'),
     title: 'welcome to the psider-verse',
   },
   money: {
@@ -206,6 +209,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'foursight is that attempt.”',
     ],
     cover: getStorageUrl('webp', 'home/intro', 'money.webp'),
+    placeholder: getStorageUrl('webp', 'thumb/home/intro', 'money.webp'),
     title: 'on personal finance',
   },
   music: {
@@ -214,6 +218,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'i grew up in the mp3 era so i’ve never made a mixtape but making hyper-specific playlists is a close enough hobby.”',
     ],
     cover: getStorageUrl('webp', 'home/intro', 'music.webp'),
+    placeholder: getStorageUrl('webp', 'thumb/home/intro', 'music.webp'),
     title: 'to the beat',
   },
   travel: {
@@ -223,6 +228,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'travel is now part of my identity, and i try to have one flight booked in the next 6 months.”',
     ],
     cover: getStorageUrl('webp', 'home/intro', 'travel.webp'),
+    placeholder: getStorageUrl('webp', 'thumb/home/intro', 'travel.webp'),
     title: 'psiderman: far from home',
   },
   work: {
@@ -231,6 +237,7 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
       'code always seemed aspirational. i don’t know about you, but today, llms make it easier to be all about the design engineering life. so i guess now i can professionally make rectangles <strong>and divs</strong>.”',
     ],
     cover: getStorageUrl('webp', 'home/intro', 'work.webp'),
+    placeholder: getStorageUrl('webp', 'thumb/home/intro', 'work.webp'),
     title: 'professional rectangle maker',
   },
 }
