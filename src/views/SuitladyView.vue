@@ -8,9 +8,10 @@
         @change="(index: number) => (selectedTab = index)"
       >
         <div
-          class="bg-surface-inverted text-text-inverted-primary text-ui flex items-center justify-center border-b border-transparent p-2"
+          class="bg-surface-inverted text-text-inverted-primary text-ui relative flex items-center justify-between border-b border-transparent p-2"
         >
-          suitlady v1.1
+          <span>suitlady v1.1</span>
+          <ThemeToggle class="absolute right-2" />
         </div>
         <TabList
           class="border-border-primary noscrollbar flex w-full flex-row gap-1 overflow-scroll border-b"
@@ -1489,6 +1490,7 @@ import { format } from 'date-fns'
 import { computed, reactive, ref, watch } from 'vue'
 
 import TheListIndicator from '@/components/TheListIndicator.vue'
+import ThemeToggle from '@/components/ThemeToggle.vue'
 import { isAdmin } from '@/composables/useAuth'
 import { activePresenceUsers, useLive } from '@/composables/useLive'
 import { type ClearanceLevel, isHighClearance, sortTripImages } from '@/composables/useTravel'
