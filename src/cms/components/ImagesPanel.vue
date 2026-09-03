@@ -108,14 +108,15 @@
                 <DisclosurePanel
                   class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
                 >
-                  <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                  <div class="text-ui-small text-text-tertiary flex flex-col gap-1">
                     <span class="pl-1.5">Clearance</span>
                     <ClearanceSelect
                       v-model="getEditImageForm(img).clearance"
                       :levels="clearanceLevels"
                       badge-class="h-5 w-1.5"
+                      select-label="Clearance"
                     />
-                  </label>
+                  </div>
 
                   <div class="grid grid-cols-1 gap-3">
                     <div class="text-ui-small flex flex-col gap-1">

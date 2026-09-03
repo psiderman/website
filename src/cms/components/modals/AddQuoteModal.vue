@@ -40,14 +40,15 @@
               </div>
 
               <form class="flex flex-col gap-3" @submit.prevent="addQuote">
-                <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+                <div class="text-ui-small text-text-tertiary flex flex-col gap-1">
                   <span class="pl-1.5">Clearance</span>
                   <ClearanceSelect
                     v-model="newQuoteForm.clearance"
                     :levels="quoteClearanceLevels"
+                    select-label="Clearance"
                     variant="compact"
                   />
-                </label>
+                </div>
 
                 <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
                   <span class="pl-1.5">Title</span>

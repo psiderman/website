@@ -45,14 +45,15 @@
         class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
       >
         <div class="flex flex-col gap-2">
-          <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+          <div class="text-ui-small text-text-tertiary flex flex-col gap-1">
             <span class="pl-1.5">Clearance</span>
             <ClearanceSelect
               v-model="getEditQuoteForm(quote).clearance"
               :levels="quoteClearanceLevels"
+              select-label="Clearance"
               variant="compact"
             />
-          </label>
+          </div>
         </div>
 
         <div class="flex flex-col gap-2">

@@ -34,14 +34,15 @@
         class="border-border-primary bg-surface-secondary flex flex-col gap-3 border-t p-4"
       >
         <div class="flex flex-col gap-2">
-          <label class="text-ui-small text-text-tertiary flex flex-col gap-1">
+          <div class="text-ui-small text-text-tertiary flex flex-col gap-1">
             <span class="pl-1.5">Clearance</span>
             <ClearanceSelect
               v-model="getEditBlogForm(post).clearance"
               :levels="blogClearanceLevels"
               badge-class="h-6 w-1.5"
+              select-label="Clearance"
             />
-          </label>
+          </div>
         </div>
 
         <div class="flex flex-col gap-2">
