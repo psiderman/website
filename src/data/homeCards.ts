@@ -198,15 +198,6 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
     cover: new URL('../assets/home/intro/life.webp', import.meta.url).href,
     title: 'welcome to the psider-verse',
   },
-  music: {
-    body: [
-      '“in hindsight, picking up a guitar at 14 to impress a girl was my canon event. music has been a recurring part of my identity.',
-      'since then, i’ve taught myself enough guitar and keys, that i make covers for fun on my daw.',
-      'i grew up in the mp3 era so i’ve never made a mixtape but my playlists are close enough.”',
-    ],
-    cover: new URL('../assets/home/intro/music.webp', import.meta.url).href,
-    title: 'to the beat',
-  },
   money: {
     body: [
       '“somewhere along the way, i became the person who friends would come to for spreadsheets, budgeting, and investment questions. i found myself further down the rabbit hole, and i enjoyed it.',
@@ -215,6 +206,14 @@ export const intros: Partial<Record<FilterGroupId, CardIntro>> = {
     ],
     cover: new URL('../assets/home/intro/money.webp', import.meta.url).href,
     title: 'on personal finance',
+  },
+  music: {
+    body: [
+      '“in hindsight, taking up guitar at 14 to impress a girl wasn’t a very unique canon event. but since then, i’ve had an on again off again relationship with making covers for fun.',
+      'i grew up in the mp3 era so i’ve never made a mixtape but making hyper-specific playlists is a close enough hobby.”',
+    ],
+    cover: new URL('../assets/home/intro/music.webp', import.meta.url).href,
+    title: 'to the beat',
   },
   travel: {
     body: [
