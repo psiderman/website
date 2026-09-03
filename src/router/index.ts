@@ -24,6 +24,15 @@ const SITE_URL = 'https://psiderman.com'
 const DEFAULT_TITLE = 'Karan Sanas | Personal Website'
 const DEFAULT_DESCRIPTION =
   "What's the difference between a good joke and a bad joke timing. This website has no description. But you did get a solid joke. Win-win, I'd say."
+const DEFAULT_OG_IMAGE = '/og.png'
+const OG_IMAGE_OVERRIDES: Record<string, string> = {
+  building: '/og_building.png',
+  life: '/og_life.png',
+  money: '/og_money.png',
+  music: '/og_music.png',
+  travel: '/og_travel.png',
+  work: '/og_work.png',
+}
 
 interface RouteMeta extends Record<number | string | symbol, unknown> {
   description?: string
@@ -31,7 +40,7 @@ interface RouteMeta extends Record<number | string | symbol, unknown> {
   title?: string
 }
 
-function applyRouteMeta(to: { meta: unknown; path: string }) {
+function applyRouteMeta(to: { meta: unknown; path: string; query?: Record<string, unknown> }) {
   if (typeof document === 'undefined') return
 
   const meta = (to.meta || {}) as RouteMeta
@@ -39,14 +48,19 @@ function applyRouteMeta(to: { meta: unknown; path: string }) {
   const description = meta.description || DEFAULT_DESCRIPTION
   const url = `${SITE_URL}${to.path}`
 
+  const filter = to.path === '/' && typeof to.query?.p === 'string' ? (to.query.p as string) : ''
+  const ogImage = `${SITE_URL}${OG_IMAGE_OVERRIDES[filter] || DEFAULT_OG_IMAGE}`
+
   document.title = title
 
   upsertMeta('name', 'description', description)
   upsertMeta('property', 'og:title', title)
   upsertMeta('property', 'og:description', description)
   upsertMeta('property', 'og:url', url)
+  upsertMeta('property', 'og:image', ogImage)
   upsertMeta('name', 'twitter:title', title)
   upsertMeta('name', 'twitter:description', description)
+  upsertMeta('name', 'twitter:image', ogImage)
   upsertMeta('name', 'robots', meta.noindex ? 'noindex, nofollow' : 'index, follow')
 
   setCanonical(to.path)
