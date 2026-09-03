@@ -15,6 +15,18 @@ interface LetterboxdItem {
   title?: string
 }
 
+// Letterboxd RSS wraps descriptions in CDATA, so entities like &#039; (') are
+// never decoded by the XML parser. This is our own content shown as plain text
+// ({{ }} interpolation, never v-html), so just unescape the common forms.
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&',
+  apos: "'",
+  gt: '>',
+  lt: '<',
+  nbsp: ' ',
+  quot: '"',
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function handler(req: any, res: any) {
   if (!isAllowedRequest(req)) {
@@ -43,7 +55,7 @@ export default async function handler(req: any, res: any) {
       const id = typeof guid === 'string' ? guid : guid?.['#text']
       const rawTitle = item.title ?? ''
 
-      const title = rawTitle.split(' - ')[0]
+      const title = decodeEntities(rawTitle.split(' - ')[0] ?? '')
       const rating = item['letterboxd:memberRating']
         ? parseFloat(item['letterboxd:memberRating'])
         : null
@@ -62,6 +74,7 @@ export default async function handler(req: any, res: any) {
           .replace(/<p><em>This review may contain spoilers\.<\/em><\/p>/g, '')
           .replace(/<[^>]+>/g, '')
           .trim() ?? null
+      if (review) review = decodeEntities(review)
       if (!review || review === '') review = null
 
       const watched = item['letterboxd:watchedDate'] || item.pubDate
@@ -84,4 +97,19 @@ export default async function handler(req: any, res: any) {
   } catch (error) {
     return respondWithError(res, error)
   }
+}
+
+function decodeEntities(input: string): string {
+  return input.replace(
+    /&(#x?[\da-f]+|[a-z]+);/gi,
+    (match, entity: string) => {
+      if (entity[0] === '#') {
+        const isHex = entity[1]?.toLowerCase() === 'x'
+        const digits = isHex ? entity.slice(2) : entity.slice(1)
+        const code = parseInt(digits, isHex ? 16 : 10)
+        return Number.isFinite(code) && code >= 0 ? String.fromCodePoint(code) : match
+      }
+      return NAMED_ENTITIES[entity.toLowerCase()] ?? match
+    },
+  )
 }
