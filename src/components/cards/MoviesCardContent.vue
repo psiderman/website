@@ -26,7 +26,7 @@
           content: `${movie.title}, ${formatDistanceToNowStrict(movie.watched_date)} ago`,
           group: 'movies',
         }"
-        class="group border-border-primary dark:border-surface-tertiary has-focus-visible:outline-surface-inverted relative block aspect-2/3 h-full shrink-0 snap-start snap-always overflow-hidden rounded-lg border border-t-0 has-focus-visible:outline-2 has-focus-visible:-outline-offset-2"
+        class="group border-border-primary dark:border-surface-tertiary has-focus-visible:outline-surface-inverted relative block aspect-2/3 h-full shrink-0 snap-start snap-always overflow-hidden rounded-lg border has-focus-visible:outline-2 has-focus-visible:-outline-offset-2"
       >
         <a
           v-if="movie.link"
@@ -53,22 +53,26 @@
         />
         <div
           v-if="movie.review"
-          class="bg-dark/70 text-p pointer-events-none absolute inset-0 flex flex-col justify-between p-3 pt-10 italic transition-opacity duration-200 group-hover:opacity-100"
+          class="bg-dark/70 text-p pointer-events-none absolute inset-0 flex flex-col justify-between p-3 italic transition-opacity duration-200 group-hover:opacity-100"
           :class="activeReviewId === movie.id ? 'opacity-100' : 'opacity-0'"
         >
           <p class="text-light/80 line-clamp-8 text-ellipsis">“{{ movie.review }}”</p>
+          <div class="flex flex-row items-center justify-between">
+            <div class="flex items-center gap-1">
+              <Star :size="16" class="fill-amber-500" stroke-width="0" />
+              <span class="text-light">
+                {{ movie.rating?.toFixed(1) }}
+              </span>
+            </div>
+            <div class="flex items-center gap-1">
+              <Repeat2 v-if="movie.rewatch" :size="16" class="text-light" />
+              <Heart
+                :size="16"
+                :class="movie.like ? 'fill-red-500 text-transparent' : 'text-light/50 fill-dark/50'"
+              />
+            </div>
+          </div>
         </div>
-        <div
-          class="bg-surface-primary rounded-b-special border-border-primary dark:border-surface-tertiary pointer-events-none absolute inset-x-0 top-0 z-20 mx-auto flex w-fit flex-row items-center justify-center gap-1 border border-t-0 px-2.5 py-1 shadow-sm"
-        >
-          <Star :size="12" class="-ml-0.5 fill-amber-500" stroke-width="0" />
-          <span class="text-mono text-text-primary">
-            {{ movie.rating?.toFixed(1) }}
-          </span>
-        </div>
-        <div
-          class="border-border-primary dark:border-surface-tertiary pointer-events-none absolute -inset-x-px top-0 z-19 h-5 rounded-t-lg border border-b-0 bg-transparent"
-        ></div>
       </div>
     </template>
 
@@ -83,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { OctagonAlert, Star } from '@lucide/vue'
+import { Heart, OctagonAlert, Repeat2, Star } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query'
 import { formatDistanceToNowStrict } from 'date-fns'
 import { onMounted, onUnmounted, ref } from 'vue'
@@ -96,9 +100,11 @@ import GenericLoader from '../GenericLoader.vue'
 interface Movie {
   cover: string
   id: string
+  like?: boolean
   link: null | string
   rating: null | number
   review: null | string
+  rewatch?: boolean
   title: string
   watched_date: string
 }

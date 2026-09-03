@@ -6,7 +6,9 @@ import { isAllowedRequest } from './_lib/origin.js'
 interface LetterboxdItem {
   description?: string
   guid?: string | { '#text'?: string }
+  'letterboxd:memberLike'?: string
   'letterboxd:memberRating'?: string
+  'letterboxd:rewatch'?: string
   'letterboxd:watchedDate'?: string
   link?: string
   pubDate?: string
@@ -45,6 +47,11 @@ export default async function handler(req: any, res: any) {
       const rating = item['letterboxd:memberRating']
         ? parseFloat(item['letterboxd:memberRating'])
         : null
+      const like =
+        item['letterboxd:memberLike'] && item['letterboxd:memberLike'] === 'Yes' ? true : false
+
+      const rewatch =
+        item['letterboxd:memberLike'] && item['letterboxd:rewatch'] === 'Yes' ? true : false
 
       const coverMatch = item.description?.match(/<img src="([^"]+)"/)
       const cover = coverMatch ? coverMatch[1] : null
@@ -61,9 +68,11 @@ export default async function handler(req: any, res: any) {
       return {
         cover,
         id,
+        like,
         link: item.link,
         rating,
         review,
+        rewatch,
         title,
         watched_date: watched ? new Date(watched).toISOString() : null,
       }
