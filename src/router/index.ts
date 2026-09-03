@@ -217,7 +217,8 @@ router.onError((error, to) => {
     msg.includes('loading chunk') ||
     msg.includes('Loading chunk') ||
     msg.includes('Unexpected token') ||
-    msg.includes('Unable to preload CSS')
+    msg.includes('Unable to preload CSS') ||
+    msg.includes("Couldn't resolve component")
 
   if (isChunkError && to?.fullPath && typeof window !== 'undefined') {
     const key = 'chunk_reload_target'

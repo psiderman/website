@@ -147,7 +147,7 @@ const visibleBgPointIndex = ref(0)
 <script setup lang="ts">
 import { FastForward, MousePointer2, Repeat, Save, Trash2 } from '@lucide/vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { format } from 'date-fns'
+import { format, isValid } from 'date-fns'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { currentUser, isAuthModalOpen } from '@/composables/useAuth'
@@ -270,8 +270,10 @@ const backgroundStrokes = computed(() => {
 const backgroundArtist = computed(() => {
   const data = latestDrawing.value
   if (!data) return ''
-  const date = format(new Date(data.created_at), 'EEE, MMM d')
-  return `${data.display_name.toLowerCase().split(' ')[0]}, ${date.toLowerCase()}`
+  const created = data.created_at ? new Date(data.created_at) : new Date(NaN)
+  const date = isValid(created) ? format(created, 'EEE, MMM d') : ''
+  const artist = data.display_name.toLowerCase().split(' ')[0]
+  return date ? `${artist}, ${date.toLowerCase()}` : artist
 })
 
 function clearStrokes() {
