@@ -397,11 +397,9 @@ const filteredCards = computed<GridCard[]>(() => {
 
   const sizeWeight = { lg: 3, md: 2, sm: 1 }
 
-  let sorted = visible.sort((a, b) => sizeWeight[b.size] - sizeWeight[a.size])
-
-  if (sorted.length === 1) {
-    sorted = [{ ...sorted[0], span: 'col-span-2 desktop:col-span-8' }]
-  }
+  const sorted = visible
+    .sort((a, b) => sizeWeight[b.size] - sizeWeight[a.size])
+    .map((card) => (card.hero ? { ...card, span: 'col-span-2 desktop:col-span-8' } : card))
 
   // Filter extra cards for the active filter
   const matchingExtras = extraCards.value[activeFilter.value]
@@ -418,6 +416,7 @@ const filteredCards = computed<GridCard[]>(() => {
         extraKey: activeFilter.value,
         focusable: extra.size === 'md' && !extra.link,
         group: [activeFilter.value],
+        hero: extra.hero,
         id: `extra_${activeFilter.value}_${idx}`,
         images: extra.images,
         imageUrl:
@@ -426,8 +425,9 @@ const filteredCards = computed<GridCard[]>(() => {
         lightbox: extra.lightbox,
         link: extra.link,
         size: extra.size || 'sm',
-        span:
-          extra.size === 'sm'
+        span: extra.hero
+          ? 'col-span-2 desktop:col-span-8'
+          : extra.size === 'sm'
             ? 'col-span-1 desktop:col-span-2'
             : 'col-span-2 desktop:col-span-4 cursor-pointer',
         title: extra.title || '',

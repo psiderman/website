@@ -10,6 +10,7 @@ export interface ExtraCard {
   cover?: string
   coverVid?: string
   description?: string
+  hero?: boolean
   images?: string[]
   lightbox?: boolean
   link?: string

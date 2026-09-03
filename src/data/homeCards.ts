@@ -16,6 +16,7 @@ export interface Card {
   carousel?: boolean
   content?: Component
   group: FilterGroupId[]
+  hero?: boolean
   id: string
   images?: string[]
   imageUrl?: string
@@ -30,6 +31,7 @@ export const cards: Card[] = [
     arrow: 'external',
     content: FoursightCardContent,
     group: ['personal_finance'],
+    hero: true,
     id: 'foursight',
     link: 'https://foursight.money/about',
     size: 'lg',
@@ -40,6 +42,7 @@ export const cards: Card[] = [
     arrow: 'none',
     content: WorkCardContent,
     group: ['work'],
+    hero: true,
     id: 'work',
     size: 'lg',
     span: 'desktop:col-span-5 col-span-2',
@@ -116,7 +119,7 @@ export const cards: Card[] = [
   {
     arrow: 'external',
     bgClass: 'bg-[#1ED760] dark:bg-linear-0 from-dark/50 to-dark/50',
-    group: ['music'],
+    group: [],
     id: 'playlists',
     imageUrl: new URL('../assets/home/spotify.webp', import.meta.url).href,
     link: 'https://links.psiderman.com/playlists',
