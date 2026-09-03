@@ -18,7 +18,7 @@ export interface Card {
   group: FilterGroupId[]
   hero?: boolean
   id: string
-  images?: string[]
+  images?: Array<string | { placeholder?: string; src: string }>
   imageUrl?: string
   link?: string
   size: 'lg' | 'md' | 'sm'

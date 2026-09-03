@@ -103,6 +103,7 @@
 <script setup lang="ts">
 import ContactForm from '@/components/home/ContactForm.vue'
 import { openPhotoLightbox } from '@/composables/useGlobal'
+import { getStorageUrl } from '@/supabase'
 
 const GAME_CAPTIONS: Record<string, string> = {
   arkham:
@@ -116,17 +117,13 @@ const GAME_CAPTIONS: Record<string, string> = {
   valo: "it's the one game that i'm not great at, but i love playing. there's always the one.",
 }
 
-const gameImages = Object.entries(
-  import.meta.glob<string>('@/assets/gaming/*.{webp,jpg,jpeg,png}', {
-    eager: true,
-    import: 'default',
-  }),
-)
-  .map(([path, url]) => {
-    const name = (path.split('/').pop() ?? path).replace(/\.(?:webp|jpg|jpeg|png)$/i, '')
-    return { caption: GAME_CAPTIONS[name] || name, name, url }
-  })
-  .sort((a, b) => a.name.localeCompare(b.name))
+const GAME_NAMES = ['arkham', 'budokai', 'hitman3', 'lis', 'spiderman', 'valo']
+
+const gameImages = GAME_NAMES.map((name) => ({
+  caption: GAME_CAPTIONS[name] || name,
+  name,
+  url: getStorageUrl('webp', 'gaming', `${name}.webp`),
+}))
 
 const PC_SPECS: Record<string, { alt: string; title: string }> = {
   corsair: {
@@ -147,14 +144,11 @@ const PC_SPECS: Record<string, { alt: string; title: string }> = {
   },
 }
 
-const pcImages = Object.entries(
-  import.meta.glob<string>('@/assets/gaming/pc/*.{jpeg,jpg,png,webp}', {
-    eager: true,
-    import: 'default',
-  }),
-).map(([path, url]) => ({
-  name: (path.split('/').pop() ?? path).replace(/\.(?:jpeg|jpg|png|webp)$/i, ''),
-  url,
+const PC_PART_NAMES = ['corsair', 'gigabyte', 'intel', 'nvidia']
+
+const pcImages = PC_PART_NAMES.map((name) => ({
+  name,
+  url: getStorageUrl('webp', 'gaming/pc', `${name}.webp`),
 }))
 
 const pcSetup = {
@@ -168,7 +162,7 @@ const pcSetup = {
   pc: {
     alt: 'pc setup',
     title: "this picture was taken before i got my playstation, but it's here in spirit.",
-    url: pcImages.find((i) => i.name === 'pc')?.url ?? '',
+    url: getStorageUrl('webp', 'gaming/pc', 'pc.webp'),
   },
 }
 

@@ -372,6 +372,7 @@ interface GridCard extends Card {
   extraIndex?: number
   extraKey?: string
   focusable?: boolean
+  images?: Array<string | { placeholder?: string; src: string }>
   isError?: boolean
   isExtra?: boolean
   isLoading?: boolean
@@ -420,7 +421,8 @@ const filteredCards = computed<GridCard[]>(() => {
         id: `extra_${activeFilter.value}_${idx}`,
         images: extra.images,
         imageUrl:
-          extra.cover || (extra.images && extra.images.length > 0 ? extra.images[0] : undefined),
+          extra.cover ||
+          (extra.images && extra.images.length > 0 ? toImgUrl(extra.images[0]) : undefined),
         isExtra: true,
         lightbox: extra.lightbox,
         link: extra.link,
@@ -440,16 +442,26 @@ const filteredCards = computed<GridCard[]>(() => {
   return sorted
 })
 
+type ExtraImg = string | { placeholder?: string; src: string }
+
 function openCarouselPhotoLightbox(extra: ExtraCard, startIndex = 0) {
   if (!extra.images || extra.images.length === 0) return
   openPhotoLightbox(
-    extra.images.map((url, i) => ({
+    extra.images.map((img, i) => ({
       caption: extra.captions?.[i] || undefined,
-      thumbnailUrl: url,
-      url,
+      thumbnailUrl: toImgThumb(img),
+      url: toImgUrl(img),
     })),
     { initialIndex: startIndex, title: extra.title || '' },
   )
+}
+
+function toImgThumb(img: ExtraImg): string {
+  return typeof img === 'string' ? img : img.placeholder || img.src
+}
+
+function toImgUrl(img: ExtraImg): string {
+  return typeof img === 'string' ? img : img.src
 }
 
 const handleCarouselClick = (card: GridCard, idx: number) => {
@@ -470,7 +482,9 @@ const handleCardClick = (card: GridCard) => {
       } else {
         openLightbox({
           description: extra.description || '',
-          images: extra.images?.map((url) => ({ clearance: 'public' as const, url })) || [],
+          images:
+            extra.images?.map((img) => ({ clearance: 'public' as const, url: toImgUrl(img) })) ||
+            [],
           tags: extra.tags,
           title: extra.title || '',
           videos: extra.videos || [],

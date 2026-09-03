@@ -12,6 +12,7 @@
         v-if="isOpen"
         class="bg-overlay fixed inset-0 z-100 flex items-center justify-center backdrop-blur-xs"
         @click.self="emit('close')"
+        @keypress.esc="emit('close')"
       >
         <div class="flex flex-col items-center justify-center gap-6 p-6">
           <WishCircle v-model:popping="popping" hint size="lg" @wished="emit('wished')" />

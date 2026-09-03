@@ -80,7 +80,7 @@ import CarouselIndicator from '../CarouselIndicator.vue'
 import GenericLoader from '../GenericLoader.vue'
 
 const props = defineProps<{
-  images?: string[]
+  images?: Array<string | { placeholder?: string; src: string }>
   interactive?: boolean
   isError?: boolean
   isLoading?: boolean

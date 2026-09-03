@@ -11,7 +11,7 @@ export interface ExtraCard {
   coverVid?: string
   description?: string
   hero?: boolean
-  images?: string[]
+  images?: Array<string | { placeholder: string; src: string }>
   lightbox?: boolean
   link?: string
   size: 'md' | 'sm'
@@ -22,6 +22,19 @@ export interface ExtraCard {
 }
 
 export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
+  music: [
+    {
+      size: 'md',
+      title: 'covers from 2019',
+    },
+    {
+      bgClass: 'bg-[#1ED760] dark:bg-linear-0 from-dark/50 to-dark/50',
+      cover: new URL('../assets/home/spotify.webp', import.meta.url).href,
+      link: 'https://links.psiderman.com/playlists',
+      size: 'sm',
+      title: 'playlists',
+    },
+  ],
   personal_finance: [
     {
       bgClass: 'bg-orange-500',
@@ -44,9 +57,10 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
         'le cheval a bougé',
       ],
       carousel: true,
-      images: Array.from({ length: 8 }, (_, i) =>
-        getStorageUrl('webp', 'dad_paris', `${i + 1}.webp`),
-      ),
+      images: Array.from({ length: 8 }, (_, i) => ({
+        placeholder: getStorageUrl('webp', 'thumbs', 'dad_paris', `${i + 1}.webp`),
+        src: getStorageUrl('webp', 'dad_paris', `${i + 1}.webp`),
+      })),
       lightbox: true,
       size: 'md',
       title: 'dad in paris (25 yrs later)',
@@ -70,9 +84,10 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
         'roppong, tokyo, fujifilm ace',
       ],
       carousel: true,
-      images: Array.from({ length: 15 }, (_, i) =>
-        getStorageUrl('webp', 'japan_film', `${i + 1}.webp`),
-      ),
+      images: Array.from({ length: 15 }, (_, i) => ({
+        placeholder: getStorageUrl('webp', 'thumbs', 'japan_film', `${i + 1}.webp`),
+        src: getStorageUrl('webp', 'japan_film', `${i + 1}.webp`),
+      })),
       lightbox: true,
       size: 'md',
       title: 'japan on film',
@@ -93,9 +108,10 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
         'inner city, budapest',
       ],
       carousel: true,
-      images: Array.from({ length: 12 }, (_, i) =>
-        getStorageUrl('webp', 'ist_bud', `${i + 1}.webp`),
-      ),
+      images: Array.from({ length: 12 }, (_, i) => ({
+        placeholder: getStorageUrl('webp', 'thumbs', 'ist_bud', `${i + 1}.webp`),
+        src: getStorageUrl('webp', 'ist_bud', `${i + 1}.webp`),
+      })),
       lightbox: true,
       size: 'md',
       title: 'olympus superzoom 80g + kodak ultramax 400',
@@ -103,13 +119,13 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
   ],
   work: [
     {
-      cover: new URL('../assets/work/dweb/00.webp', import.meta.url).href,
+      cover: getStorageUrl('webp', 'work/dweb/00.webp'),
       description:
         'Dezerv paid a multi-crore license every year for a third-party desktop tool built for the average wealth manager. I replaced it with a desktop experience built on Dezerv’s own design language — shipped after I left, and now used by clients and RMs both.',
       images: [
-        new URL('../assets/work/dweb/01.webp', import.meta.url).href,
-        new URL('../assets/work/dweb/02.webp', import.meta.url).href,
-        new URL('../assets/work/dweb/03.webp', import.meta.url).href,
+        getStorageUrl('webp', 'work/dweb/01.webp'),
+        getStorageUrl('webp', 'work/dweb/02.webp'),
+        getStorageUrl('webp', 'work/dweb/03.webp'),
       ],
       size: 'md',
       tags: [
@@ -120,14 +136,14 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       title: 'Dezerv Web',
     },
     {
-      cover: new URL('../assets/work/prspr/00.webp', import.meta.url).href,
+      cover: getStorageUrl('webp', 'work/prspr/00.webp'),
       description:
         'Four products, three-plus codebases, two color schemes, zero shared vocabulary. I rebuilt Dezerv’s design foundations from the ground up — one token system, one typography scale, one icon system — and the plugin pipeline that kept it in sync with engineering.',
       images: [
-        new URL('../assets/work/prspr/01.webp', import.meta.url).href,
-        new URL('../assets/work/prspr/02.webp', import.meta.url).href,
-        new URL('../assets/work/prspr/03.webp', import.meta.url).href,
-        new URL('../assets/work/prspr/04.webp', import.meta.url).href,
+        getStorageUrl('webp', 'work/prspr/01.webp'),
+        getStorageUrl('webp', 'work/prspr/02.webp'),
+        getStorageUrl('webp', 'work/prspr/03.webp'),
+        getStorageUrl('webp', 'work/prspr/04.webp'),
       ],
       size: 'md',
       tags: [
@@ -138,14 +154,14 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       title: 'Prosper',
     },
     {
-      cover: new URL('../assets/work/qtcs/00.webp', import.meta.url).href,
+      cover: getStorageUrl('webp', 'work/qtcs/00.webp'),
       description:
         'At the time of writing this, there are sixteen ways to ask a question on Quizizz. Between 2021 and 2023, we added 12 new question types, of which I designed 9, and led the designs for 3 more.',
       images: [
-        new URL('../assets/work/qtcs/01.webp', import.meta.url).href,
-        new URL('../assets/work/qtcs/02.webp', import.meta.url).href,
-        new URL('../assets/work/qtcs/03.webp', import.meta.url).href,
-        new URL('../assets/work/qtcs/04.webp', import.meta.url).href,
+        getStorageUrl('webp', 'work/qtcs/01.webp'),
+        getStorageUrl('webp', 'work/qtcs/02.webp'),
+        getStorageUrl('webp', 'work/qtcs/03.webp'),
+        getStorageUrl('webp', 'work/qtcs/04.webp'),
       ],
       size: 'md',
       tags: [
@@ -156,13 +172,13 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       title: 'Question Types',
     },
     {
-      cover: new URL('../assets/work/ds/00.webp', import.meta.url).href,
+      cover: getStorageUrl('webp', 'work/ds/00.webp'),
       description:
         'I created and maintained three iterations of the design system in Figma+Code to be used by 16 designers and 50+ engineers.',
       images: [
-        new URL('../assets/work/ds/01.webp', import.meta.url).href,
-        new URL('../assets/work/ds/02.webp', import.meta.url).href,
-        new URL('../assets/work/ds/03.webp', import.meta.url).href,
+        getStorageUrl('webp', 'work/ds/01.webp'),
+        getStorageUrl('webp', 'work/ds/02.webp'),
+        getStorageUrl('webp', 'work/ds/03.webp'),
       ],
       size: 'md',
       tags: [
@@ -173,13 +189,13 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       title: 'Chalkboard',
     },
     {
-      cover: new URL('../assets/work/lessons/01.webp', import.meta.url).href,
+      cover: getStorageUrl('webp', 'work/lessons/01.webp'),
       description:
         'Two designers and a handful of engineers launched this product in under a month or two.',
       images: [
-        new URL('../assets/work/lessons/02.webp', import.meta.url).href,
-        new URL('../assets/work/lessons/03.webp', import.meta.url).href,
-        new URL('../assets/work/lessons/04.gif', import.meta.url).href,
+        getStorageUrl('webp', 'work/lessons/02.webp'),
+        getStorageUrl('webp', 'work/lessons/03.webp'),
+        getStorageUrl('webp', 'work/lessons/04.gif'),
       ],
       size: 'md',
       tags: [
@@ -194,46 +210,46 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       videos: [getStorageUrl('mp4', 'lesson_promo.mp4')],
     },
     {
-      coverVid: new URL('../assets/work/shots/button.mp4', import.meta.url).href,
+      coverVid: getStorageUrl('mp4', 'button.mp4'),
       size: 'md',
       title: 'Skeuomorphic Button',
-      videos: [new URL('../assets/work/shots/button.mp4', import.meta.url).href],
+      videos: [getStorageUrl('mp4', 'button.mp4')],
     },
     {
-      coverVid: new URL('../assets/work/shots/calc.mp4', import.meta.url).href,
+      coverVid: getStorageUrl('mp4', 'calc.mp4'),
       size: 'md',
       title: 'Math Input',
-      videos: [new URL('../assets/work/shots/calc.mp4', import.meta.url).href],
+      videos: [getStorageUrl('mp4', 'calc.mp4')],
     },
     {
-      coverVid: new URL('../assets/work/shots/owensans.mp4', import.meta.url).href,
+      coverVid: getStorageUrl('mp4', 'owensans.mp4'),
       size: 'md',
       title: 'Owen Sans',
-      videos: [new URL('../assets/work/shots/owensans.mp4', import.meta.url).href],
+      videos: [getStorageUrl('mp4', 'owensans.mp4')],
     },
     {
-      coverVid: new URL('../assets/work/shots/graphing.mp4', import.meta.url).href,
+      coverVid: getStorageUrl('mp4', 'graphing.mp4'),
       size: 'md',
       title: 'Graphing In-Product Education',
-      videos: [new URL('../assets/work/shots/graphing.mp4', import.meta.url).href],
+      videos: [getStorageUrl('mp4', 'graphing.mp4')],
     },
     {
-      coverVid: new URL('../assets/work/shots/kiwi.mp4', import.meta.url).href,
+      coverVid: getStorageUrl('mp4', 'kiwi.mp4'),
       size: 'md',
       title: 'Kiwi Personal Finance',
-      videos: [new URL('../assets/work/shots/kiwi.mp4', import.meta.url).href],
+      videos: [getStorageUrl('mp4', 'kiwi.mp4')],
     },
     {
-      cover: new URL('../assets/work/shots/cmd.webp', import.meta.url).href,
-      images: [new URL('../assets/work/shots/cmd.webp', import.meta.url).href],
+      cover: getStorageUrl('webp', 'work/shots/cmd.webp'),
+      images: [getStorageUrl('webp', 'work/shots/cmd.webp')],
       size: 'md',
       title: 'Cmd F*ck off Laptop Stickers',
     },
     {
-      coverVid: new URL('../assets/work/shots/psiderman.com.mp4', import.meta.url).href,
+      coverVid: getStorageUrl('mp4', 'psiderman.com.mp4'),
       size: 'md',
       title: 'Old Portfolio',
-      videos: [new URL('../assets/work/shots/psiderman.com.mp4', import.meta.url).href],
+      videos: [getStorageUrl('mp4', 'psiderman.com.mp4')],
     },
   ],
 }

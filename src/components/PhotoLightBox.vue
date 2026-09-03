@@ -212,8 +212,9 @@ import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import TheListIndicator from '@/components/TheListIndicator.vue'
 import { photoLightBoxData } from '@/composables/useGlobal'
 import { isHighClearance, useTravelsWithImages } from '@/composables/useTravel'
-import type { GalleryImage } from '@/types'
 import { trackEvent } from '@/utils/analytics'
+
+import type { GalleryImage } from '@/types'
 
 const props = withDefaults(
   defineProps<{

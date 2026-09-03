@@ -88,7 +88,10 @@ async function listNowBucket(): Promise<RemoteNowEntry[]> {
 
       const images: NowGalleryImage[] = files
         .filter((f) => IMAGE_EXT.test(f.name))
-        .map((f) => ({ name: f.name, url: getStorageUrl('now', slug, f.name) }))
+        .map((f) => ({
+          name: f.name,
+          url: getStorageUrl('now', slug, f.name),
+        }))
         .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
         .map((img, idx) => ({ caption: parsed?.captions[idx] ?? '', ...img }))
 
