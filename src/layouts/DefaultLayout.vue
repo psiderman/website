@@ -30,7 +30,7 @@ import GlobalFooter from '@/components/GlobalFooter.vue'
 import GlobalHeader from '@/components/HeaderBar.vue'
 import LightBox from '@/components/LightBox.vue'
 import LiveCursors from '@/components/LiveCursors.vue'
-import PhotoLightBox from '@/components/PhotoLightBox.vue'
+import PhotoLightBox from '@/components/photo-lightbox/PhotoLightBox.vue'
 import WorkModal from '@/components/WorkModal.vue'
 import { isAuthModalOpen } from '@/composables/useAuth'
 import {
