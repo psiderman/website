@@ -31,19 +31,19 @@ export const extraCards: Partial<Record<FilterGroupId, ExtraCard[]>> = {
       title: 'talk foursight?',
     },
   ],
-  music: [
-    {
-      size: 'md',
-      title: 'covers from 2019',
-    },
-    {
-      bgClass: 'bg-[#1ED760] dark:bg-linear-0 from-dark/50 to-dark/50',
-      cover: new URL('../assets/home/spotify.webp', import.meta.url).href,
-      link: 'https://links.psiderman.com/playlists',
-      size: 'sm',
-      title: 'playlists',
-    },
-  ],
+  // music: [
+  //   {
+  //     size: 'md',
+  //     title: 'covers from 2019',
+  //   },
+  //   {
+  //     bgClass: 'bg-[#1ED760] dark:bg-linear-0 from-dark/50 to-dark/50',
+  //     cover: new URL('../assets/home/spotify.webp', import.meta.url).href,
+  //     link: 'https://links.psiderman.com/playlists',
+  //     size: 'sm',
+  //     title: 'playlists',
+  //   },
+  // ],
   travel: [
     {
       captions: [

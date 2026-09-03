@@ -52,7 +52,7 @@ export const workHistory: WorkDetail[] = [
         'I started my contribution to the product by designing the experience for tracking National Pension Scheme investments on the Wealth Monitor app.',
         'After that, I rebuilt the design infrastructure connecting four fragmented products, then used it to ship Dezerv Web, a desktop platform used by both clients and Relationship Managers.',
       ],
-      galleryImages: [{ src: '4.webp' }, { src: '3.webp' }, { src: '2.webp' }, { src: '1.webp' }],
+      galleryImages: [{ src: '3.webp' }, { src: '2.webp' }, { src: '1.webp' }, { src: '4.webp' }],
       projects: [
         { link: 'https://links.psiderman.com/dezerv-web-case-study', name: 'Dezerv Web' },
         { link: 'https://links.psiderman.com/prosper-case-study', name: 'Prosper Design System' },

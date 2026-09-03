@@ -35,7 +35,6 @@
                 v-for="travel in travelsByYear[year]"
                 :key="travel.slug"
                 :ref="(el) => setCardRef(el, travel.slug)"
-                v-reveal
                 class="border-border-primary bg-surface-primary desktop:h-fit noscrollbar desktop:w-full desktop:snap-start desktop:scroll-mt-14 pointer-events-auto flex h-80 w-[90svw] snap-center snap-always flex-col overflow-y-scroll rounded-xl border p-0 transition-colors duration-200"
                 :class="[currentUser?.id ? 'cursor-pointer hover:shadow-xs' : '']"
                 :data-sync="travel.slug"
