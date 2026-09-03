@@ -18,7 +18,7 @@ export default async function handler(req: any, res: any) {
 
   try {
     const recentlyPlayed = await fetch(
-      'https://api.spotify.com/v1/me/player/recently-played?limit=25',
+      'https://api.spotify.com/v1/me/player/recently-played?limit=50',
       { headers: { Authorization: `Bearer ${access_token}` } },
     )
 
