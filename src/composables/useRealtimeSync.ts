@@ -1,4 +1,5 @@
 import { currentUser, currentUserRole } from '@/composables/useAuth'
+import { LIVE_TABLES } from '@/liveContent'
 import { queryClient } from '@/queryClient'
 import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
@@ -38,7 +39,7 @@ const scheduleRetry = () => {
 let pending: Array<null | string> = []
 let flushTimer: null | ReturnType<typeof setTimeout> = null
 
-const scheduleInvalidate = (keys: Array<null | string>) => {
+const scheduleInvalidate = (keys: ReadonlyArray<null | string>) => {
   for (const key of keys) {
     if (!pending.includes(key)) pending.push(key)
   }
@@ -60,94 +61,56 @@ const scheduleInvalidate = (keys: Array<null | string>) => {
 export function initRealtimeSync(): RealtimeChannel {
   if (syncChannel) return syncChannel
   syncChannel = buildSyncChannel()
+
+  // A degraded/idle channel never recovers on its own (retries are capped).
+  // Any network hiccup — a backgrounded tab, sleep, a dropped socket — can
+  // leave realtime permanently dead for the rest of the session. Re-arm on
+  // foregrounding so invalidations keep flowing.
+  if (typeof window !== 'undefined') {
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') rearmRealtimeSync()
+    })
+    window.addEventListener('focus', rearmRealtimeSync)
+  }
+
   return syncChannel
 }
 
 function buildSyncChannel(): RealtimeChannel {
+  syncChannel = supabase.channel('public-db-changes')
 
-  syncChannel = supabase
-    .channel('public-db-changes')
-    .on(
+  // One handler per live table, registered off the single registry in
+  // @/liveContent — add a table there and its realtime invalidation appears
+  // here automatically.
+  for (const { keys, table } of LIVE_TABLES) {
+    syncChannel = syncChannel.on(
       'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'trips',
-      },
-      () => {
-        scheduleInvalidate([
-          ...queryKeys.travel.trips,
-          ...queryKeys.travel.tripsWithImages,
-          ...queryKeys.admin.trips,
-        ])
-      },
+      { event: '*', schema: 'public', table },
+      () => scheduleInvalidate(keys),
     )
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'blog',
-      },
-      () => {
-        scheduleInvalidate([
-          ...queryKeys.blog.list,
-          ...queryKeys.blog.postBase,
-          ...queryKeys.blog.contentBase,
-        ])
-      },
-    )
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'guestbook',
-      },
-      () => {
-        scheduleInvalidate([...queryKeys.guestbook.list, ...queryKeys.admin.guestbook])
-      },
-    )
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'work_people',
-      },
-      () => {
-        scheduleInvalidate([...queryKeys.workPeople.list, ...queryKeys.admin.workPeople])
-      },
-    )
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'quotes',
-      },
-      () => {
-        scheduleInvalidate([...queryKeys.quotes, ...queryKeys.admin.quotes])
-      },
-    )
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'user_roles',
-      },
-      (payload) => {
-        const record = payload.new as null | { role?: string; user_id?: string }
-        const isCurrentUser = currentUser.value?.id && record?.user_id === currentUser.value.id
-        if (isCurrentUser && record?.role && record.role !== currentUserRole.value) {
-          currentUserRole.value = record.role
-          scheduleInvalidate([null])
-        }
-        scheduleInvalidate([...queryKeys.admin.userRoles])
-      },
-    )
-    .subscribe((status, err) => {
+  }
+
+  // The user_roles handler doubles as the in-session role-mirror: a role
+  // change on the CURRENT user updates our role ref + nukes the whole cache.
+  syncChannel = syncChannel.on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'user_roles',
+    },
+    (payload) => {
+      const record = payload.new as null | { role?: string; user_id?: string }
+      const isCurrentUser = currentUser.value?.id && record?.user_id === currentUser.value.id
+      if (isCurrentUser && record?.role && record.role !== currentUserRole.value) {
+        currentUserRole.value = record.role
+        scheduleInvalidate([null])
+      }
+      scheduleInvalidate([...queryKeys.admin.userRoles])
+    },
+  )
+
+  syncChannel = syncChannel.subscribe((status, err) => {
       if (status === 'SUBSCRIBED') {
         attempts = 0
         return
@@ -164,4 +127,22 @@ function buildSyncChannel(): RealtimeChannel {
     })
 
   return syncChannel
+}
+
+/**
+ * Drop any channel that isn't actively subscribed and rebuild it. Resets the
+ * retry budget so a permanently-idled channel gets another chance.
+ */
+function rearmRealtimeSync(): void {
+  attempts = 0
+  if (syncChannel && syncChannel.state === 'joined') return
+  if (retryTimer) {
+    clearTimeout(retryTimer)
+    retryTimer = null
+  }
+  if (syncChannel) {
+    syncChannel.unsubscribe()
+    syncChannel = null
+  }
+  syncChannel = buildSyncChannel()
 }

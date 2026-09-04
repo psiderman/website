@@ -1,6 +1,7 @@
 import { experimental_createQueryPersister } from '@tanstack/query-persist-client-core'
 import { QueryCache, QueryClient } from '@tanstack/vue-query'
 
+import { LIVE_PUBLIC_PREFIXES } from '@/liveContent'
 import { queryKeys } from '@/queryKeys'
 import { supabase } from '@/supabase'
 
@@ -35,6 +36,8 @@ function isAdminKey(key: string): boolean {
   return key.startsWith('admin')
 }
 
+const BUSTER = '1'
+
 const persister = experimental_createQueryPersister({
   filters: {
     predicate: (query) => {
@@ -43,6 +46,31 @@ const persister = experimental_createQueryPersister({
     },
   },
   maxAge: 1000 * 60 * 60 * 12, // 12 hours
+  storage: window.localStorage,
+})
+
+// Real live-content tables (blog, trips, trip_images, guestbook, quotes,
+// work_people — see @/liveContent) are the only queries that can change while
+// someone is looking at the site, and the only actor that ever changes them
+// is this site itself via realtime/publication. So for those:
+//   - a LONG staleTime: time never makes them stale; if nothing changed, the
+//     cache is simply right. Realtime invalidation is the only refresh.
+//   - refetchOnRestore: 'always': realtime events don't replay across reloads,
+//     so a restored localStorage snapshot ALWAYS re-fetches before painting.
+//     This is the load-bearing guarantee: a month-long staleTime must never
+//     mean "reload shows a pre-edit blob."
+// Bump BUSTER above whenever a query shape changes (new column, renamed key)
+// to hard-drop stale persisted snapshots on deploy.
+const livePersister = experimental_createQueryPersister({
+  buster: BUSTER,
+  filters: {
+    predicate: (query) => {
+      const key = query.queryKey[0]
+      return typeof key === 'string' && LIVE_PUBLIC_PREFIXES.includes(key)
+    },
+  },
+  maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+  refetchOnRestore: 'always',
   storage: window.localStorage,
 })
 
@@ -109,3 +137,11 @@ adminKeys.forEach((key) => {
     staleTime: 0,
   })
 })
+
+// Live content: long single staleTime, restore-then-refetch persister.
+for (const key of LIVE_PUBLIC_PREFIXES) {
+  queryClient.setQueryDefaults([key], {
+    persister: livePersister.persisterFn,
+    staleTime: 1000 * 60 * 60 * 24 * 30, // 30 days (cache lives until an event says otherwise)
+  })
+}
