@@ -2,7 +2,6 @@
   "recommendations": [
     "github.vscode-pull-request-github",
     "henrikdev.ag-quota",
-    "formulahendry.auto-rename-tag",
     "catppuccin.catppuccin-vsc",
     "catppuccin.catppuccin-vsc-icons",
     "usernamehw.errorlens",
@@ -17,12 +16,8 @@
     "esbenp.prettier-vscode",
     "mechatroner.rainbow-csv",
     "bradlc.vscode-tailwindcss",
-    "gruntfuggly.todo-tree",
     "ms-vscode.vscode-typescript-tslint-plugin",
-    "tomoki1207.pdf",
     "tonybaloney.vscode-pets",
-    "streetsidesoftware.code-spell-checker",
-    "stylelint.vscode-stylelint",
     "vue.volar",
     "redhat.vscode-xml",
     "redhat.vscode-yaml"
